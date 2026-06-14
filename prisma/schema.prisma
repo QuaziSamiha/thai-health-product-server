@@ -1,0 +1,421 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  SUPER_ADMIN
+  MANAGER
+  MARKETING
+  SUPPORT
+  EMPLOYEE
+  VENDOR
+  WAREHOUSE
+  DELIVERY_PARTNER
+  CUSTOMER
+  GUEST
+}
+
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+  FACEBOOK
+  APPLE
+}
+
+enum UserStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  BLOCKED
+  DEACTIVATED
+  ARCHIVED
+}
+
+enum OTPType {
+  SIGNUP
+  PASSWORD_RESET
+  LOGIN_2FA
+  PHONE_CHANGE
+}
+
+enum CategoryProductStatus {
+  ACTIVE
+  INACTIVE
+  DRAFT
+  ARCHIVED
+  HIDDEN
+}
+
+enum ProductType {
+  SIMPLE
+  VARIABLE
+  COMBO
+}
+
+enum DiscountType {
+  FIXED
+  PERCENTAGE
+}
+
+enum StockStatus {
+  IN_STOCK
+  OUT_OF_STOCK
+  LOW_STOCK
+}
+
+enum InventoryExchangeType {
+  ADD
+  RESTOCK
+  SALE
+  RETURN
+  ADJUSTMENT
+  DAMAGE
+  EXPIRED
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  sid      String  @unique @default(uuid()) @map("user_sid") @db.Uuid // Use native UUID type for performance
+  email    String  @unique
+  password String? // Null for OAuth
+  phone    String? @db.VarChar(20)
+
+  // Enums
+  role         UserRole     @default(CUSTOMER)
+  status       UserStatus   @default(PENDING_VERIFICATION)
+  authProvider AuthProvider @default(EMAIL)
+  providerId   String? // OAuth ID
+
+  // Timestamps
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  lastLoginAt DateTime? @map("last_login_at")
+
+  // Relations
+  profile           Profile?
+  security          UserSecurity?
+  sessions          Session[] // Replaces single refreshToken for multi-device support
+  otps              OTP[]
+  createdCategories Category[]    @relation("CategoryCreatedBy")
+  updatedCategories Category[]    @relation("CategoryUpdatedBy")
+  createdProducts   Product[]     @relation("ProductCreatedBy")
+  updatedProducts   Product[]     @relation("ProductUpdatedBy")
+  deletedProducts   Product[]     @relation("ProductDeletedBy")
+  inventories       Inventory[]
+
+  @@index([email, phone])
+  @@map("users")
+}
+
+model Profile {
+  id          Int       @id @default(autoincrement())
+  firstName   String    @db.VarChar(100)
+  lastName    String?   @db.VarChar(100)
+  name        String?   @db.VarChar(200)
+  avatarUrl   String? // One source of truth for the image
+  bio         String?   @db.Text
+  dateOfBirth DateTime?
+  gender      String?   @db.VarChar(20)
+
+  metadata Json? @default("{}")
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @unique @map("user_id")
+
+  @@index([firstName, lastName])
+  @@map("profiles")
+}
+
+model UserSecurity {
+  id              Int       @id @default(autoincrement())
+  isEmailVerified Boolean   @default(false)
+  emailVerifiedAt DateTime?
+
+  // Multi-step Auth logic
+  verificationToken        String?
+  verificationTokenExpires DateTime?
+  resetToken               String?
+  resetTokenExpires        DateTime?
+
+  // Security Logs
+  loginAttempts Int     @default(0)
+  lastLoginIp   String?
+  assignedIp    String? // For internal/vendor restricted access
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @unique @map("user_id")
+
+  @@map("user_security")
+}
+
+model Session {
+  id                    Int      @id @default(autoincrement())
+  refreshToken          String   @unique @db.Text
+  refreshTokenExpiresAt DateTime
+  createdAt             DateTime @default(now())
+  userAgent             String?
+  ipAddress             String?
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  @@map("sessions")
+}
+
+model OTP {
+  id        Int      @id @default(autoincrement())
+  code      String // Hashed code for security
+  type      OTPType
+  expiresAt DateTime @map("expires_at")
+  isUsed    Boolean  @default(false) @map("is_used")
+
+  // To identify the target
+  identifier String // * email or phone number
+
+  userId Int?  @map("user_id") // Optional for guest checkouts
+  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([identifier])
+  @@map("otps")
+}
+
+// * =========== CATEGORY MODEL ============
+model Category {
+  id     Int                   @id @default(autoincrement())
+  sid    String                @unique @default(uuid()) @db.Uuid // * Use native UUID type for performance
+  status CategoryProductStatus @default(ACTIVE)
+
+  //* PRIMARY CONTENT (ENGLISH & GLOBAL SLUG)
+  name        String  @db.VarChar(255)
+  slug        String  @unique @db.VarChar(255) //* GLOBAL SEARCH IDENTIFIER
+  description String? @db.Text
+
+  //* SECONDARY CONTENT (THAI DISPLAY ONLY)
+  nameTh        String? @db.VarChar(255)
+  descriptionTh String? @db.Text
+
+  //* HIERARCHY MANAGEMENT
+  parentId Int?
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: NoAction)
+  children Category[] @relation("CategoryHierarchy")
+  level    Int        @default(0)
+
+  //* OPTIMIZED IMAGES
+  thumbnailUrl String? @db.VarChar(512)
+  bannerUrl    String? @db.VarChar(512)
+  iconUrl      String? @db.VarChar(512)
+
+  //* UI & SEO METADATA
+  displayOrder Int     @default(0)
+  isFeatured   Boolean @default(false)
+  productCount Int     @default(0) //* DENORMALIZED FOR PERFORMANCE
+
+  metaTitle         String? @db.VarChar(255)
+  metaDescription   String? @db.Text
+  metaTitleTh       String? @db.VarChar(255)
+  metaDescriptionTh String? @db.Text
+
+  //* AUDIT TRAIL & TIMESTAMPS
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //* RELATINOS
+  createdBy     Int?
+  createdByUser User?     @relation("CategoryCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedBy     Int?
+  updatedByUser User?     @relation("CategoryUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  products      Product[]
+
+  //* INDEXING STRATEGY
+  @@index([slug]) //* PRIMARY INDEX FOR URL LOOKUPS
+  @@index([parentId, status]) //* FAST FETCHING OF ACTIVE SUB-CATEGORIES
+  @@index([status, isFeatured]) //* FAST FETCHING FOR "FEATURED" HOMEPAGE SECTIONS
+  @@index([displayOrder]) //* OPTIMIZED SORTING FOR MENUS/LISTS
+  @@map("categories")
+}
+
+// =========== PRODUCT MODEL ============
+model Product {
+  //* SEARCH & IDENTITY
+  id  Int    @id @default(autoincrement())
+  sid String @unique @default(uuid()) @db.Uuid //* Use native UUID type for performance
+
+  name             String  @unique @db.VarChar(255)
+  slug             String  @unique @db.VarChar(255)
+  sku              String? @unique @db.VarChar(100)
+  barcode          String? @unique @db.VarChar(100)
+  //* PRIMARY CONTENT (ENGLISH & GLOBAL SLUG)
+  description      String? @db.Text
+  shortDescription String? @db.VarChar(500) // Restricted for UI consistency
+
+  //* SECONDARY CONTENT (THAI DISPLAY)
+  nameTh        String? @db.VarChar(255)
+  descriptionTh String? @db.Text
+  shortDescTh   String? @db.VarChar(500)
+
+  //* CONFIGURATIONS
+  type        ProductType           @default(SIMPLE)
+  status      CategoryProductStatus @default(ACTIVE)
+  isFeatured  Boolean               @default(false)
+  hasVariants Boolean               @default(false) //* DERIVED FIELD TO READ FASTER (variants.length)
+
+  //* PRICING (USE DECIMAL FOR FINANCIAL ACCURACY)
+  basePrice    Decimal       @default(0) @db.Decimal(12, 2)
+  discountType DiscountType?
+  salePrice    Decimal?      @db.Decimal(12, 2) //* SALE PRICE
+  costPrice    Decimal?      @db.Decimal(12, 2) //* FOR PROFIT CALCULATION
+
+  //* STOCK 
+  quantity    Int         @default(0) // * TOTAL QUANTITY OF A PRODUCT WIHTOUT VARIANTS
+  totalStock  Int         @default(0) @map("total_stock") // * TOTAL QUANTITY ACROSS ALL VARIANTS -- Denormalized cache: Represents sum of all variant stock. Must be kept in sync via application logic or DB trigger.
+  stockStatus StockStatus @default(OUT_OF_STOCK)
+
+  // * PHYSICAL
+  weight     Decimal? @db.Decimal(10, 3) //* WEIGHT IN KG
+  dimensions Json?    @default("{}") //* STRUCTURED (LENGTH, WIDTH, HEIGHT) 
+
+  //* SEO METADATA
+  seoMetadata Json? @default("{}") //* Consolidating SEO fields for cleaner API: metaTitle,  metaDescription, metaTitleTh, metaDescriptionTh 
+
+  tags String[] //* POSTGRES NATIVE ARRAY SUPPORT
+
+  //* RELATIONS
+  categoryId    Int
+  category      Category         @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  images        ProductImage[]
+  variants      ProductVariant[]
+  inventoryLogs Inventory[]
+
+  //* AUDIT & TIMESTAMPS
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at") //* FOR SOFT DELETE
+  publishedAt DateTime? @map("published_at") //* This allows for scheduled launches draft vs live
+
+  createdBy     Int?  @map("created_by")
+  createdByUser User? @relation("ProductCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedBy     Int?  @map("updated_by")
+  updatedByUser User? @relation("ProductUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  deletedBy     Int?  @map("deleted_by")
+  deletedByUser User? @relation("ProductDeletedBy", fields: [deletedBy], references: [id], onDelete: SetNull)
+
+  @@index([stockStatus])
+  @@index([status, type, publishedAt]) //* Fast filtering for shop listing
+  @@index([categoryId, status]) //* Optimized category browsing
+  @@index([status, isFeatured]) //* Homepage performance
+  @@index([createdAt]) //* Sorting by "Newest"
+  @@map("products")
+}
+
+// =========== PRODUCT VARIANT MODEL ============
+model ProductVariant {
+  id               Int     @id @default(autoincrement())
+  //* PRIMARY CONTENT (ENGLISH & GLOBAL SLUG)
+  name             String  @unique @db.VarChar(255)
+  slug             String  @unique @db.VarChar(255)
+  description      String? @db.Text
+  shortDescription String? @db.Text
+
+  //* SECONDARY CONTENT (THAI DISPLAY)
+  nameTh        String? @db.VarChar(255)
+  descriptionTh String? @db.Text
+  shortDescTh   String? @db.Text
+
+  //* STOCK & LOGISTICS
+  sku         String?     @unique @db.VarChar(100)
+  barcode     String?     @db.VarChar(100)
+  quantity    Int         @default(0)
+  stockStatus StockStatus @default(OUT_OF_STOCK)
+  weight      Decimal?    @db.Decimal(10, 3) //* WEIGHT IN KG
+  size        String?     @db.VarChar(50) // * PRODUCT WITHOUT VARIANTS
+
+  price         Decimal       @default(0) @db.Decimal(12, 2)
+  discountType  DiscountType?
+  discountPrice Decimal?      @db.Decimal(12, 2)
+  costPerItem   Decimal?      @db.Decimal(12, 2) //* FOR PROFIT CALCULATION
+  attributes    Json          @default("{}") // The JSON structure for attributes (e.g., {"color": "Red", "size": "XL"})  //* E.G. { "size": "500ml", "flavor": "Honey" }
+  isDefault     Boolean       @default(false)
+
+  // * RELATIONS
+  productId     Int
+  product       Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  images        ProductImage[]
+  inventoryLogs Inventory[]
+
+  @@map("product_variants")
+}
+
+// =========== PRODUCT IMAGE MODEL ============
+model ProductImage {
+  id           Int     @id @default(autoincrement())
+  url          String  @db.VarChar(512)
+  //* OPTIMIZED IMAGES
+  thumbnailUrl String? @db.VarChar(512)
+  bannerUrl    String? @db.VarChar(512)
+  iconUrl      String? @db.VarChar(512)
+
+  altText      String?
+  displayOrder Int     @default(0)
+  isPrimary    Boolean @default(false)
+  isActive     Boolean @default(true)
+
+  // * RELATIONS
+  productId Int
+  product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId Int?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@index([productId, isPrimary])
+  @@map("product_images")
+}
+
+// ============= INVENTORY/STOCK MODEL =============
+model Inventory {
+  id             Int                   @id @default(autoincrement())
+  sid            String                @unique @default(uuid()) @db.Uuid
+  quantity       Int                   @default(0)
+  changeType     InventoryExchangeType @default(ADD)
+  reason         String?               @db.Text
+  referenceId    String? // Reference to order, purchase, etc.
+  costPrice      Decimal? // Cost at time of stock change
+  sellingPrice   Decimal? // Selling price at time of stock change
+  // * TIME STAMPS
+  recordedAt     DateTime              @default(now())
+  // * RELATIONS
+  productId      Int?
+  product        Product?              @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId      Int?
+  variant        ProductVariant?       @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  recordedBy     Int?
+  recordedByUser User?                 @relation(fields: [recordedBy], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([variantId])
+  @@index([changeType])
+  @@map("inventory")
+}
+
+// =========== COMBO ITEM MODEL (THE MISSING LINK) ============
+// model ComboItem {
+//   id             Int     @id @default(autoincrement())
+//   comboProductId Int //* THE ID OF THE COMBO PRODUCT
+//   comboProduct   Product @relation("MainCombo", fields: [comboProductId], references: [id], onDelete: Cascade)
+
+//   includedProductId Int //* THE ID OF THE INDIVIDUAL PRODUCT INSIDE THE COMBO
+//   includedProduct   Product @relation("IncludedProduct", fields: [includedProductId], references: [id], onDelete: Cascade)
+
+//   quantity Int @default(1) //* HOW MANY OF THIS ITEM ARE IN THE COMBO
+
+//   @@unique([comboProductId, includedProductId])
+//   @@map("product_combo_items")
+// }
