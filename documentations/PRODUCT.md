@@ -327,5 +327,3 @@ Maintaining the `totalStock` cache requires a strict update pattern:
 > When creating a product via the Admin API, the `hasVariants` flag should be set automatically based on the presence of a `variants` array in the request payload to ensure the UI can toggle between "Add to Cart" and "Select Options" instantly without checking related tables.
 
 ```
-
-```
