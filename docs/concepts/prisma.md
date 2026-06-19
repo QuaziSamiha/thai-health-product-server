@@ -1,4 +1,4 @@
-## 3. Env file precedence
+## Env file precedence
 
 Both loading paths resolve files in this order (first file to define a variable wins; later files only fill in what's missing):
 
