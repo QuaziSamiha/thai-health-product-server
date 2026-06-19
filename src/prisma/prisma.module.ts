@@ -1,8 +1,12 @@
 import { Global, Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { PrismaService } from './prisma.service';
+import databaseConfig from './config/database.config';
 
-@Global() // This makes PrismaService available everywhere without re-importing the module
+@Global() //* MAKES PRISMASERVICE AVAILABLE EVERYWHERE WITHOUT RE-IMPORTING THE MODULE
 @Module({
+  //* PARTIAL REGISTRATION — PRISMAMODULE OWNS THE 'DATABASE' CONFIG NAMESPACE
+  imports: [ConfigModule.forFeature(databaseConfig)],
   providers: [PrismaService],
   exports: [PrismaService],
 })

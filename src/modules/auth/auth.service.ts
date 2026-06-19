@@ -10,7 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { HashUtil } from '../../common/utils/auth/hash.util';
 import { UserStatus } from '../../generated/prisma/enums';
 import { UserResponseDto } from '../user/dto/user-response.dto';
-import type { SignOptions } from 'jsonwebtoken';
+// import type { SignOptions } from 'jsonwebtoken';
 import { IJwtPayload, ITokens } from './interfaces/jwt-payload.interface';
 import { LoginDto } from './dto/login.dto';
 import { TokensResponseDto } from './dto/token-response.dto';

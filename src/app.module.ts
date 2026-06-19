@@ -12,18 +12,21 @@ import { OtpModule } from './modules/otp/otp.module';
 import { SessionModule } from './modules/session/session.module';
 import { MailModule } from './modules/mail/mail.module';
 import { CategoryModule } from './modules/category/category.module';
-import databaseConfig from './config/database.config';
-import authConfig from './config/auth.config';
 import { validate } from './config/env.validation';
 import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
 
 @Module({
   imports: [
+    //* GLOBAL ROOT — ONLY HANDLES ENV FILE LOADING + SHAPE VALIDATION
+    //* NAMESPACED CONFIG (AUTH, DATABASE, ...) IS OWNED AND REGISTERED BY EACH FEATURE MODULE
     ConfigModule.forRoot({
-      isGlobal: true,
+      isGlobal: true, // Make ConfigModule available globally
       expandVariables: true,
-      envFilePath: [`.env.${process.env.NODE_ENV || 'development'}`, '.env'],
-      load: [databaseConfig, authConfig],
+      envFilePath: [
+        `.env.${process.env.NODE_ENV || 'development'}.local`,
+        `.env.${process.env.NODE_ENV || 'development'}`,
+        '.env',
+      ],
       cache: true,
       validate,
     }),

@@ -9,15 +9,21 @@ import { PrismaModule } from '../../prisma/prisma.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
+import authConfig from './config/auth.config';
 
 @Module({
   imports: [
+    //* PARTIAL REGISTRATION — AUTHMODULE OWNS THE 'AUTH' CONFIG NAMESPACE
+    //* INSTEAD OF RELYING ON A SHARED GLOBAL CONFIG FOLDER
+    ConfigModule.forFeature(authConfig),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
-        secret: config.get('JWT_SECRET'),
-        signOptions: { expiresIn: config.get('JWT_EXPIRES_IN') },
+        //* READS FROM THE SAME 'AUTH' NAMESPACE AS JWTSTRATEGY AND AUTHSERVICE
+        //* SO THERE IS NO LONGER A SEPARATE, MISMATCHED MODULE-LEVEL SECRET
+        secret: config.get<string>('auth.accessSecret'),
+        signOptions: { expiresIn: config.get('auth.accessExpiresIn') },
       }),
       inject: [ConfigService],
     }),

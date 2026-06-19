@@ -1,5 +1,7 @@
 import { registerAs } from '@nestjs/config';
 
+//* NAMESPACE REGISTRATION — REGISTERS THIS FACTORY UNDER THE KEY 'AUTH'
+//* SO IT IS READ AS CONFIGSERVICE.GET('AUTH.ACCESSSECRET'), NOT A RAW ENV LOOKUP
 export default registerAs('auth', () => ({
   accessSecret: process.env.JWT_ACCESS_SECRET,
   refreshSecret: process.env.JWT_REFRESH_SECRET,
