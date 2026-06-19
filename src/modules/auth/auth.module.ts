@@ -21,7 +21,6 @@ import authConfig from './config/auth.config';
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
         //* READS FROM THE SAME 'AUTH' NAMESPACE AS JWTSTRATEGY AND AUTHSERVICE
-        //* SO THERE IS NO LONGER A SEPARATE, MISMATCHED MODULE-LEVEL SECRET
         secret: config.get<string>('auth.accessSecret'),
         signOptions: { expiresIn: config.get('auth.accessExpiresIn') },
       }),
