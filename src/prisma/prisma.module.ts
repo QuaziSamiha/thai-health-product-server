@@ -5,7 +5,7 @@ import databaseConfig from './config/database.config';
 
 @Global() //* MAKES PRISMASERVICE AVAILABLE EVERYWHERE WITHOUT RE-IMPORTING THE MODULE
 @Module({
-  //* PARTIAL REGISTRATION — PRISMAMODULE OWNS THE 'DATABASE' CONFIG NAMESPACE
+  //* PARTIAL REGISTRATION — PRISMA MODULE OWNS THE 'database' CONFIG NAMESPACE
   imports: [ConfigModule.forFeature(databaseConfig)],
   providers: [PrismaService],
   exports: [PrismaService],

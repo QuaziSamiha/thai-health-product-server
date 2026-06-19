@@ -9,6 +9,9 @@ const envSchema = z.object({
 
   // Database
   DATABASE_URL: z.string().min(1),
+  DATABASE_POOL_MAX: z.coerce.number().default(10),
+  DATABASE_POOL_IDLE_TIMEOUT_MS: z.coerce.number().default(10000),
+  DATABASE_POOL_CONNECTION_TIMEOUT_MS: z.coerce.number().default(0),
 
   // JWT
   JWT_ACCESS_SECRET: z.string().min(1),

@@ -45,12 +45,3 @@ npx prisma migrate reset
 ```
 
 > ⚠️ Only ever run `migrate reset` against your own local dev database. Never against `.env.production` / `.env.office`. This command will refuse to run unattended for an AI agent without explicit human confirmation — that guard is intentional, don't bypass it.
-
-### Running the app itself against a specific env
-
-```bash
-yarn start:dev      # .env.development
-yarn start:local     # .env.development.local (your personal DB)
-yarn start:office    # .env.office
-yarn start:prod      # .env.production
-```

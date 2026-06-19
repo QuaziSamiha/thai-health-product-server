@@ -11,16 +11,31 @@ export class PrismaService
   implements OnModuleInit, OnModuleDestroy
 {
   constructor(configService: ConfigService) {
-    //* 1. READ THE CONNECTION STRING FROM THE 'DATABASE' NAMESPACE, NOT PROCESS.ENV DIRECTLY
+    //* 1. READ THE CONNECTION STRING AND POOL SIZING FROM THE 'database' NAMESPACE, NOT PROCESS.ENV DIRECTLY
     const databaseUrl = configService.get<string>('database.url');
+    const poolMax = configService.get<number>('database.pool.max');
+    const idleTimeoutMillis = configService.get<number>(
+      'database.pool.idleTimeoutMillis',
+    );
+    const connectionTimeoutMillis = configService.get<number>(
+      'database.pool.connectionTimeoutMillis',
+    );
 
     //* 2. SETUP THE CONNECTION POOL
-    const pool = new Pool({ connectionString: databaseUrl });
+    const pool = new Pool({
+      connectionString: databaseUrl,
+      max: poolMax,
+      idleTimeoutMillis,
+      connectionTimeoutMillis,
+    });
 
     //* 3. SETUP THE ADAPTER
-    const adapter = new PrismaPg(pool);
+    //* disposeExternalPool: true — WITHOUT THIS, $disconnect() ON SHUTDOWN
+    //* CLOSES THE PRISMA ENGINE BUT LEAVES THE UNDERLYING PG POOL'S TCP
+    //* CONNECTIONS OPEN, LEAKING CONNECTIONS ON EVERY RESTART/REDEPLOY
+    const adapter = new PrismaPg(pool, { disposeExternalPool: true });
 
-    //* 4. PASS THE ADAPTER TO THE PRISMACLIENT CONSTRUCTOR
+    //* 4. PASS THE ADAPTER TO THE PRISMA CLIENT CONSTRUCTOR
     super({ adapter });
   }
 
