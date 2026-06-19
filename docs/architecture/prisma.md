@@ -2,6 +2,8 @@
 
 This document is the single map of every Prisma-related file in this service: where it lives, what owns it, and the exact commands to run against it. Read this before touching the schema, migrations, or the generated client.
 
+> See also: [Commands](../commands/prisma.md) for the exact CLI commands, [Concepts](../concepts/prisma.md) for how repositories, transactions, pagination, and enums are actually used in app code.
+
 ---
 
 ## 1. File map (at a glance)
@@ -46,9 +48,9 @@ thai-health-product-server/
 │   │
 │   └── prisma/                          # The NestJS-side wrapper around the generated client
 │       ├── config/
-│       │   └── database.config.ts       # registerAs('database', ...) — owns DATABASE_URL for this module only
+│       │   └── database.config.ts       # registerAs('database', ...) — owns DATABASE_URL + pg pool sizing (max/idle/connection timeout) for this module only
 │       ├── prisma.module.ts             # @Global() module — registers config + provides/exports PrismaService
-│       ├── prisma.service.ts            # Extends PrismaClient, wires the pg driver adapter, connect/disconnect hooks
+│       ├── prisma.service.ts            # Extends PrismaClient, wires the pg driver adapter + connection pool sizing, connect/disconnect hooks
 │       └── base.repository.ts           # Abstract base class — gives every repository a `withTransaction()` helper
 │
 ├── .env / .env.development / .env.development.local / .env.office / .env.production
@@ -91,7 +93,7 @@ Key point: **the Prisma CLI (`prisma migrate`, `prisma studio`, `prisma generate
 - CLI commands → `prisma.config.ts` → its own `dotenv` loading.
 - The running app → `src/app.module.ts`'s `ConfigModule.forRoot({ envFilePath: [...] })` → `src/prisma/config/database.config.ts` → `PrismaService` via `ConfigService`.
 
-Both now load the **same files in the same priority order** (see below), but they are still two independent code paths — if you ever change one, change the other to match.
+Both now load the **same files in the same priority order** (see [Env file precedence](../concepts/prisma.md#env-file-precedence)), but they are still two independent code paths — if you ever change one, change the other to match.
 
 ---
 

@@ -1,3 +1,19 @@
+# Essence Lab Backend (`thai-health-product-server`)
+
+NestJS backend for the Thai Health Product (Essence Lab) e-commerce platform — Prisma ORM on PostgreSQL via the `pg` driver adapter, JWT auth, and modular domain services.
+
+## Documentation
+
+| Area | Doc |
+| --- | --- |
+| Prisma — file map & how the pieces connect | [docs/architecture/prisma.md](./docs/architecture/prisma.md) |
+| Prisma — CLI commands (migrate, studio, reset, deploy) | [docs/commands/prisma.md](./docs/commands/prisma.md) |
+| Prisma — concepts, conventions, developer guide | [docs/concepts/prisma.md](./docs/concepts/prisma.md) |
+| Project setup from scratch | [documentations/PROJECT_SETUP.md](./documentations/PROJECT_SETUP.md) |
+| Category module | [documentations/CATEGORY.md](./documentations/CATEGORY.md) |
+| Product module | [documentations/PRODUCT.md](./documentations/PRODUCT.md) |
+| Shared pagination pattern | [documentations/PAGINATION.md](./documentations/PAGINATION.md) |
+
 ## Environment & Running Commands
 
 ### Command Reference
@@ -23,7 +39,3 @@ yarn start:local     # .env.development.local (your personal DB)
 yarn start:office    # .env.office
 yarn start:prod      # .env.production
 ```
-
-- [Project Setup](./documentations/PROJECT_SETUP.md)
-- [Category Module](./documentations/CATEGORY.md)
-- [Product Module](./documentations/PRODUCT.md)

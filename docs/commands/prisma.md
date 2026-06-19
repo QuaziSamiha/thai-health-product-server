@@ -1,6 +1,8 @@
 
 ## Commands
 
+> See also: [Architecture](../architecture/prisma.md) for the file map, [Concepts](../concepts/prisma.md) for how repositories, transactions, and pagination work in app code.
+
 Run all commands from `thai-health-product-server/`.
 
 ### Day-to-day schema changes
