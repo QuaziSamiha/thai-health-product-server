@@ -1,0 +1,56 @@
+//* ============= CATEGORY DOMAIN =============
+//* CategoryProductStatus IS SHARED WITH product.prisma — DEFINED IN shared.prisma
+
+model Category {
+  id     Int                   @id @default(autoincrement())
+  sid    String                @unique @default(uuid()) @db.Uuid // * Use native UUID type for performance
+  status CategoryProductStatus @default(ACTIVE)
+
+  //* PRIMARY CONTENT (ENGLISH & GLOBAL SLUG)
+  name        String  @db.VarChar(255)
+  slug        String  @unique @db.VarChar(255) //* GLOBAL SEARCH IDENTIFIER
+  description String? @db.Text
+
+  //* SECONDARY CONTENT (THAI DISPLAY ONLY)
+  nameTh        String? @db.VarChar(255)
+  descriptionTh String? @db.Text
+
+  //* HIERARCHY MANAGEMENT
+  parentId Int?
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: NoAction)
+  children Category[] @relation("CategoryHierarchy")
+  level    Int        @default(0)
+
+  //* OPTIMIZED IMAGES
+  thumbnailUrl String? @db.VarChar(512)
+  bannerUrl    String? @db.VarChar(512)
+  iconUrl      String? @db.VarChar(512)
+
+  //* UI & SEO METADATA
+  displayOrder Int     @default(0)
+  isFeatured   Boolean @default(false)
+  productCount Int     @default(0) //* DENORMALIZED FOR PERFORMANCE
+
+  metaTitle         String? @db.VarChar(255)
+  metaDescription   String? @db.Text
+  metaTitleTh       String? @db.VarChar(255)
+  metaDescriptionTh String? @db.Text
+
+  //* AUDIT TRAIL & TIMESTAMPS
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //* RELATINOS
+  createdBy     Int?
+  createdByUser User?     @relation("CategoryCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedBy     Int?
+  updatedByUser User?     @relation("CategoryUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  products      Product[]
+
+  //* INDEXING STRATEGY
+  @@index([slug]) //* PRIMARY INDEX FOR URL LOOKUPS
+  @@index([parentId, status]) //* FAST FETCHING OF ACTIVE SUB-CATEGORIES
+  @@index([status, isFeatured]) //* FAST FETCHING FOR "FEATURED" HOMEPAGE SECTIONS
+  @@index([displayOrder]) //* OPTIMIZED SORTING FOR MENUS/LISTS
+  @@map("categories")
+}

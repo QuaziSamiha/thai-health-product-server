@@ -51,16 +51,16 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  Category: 'Category',
+  Inventory: 'Inventory',
+  Product: 'Product',
+  ProductVariant: 'ProductVariant',
+  ProductImage: 'ProductImage',
   User: 'User',
   Profile: 'Profile',
   UserSecurity: 'UserSecurity',
   Session: 'Session',
-  OTP: 'OTP',
-  Category: 'Category',
-  Product: 'Product',
-  ProductVariant: 'ProductVariant',
-  ProductImage: 'ProductImage',
-  Inventory: 'Inventory'
+  OTP: 'OTP'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -77,84 +77,6 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 } as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
-
-
-export const UserScalarFieldEnum = {
-  id: 'id',
-  sid: 'sid',
-  email: 'email',
-  password: 'password',
-  phone: 'phone',
-  role: 'role',
-  status: 'status',
-  authProvider: 'authProvider',
-  providerId: 'providerId',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  lastLoginAt: 'lastLoginAt'
-} as const
-
-export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
-
-
-export const ProfileScalarFieldEnum = {
-  id: 'id',
-  firstName: 'firstName',
-  lastName: 'lastName',
-  name: 'name',
-  avatarUrl: 'avatarUrl',
-  bio: 'bio',
-  dateOfBirth: 'dateOfBirth',
-  gender: 'gender',
-  metadata: 'metadata',
-  userId: 'userId'
-} as const
-
-export type ProfileScalarFieldEnum = (typeof ProfileScalarFieldEnum)[keyof typeof ProfileScalarFieldEnum]
-
-
-export const UserSecurityScalarFieldEnum = {
-  id: 'id',
-  isEmailVerified: 'isEmailVerified',
-  emailVerifiedAt: 'emailVerifiedAt',
-  verificationToken: 'verificationToken',
-  verificationTokenExpires: 'verificationTokenExpires',
-  resetToken: 'resetToken',
-  resetTokenExpires: 'resetTokenExpires',
-  loginAttempts: 'loginAttempts',
-  lastLoginIp: 'lastLoginIp',
-  assignedIp: 'assignedIp',
-  userId: 'userId'
-} as const
-
-export type UserSecurityScalarFieldEnum = (typeof UserSecurityScalarFieldEnum)[keyof typeof UserSecurityScalarFieldEnum]
-
-
-export const SessionScalarFieldEnum = {
-  id: 'id',
-  refreshToken: 'refreshToken',
-  refreshTokenExpiresAt: 'refreshTokenExpiresAt',
-  createdAt: 'createdAt',
-  userAgent: 'userAgent',
-  ipAddress: 'ipAddress',
-  userId: 'userId'
-} as const
-
-export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
-
-
-export const OTPScalarFieldEnum = {
-  id: 'id',
-  code: 'code',
-  type: 'type',
-  expiresAt: 'expiresAt',
-  isUsed: 'isUsed',
-  identifier: 'identifier',
-  userId: 'userId',
-  createdAt: 'createdAt'
-} as const
-
-export type OTPScalarFieldEnum = (typeof OTPScalarFieldEnum)[keyof typeof OTPScalarFieldEnum]
 
 
 export const CategoryScalarFieldEnum = {
@@ -185,6 +107,24 @@ export const CategoryScalarFieldEnum = {
 } as const
 
 export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
+
+
+export const InventoryScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  quantity: 'quantity',
+  changeType: 'changeType',
+  reason: 'reason',
+  referenceId: 'referenceId',
+  costPrice: 'costPrice',
+  sellingPrice: 'sellingPrice',
+  recordedAt: 'recordedAt',
+  productId: 'productId',
+  variantId: 'variantId',
+  recordedBy: 'recordedBy'
+} as const
+
+export type InventoryScalarFieldEnum = (typeof InventoryScalarFieldEnum)[keyof typeof InventoryScalarFieldEnum]
 
 
 export const ProductScalarFieldEnum = {
@@ -271,22 +211,82 @@ export const ProductImageScalarFieldEnum = {
 export type ProductImageScalarFieldEnum = (typeof ProductImageScalarFieldEnum)[keyof typeof ProductImageScalarFieldEnum]
 
 
-export const InventoryScalarFieldEnum = {
+export const UserScalarFieldEnum = {
   id: 'id',
   sid: 'sid',
-  quantity: 'quantity',
-  changeType: 'changeType',
-  reason: 'reason',
-  referenceId: 'referenceId',
-  costPrice: 'costPrice',
-  sellingPrice: 'sellingPrice',
-  recordedAt: 'recordedAt',
-  productId: 'productId',
-  variantId: 'variantId',
-  recordedBy: 'recordedBy'
+  email: 'email',
+  password: 'password',
+  phone: 'phone',
+  role: 'role',
+  status: 'status',
+  authProvider: 'authProvider',
+  providerId: 'providerId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  lastLoginAt: 'lastLoginAt'
 } as const
 
-export type InventoryScalarFieldEnum = (typeof InventoryScalarFieldEnum)[keyof typeof InventoryScalarFieldEnum]
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const ProfileScalarFieldEnum = {
+  id: 'id',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  name: 'name',
+  avatarUrl: 'avatarUrl',
+  bio: 'bio',
+  dateOfBirth: 'dateOfBirth',
+  gender: 'gender',
+  metadata: 'metadata',
+  userId: 'userId'
+} as const
+
+export type ProfileScalarFieldEnum = (typeof ProfileScalarFieldEnum)[keyof typeof ProfileScalarFieldEnum]
+
+
+export const UserSecurityScalarFieldEnum = {
+  id: 'id',
+  isEmailVerified: 'isEmailVerified',
+  emailVerifiedAt: 'emailVerifiedAt',
+  verificationToken: 'verificationToken',
+  verificationTokenExpires: 'verificationTokenExpires',
+  resetToken: 'resetToken',
+  resetTokenExpires: 'resetTokenExpires',
+  loginAttempts: 'loginAttempts',
+  lastLoginIp: 'lastLoginIp',
+  assignedIp: 'assignedIp',
+  userId: 'userId'
+} as const
+
+export type UserSecurityScalarFieldEnum = (typeof UserSecurityScalarFieldEnum)[keyof typeof UserSecurityScalarFieldEnum]
+
+
+export const SessionScalarFieldEnum = {
+  id: 'id',
+  refreshToken: 'refreshToken',
+  refreshTokenExpiresAt: 'refreshTokenExpiresAt',
+  createdAt: 'createdAt',
+  userAgent: 'userAgent',
+  ipAddress: 'ipAddress',
+  userId: 'userId'
+} as const
+
+export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
+
+
+export const OTPScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  type: 'type',
+  expiresAt: 'expiresAt',
+  isUsed: 'isUsed',
+  identifier: 'identifier',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type OTPScalarFieldEnum = (typeof OTPScalarFieldEnum)[keyof typeof OTPScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -477,16 +477,6 @@ export type InventoryUncheckedUpdateManyInput = {
   recordedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
-export type InventoryListRelationFilter = {
-  every?: Prisma.InventoryWhereInput
-  some?: Prisma.InventoryWhereInput
-  none?: Prisma.InventoryWhereInput
-}
-
-export type InventoryOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
-}
-
 export type InventoryCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   sid?: Prisma.SortOrder
@@ -552,46 +542,26 @@ export type InventorySumOrderByAggregateInput = {
   recordedBy?: Prisma.SortOrder
 }
 
-export type InventoryCreateNestedManyWithoutRecordedByUserInput = {
-  create?: Prisma.XOR<Prisma.InventoryCreateWithoutRecordedByUserInput, Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput> | Prisma.InventoryCreateWithoutRecordedByUserInput[] | Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput[]
-  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput | Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput[]
-  createMany?: Prisma.InventoryCreateManyRecordedByUserInputEnvelope
-  connect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+export type InventoryListRelationFilter = {
+  every?: Prisma.InventoryWhereInput
+  some?: Prisma.InventoryWhereInput
+  none?: Prisma.InventoryWhereInput
 }
 
-export type InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput = {
-  create?: Prisma.XOR<Prisma.InventoryCreateWithoutRecordedByUserInput, Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput> | Prisma.InventoryCreateWithoutRecordedByUserInput[] | Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput[]
-  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput | Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput[]
-  createMany?: Prisma.InventoryCreateManyRecordedByUserInputEnvelope
-  connect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+export type InventoryOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
-export type InventoryUpdateManyWithoutRecordedByUserNestedInput = {
-  create?: Prisma.XOR<Prisma.InventoryCreateWithoutRecordedByUserInput, Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput> | Prisma.InventoryCreateWithoutRecordedByUserInput[] | Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput[]
-  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput | Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput[]
-  upsert?: Prisma.InventoryUpsertWithWhereUniqueWithoutRecordedByUserInput | Prisma.InventoryUpsertWithWhereUniqueWithoutRecordedByUserInput[]
-  createMany?: Prisma.InventoryCreateManyRecordedByUserInputEnvelope
-  set?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
-  disconnect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
-  delete?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
-  connect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
-  update?: Prisma.InventoryUpdateWithWhereUniqueWithoutRecordedByUserInput | Prisma.InventoryUpdateWithWhereUniqueWithoutRecordedByUserInput[]
-  updateMany?: Prisma.InventoryUpdateManyWithWhereWithoutRecordedByUserInput | Prisma.InventoryUpdateManyWithWhereWithoutRecordedByUserInput[]
-  deleteMany?: Prisma.InventoryScalarWhereInput | Prisma.InventoryScalarWhereInput[]
+export type EnumInventoryExchangeTypeFieldUpdateOperationsInput = {
+  set?: $Enums.InventoryExchangeType
 }
 
-export type InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput = {
-  create?: Prisma.XOR<Prisma.InventoryCreateWithoutRecordedByUserInput, Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput> | Prisma.InventoryCreateWithoutRecordedByUserInput[] | Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput[]
-  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput | Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput[]
-  upsert?: Prisma.InventoryUpsertWithWhereUniqueWithoutRecordedByUserInput | Prisma.InventoryUpsertWithWhereUniqueWithoutRecordedByUserInput[]
-  createMany?: Prisma.InventoryCreateManyRecordedByUserInputEnvelope
-  set?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
-  disconnect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
-  delete?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
-  connect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
-  update?: Prisma.InventoryUpdateWithWhereUniqueWithoutRecordedByUserInput | Prisma.InventoryUpdateWithWhereUniqueWithoutRecordedByUserInput[]
-  updateMany?: Prisma.InventoryUpdateManyWithWhereWithoutRecordedByUserInput | Prisma.InventoryUpdateManyWithWhereWithoutRecordedByUserInput[]
-  deleteMany?: Prisma.InventoryScalarWhereInput | Prisma.InventoryScalarWhereInput[]
+export type NullableDecimalFieldUpdateOperationsInput = {
+  set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type InventoryCreateNestedManyWithoutProductInput = {
@@ -678,79 +648,46 @@ export type InventoryUncheckedUpdateManyWithoutVariantNestedInput = {
   deleteMany?: Prisma.InventoryScalarWhereInput | Prisma.InventoryScalarWhereInput[]
 }
 
-export type EnumInventoryExchangeTypeFieldUpdateOperationsInput = {
-  set?: $Enums.InventoryExchangeType
+export type InventoryCreateNestedManyWithoutRecordedByUserInput = {
+  create?: Prisma.XOR<Prisma.InventoryCreateWithoutRecordedByUserInput, Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput> | Prisma.InventoryCreateWithoutRecordedByUserInput[] | Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput[]
+  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput | Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput[]
+  createMany?: Prisma.InventoryCreateManyRecordedByUserInputEnvelope
+  connect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
 }
 
-export type InventoryCreateWithoutRecordedByUserInput = {
-  sid?: string
-  quantity?: number
-  changeType?: $Enums.InventoryExchangeType
-  reason?: string | null
-  referenceId?: string | null
-  costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  sellingPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  recordedAt?: Date | string
-  product?: Prisma.ProductCreateNestedOneWithoutInventoryLogsInput
-  variant?: Prisma.ProductVariantCreateNestedOneWithoutInventoryLogsInput
+export type InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput = {
+  create?: Prisma.XOR<Prisma.InventoryCreateWithoutRecordedByUserInput, Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput> | Prisma.InventoryCreateWithoutRecordedByUserInput[] | Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput[]
+  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput | Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput[]
+  createMany?: Prisma.InventoryCreateManyRecordedByUserInputEnvelope
+  connect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
 }
 
-export type InventoryUncheckedCreateWithoutRecordedByUserInput = {
-  id?: number
-  sid?: string
-  quantity?: number
-  changeType?: $Enums.InventoryExchangeType
-  reason?: string | null
-  referenceId?: string | null
-  costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  sellingPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  recordedAt?: Date | string
-  productId?: number | null
-  variantId?: number | null
+export type InventoryUpdateManyWithoutRecordedByUserNestedInput = {
+  create?: Prisma.XOR<Prisma.InventoryCreateWithoutRecordedByUserInput, Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput> | Prisma.InventoryCreateWithoutRecordedByUserInput[] | Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput[]
+  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput | Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput[]
+  upsert?: Prisma.InventoryUpsertWithWhereUniqueWithoutRecordedByUserInput | Prisma.InventoryUpsertWithWhereUniqueWithoutRecordedByUserInput[]
+  createMany?: Prisma.InventoryCreateManyRecordedByUserInputEnvelope
+  set?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+  disconnect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+  delete?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+  connect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+  update?: Prisma.InventoryUpdateWithWhereUniqueWithoutRecordedByUserInput | Prisma.InventoryUpdateWithWhereUniqueWithoutRecordedByUserInput[]
+  updateMany?: Prisma.InventoryUpdateManyWithWhereWithoutRecordedByUserInput | Prisma.InventoryUpdateManyWithWhereWithoutRecordedByUserInput[]
+  deleteMany?: Prisma.InventoryScalarWhereInput | Prisma.InventoryScalarWhereInput[]
 }
 
-export type InventoryCreateOrConnectWithoutRecordedByUserInput = {
-  where: Prisma.InventoryWhereUniqueInput
-  create: Prisma.XOR<Prisma.InventoryCreateWithoutRecordedByUserInput, Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput>
-}
-
-export type InventoryCreateManyRecordedByUserInputEnvelope = {
-  data: Prisma.InventoryCreateManyRecordedByUserInput | Prisma.InventoryCreateManyRecordedByUserInput[]
-  skipDuplicates?: boolean
-}
-
-export type InventoryUpsertWithWhereUniqueWithoutRecordedByUserInput = {
-  where: Prisma.InventoryWhereUniqueInput
-  update: Prisma.XOR<Prisma.InventoryUpdateWithoutRecordedByUserInput, Prisma.InventoryUncheckedUpdateWithoutRecordedByUserInput>
-  create: Prisma.XOR<Prisma.InventoryCreateWithoutRecordedByUserInput, Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput>
-}
-
-export type InventoryUpdateWithWhereUniqueWithoutRecordedByUserInput = {
-  where: Prisma.InventoryWhereUniqueInput
-  data: Prisma.XOR<Prisma.InventoryUpdateWithoutRecordedByUserInput, Prisma.InventoryUncheckedUpdateWithoutRecordedByUserInput>
-}
-
-export type InventoryUpdateManyWithWhereWithoutRecordedByUserInput = {
-  where: Prisma.InventoryScalarWhereInput
-  data: Prisma.XOR<Prisma.InventoryUpdateManyMutationInput, Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserInput>
-}
-
-export type InventoryScalarWhereInput = {
-  AND?: Prisma.InventoryScalarWhereInput | Prisma.InventoryScalarWhereInput[]
-  OR?: Prisma.InventoryScalarWhereInput[]
-  NOT?: Prisma.InventoryScalarWhereInput | Prisma.InventoryScalarWhereInput[]
-  id?: Prisma.IntFilter<"Inventory"> | number
-  sid?: Prisma.UuidFilter<"Inventory"> | string
-  quantity?: Prisma.IntFilter<"Inventory"> | number
-  changeType?: Prisma.EnumInventoryExchangeTypeFilter<"Inventory"> | $Enums.InventoryExchangeType
-  reason?: Prisma.StringNullableFilter<"Inventory"> | string | null
-  referenceId?: Prisma.StringNullableFilter<"Inventory"> | string | null
-  costPrice?: Prisma.DecimalNullableFilter<"Inventory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  sellingPrice?: Prisma.DecimalNullableFilter<"Inventory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  recordedAt?: Prisma.DateTimeFilter<"Inventory"> | Date | string
-  productId?: Prisma.IntNullableFilter<"Inventory"> | number | null
-  variantId?: Prisma.IntNullableFilter<"Inventory"> | number | null
-  recordedBy?: Prisma.IntNullableFilter<"Inventory"> | number | null
+export type InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput = {
+  create?: Prisma.XOR<Prisma.InventoryCreateWithoutRecordedByUserInput, Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput> | Prisma.InventoryCreateWithoutRecordedByUserInput[] | Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput[]
+  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput | Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput[]
+  upsert?: Prisma.InventoryUpsertWithWhereUniqueWithoutRecordedByUserInput | Prisma.InventoryUpsertWithWhereUniqueWithoutRecordedByUserInput[]
+  createMany?: Prisma.InventoryCreateManyRecordedByUserInputEnvelope
+  set?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+  disconnect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+  delete?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+  connect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+  update?: Prisma.InventoryUpdateWithWhereUniqueWithoutRecordedByUserInput | Prisma.InventoryUpdateWithWhereUniqueWithoutRecordedByUserInput[]
+  updateMany?: Prisma.InventoryUpdateManyWithWhereWithoutRecordedByUserInput | Prisma.InventoryUpdateManyWithWhereWithoutRecordedByUserInput[]
+  deleteMany?: Prisma.InventoryScalarWhereInput | Prisma.InventoryScalarWhereInput[]
 }
 
 export type InventoryCreateWithoutProductInput = {
@@ -806,6 +743,24 @@ export type InventoryUpdateManyWithWhereWithoutProductInput = {
   data: Prisma.XOR<Prisma.InventoryUpdateManyMutationInput, Prisma.InventoryUncheckedUpdateManyWithoutProductInput>
 }
 
+export type InventoryScalarWhereInput = {
+  AND?: Prisma.InventoryScalarWhereInput | Prisma.InventoryScalarWhereInput[]
+  OR?: Prisma.InventoryScalarWhereInput[]
+  NOT?: Prisma.InventoryScalarWhereInput | Prisma.InventoryScalarWhereInput[]
+  id?: Prisma.IntFilter<"Inventory"> | number
+  sid?: Prisma.UuidFilter<"Inventory"> | string
+  quantity?: Prisma.IntFilter<"Inventory"> | number
+  changeType?: Prisma.EnumInventoryExchangeTypeFilter<"Inventory"> | $Enums.InventoryExchangeType
+  reason?: Prisma.StringNullableFilter<"Inventory"> | string | null
+  referenceId?: Prisma.StringNullableFilter<"Inventory"> | string | null
+  costPrice?: Prisma.DecimalNullableFilter<"Inventory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  sellingPrice?: Prisma.DecimalNullableFilter<"Inventory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  recordedAt?: Prisma.DateTimeFilter<"Inventory"> | Date | string
+  productId?: Prisma.IntNullableFilter<"Inventory"> | number | null
+  variantId?: Prisma.IntNullableFilter<"Inventory"> | number | null
+  recordedBy?: Prisma.IntNullableFilter<"Inventory"> | number | null
+}
+
 export type InventoryCreateWithoutVariantInput = {
   sid?: string
   quantity?: number
@@ -859,7 +814,20 @@ export type InventoryUpdateManyWithWhereWithoutVariantInput = {
   data: Prisma.XOR<Prisma.InventoryUpdateManyMutationInput, Prisma.InventoryUncheckedUpdateManyWithoutVariantInput>
 }
 
-export type InventoryCreateManyRecordedByUserInput = {
+export type InventoryCreateWithoutRecordedByUserInput = {
+  sid?: string
+  quantity?: number
+  changeType?: $Enums.InventoryExchangeType
+  reason?: string | null
+  referenceId?: string | null
+  costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  sellingPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  recordedAt?: Date | string
+  product?: Prisma.ProductCreateNestedOneWithoutInventoryLogsInput
+  variant?: Prisma.ProductVariantCreateNestedOneWithoutInventoryLogsInput
+}
+
+export type InventoryUncheckedCreateWithoutRecordedByUserInput = {
   id?: number
   sid?: string
   quantity?: number
@@ -873,45 +841,30 @@ export type InventoryCreateManyRecordedByUserInput = {
   variantId?: number | null
 }
 
-export type InventoryUpdateWithoutRecordedByUserInput = {
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  changeType?: Prisma.EnumInventoryExchangeTypeFieldUpdateOperationsInput | $Enums.InventoryExchangeType
-  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  referenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  sellingPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  product?: Prisma.ProductUpdateOneWithoutInventoryLogsNestedInput
-  variant?: Prisma.ProductVariantUpdateOneWithoutInventoryLogsNestedInput
+export type InventoryCreateOrConnectWithoutRecordedByUserInput = {
+  where: Prisma.InventoryWhereUniqueInput
+  create: Prisma.XOR<Prisma.InventoryCreateWithoutRecordedByUserInput, Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput>
 }
 
-export type InventoryUncheckedUpdateWithoutRecordedByUserInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  changeType?: Prisma.EnumInventoryExchangeTypeFieldUpdateOperationsInput | $Enums.InventoryExchangeType
-  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  referenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  sellingPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  productId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  variantId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+export type InventoryCreateManyRecordedByUserInputEnvelope = {
+  data: Prisma.InventoryCreateManyRecordedByUserInput | Prisma.InventoryCreateManyRecordedByUserInput[]
+  skipDuplicates?: boolean
 }
 
-export type InventoryUncheckedUpdateManyWithoutRecordedByUserInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  changeType?: Prisma.EnumInventoryExchangeTypeFieldUpdateOperationsInput | $Enums.InventoryExchangeType
-  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  referenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  sellingPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  productId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  variantId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+export type InventoryUpsertWithWhereUniqueWithoutRecordedByUserInput = {
+  where: Prisma.InventoryWhereUniqueInput
+  update: Prisma.XOR<Prisma.InventoryUpdateWithoutRecordedByUserInput, Prisma.InventoryUncheckedUpdateWithoutRecordedByUserInput>
+  create: Prisma.XOR<Prisma.InventoryCreateWithoutRecordedByUserInput, Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput>
+}
+
+export type InventoryUpdateWithWhereUniqueWithoutRecordedByUserInput = {
+  where: Prisma.InventoryWhereUniqueInput
+  data: Prisma.XOR<Prisma.InventoryUpdateWithoutRecordedByUserInput, Prisma.InventoryUncheckedUpdateWithoutRecordedByUserInput>
+}
+
+export type InventoryUpdateManyWithWhereWithoutRecordedByUserInput = {
+  where: Prisma.InventoryScalarWhereInput
+  data: Prisma.XOR<Prisma.InventoryUpdateManyMutationInput, Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserInput>
 }
 
 export type InventoryCreateManyProductInput = {
@@ -1022,6 +975,61 @@ export type InventoryUncheckedUpdateManyWithoutVariantInput = {
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   recordedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+}
+
+export type InventoryCreateManyRecordedByUserInput = {
+  id?: number
+  sid?: string
+  quantity?: number
+  changeType?: $Enums.InventoryExchangeType
+  reason?: string | null
+  referenceId?: string | null
+  costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  sellingPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  recordedAt?: Date | string
+  productId?: number | null
+  variantId?: number | null
+}
+
+export type InventoryUpdateWithoutRecordedByUserInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  changeType?: Prisma.EnumInventoryExchangeTypeFieldUpdateOperationsInput | $Enums.InventoryExchangeType
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  sellingPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  product?: Prisma.ProductUpdateOneWithoutInventoryLogsNestedInput
+  variant?: Prisma.ProductVariantUpdateOneWithoutInventoryLogsNestedInput
+}
+
+export type InventoryUncheckedUpdateWithoutRecordedByUserInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  changeType?: Prisma.EnumInventoryExchangeTypeFieldUpdateOperationsInput | $Enums.InventoryExchangeType
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  sellingPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  productId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  variantId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+}
+
+export type InventoryUncheckedUpdateManyWithoutRecordedByUserInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  changeType?: Prisma.EnumInventoryExchangeTypeFieldUpdateOperationsInput | $Enums.InventoryExchangeType
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  sellingPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  productId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  variantId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 

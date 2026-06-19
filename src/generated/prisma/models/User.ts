@@ -517,6 +517,11 @@ export type UserUncheckedUpdateManyInput = {
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
+}
+
 export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   sid?: Prisma.SortOrder
@@ -575,17 +580,100 @@ export type UserScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput
 }
 
-export type UserNullableScalarRelationFilter = {
-  is?: Prisma.UserWhereInput | null
-  isNot?: Prisma.UserWhereInput | null
+export type UserCreateNestedOneWithoutCreatedCategoriesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedCategoriesInput, Prisma.UserUncheckedCreateWithoutCreatedCategoriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedCategoriesInput
+  connect?: Prisma.UserWhereUniqueInput
 }
 
-export type StringFieldUpdateOperationsInput = {
-  set?: string
+export type UserCreateNestedOneWithoutUpdatedCategoriesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedCategoriesInput, Prisma.UserUncheckedCreateWithoutUpdatedCategoriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedCategoriesInput
+  connect?: Prisma.UserWhereUniqueInput
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
+export type UserUpdateOneWithoutCreatedCategoriesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedCategoriesInput, Prisma.UserUncheckedCreateWithoutCreatedCategoriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedCategoriesInput
+  upsert?: Prisma.UserUpsertWithoutCreatedCategoriesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedCategoriesInput, Prisma.UserUpdateWithoutCreatedCategoriesInput>, Prisma.UserUncheckedUpdateWithoutCreatedCategoriesInput>
+}
+
+export type UserUpdateOneWithoutUpdatedCategoriesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedCategoriesInput, Prisma.UserUncheckedCreateWithoutUpdatedCategoriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedCategoriesInput
+  upsert?: Prisma.UserUpsertWithoutUpdatedCategoriesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUpdatedCategoriesInput, Prisma.UserUpdateWithoutUpdatedCategoriesInput>, Prisma.UserUncheckedUpdateWithoutUpdatedCategoriesInput>
+}
+
+export type UserCreateNestedOneWithoutInventoriesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutInventoriesInput, Prisma.UserUncheckedCreateWithoutInventoriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutInventoriesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutInventoriesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutInventoriesInput, Prisma.UserUncheckedCreateWithoutInventoriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutInventoriesInput
+  upsert?: Prisma.UserUpsertWithoutInventoriesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutInventoriesInput, Prisma.UserUpdateWithoutInventoriesInput>, Prisma.UserUncheckedUpdateWithoutInventoriesInput>
+}
+
+export type UserCreateNestedOneWithoutCreatedProductsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedProductsInput, Prisma.UserUncheckedCreateWithoutCreatedProductsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedProductsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutUpdatedProductsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedProductsInput, Prisma.UserUncheckedCreateWithoutUpdatedProductsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedProductsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutDeletedProductsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDeletedProductsInput, Prisma.UserUncheckedCreateWithoutDeletedProductsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeletedProductsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutCreatedProductsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedProductsInput, Prisma.UserUncheckedCreateWithoutCreatedProductsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedProductsInput
+  upsert?: Prisma.UserUpsertWithoutCreatedProductsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedProductsInput, Prisma.UserUpdateWithoutCreatedProductsInput>, Prisma.UserUncheckedUpdateWithoutCreatedProductsInput>
+}
+
+export type UserUpdateOneWithoutUpdatedProductsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedProductsInput, Prisma.UserUncheckedCreateWithoutUpdatedProductsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedProductsInput
+  upsert?: Prisma.UserUpsertWithoutUpdatedProductsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUpdatedProductsInput, Prisma.UserUpdateWithoutUpdatedProductsInput>, Prisma.UserUncheckedUpdateWithoutUpdatedProductsInput>
+}
+
+export type UserUpdateOneWithoutDeletedProductsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDeletedProductsInput, Prisma.UserUncheckedCreateWithoutDeletedProductsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeletedProductsInput
+  upsert?: Prisma.UserUpsertWithoutDeletedProductsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDeletedProductsInput, Prisma.UserUpdateWithoutDeletedProductsInput>, Prisma.UserUncheckedUpdateWithoutDeletedProductsInput>
 }
 
 export type EnumUserRoleFieldUpdateOperationsInput = {
@@ -598,22 +686,6 @@ export type EnumUserStatusFieldUpdateOperationsInput = {
 
 export type EnumAuthProviderFieldUpdateOperationsInput = {
   set?: $Enums.AuthProvider
-}
-
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
-}
-
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
 }
 
 export type UserCreateNestedOneWithoutProfileInput = {
@@ -674,100 +746,664 @@ export type UserUpdateOneWithoutOtpsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutOtpsInput, Prisma.UserUpdateWithoutOtpsInput>, Prisma.UserUncheckedUpdateWithoutOtpsInput>
 }
 
-export type UserCreateNestedOneWithoutCreatedCategoriesInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedCategoriesInput, Prisma.UserUncheckedCreateWithoutCreatedCategoriesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedCategoriesInput
-  connect?: Prisma.UserWhereUniqueInput
+export type UserCreateWithoutCreatedCategoriesInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
 }
 
-export type UserCreateNestedOneWithoutUpdatedCategoriesInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedCategoriesInput, Prisma.UserUncheckedCreateWithoutUpdatedCategoriesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedCategoriesInput
-  connect?: Prisma.UserWhereUniqueInput
+export type UserUncheckedCreateWithoutCreatedCategoriesInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
 }
 
-export type UserUpdateOneWithoutCreatedCategoriesNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedCategoriesInput, Prisma.UserUncheckedCreateWithoutCreatedCategoriesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedCategoriesInput
-  upsert?: Prisma.UserUpsertWithoutCreatedCategoriesInput
-  disconnect?: Prisma.UserWhereInput | boolean
-  delete?: Prisma.UserWhereInput | boolean
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedCategoriesInput, Prisma.UserUpdateWithoutCreatedCategoriesInput>, Prisma.UserUncheckedUpdateWithoutCreatedCategoriesInput>
+export type UserCreateOrConnectWithoutCreatedCategoriesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedCategoriesInput, Prisma.UserUncheckedCreateWithoutCreatedCategoriesInput>
 }
 
-export type UserUpdateOneWithoutUpdatedCategoriesNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedCategoriesInput, Prisma.UserUncheckedCreateWithoutUpdatedCategoriesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedCategoriesInput
-  upsert?: Prisma.UserUpsertWithoutUpdatedCategoriesInput
-  disconnect?: Prisma.UserWhereInput | boolean
-  delete?: Prisma.UserWhereInput | boolean
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUpdatedCategoriesInput, Prisma.UserUpdateWithoutUpdatedCategoriesInput>, Prisma.UserUncheckedUpdateWithoutUpdatedCategoriesInput>
+export type UserCreateWithoutUpdatedCategoriesInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
 }
 
-export type UserCreateNestedOneWithoutCreatedProductsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedProductsInput, Prisma.UserUncheckedCreateWithoutCreatedProductsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedProductsInput
-  connect?: Prisma.UserWhereUniqueInput
+export type UserUncheckedCreateWithoutUpdatedCategoriesInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
 }
 
-export type UserCreateNestedOneWithoutUpdatedProductsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedProductsInput, Prisma.UserUncheckedCreateWithoutUpdatedProductsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedProductsInput
-  connect?: Prisma.UserWhereUniqueInput
+export type UserCreateOrConnectWithoutUpdatedCategoriesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedCategoriesInput, Prisma.UserUncheckedCreateWithoutUpdatedCategoriesInput>
 }
 
-export type UserCreateNestedOneWithoutDeletedProductsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutDeletedProductsInput, Prisma.UserUncheckedCreateWithoutDeletedProductsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeletedProductsInput
-  connect?: Prisma.UserWhereUniqueInput
+export type UserUpsertWithoutCreatedCategoriesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedCategoriesInput, Prisma.UserUncheckedUpdateWithoutCreatedCategoriesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedCategoriesInput, Prisma.UserUncheckedCreateWithoutCreatedCategoriesInput>
+  where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateOneWithoutCreatedProductsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedProductsInput, Prisma.UserUncheckedCreateWithoutCreatedProductsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedProductsInput
-  upsert?: Prisma.UserUpsertWithoutCreatedProductsInput
-  disconnect?: Prisma.UserWhereInput | boolean
-  delete?: Prisma.UserWhereInput | boolean
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedProductsInput, Prisma.UserUpdateWithoutCreatedProductsInput>, Prisma.UserUncheckedUpdateWithoutCreatedProductsInput>
+export type UserUpdateToOneWithWhereWithoutCreatedCategoriesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedCategoriesInput, Prisma.UserUncheckedUpdateWithoutCreatedCategoriesInput>
 }
 
-export type UserUpdateOneWithoutUpdatedProductsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedProductsInput, Prisma.UserUncheckedCreateWithoutUpdatedProductsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedProductsInput
-  upsert?: Prisma.UserUpsertWithoutUpdatedProductsInput
-  disconnect?: Prisma.UserWhereInput | boolean
-  delete?: Prisma.UserWhereInput | boolean
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUpdatedProductsInput, Prisma.UserUpdateWithoutUpdatedProductsInput>, Prisma.UserUncheckedUpdateWithoutUpdatedProductsInput>
+export type UserUpdateWithoutCreatedCategoriesInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
 }
 
-export type UserUpdateOneWithoutDeletedProductsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutDeletedProductsInput, Prisma.UserUncheckedCreateWithoutDeletedProductsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeletedProductsInput
-  upsert?: Prisma.UserUpsertWithoutDeletedProductsInput
-  disconnect?: Prisma.UserWhereInput | boolean
-  delete?: Prisma.UserWhereInput | boolean
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDeletedProductsInput, Prisma.UserUpdateWithoutDeletedProductsInput>, Prisma.UserUncheckedUpdateWithoutDeletedProductsInput>
+export type UserUncheckedUpdateWithoutCreatedCategoriesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
 }
 
-export type UserCreateNestedOneWithoutInventoriesInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutInventoriesInput, Prisma.UserUncheckedCreateWithoutInventoriesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutInventoriesInput
-  connect?: Prisma.UserWhereUniqueInput
+export type UserUpsertWithoutUpdatedCategoriesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedCategoriesInput, Prisma.UserUncheckedUpdateWithoutUpdatedCategoriesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedCategoriesInput, Prisma.UserUncheckedCreateWithoutUpdatedCategoriesInput>
+  where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateOneWithoutInventoriesNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutInventoriesInput, Prisma.UserUncheckedCreateWithoutInventoriesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutInventoriesInput
-  upsert?: Prisma.UserUpsertWithoutInventoriesInput
-  disconnect?: Prisma.UserWhereInput | boolean
-  delete?: Prisma.UserWhereInput | boolean
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutInventoriesInput, Prisma.UserUpdateWithoutInventoriesInput>, Prisma.UserUncheckedUpdateWithoutInventoriesInput>
+export type UserUpdateToOneWithWhereWithoutUpdatedCategoriesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedCategoriesInput, Prisma.UserUncheckedUpdateWithoutUpdatedCategoriesInput>
+}
+
+export type UserUpdateWithoutUpdatedCategoriesInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutUpdatedCategoriesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+}
+
+export type UserCreateWithoutInventoriesInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+}
+
+export type UserUncheckedCreateWithoutInventoriesInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+}
+
+export type UserCreateOrConnectWithoutInventoriesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutInventoriesInput, Prisma.UserUncheckedCreateWithoutInventoriesInput>
+}
+
+export type UserUpsertWithoutInventoriesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutInventoriesInput, Prisma.UserUncheckedUpdateWithoutInventoriesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutInventoriesInput, Prisma.UserUncheckedCreateWithoutInventoriesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutInventoriesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutInventoriesInput, Prisma.UserUncheckedUpdateWithoutInventoriesInput>
+}
+
+export type UserUpdateWithoutInventoriesInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutInventoriesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+}
+
+export type UserCreateWithoutCreatedProductsInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+}
+
+export type UserUncheckedCreateWithoutCreatedProductsInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+}
+
+export type UserCreateOrConnectWithoutCreatedProductsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedProductsInput, Prisma.UserUncheckedCreateWithoutCreatedProductsInput>
+}
+
+export type UserCreateWithoutUpdatedProductsInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+}
+
+export type UserUncheckedCreateWithoutUpdatedProductsInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+}
+
+export type UserCreateOrConnectWithoutUpdatedProductsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedProductsInput, Prisma.UserUncheckedCreateWithoutUpdatedProductsInput>
+}
+
+export type UserCreateWithoutDeletedProductsInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+}
+
+export type UserUncheckedCreateWithoutDeletedProductsInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+}
+
+export type UserCreateOrConnectWithoutDeletedProductsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDeletedProductsInput, Prisma.UserUncheckedCreateWithoutDeletedProductsInput>
+}
+
+export type UserUpsertWithoutCreatedProductsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedProductsInput, Prisma.UserUncheckedUpdateWithoutCreatedProductsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedProductsInput, Prisma.UserUncheckedCreateWithoutCreatedProductsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCreatedProductsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedProductsInput, Prisma.UserUncheckedUpdateWithoutCreatedProductsInput>
+}
+
+export type UserUpdateWithoutCreatedProductsInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCreatedProductsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+}
+
+export type UserUpsertWithoutUpdatedProductsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedProductsInput, Prisma.UserUncheckedUpdateWithoutUpdatedProductsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedProductsInput, Prisma.UserUncheckedCreateWithoutUpdatedProductsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutUpdatedProductsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedProductsInput, Prisma.UserUncheckedUpdateWithoutUpdatedProductsInput>
+}
+
+export type UserUpdateWithoutUpdatedProductsInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutUpdatedProductsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+}
+
+export type UserUpsertWithoutDeletedProductsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDeletedProductsInput, Prisma.UserUncheckedUpdateWithoutDeletedProductsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDeletedProductsInput, Prisma.UserUncheckedCreateWithoutDeletedProductsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDeletedProductsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDeletedProductsInput, Prisma.UserUncheckedUpdateWithoutDeletedProductsInput>
+}
+
+export type UserUpdateWithoutDeletedProductsInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDeletedProductsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
 }
 
 export type UserCreateWithoutProfileInput = {
@@ -1208,666 +1844,6 @@ export type UserUncheckedUpdateWithoutOtpsInput = {
   updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
-}
-
-export type UserCreateWithoutCreatedCategoriesInput = {
-  sid?: string
-  email: string
-  password?: string | null
-  phone?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  authProvider?: $Enums.AuthProvider
-  providerId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  lastLoginAt?: Date | string | null
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
-  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
-  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
-  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
-  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
-}
-
-export type UserUncheckedCreateWithoutCreatedCategoriesInput = {
-  id?: number
-  sid?: string
-  email: string
-  password?: string | null
-  phone?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  authProvider?: $Enums.AuthProvider
-  providerId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  lastLoginAt?: Date | string | null
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
-  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
-}
-
-export type UserCreateOrConnectWithoutCreatedCategoriesInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedCategoriesInput, Prisma.UserUncheckedCreateWithoutCreatedCategoriesInput>
-}
-
-export type UserCreateWithoutUpdatedCategoriesInput = {
-  sid?: string
-  email: string
-  password?: string | null
-  phone?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  authProvider?: $Enums.AuthProvider
-  providerId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  lastLoginAt?: Date | string | null
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
-  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
-  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
-  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
-  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
-}
-
-export type UserUncheckedCreateWithoutUpdatedCategoriesInput = {
-  id?: number
-  sid?: string
-  email: string
-  password?: string | null
-  phone?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  authProvider?: $Enums.AuthProvider
-  providerId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  lastLoginAt?: Date | string | null
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
-  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
-}
-
-export type UserCreateOrConnectWithoutUpdatedCategoriesInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedCategoriesInput, Prisma.UserUncheckedCreateWithoutUpdatedCategoriesInput>
-}
-
-export type UserUpsertWithoutCreatedCategoriesInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedCategoriesInput, Prisma.UserUncheckedUpdateWithoutCreatedCategoriesInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedCategoriesInput, Prisma.UserUncheckedCreateWithoutCreatedCategoriesInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutCreatedCategoriesInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedCategoriesInput, Prisma.UserUncheckedUpdateWithoutCreatedCategoriesInput>
-}
-
-export type UserUpdateWithoutCreatedCategoriesInput = {
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
-  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
-  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
-  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
-  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
-  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
-}
-
-export type UserUncheckedUpdateWithoutCreatedCategoriesInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
-  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
-  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
-}
-
-export type UserUpsertWithoutUpdatedCategoriesInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedCategoriesInput, Prisma.UserUncheckedUpdateWithoutUpdatedCategoriesInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedCategoriesInput, Prisma.UserUncheckedCreateWithoutUpdatedCategoriesInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutUpdatedCategoriesInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedCategoriesInput, Prisma.UserUncheckedUpdateWithoutUpdatedCategoriesInput>
-}
-
-export type UserUpdateWithoutUpdatedCategoriesInput = {
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
-  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
-  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
-  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
-  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
-  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
-}
-
-export type UserUncheckedUpdateWithoutUpdatedCategoriesInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
-  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
-  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
-}
-
-export type UserCreateWithoutCreatedProductsInput = {
-  sid?: string
-  email: string
-  password?: string | null
-  phone?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  authProvider?: $Enums.AuthProvider
-  providerId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  lastLoginAt?: Date | string | null
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
-  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
-  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
-  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
-  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
-}
-
-export type UserUncheckedCreateWithoutCreatedProductsInput = {
-  id?: number
-  sid?: string
-  email: string
-  password?: string | null
-  phone?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  authProvider?: $Enums.AuthProvider
-  providerId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  lastLoginAt?: Date | string | null
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
-  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
-}
-
-export type UserCreateOrConnectWithoutCreatedProductsInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedProductsInput, Prisma.UserUncheckedCreateWithoutCreatedProductsInput>
-}
-
-export type UserCreateWithoutUpdatedProductsInput = {
-  sid?: string
-  email: string
-  password?: string | null
-  phone?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  authProvider?: $Enums.AuthProvider
-  providerId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  lastLoginAt?: Date | string | null
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
-  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
-  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
-  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
-  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
-}
-
-export type UserUncheckedCreateWithoutUpdatedProductsInput = {
-  id?: number
-  sid?: string
-  email: string
-  password?: string | null
-  phone?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  authProvider?: $Enums.AuthProvider
-  providerId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  lastLoginAt?: Date | string | null
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
-  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
-  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
-}
-
-export type UserCreateOrConnectWithoutUpdatedProductsInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedProductsInput, Prisma.UserUncheckedCreateWithoutUpdatedProductsInput>
-}
-
-export type UserCreateWithoutDeletedProductsInput = {
-  sid?: string
-  email: string
-  password?: string | null
-  phone?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  authProvider?: $Enums.AuthProvider
-  providerId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  lastLoginAt?: Date | string | null
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
-  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
-  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
-  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
-  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
-}
-
-export type UserUncheckedCreateWithoutDeletedProductsInput = {
-  id?: number
-  sid?: string
-  email: string
-  password?: string | null
-  phone?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  authProvider?: $Enums.AuthProvider
-  providerId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  lastLoginAt?: Date | string | null
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
-  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
-}
-
-export type UserCreateOrConnectWithoutDeletedProductsInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutDeletedProductsInput, Prisma.UserUncheckedCreateWithoutDeletedProductsInput>
-}
-
-export type UserUpsertWithoutCreatedProductsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedProductsInput, Prisma.UserUncheckedUpdateWithoutCreatedProductsInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedProductsInput, Prisma.UserUncheckedCreateWithoutCreatedProductsInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutCreatedProductsInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedProductsInput, Prisma.UserUncheckedUpdateWithoutCreatedProductsInput>
-}
-
-export type UserUpdateWithoutCreatedProductsInput = {
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
-  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
-  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
-  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
-  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
-  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
-}
-
-export type UserUncheckedUpdateWithoutCreatedProductsInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
-  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
-  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
-}
-
-export type UserUpsertWithoutUpdatedProductsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedProductsInput, Prisma.UserUncheckedUpdateWithoutUpdatedProductsInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedProductsInput, Prisma.UserUncheckedCreateWithoutUpdatedProductsInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutUpdatedProductsInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedProductsInput, Prisma.UserUncheckedUpdateWithoutUpdatedProductsInput>
-}
-
-export type UserUpdateWithoutUpdatedProductsInput = {
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
-  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
-  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
-  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
-  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
-  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
-}
-
-export type UserUncheckedUpdateWithoutUpdatedProductsInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
-  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
-  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
-}
-
-export type UserUpsertWithoutDeletedProductsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutDeletedProductsInput, Prisma.UserUncheckedUpdateWithoutDeletedProductsInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutDeletedProductsInput, Prisma.UserUncheckedCreateWithoutDeletedProductsInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutDeletedProductsInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutDeletedProductsInput, Prisma.UserUncheckedUpdateWithoutDeletedProductsInput>
-}
-
-export type UserUpdateWithoutDeletedProductsInput = {
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
-  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
-  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
-  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
-  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
-  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
-}
-
-export type UserUncheckedUpdateWithoutDeletedProductsInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
-  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
-  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
-}
-
-export type UserCreateWithoutInventoriesInput = {
-  sid?: string
-  email: string
-  password?: string | null
-  phone?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  authProvider?: $Enums.AuthProvider
-  providerId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  lastLoginAt?: Date | string | null
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
-  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
-  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
-  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
-  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
-  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-}
-
-export type UserUncheckedCreateWithoutInventoriesInput = {
-  id?: number
-  sid?: string
-  email: string
-  password?: string | null
-  phone?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  authProvider?: $Enums.AuthProvider
-  providerId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  lastLoginAt?: Date | string | null
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
-  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-}
-
-export type UserCreateOrConnectWithoutInventoriesInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutInventoriesInput, Prisma.UserUncheckedCreateWithoutInventoriesInput>
-}
-
-export type UserUpsertWithoutInventoriesInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutInventoriesInput, Prisma.UserUncheckedUpdateWithoutInventoriesInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutInventoriesInput, Prisma.UserUncheckedCreateWithoutInventoriesInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutInventoriesInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutInventoriesInput, Prisma.UserUncheckedUpdateWithoutInventoriesInput>
-}
-
-export type UserUpdateWithoutInventoriesInput = {
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
-  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
-  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
-  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
-  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
-  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
-  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-}
-
-export type UserUncheckedUpdateWithoutInventoriesInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
-  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
-  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
 }
 
 

@@ -1,0 +1,12 @@
+//* ROOT CONFIG FILE — GENERATOR + DATASOURCE ONLY
+//* NO MODELS OR ENUMS BELONG HERE — SEE user.prisma, category.prisma,
+//* product.prisma, inventory.prisma etc AND shared.prisma FOR THOSE
+generator client {
+  provider     = "prisma-client"
+  output       = "../../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}

@@ -8,9 +8,15 @@ This document is the single map of every Prisma-related file in this service: wh
 
 ```
 thai-health-product-server/
-├── prisma.config.ts                     # Prisma CLI entrypoint — schema path, migrations path, env loading
+├── prisma.config.ts                     # Prisma CLI entrypoint — schema folder path, migrations path, env loading
 ├── prisma/
-│   ├── schema.prisma                    # Single source of truth: datasource, generator, all models/enums
+│   ├── schema/                          # MULTI-FILE SCHEMA — Prisma merges every *.prisma file in this folder
+│   │   ├── schema.prisma                # Generator + datasource ONLY — no models/enums belong here
+│   │   ├── shared.prisma                # Cross-domain enums (e.g. CategoryProductStatus)
+│   │   ├── user.prisma                  # User, Profile, UserSecurity, Session, OTP + their enums
+│   │   ├── category.prisma              # Category
+│   │   ├── product.prisma               # Product, ProductVariant, ProductImage + their enums
+│   │   └── inventory.prisma             # Inventory + InventoryExchangeType
 │   └── migrations/                      # Append-only history of applied SQL migrations
 │       ├── migration_lock.toml          # Locks the migration engine to "postgresql" — do not edit
 │       ├── 20260411060538_product_modified/
@@ -60,7 +66,7 @@ thai-health-product-server/
 prisma.config.ts ──loads env, in priority order──▶ used by Prisma CLI only
    │                                                 (migrate, studio, generate, validate, db ...)
    ▼
-prisma/schema.prisma ──`prisma generate`──▶ src/generated/prisma/* (PrismaClient + types)
+prisma/schema/*.prisma ──merged, then `prisma generate`──▶ src/generated/prisma/* (PrismaClient + types)
                                                  │
                                                  ▼
                                    src/prisma/prisma.service.ts
@@ -103,12 +109,15 @@ Both loading paths resolve files in this order (first file to define a variable 
 
 ---
 
-## 4. `schema.prisma` structure
+## 4. Multi-file schema structure
+
+The schema is split by domain under `prisma/schema/`, not a single `schema.prisma` file. Prisma 7's multi-file support merges every `*.prisma` file in the configured folder (`prisma.config.ts` → `schema: 'prisma/schema'`) as if it were one file — cross-file relations (e.g. `Product` → `Category`) resolve normally, no imports needed.
 
 ```prisma
+// prisma/schema/schema.prisma — generator + datasource ONLY, nothing else
 generator client {
-  provider     = "prisma-client"     // new (v7) client generator, not the legacy "prisma-client-js"
-  output       = "../src/generated/prisma"
+  provider     = "prisma-client"        // new (v7) client generator, not the legacy "prisma-client-js"
+  output       = "../../src/generated/prisma"  // one level deeper than a single-file schema would need
   moduleFormat = "cjs"
 }
 
@@ -119,7 +128,21 @@ datasource db {
 }
 ```
 
-Models are grouped by domain in this order: `User` → `Profile` → `UserSecurity` → `Session` → `OTP` → `Category` → `Product` → `ProductVariant` → `ProductImage` → `Inventory`. Each model uses `@@map`/`@map` to keep Prisma's camelCase field names mapped to `snake_case` Postgres columns/tables.
+> ⚠️ **Relative path gotcha:** because `schema.prisma` now lives at `prisma/schema/schema.prisma` instead of `prisma/schema.prisma`, the generator `output` path needed an extra `../` (`../../src/generated/prisma`) to still land at `src/generated/prisma`. If you ever move this file, re-run `npx prisma generate` and check the output path printed in the CLI log.
+
+**Where each domain lives:**
+
+| File | Models | Enums |
+|---|---|---|
+| `user.prisma` | `User`, `Profile`, `UserSecurity`, `Session`, `OTP` | `UserRole`, `AuthProvider`, `UserStatus`, `OTPType` |
+| `category.prisma` | `Category` | — |
+| `product.prisma` | `Product`, `ProductVariant`, `ProductImage` | `ProductType`, `DiscountType`, `StockStatus` |
+| `inventory.prisma` | `Inventory` | `InventoryExchangeType` |
+| `shared.prisma` | — | `CategoryProductStatus` (used by **both** `Category.status` and `Product.status` — that's why it's not in either domain file) |
+
+**Rule for new domains:** add a new `<domain>.prisma` file named after its `src/modules/<domain>` counterpart. If a new enum or model is genuinely used by 2+ domain files, it goes in `shared.prisma` — never duplicate it into each file that needs it.
+
+Each model uses `@@map`/`@map` to keep Prisma's camelCase field names mapped to `snake_case` Postgres columns/tables.
 
 ---
 
@@ -130,7 +153,8 @@ Run all commands from `thai-health-product-server/`.
 ### Day-to-day schema changes
 
 ```bash
-# 1. Edit prisma/schema.prisma, then generate a migration + apply it locally
+# 1. Edit the relevant prisma/schema/<domain>.prisma file(s), then generate
+#    a migration + apply it locally
 npx prisma migrate dev --name <short_description_of_change>
 
 # 2. Regenerate the TypeScript client (migrate dev does this automatically,
@@ -144,10 +168,11 @@ npx prisma generate
 # Open Prisma Studio (visual data browser) against your current env
 npx prisma studio
 
-# Validate schema.prisma syntax + relations without touching the DB
+# Validate every file under prisma/schema/ (merged) — syntax + relations,
+# without touching the DB
 npx prisma validate
 
-# Auto-format schema.prisma (consistent column alignment, etc.)
+# Auto-format every file under prisma/schema/ (consistent column alignment, etc.)
 npx prisma format
 ```
 

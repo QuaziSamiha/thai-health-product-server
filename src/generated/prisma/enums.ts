@@ -9,6 +9,56 @@
 * 🟢 You can import this file directly.
 */
 
+export const InventoryExchangeType = {
+  ADD: 'ADD',
+  RESTOCK: 'RESTOCK',
+  SALE: 'SALE',
+  RETURN: 'RETURN',
+  ADJUSTMENT: 'ADJUSTMENT',
+  DAMAGE: 'DAMAGE',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type InventoryExchangeType = (typeof InventoryExchangeType)[keyof typeof InventoryExchangeType]
+
+
+export const ProductType = {
+  SIMPLE: 'SIMPLE',
+  VARIABLE: 'VARIABLE',
+  COMBO: 'COMBO'
+} as const
+
+export type ProductType = (typeof ProductType)[keyof typeof ProductType]
+
+
+export const DiscountType = {
+  FIXED: 'FIXED',
+  PERCENTAGE: 'PERCENTAGE'
+} as const
+
+export type DiscountType = (typeof DiscountType)[keyof typeof DiscountType]
+
+
+export const StockStatus = {
+  IN_STOCK: 'IN_STOCK',
+  OUT_OF_STOCK: 'OUT_OF_STOCK',
+  LOW_STOCK: 'LOW_STOCK'
+} as const
+
+export type StockStatus = (typeof StockStatus)[keyof typeof StockStatus]
+
+
+export const CategoryProductStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  DRAFT: 'DRAFT',
+  ARCHIVED: 'ARCHIVED',
+  HIDDEN: 'HIDDEN'
+} as const
+
+export type CategoryProductStatus = (typeof CategoryProductStatus)[keyof typeof CategoryProductStatus]
+
+
 export const UserRole = {
   ADMIN: 'ADMIN',
   SUPER_ADMIN: 'SUPER_ADMIN',
@@ -57,53 +107,3 @@ export const OTPType = {
 } as const
 
 export type OTPType = (typeof OTPType)[keyof typeof OTPType]
-
-
-export const CategoryProductStatus = {
-  ACTIVE: 'ACTIVE',
-  INACTIVE: 'INACTIVE',
-  DRAFT: 'DRAFT',
-  ARCHIVED: 'ARCHIVED',
-  HIDDEN: 'HIDDEN'
-} as const
-
-export type CategoryProductStatus = (typeof CategoryProductStatus)[keyof typeof CategoryProductStatus]
-
-
-export const ProductType = {
-  SIMPLE: 'SIMPLE',
-  VARIABLE: 'VARIABLE',
-  COMBO: 'COMBO'
-} as const
-
-export type ProductType = (typeof ProductType)[keyof typeof ProductType]
-
-
-export const DiscountType = {
-  FIXED: 'FIXED',
-  PERCENTAGE: 'PERCENTAGE'
-} as const
-
-export type DiscountType = (typeof DiscountType)[keyof typeof DiscountType]
-
-
-export const StockStatus = {
-  IN_STOCK: 'IN_STOCK',
-  OUT_OF_STOCK: 'OUT_OF_STOCK',
-  LOW_STOCK: 'LOW_STOCK'
-} as const
-
-export type StockStatus = (typeof StockStatus)[keyof typeof StockStatus]
-
-
-export const InventoryExchangeType = {
-  ADD: 'ADD',
-  RESTOCK: 'RESTOCK',
-  SALE: 'SALE',
-  RETURN: 'RETURN',
-  ADJUSTMENT: 'ADJUSTMENT',
-  DAMAGE: 'DAMAGE',
-  EXPIRED: 'EXPIRED'
-} as const
-
-export type InventoryExchangeType = (typeof InventoryExchangeType)[keyof typeof InventoryExchangeType]

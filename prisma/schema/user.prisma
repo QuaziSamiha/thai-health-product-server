@@ -1,0 +1,148 @@
+//* ============= USER DOMAIN =============
+//* COVERS: AUTHENTICATION, PROFILE, SECURITY, SESSIONS, OTP
+
+enum UserRole {
+  ADMIN
+  SUPER_ADMIN
+  MANAGER
+  MARKETING
+  SUPPORT
+  EMPLOYEE
+  VENDOR
+  WAREHOUSE
+  DELIVERY_PARTNER
+  CUSTOMER
+  GUEST
+}
+
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+  FACEBOOK
+  APPLE
+}
+
+enum UserStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  BLOCKED
+  DEACTIVATED
+  ARCHIVED
+}
+
+enum OTPType {
+  SIGNUP
+  PASSWORD_RESET
+  LOGIN_2FA
+  PHONE_CHANGE
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  sid      String  @unique @default(uuid()) @map("user_sid") @db.Uuid // Use native UUID type for performance
+  email    String  @unique
+  password String? // Null for OAuth
+  phone    String? @db.VarChar(20)
+
+  // Enums
+  role         UserRole     @default(CUSTOMER)
+  status       UserStatus   @default(PENDING_VERIFICATION)
+  authProvider AuthProvider @default(EMAIL)
+  providerId   String? // OAuth ID
+
+  // Timestamps
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  lastLoginAt DateTime? @map("last_login_at")
+
+  // Relations
+  profile           Profile?
+  security          UserSecurity?
+  sessions          Session[] // Replaces single refreshToken for multi-device support
+  otps              OTP[]
+  createdCategories Category[]    @relation("CategoryCreatedBy")
+  updatedCategories Category[]    @relation("CategoryUpdatedBy")
+  createdProducts   Product[]     @relation("ProductCreatedBy")
+  updatedProducts   Product[]     @relation("ProductUpdatedBy")
+  deletedProducts   Product[]     @relation("ProductDeletedBy")
+  inventories       Inventory[]
+
+  @@index([email, phone])
+  @@map("users")
+}
+
+model Profile {
+  id          Int       @id @default(autoincrement())
+  firstName   String    @db.VarChar(100)
+  lastName    String?   @db.VarChar(100)
+  name        String?   @db.VarChar(200)
+  avatarUrl   String? // One source of truth for the image
+  bio         String?   @db.Text
+  dateOfBirth DateTime?
+  gender      String?   @db.VarChar(20)
+
+  metadata Json? @default("{}")
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @unique @map("user_id")
+
+  @@index([firstName, lastName])
+  @@map("profiles")
+}
+
+model UserSecurity {
+  id              Int       @id @default(autoincrement())
+  isEmailVerified Boolean   @default(false)
+  emailVerifiedAt DateTime?
+
+  // Multi-step Auth logic
+  verificationToken        String?
+  verificationTokenExpires DateTime?
+  resetToken               String?
+  resetTokenExpires        DateTime?
+
+  // Security Logs
+  loginAttempts Int     @default(0)
+  lastLoginIp   String?
+  assignedIp    String? // For internal/vendor restricted access
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @unique @map("user_id")
+
+  @@map("user_security")
+}
+
+model Session {
+  id                    Int      @id @default(autoincrement())
+  refreshToken          String   @unique @db.Text
+  refreshTokenExpiresAt DateTime
+  createdAt             DateTime @default(now())
+  userAgent             String?
+  ipAddress             String?
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  @@map("sessions")
+}
+
+model OTP {
+  id        Int      @id @default(autoincrement())
+  code      String // Hashed code for security
+  type      OTPType
+  expiresAt DateTime @map("expires_at")
+  isUsed    Boolean  @default(false) @map("is_used")
+
+  // To identify the target
+  identifier String // * email or phone number
+
+  userId Int?  @map("user_id") // Optional for guest checkouts
+  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([identifier])
+  @@map("otps")
+}

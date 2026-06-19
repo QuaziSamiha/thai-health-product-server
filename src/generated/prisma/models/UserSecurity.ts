@@ -529,10 +529,6 @@ export type UserSecurityUncheckedUpdateOneWithoutUserNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserSecurityUpdateToOneWithWhereWithoutUserInput, Prisma.UserSecurityUpdateWithoutUserInput>, Prisma.UserSecurityUncheckedUpdateWithoutUserInput>
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type UserSecurityCreateWithoutUserInput = {
   isEmailVerified?: boolean
   emailVerifiedAt?: Date | string | null

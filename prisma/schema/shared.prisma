@@ -1,0 +1,12 @@
+//* CROSS-DOMAIN ENUMS — USED BY MORE THAN ONE DOMAIN FILE
+//* KEEP THIS FILE SMALL: ANYTHING OWNED BY A SINGLE DOMAIN BELONGS IN
+//* THAT DOMAIN'S OWN .PRISMA FILE INSTEAD
+
+//* USED BY BOTH Category.status (category.prisma) AND Product.status (product.prisma)
+enum CategoryProductStatus {
+  ACTIVE
+  INACTIVE
+  DRAFT
+  ARCHIVED
+  HIDDEN
+}

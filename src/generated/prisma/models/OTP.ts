@@ -476,14 +476,6 @@ export type EnumOTPTypeFieldUpdateOperationsInput = {
   set?: $Enums.OTPType
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type OTPCreateWithoutUserInput = {
   code: string
   type: $Enums.OTPType
