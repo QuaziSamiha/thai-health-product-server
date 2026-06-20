@@ -14,7 +14,6 @@ import { UserResponseDto } from '../user/dto/user-response.dto';
 import { IJwtPayload, ITokens } from './interfaces/jwt-payload.interface';
 import { LoginDto } from './dto/login.dto';
 import { TokensResponseDto } from './dto/token-response.dto';
-import { ERROR_MESSAGES } from './constants/error-messages.constants';
 
 @Injectable()
 export class AuthService {
@@ -34,33 +33,33 @@ export class AuthService {
   ): Promise<UserResponseDto> {
     const user = await this.userService.findForAuth(email);
     if (!user) {
-      throw new UnauthorizedException(ERROR_MESSAGES.INVALID_CREDENTIALS);
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     if (
       user.status === UserStatus.BLOCKED ||
       user.status === UserStatus.SUSPENDED
     ) {
-      throw new ForbiddenException(
-        ERROR_MESSAGES.ACCOUNT_STATUS(user.status.toLowerCase()),
-      );
+      throw new ForbiddenException(`Account is ${user.status.toLowerCase()}`);
     }
 
     if (user.status === UserStatus.PENDING_VERIFICATION) {
       throw new UnauthorizedException(
-        ERROR_MESSAGES.ACCOUNT_PENDING_VERIFICATION,
+        'Account is not active. Please verify your email before logging in',
       );
     }
 
     // * Check for password (OAuth users won't have one)
     if (!user.password) {
-      throw new UnauthorizedException(ERROR_MESSAGES.PASSWORD_NOT_SET);
+      throw new UnauthorizedException(
+        'Password not set. Please use third-party (Google, Facebook) login.',
+      );
     }
 
     const isMatch = await this.hashService.compare(password, user.password);
     if (!isMatch) {
       await this.userService.updateLoginAttempts(user.id); // * Increment failed attempts
-      throw new UnauthorizedException(ERROR_MESSAGES.INVALID_CREDENTIALS);
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     await this.userService.updateLoginSuccess(user.id, ip);
@@ -110,17 +109,17 @@ export class AuthService {
       );
 
       if (!payload || !payload.sub) {
-        throw new UnauthorizedException(ERROR_MESSAGES.INVALID_TOKEN_PAYLOAD);
+        throw new UnauthorizedException('Invalid token payload');
       }
 
       const user = await this.userService.getUserById(payload.sub);
 
       if (!user) {
-        throw new UnauthorizedException(ERROR_MESSAGES.USER_NOT_FOUND);
+        throw new UnauthorizedException('User not found');
       }
 
       if (user.status !== UserStatus.ACTIVE) {
-        throw new UnauthorizedException(ERROR_MESSAGES.ACCOUNT_NOT_ACTIVE);
+        throw new UnauthorizedException('Account is not active');
       }
 
       // 5. Generate new pair
@@ -133,9 +132,7 @@ export class AuthService {
       return new TokensResponseDto(tokens);
     } catch (error: unknown) {
       this.logger.warn('Refresh token validation failed', error);
-      throw new UnauthorizedException(
-        ERROR_MESSAGES.INVALID_OR_EXPIRED_REFRESH_TOKEN,
-      );
+      throw new UnauthorizedException('Invalid or expired refresh token');
     }
   }
 

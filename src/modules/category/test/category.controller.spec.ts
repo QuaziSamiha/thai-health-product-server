@@ -8,16 +8,23 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { CategoryController } from '../category.controller';
 import { CategoryService } from '../category.service';
-import { CategoryResponseDto, RootActiveCategoryResponseDto } from '../dto/category-response.dto';
-import { CategoryProductStatus, UserRole } from '../../../generated/prisma/enums';
-import { ERROR_MESSAGES } from '../../../common/constants/error-messages';
+import {
+  CategoryResponseDto,
+  RootActiveCategoryResponseDto,
+} from '../dto/category-response.dto';
+import {
+  CategoryProductStatus,
+  UserRole,
+} from '../../../generated/prisma/enums';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 /** Minimal shape that satisfies CategoryResponseDto for assertion purposes. */
-const makeCategoryDto = (overrides: Partial<CategoryResponseDto> = {}): CategoryResponseDto =>
+const makeCategoryDto = (
+  overrides: Partial<CategoryResponseDto> = {},
+): CategoryResponseDto =>
   ({
     id: 1,
     sid: 'uuid-111',
@@ -34,7 +41,10 @@ const makeCategoryDto = (overrides: Partial<CategoryResponseDto> = {}): Category
     ...overrides,
   }) as CategoryResponseDto;
 
-const makeRootDto = (): RootActiveCategoryResponseDto => ({ id: 1, name: 'Electronics' });
+const makeRootDto = (): RootActiveCategoryResponseDto => ({
+  id: 1,
+  name: 'Electronics',
+});
 
 /** Creates a mock Express Response with a spy-able json() and status() chain. */
 const makeMockResponse = () => {
@@ -46,7 +56,9 @@ const makeMockResponse = () => {
 
 /** Creates a minimal authenticated request object. */
 const makeAuthReq = (userId = 1) =>
-  ({ user: { id: userId } }) as import('express').Request & { user: { id: number } };
+  ({ user: { id: userId } }) as import('express').Request & {
+    user: { id: number };
+  };
 
 const makeFile = (): Express.Multer.File =>
   ({
@@ -113,7 +125,9 @@ describe('CategoryController', () => {
 
     it('returns 401 when user identity is missing from the request', async () => {
       const res = makeMockResponse();
-      const req = { user: undefined } as unknown as import('express').Request & { user?: { id: number } };
+      const req = {
+        user: undefined,
+      } as unknown as import('express').Request & { user?: { id: number } };
 
       await controller.createCategory({ name: 'X' }, {}, req, res);
 
@@ -125,28 +139,38 @@ describe('CategoryController', () => {
 
     it('returns 404 when service throws NotFoundException (parent not found)', async () => {
       service.createCategory.mockRejectedValue(
-        new NotFoundException(ERROR_MESSAGES.CATEGORY.PARENT_NOT_FOUND),
+        new NotFoundException('Parent category not found'),
       );
       const res = makeMockResponse();
 
-      await controller.createCategory({ name: 'X', parentId: 999 }, {}, makeAuthReq(), res);
+      await controller.createCategory(
+        { name: 'X', parentId: 999 },
+        {},
+        makeAuthReq(),
+        res,
+      );
 
       expect(res.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: ERROR_MESSAGES.CATEGORY.PARENT_NOT_FOUND,
+          message: 'Parent category not found',
         }),
       );
     });
 
     it('returns 409 when service throws ConflictException (duplicate name)', async () => {
       service.createCategory.mockRejectedValue(
-        new ConflictException(ERROR_MESSAGES.CATEGORY.DUPLICATE_NAME),
+        new ConflictException('Category with this name already exists'),
       );
       const res = makeMockResponse();
 
-      await controller.createCategory({ name: 'Electronics' }, {}, makeAuthReq(), res);
+      await controller.createCategory(
+        { name: 'Electronics' },
+        {},
+        makeAuthReq(),
+        res,
+      );
 
       expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
       expect(res.json).toHaveBeenCalledWith(
@@ -226,7 +250,10 @@ describe('CategoryController', () => {
 
   describe('getAllActiveCategories', () => {
     it('returns 200 with the active category list', async () => {
-      const categories = [makeCategoryDto(), makeCategoryDto({ id: 2, name: 'Fashion' })];
+      const categories = [
+        makeCategoryDto(),
+        makeCategoryDto({ id: 2, name: 'Fashion' }),
+      ];
       service.getAllActiveCategories.mockResolvedValue(categories);
       const res = makeMockResponse();
 
@@ -296,7 +323,7 @@ describe('CategoryController', () => {
 
     it('returns 404 when service throws NotFoundException', async () => {
       service.getCategoryBySlug.mockRejectedValue(
-        new NotFoundException(ERROR_MESSAGES.CATEGORY.NOT_FOUND),
+        new NotFoundException('Category not found'),
       );
       const res = makeMockResponse();
 
@@ -306,7 +333,7 @@ describe('CategoryController', () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: ERROR_MESSAGES.CATEGORY.NOT_FOUND,
+          message: 'Category not found',
         }),
       );
     });
@@ -322,7 +349,13 @@ describe('CategoryController', () => {
       service.updateCategory.mockResolvedValue(updated);
       const res = makeMockResponse();
 
-      await controller.updateCategory(1, { name: 'New Name' }, {}, makeAuthReq(), res);
+      await controller.updateCategory(
+        1,
+        { name: 'New Name' },
+        {},
+        makeAuthReq(),
+        res,
+      );
 
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.json).toHaveBeenCalledWith(
@@ -332,7 +365,9 @@ describe('CategoryController', () => {
 
     it('returns 401 when user identity is missing', async () => {
       const res = makeMockResponse();
-      const req = { user: undefined } as unknown as import('express').Request & { user?: { id: number } };
+      const req = {
+        user: undefined,
+      } as unknown as import('express').Request & { user?: { id: number } };
 
       await controller.updateCategory(1, {}, {}, req, res);
 
@@ -341,7 +376,7 @@ describe('CategoryController', () => {
 
     it('returns 404 when service throws NotFoundException', async () => {
       service.updateCategory.mockRejectedValue(
-        new NotFoundException(ERROR_MESSAGES.CATEGORY.NOT_FOUND_BY_ID(1)),
+        new NotFoundException(`Category with ID 1 not found`),
       );
       const res = makeMockResponse();
 
@@ -352,11 +387,17 @@ describe('CategoryController', () => {
 
     it('returns 409 when service throws ConflictException (duplicate slug)', async () => {
       service.updateCategory.mockRejectedValue(
-        new ConflictException(ERROR_MESSAGES.CATEGORY.DUPLICATE_NAME_ON_UPDATE),
+        new ConflictException('New category name results in a duplicate name'),
       );
       const res = makeMockResponse();
 
-      await controller.updateCategory(1, { name: 'Duplicate' }, {}, makeAuthReq(), res);
+      await controller.updateCategory(
+        1,
+        { name: 'Duplicate' },
+        {},
+        makeAuthReq(),
+        res,
+      );
 
       expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
     });

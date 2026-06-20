@@ -11,7 +11,6 @@ import { STORAGE_SERVICE_TOKEN } from '../../../shared/storage/storage.constants
 import type { IStorageService } from '../../../shared/storage/interfaces/storage.interface';
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
-import { ERROR_MESSAGES } from '../../../common/constants/error-messages';
 import {
   CategoryProductStatus,
   UserRole,
@@ -138,7 +137,12 @@ describe('CategoryService', () => {
       const result = await service.createCategory(userId, dto, {});
 
       expect(repo.createCategory).toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'Electronics', slug: 'electronics', level: 0, userId }),
+        expect.objectContaining({
+          name: 'Electronics',
+          slug: 'electronics',
+          level: 0,
+          userId,
+        }),
       );
       expect(result.name).toBe('Electronics');
       expect(result.level).toBe(0);
@@ -172,19 +176,19 @@ describe('CategoryService', () => {
 
       await expect(
         service.createCategory(userId, { name: 'X', parentId: 99 }, {}),
-      ).rejects.toThrow(ERROR_MESSAGES.CATEGORY.PARENT_NOT_FOUND);
+      ).rejects.toThrow('Parent category not found');
     });
 
     it('throws ConflictException when a category with the same name already exists', async () => {
       repo.findBySlug.mockResolvedValue(makeCategory());
 
-      await expect(
-        service.createCategory(userId, dto, {}),
-      ).rejects.toThrow(ConflictException);
+      await expect(service.createCategory(userId, dto, {})).rejects.toThrow(
+        ConflictException,
+      );
 
-      await expect(
-        service.createCategory(userId, dto, {}),
-      ).rejects.toThrow(ERROR_MESSAGES.CATEGORY.DUPLICATE_NAME);
+      await expect(service.createCategory(userId, dto, {})).rejects.toThrow(
+        'Category with this name already exists',
+      );
     });
 
     it('uploads all three images and updates category URLs', async () => {
@@ -199,9 +203,18 @@ describe('CategoryService', () => {
       repo.findById.mockResolvedValue(updated);
       repo.updateCategory.mockResolvedValue(updated);
       storage.saveFile
-        .mockResolvedValueOnce({ filename: 'banner.jpg', path: '/categories/banner-images/banner.jpg' })
-        .mockResolvedValueOnce({ filename: 'icon.jpg', path: '/categories/icon-images/icon.jpg' })
-        .mockResolvedValueOnce({ filename: 'thumb.jpg', path: '/categories/thumbnail-images/thumb.jpg' });
+        .mockResolvedValueOnce({
+          filename: 'banner.jpg',
+          path: '/categories/banner-images/banner.jpg',
+        })
+        .mockResolvedValueOnce({
+          filename: 'icon.jpg',
+          path: '/categories/icon-images/icon.jpg',
+        })
+        .mockResolvedValueOnce({
+          filename: 'thumb.jpg',
+          path: '/categories/thumbnail-images/thumb.jpg',
+        });
 
       const result = await service.createCategory(userId, dto, {
         bannerImage: makeFile('banner.jpg'),
@@ -218,24 +231,35 @@ describe('CategoryService', () => {
           thumbnailUrl: '/categories/thumbnail-images/thumb.jpg',
         }),
       );
-      expect(result.bannerUrl).toBe(`${BASE_URL}/categories/banner-images/banner.jpg`);
+      expect(result.bannerUrl).toBe(
+        `${BASE_URL}/categories/banner-images/banner.jpg`,
+      );
     });
 
     it('uploads only iconImage when only iconImage is provided', async () => {
       const created = makeCategory();
-      const updated = makeCategory({ iconUrl: '/categories/icon-images/icon.jpg' });
+      const updated = makeCategory({
+        iconUrl: '/categories/icon-images/icon.jpg',
+      });
       repo.findBySlug.mockResolvedValue(null);
       repo.createCategory.mockResolvedValue(created);
       repo.findById.mockResolvedValue(updated);
       repo.updateCategory.mockResolvedValue(updated);
-      storage.saveFile.mockResolvedValue({ filename: 'icon.jpg', path: '/categories/icon-images/icon.jpg' });
+      storage.saveFile.mockResolvedValue({
+        filename: 'icon.jpg',
+        path: '/categories/icon-images/icon.jpg',
+      });
 
-      await service.createCategory(userId, dto, { iconImage: makeFile('icon.jpg') });
+      await service.createCategory(userId, dto, {
+        iconImage: makeFile('icon.jpg'),
+      });
 
       expect(storage.saveFile).toHaveBeenCalledTimes(1);
       expect(repo.updateCategory).toHaveBeenCalledWith(
         created.id,
-        expect.objectContaining({ iconUrl: '/categories/icon-images/icon.jpg' }),
+        expect.objectContaining({
+          iconUrl: '/categories/icon-images/icon.jpg',
+        }),
       );
     });
 
@@ -246,7 +270,10 @@ describe('CategoryService', () => {
       repo.deleteCategory.mockResolvedValue(undefined);
       // First upload succeeds, second throws
       storage.saveFile
-        .mockResolvedValueOnce({ filename: 'banner.jpg', path: '/categories/banner-images/banner.jpg' })
+        .mockResolvedValueOnce({
+          filename: 'banner.jpg',
+          path: '/categories/banner-images/banner.jpg',
+        })
         .mockRejectedValueOnce(new Error('S3 timeout'));
       storage.deleteFile.mockResolvedValue(undefined);
 
@@ -258,7 +285,10 @@ describe('CategoryService', () => {
       ).rejects.toThrow('S3 timeout');
 
       expect(repo.deleteCategory).toHaveBeenCalledWith(created.id);
-      expect(storage.deleteFile).toHaveBeenCalledWith('banner.jpg', 'categories/banner-images');
+      expect(storage.deleteFile).toHaveBeenCalledWith(
+        'banner.jpg',
+        'categories/banner-images',
+      );
     });
 
     it('does not call updateCategory when no images are provided', async () => {
@@ -300,7 +330,10 @@ describe('CategoryService', () => {
 
   describe('getAllActiveCategories', () => {
     it('returns all active categories as DTOs', async () => {
-      repo.findAllActiveCategories.mockResolvedValue([makeCategory(), makeCategory({ id: 2, name: 'Fashion', slug: 'fashion' })]);
+      repo.findAllActiveCategories.mockResolvedValue([
+        makeCategory(),
+        makeCategory({ id: 2, name: 'Fashion', slug: 'fashion' }),
+      ]);
 
       const result = await service.getAllActiveCategories();
 
@@ -356,7 +389,7 @@ describe('CategoryService', () => {
         NotFoundException,
       );
       await expect(service.getCategoryBySlug('unknown')).rejects.toThrow(
-        ERROR_MESSAGES.CATEGORY.NOT_FOUND,
+        'Category not found',
       );
     });
   });
@@ -369,7 +402,12 @@ describe('CategoryService', () => {
     const userId = 1;
     const categoryId = 1;
     const dto: UpdateCategoryDto = {};
-    const noImages = { image: undefined, iconImage: undefined, thumbnailImage: undefined, bannerImage: undefined };
+    const noImages = {
+      image: undefined,
+      iconImage: undefined,
+      thumbnailImage: undefined,
+      bannerImage: undefined,
+    };
 
     it('throws NotFoundException when category does not exist', async () => {
       repo.findById.mockResolvedValue(null);
@@ -379,27 +417,47 @@ describe('CategoryService', () => {
       ).rejects.toThrow(NotFoundException);
       await expect(
         service.updateCategory(categoryId, userId, dto, noImages),
-      ).rejects.toThrow(ERROR_MESSAGES.CATEGORY.NOT_FOUND_BY_ID(categoryId));
+      ).rejects.toThrow(`Category with ID ${categoryId} not found`);
     });
 
     it('throws BadRequestException when parentId equals the category id (self-parent)', async () => {
       repo.findById.mockResolvedValue(makeCategory());
 
       await expect(
-        service.updateCategory(categoryId, userId, { parentId: categoryId }, noImages),
+        service.updateCategory(
+          categoryId,
+          userId,
+          { parentId: categoryId },
+          noImages,
+        ),
       ).rejects.toThrow(BadRequestException);
       await expect(
-        service.updateCategory(categoryId, userId, { parentId: categoryId }, noImages),
-      ).rejects.toThrow(ERROR_MESSAGES.CATEGORY.SELF_PARENT);
+        service.updateCategory(
+          categoryId,
+          userId,
+          { parentId: categoryId },
+          noImages,
+        ),
+      ).rejects.toThrow('A category cannot be its own parent');
     });
 
     it('generates a new slug when name changes', async () => {
       const existing = makeCategory();
       repo.findById.mockResolvedValue(existing);
       repo.findBySlug.mockResolvedValue(null);
-      repo.updateCategory.mockResolvedValue(makeCategory({ name: 'Consumer Electronics', slug: 'consumer-electronics' }));
+      repo.updateCategory.mockResolvedValue(
+        makeCategory({
+          name: 'Consumer Electronics',
+          slug: 'consumer-electronics',
+        }),
+      );
 
-      await service.updateCategory(categoryId, userId, { name: 'Consumer Electronics' }, noImages);
+      await service.updateCategory(
+        categoryId,
+        userId,
+        { name: 'Consumer Electronics' },
+        noImages,
+      );
 
       expect(repo.updateCategory).toHaveBeenCalledWith(
         categoryId,
@@ -412,10 +470,18 @@ describe('CategoryService', () => {
       repo.findById.mockResolvedValue(existing);
       repo.updateCategory.mockResolvedValue(existing);
 
-      await service.updateCategory(categoryId, userId, { name: 'Electronics' }, noImages);
+      await service.updateCategory(
+        categoryId,
+        userId,
+        { name: 'Electronics' },
+        noImages,
+      );
 
       expect(repo.findBySlug).not.toHaveBeenCalled();
-      const call = repo.updateCategory.mock.calls[0][1] as Record<string, unknown>;
+      const call = repo.updateCategory.mock.calls[0][1] as Record<
+        string,
+        unknown
+      >;
       expect(call.slug).toBeUndefined();
     });
 
@@ -426,11 +492,21 @@ describe('CategoryService', () => {
       repo.findBySlug.mockResolvedValue(other);
 
       await expect(
-        service.updateCategory(categoryId, userId, { name: 'Fashion' }, noImages),
+        service.updateCategory(
+          categoryId,
+          userId,
+          { name: 'Fashion' },
+          noImages,
+        ),
       ).rejects.toThrow(ConflictException);
       await expect(
-        service.updateCategory(categoryId, userId, { name: 'Fashion' }, noImages),
-      ).rejects.toThrow(ERROR_MESSAGES.CATEGORY.DUPLICATE_NAME_ON_UPDATE);
+        service.updateCategory(
+          categoryId,
+          userId,
+          { name: 'Fashion' },
+          noImages,
+        ),
+      ).rejects.toThrow('New category name results in a duplicate name');
     });
 
     it('does not throw ConflictException when slug matches itself (safe rename to same name)', async () => {
@@ -441,7 +517,12 @@ describe('CategoryService', () => {
       repo.updateCategory.mockResolvedValue(existing);
 
       await expect(
-        service.updateCategory(categoryId, userId, { name: 'Electronics' }, noImages),
+        service.updateCategory(
+          categoryId,
+          userId,
+          { name: 'Electronics' },
+          noImages,
+        ),
       ).resolves.not.toThrow();
     });
 
@@ -450,7 +531,12 @@ describe('CategoryService', () => {
       repo.findById.mockResolvedValue(existing);
       repo.updateCategory.mockResolvedValue(makeCategory({ level: 0 }));
 
-      await service.updateCategory(categoryId, userId, { parentId: null as never }, noImages);
+      await service.updateCategory(
+        categoryId,
+        userId,
+        { parentId: null as never },
+        noImages,
+      );
 
       expect(repo.updateCategory).toHaveBeenCalledWith(
         categoryId,
@@ -461,10 +547,17 @@ describe('CategoryService', () => {
     it('updates level to parent.level + 1 when parentId changes', async () => {
       const existing = makeCategory();
       const newParent = makeCategory({ id: 10, level: 3 });
-      repo.findById.mockResolvedValueOnce(existing).mockResolvedValueOnce(newParent);
+      repo.findById
+        .mockResolvedValueOnce(existing)
+        .mockResolvedValueOnce(newParent);
       repo.updateCategory.mockResolvedValue(makeCategory({ level: 4 }));
 
-      await service.updateCategory(categoryId, userId, { parentId: 10 }, noImages);
+      await service.updateCategory(
+        categoryId,
+        userId,
+        { parentId: 10 },
+        noImages,
+      );
 
       expect(repo.updateCategory).toHaveBeenCalledWith(
         categoryId,
@@ -473,108 +566,153 @@ describe('CategoryService', () => {
     });
 
     it('throws NotFoundException when new parentId does not exist', async () => {
-      repo.findById.mockResolvedValueOnce(makeCategory()).mockResolvedValueOnce(null);
+      repo.findById
+        .mockResolvedValueOnce(makeCategory())
+        .mockResolvedValueOnce(null);
 
       await expect(
         service.updateCategory(categoryId, userId, { parentId: 999 }, noImages),
       ).rejects.toThrow(NotFoundException);
       await expect(
         service.updateCategory(categoryId, userId, { parentId: 999 }, noImages),
-      ).rejects.toThrow(ERROR_MESSAGES.CATEGORY.PARENT_NOT_FOUND);
+      ).rejects.toThrow('Parent category not found');
     });
 
     it('uploads new bannerImage, saves URL, and deletes the old file', async () => {
-      const existing = makeCategory({ bannerUrl: '/categories/banner-images/old.jpg' });
-      const updatedCat = makeCategory({ bannerUrl: '/categories/banner-images/new.jpg' });
+      const existing = makeCategory({
+        bannerUrl: '/categories/banner-images/old.jpg',
+      });
+      const updatedCat = makeCategory({
+        bannerUrl: '/categories/banner-images/new.jpg',
+      });
       repo.findById.mockResolvedValue(existing);
       repo.updateCategory.mockResolvedValue(updatedCat);
-      storage.saveFile.mockResolvedValue({ filename: 'new.jpg', path: '/categories/banner-images/new.jpg' });
+      storage.saveFile.mockResolvedValue({
+        filename: 'new.jpg',
+        path: '/categories/banner-images/new.jpg',
+      });
       storage.deleteFile.mockResolvedValue(undefined);
 
-      await service.updateCategory(
-        categoryId,
-        userId,
-        dto,
-        { ...noImages, bannerImage: makeFile('new.jpg') },
-      );
+      await service.updateCategory(categoryId, userId, dto, {
+        ...noImages,
+        bannerImage: makeFile('new.jpg'),
+      });
 
-      expect(storage.saveFile).toHaveBeenCalledWith(expect.any(Object), 'categories/banner-images');
-      expect(storage.deleteFile).toHaveBeenCalledWith('old.jpg', 'categories/banner-images');
+      expect(storage.saveFile).toHaveBeenCalledWith(
+        expect.any(Object),
+        'categories/banner-images',
+      );
+      expect(storage.deleteFile).toHaveBeenCalledWith(
+        'old.jpg',
+        'categories/banner-images',
+      );
       expect(repo.updateCategory).toHaveBeenCalledWith(
         categoryId,
-        expect.objectContaining({ bannerUrl: '/categories/banner-images/new.jpg' }),
+        expect.objectContaining({
+          bannerUrl: '/categories/banner-images/new.jpg',
+        }),
       );
     });
 
     it('treats image as an alias for bannerImage during update', async () => {
       const existing = makeCategory();
       repo.findById.mockResolvedValue(existing);
-      repo.updateCategory.mockResolvedValue(makeCategory({ bannerUrl: '/categories/banner-images/img.jpg' }));
-      storage.saveFile.mockResolvedValue({ filename: 'img.jpg', path: '/categories/banner-images/img.jpg' });
-
-      await service.updateCategory(
-        categoryId,
-        userId,
-        dto,
-        { ...noImages, image: makeFile('img.jpg') },
+      repo.updateCategory.mockResolvedValue(
+        makeCategory({ bannerUrl: '/categories/banner-images/img.jpg' }),
       );
+      storage.saveFile.mockResolvedValue({
+        filename: 'img.jpg',
+        path: '/categories/banner-images/img.jpg',
+      });
 
-      expect(storage.saveFile).toHaveBeenCalledWith(expect.any(Object), 'categories/banner-images');
+      await service.updateCategory(categoryId, userId, dto, {
+        ...noImages,
+        image: makeFile('img.jpg'),
+      });
+
+      expect(storage.saveFile).toHaveBeenCalledWith(
+        expect.any(Object),
+        'categories/banner-images',
+      );
     });
 
     it('uploads new iconImage and deletes the old file', async () => {
-      const existing = makeCategory({ iconUrl: '/categories/icon-images/old-icon.jpg' });
+      const existing = makeCategory({
+        iconUrl: '/categories/icon-images/old-icon.jpg',
+      });
       repo.findById.mockResolvedValue(existing);
-      repo.updateCategory.mockResolvedValue(makeCategory({ iconUrl: '/categories/icon-images/new-icon.jpg' }));
-      storage.saveFile.mockResolvedValue({ filename: 'new-icon.jpg', path: '/categories/icon-images/new-icon.jpg' });
+      repo.updateCategory.mockResolvedValue(
+        makeCategory({ iconUrl: '/categories/icon-images/new-icon.jpg' }),
+      );
+      storage.saveFile.mockResolvedValue({
+        filename: 'new-icon.jpg',
+        path: '/categories/icon-images/new-icon.jpg',
+      });
       storage.deleteFile.mockResolvedValue(undefined);
 
-      await service.updateCategory(
-        categoryId,
-        userId,
-        dto,
-        { ...noImages, iconImage: makeFile('new-icon.jpg') },
-      );
+      await service.updateCategory(categoryId, userId, dto, {
+        ...noImages,
+        iconImage: makeFile('new-icon.jpg'),
+      });
 
-      expect(storage.deleteFile).toHaveBeenCalledWith('old-icon.jpg', 'categories/icon-images');
+      expect(storage.deleteFile).toHaveBeenCalledWith(
+        'old-icon.jpg',
+        'categories/icon-images',
+      );
     });
 
     it('uploads new thumbnailImage and deletes the old file', async () => {
-      const existing = makeCategory({ thumbnailUrl: '/categories/thumbnail-images/old-thumb.jpg' });
+      const existing = makeCategory({
+        thumbnailUrl: '/categories/thumbnail-images/old-thumb.jpg',
+      });
       repo.findById.mockResolvedValue(existing);
-      repo.updateCategory.mockResolvedValue(makeCategory({ thumbnailUrl: '/categories/thumbnail-images/new-thumb.jpg' }));
-      storage.saveFile.mockResolvedValue({ filename: 'new-thumb.jpg', path: '/categories/thumbnail-images/new-thumb.jpg' });
+      repo.updateCategory.mockResolvedValue(
+        makeCategory({
+          thumbnailUrl: '/categories/thumbnail-images/new-thumb.jpg',
+        }),
+      );
+      storage.saveFile.mockResolvedValue({
+        filename: 'new-thumb.jpg',
+        path: '/categories/thumbnail-images/new-thumb.jpg',
+      });
       storage.deleteFile.mockResolvedValue(undefined);
 
-      await service.updateCategory(
-        categoryId,
-        userId,
-        dto,
-        { ...noImages, thumbnailImage: makeFile('new-thumb.jpg') },
-      );
+      await service.updateCategory(categoryId, userId, dto, {
+        ...noImages,
+        thumbnailImage: makeFile('new-thumb.jpg'),
+      });
 
-      expect(storage.deleteFile).toHaveBeenCalledWith('old-thumb.jpg', 'categories/thumbnail-images');
+      expect(storage.deleteFile).toHaveBeenCalledWith(
+        'old-thumb.jpg',
+        'categories/thumbnail-images',
+      );
     });
 
     it('skips deleteFile when no previous image URL exists', async () => {
       const existing = makeCategory({ bannerUrl: null });
       repo.findById.mockResolvedValue(existing);
-      repo.updateCategory.mockResolvedValue(makeCategory({ bannerUrl: '/categories/banner-images/new.jpg' }));
-      storage.saveFile.mockResolvedValue({ filename: 'new.jpg', path: '/categories/banner-images/new.jpg' });
-
-      await service.updateCategory(
-        categoryId,
-        userId,
-        dto,
-        { ...noImages, bannerImage: makeFile('new.jpg') },
+      repo.updateCategory.mockResolvedValue(
+        makeCategory({ bannerUrl: '/categories/banner-images/new.jpg' }),
       );
+      storage.saveFile.mockResolvedValue({
+        filename: 'new.jpg',
+        path: '/categories/banner-images/new.jpg',
+      });
+
+      await service.updateCategory(categoryId, userId, dto, {
+        ...noImages,
+        bannerImage: makeFile('new.jpg'),
+      });
 
       expect(storage.deleteFile).not.toHaveBeenCalled();
     });
 
     it('returns the updated category as a CategoryResponseAdminDto', async () => {
       const existing = makeCategory();
-      const updated = makeCategory({ name: 'Updated Name', slug: 'updated-name' });
+      const updated = makeCategory({
+        name: 'Updated Name',
+        slug: 'updated-name',
+      });
       repo.findById.mockResolvedValue(existing);
       repo.findBySlug.mockResolvedValue(null);
       repo.updateCategory.mockResolvedValue(updated);

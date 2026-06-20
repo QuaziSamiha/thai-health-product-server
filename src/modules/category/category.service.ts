@@ -18,7 +18,6 @@ import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
 import type { IStorageService } from '../../shared/storage/interfaces/storage.interface';
 import { PaginationQueryDto, IPaginatedResult } from '../../shared/pagination';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { ERROR_MESSAGES } from '../../common/constants/error-messages';
 
 @Injectable()
 export class CategoryService {
@@ -45,7 +44,7 @@ export class CategoryService {
     if (parentId) {
       const parent = await this.categoryRepository.findById(parentId);
       if (!parent) {
-        throw new NotFoundException(ERROR_MESSAGES.CATEGORY.PARENT_NOT_FOUND);
+        throw new NotFoundException('Parent category not found');
       }
       level = parent.level + 1;
     }
@@ -53,7 +52,7 @@ export class CategoryService {
     const slug = generateSlug(name);
     const existingCategory = await this.categoryRepository.findBySlug(slug);
     if (existingCategory) {
-      throw new ConflictException(ERROR_MESSAGES.CATEGORY.DUPLICATE_NAME);
+      throw new ConflictException('Category with this name already exists');
     }
 
     let bannerImagePath: string | undefined;
@@ -169,7 +168,7 @@ export class CategoryService {
   async getCategoryBySlug(slug: string): Promise<CategoryResponseDto> {
     const existingCategory = await this.categoryRepository.findBySlug(slug);
     if (!existingCategory) {
-      throw new NotFoundException(ERROR_MESSAGES.CATEGORY.NOT_FOUND);
+      throw new NotFoundException('Category not found');
     }
     return new CategoryResponseDto(existingCategory, getBaseUrl());
   }
@@ -187,7 +186,7 @@ export class CategoryService {
   ): Promise<CategoryResponseDto> {
     const category = await this.categoryRepository.findById(id);
     if (!category) {
-      throw new NotFoundException(ERROR_MESSAGES.CATEGORY.NOT_FOUND_BY_ID(id));
+      throw new NotFoundException(`Category with ID ${id} not found`);
     }
 
     const updateData: Partial<UpdateCategoryDto> & {
@@ -203,7 +202,7 @@ export class CategoryService {
       const existingSlug = await this.categoryRepository.findBySlug(newSlug);
       if (existingSlug && existingSlug.id !== id) {
         throw new ConflictException(
-          ERROR_MESSAGES.CATEGORY.DUPLICATE_NAME_ON_UPDATE,
+          'New category name results in a duplicate name',
         );
       }
       updateData.slug = newSlug;
@@ -211,7 +210,7 @@ export class CategoryService {
 
     if (updateCategoryDto.parentId !== undefined) {
       if (updateCategoryDto.parentId === id) {
-        throw new BadRequestException(ERROR_MESSAGES.CATEGORY.SELF_PARENT);
+        throw new BadRequestException('A category cannot be its own parent');
       }
 
       if (updateCategoryDto.parentId === null) {
@@ -221,7 +220,7 @@ export class CategoryService {
           updateCategoryDto.parentId,
         );
         if (!parent) {
-          throw new NotFoundException(ERROR_MESSAGES.CATEGORY.PARENT_NOT_FOUND);
+          throw new NotFoundException('Parent category not found');
         }
         updateData.level = parent.level + 1;
       }
