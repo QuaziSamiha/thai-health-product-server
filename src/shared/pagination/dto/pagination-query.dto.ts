@@ -11,6 +11,7 @@ import { Type } from 'class-transformer';
 import {
   DEFAULT_PAGE,
   DEFAULT_PAGE_SIZE,
+  DEFAULT_SORT_ORDER,
   MAX_PAGE_SIZE,
 } from '../constants/pagination.constants';
 
@@ -49,13 +50,13 @@ export class PaginationQueryDto {
   @ApiPropertyOptional({
     description: 'Sorting direction for the list',
     enum: ['asc', 'desc'],
-    example: 'desc',
-    default: 'desc',
+    example: DEFAULT_SORT_ORDER,
+    default: DEFAULT_SORT_ORDER,
   })
   @IsOptional()
   @IsString({ message: 'Sort order must be a valid text string' })
   @IsIn(['asc', 'desc'], { message: 'Sort order must be either asc or desc' })
-  sortOrder?: 'asc' | 'desc' = 'desc';
+  sortOrder?: 'asc' | 'desc' = DEFAULT_SORT_ORDER;
 
   @ApiPropertyOptional({
     description:

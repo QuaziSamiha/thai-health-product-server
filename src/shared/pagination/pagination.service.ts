@@ -5,6 +5,7 @@ import {
   IPaginationDataSource,
   TFindManyArgsOf,
 } from './interfaces/pagination-data-source.interface';
+import { DEFAULT_SORT_FIELD } from './constants/pagination.constants';
 
 @Injectable()
 export class PaginationService {
@@ -32,7 +33,7 @@ export class PaginationService {
       include,
       select,
       searchableFields = [],
-      defaultSortField = 'createdAt',
+      defaultSortField = DEFAULT_SORT_FIELD,
     } = options;
 
     const searchCondition: Record<string, any> =

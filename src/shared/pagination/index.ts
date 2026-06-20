@@ -1,3 +1,4 @@
+//* SINGLE PUBLIC ENTRYPOINT — BARREL RE-EXPORT OF EVERYTHING BELOW
 export * from './pagination.module';
 export * from './pagination.service';
 export * from './dto/pagination-query.dto';
