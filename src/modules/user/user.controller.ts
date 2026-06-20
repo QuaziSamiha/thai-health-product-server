@@ -31,8 +31,8 @@ import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { sendResponse } from '../../common/responses/send-response';
 import type { Request, Response } from 'express';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../../common/guards/roles.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/auth/roles.decorator';
 import { UserRole } from '../../generated/prisma/enums';
 import {

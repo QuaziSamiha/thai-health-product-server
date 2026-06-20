@@ -6,9 +6,9 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { UserRole } from '../../generated/prisma/enums';
-import { ROLES_KEY } from '../decorators/auth/roles.decorator';
-import { User } from '../../generated/prisma/client';
+import { UserRole } from '../../../generated/prisma/enums';
+import { ROLES_KEY } from '../../../common/decorators/auth/roles.decorator';
+import { User } from '../../../generated/prisma/client';
 
 @Injectable()
 export class RolesGuard implements CanActivate {

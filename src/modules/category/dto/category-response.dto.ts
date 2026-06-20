@@ -5,7 +5,7 @@ import { CategoryModel } from '../../../generated/prisma/models';
 import {
   MinifiedUser,
   UserMinifiedResponseDto,
-} from '../../../common/responses/user-minified-response.dto';
+} from '../../user/dto/user-response.dto';
 
 export { UserMinifiedResponseDto };
 export type { MinifiedUser };

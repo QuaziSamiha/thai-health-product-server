@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
-import { IS_PUBLIC_KEY } from '../decorators/auth/public.decorator';
-import { User } from '../../generated/prisma/client';
+import { IS_PUBLIC_KEY } from '../../../common/decorators/auth/public.decorator';
+import { User } from '../../../generated/prisma/client';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {

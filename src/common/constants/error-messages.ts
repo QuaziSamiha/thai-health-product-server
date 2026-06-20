@@ -8,12 +8,6 @@ export const ERROR_MESSAGES = {
     SELF_PARENT: 'A category cannot be its own parent',
     DUPLICATE_NAME_ON_UPDATE: 'New category name results in a duplicate name',
   },
-  AUTH: {
-    INVALID_CREDENTIALS: 'Invalid email or password',
-    TOKEN_EXPIRED: 'Session expired, please log in again',
-    TOKEN_INVALID: 'Invalid authentication token',
-    USER_IDENTITY_MISSING: 'User identity missing from request',
-  },
   USER: {
     NOT_FOUND: 'User not found',
     DUPLICATE_EMAIL: 'A user with this email already exists',
