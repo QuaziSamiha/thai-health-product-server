@@ -3,13 +3,11 @@ import {
   Catch,
   ArgumentsHost,
   HttpStatus,
+  HttpException,
   BadRequestException,
-  UnauthorizedException,
-  ForbiddenException,
   Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { ApiError } from './api-error';
 import { ValidationError } from 'class-validator';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import { constraintRecordFromUnknown } from '../utils/validation.util';
@@ -34,36 +32,16 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       statusCode = HttpStatus.UNAUTHORIZED;
       message = 'Token expired';
       error = (exception as Error).message;
-    } else if (exception instanceof UnauthorizedException) {
-      statusCode = HttpStatus.UNAUTHORIZED;
-      const exceptionResponse = exception.getResponse();
-      message =
-        typeof exceptionResponse === 'object'
-          ? (exceptionResponse['message'] as string) || 'Unauthorized'
-          : exceptionResponse;
-      error = 'Unauthorized';
-    } else if (exception instanceof ForbiddenException) {
-      statusCode = HttpStatus.FORBIDDEN;
-      const exceptionResponse = exception.getResponse();
-      message =
-        typeof exceptionResponse === 'object'
-          ? (exceptionResponse['message'] as string) || 'Forbidden'
-          : exceptionResponse;
-      error = 'Forbidden';
-    } else if (exception instanceof ApiError) {
-      statusCode = exception.statusCode;
-      message = exception.message;
-      error = exception.message;
     } else if (exception instanceof BadRequestException) {
       const validationErrors = exception.getResponse() as {
         message?: string | ValidationError[];
       };
       if (
-        Array.isArray(validationErrors['message']) &&
-        validationErrors['message'][0] instanceof ValidationError
+        Array.isArray(validationErrors.message) &&
+        validationErrors.message[0] instanceof ValidationError
       ) {
         statusCode = HttpStatus.BAD_REQUEST;
-        message = validationErrors['message']
+        message = validationErrors.message
           .map((item) =>
             Object.values(constraintRecordFromUnknown(item)).join(', '),
           )
@@ -71,15 +49,28 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         error = 'Validation Error';
       } else {
         statusCode = HttpStatus.BAD_REQUEST;
-        message =
-          (validationErrors['message'] as string) || 'Validation failed';
+        message = (validationErrors.message as string) || 'Validation failed';
         error = 'Bad Request';
+      }
+    } else if (exception instanceof HttpException) {
+      //* GENERIC FALLBACK FOR EVERY HttpException SUBCLASS (BUILT-IN OR CUSTOM) —
+      //* COVERS ANY CURRENT OR FUTURE EXCEPTION WITHOUT NEEDING ITS OWN NAMED BRANCH HERE
+      statusCode = exception.getStatus();
+      const exceptionResponse = exception.getResponse();
+      if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+        const responseObj = exceptionResponse as Record<string, unknown>;
+        message = (responseObj['message'] as string) || exception.message;
+        error = (responseObj['error'] as string) || exception.message;
+      } else {
+        message = exceptionResponse;
+        error = exceptionResponse;
       }
     }
 
     if ((statusCode as number) >= 500) {
+      const logMessage = Array.isArray(message) ? message.join(', ') : message;
       this.logger.error(
-        `Unhandled Exception [${statusCode}]: ${message}`,
+        `Unhandled Exception [${statusCode}]: ${logMessage}`,
         exception instanceof Error ? exception.stack : String(exception),
       );
     }
