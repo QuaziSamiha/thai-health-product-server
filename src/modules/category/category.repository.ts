@@ -3,8 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { BaseRepository } from '../../prisma/base.repository';
 import { Prisma } from '../../generated/prisma/client';
 import { CategoryProductStatus } from '../../generated/prisma/enums';
-import { PaginationService } from '../../shared/pagination/pagination.service';
-import { PaginationParamsDto } from '../../shared/pagination/dto/pagination-params.dto';
+import { PaginationService, PaginationQueryDto } from '../../shared/pagination';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Injectable()
@@ -129,11 +128,14 @@ export class CategoryRepository extends BaseRepository {
   }
 
   async findAllCategories(
-    params: PaginationParamsDto,
+    params: PaginationQueryDto,
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx || this.prisma;
-    return await this.paginationService.paginate(client.category, params, {
+    return await this.paginationService.paginate<
+      Prisma.CategoryGetPayload<{ select: typeof this.CATEGORY_SELECT }>,
+      typeof client.category
+    >(client.category, params, {
       select: this.CATEGORY_SELECT,
       searchableFields: ['name', 'slug', 'nameTh'],
       defaultSortField: 'createdAt',

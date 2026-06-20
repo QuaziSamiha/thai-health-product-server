@@ -3,8 +3,10 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { BaseRepository } from '../../../prisma/base.repository';
 import { Prisma, UserStatus } from '../../../generated/prisma/client';
 import { UserRole } from '../../../generated/prisma/enums';
-import { PaginationService } from '../../../shared/pagination/pagination.service';
-import { PaginationParamsDto } from '../../../shared/pagination/dto/pagination-params.dto';
+import {
+  PaginationService,
+  PaginationQueryDto,
+} from '../../../shared/pagination';
 
 @Injectable()
 export class UserRepository extends BaseRepository {
@@ -203,11 +205,14 @@ export class UserRepository extends BaseRepository {
   }
 
   async findAllUsers(
-    params: PaginationParamsDto,
+    params: PaginationQueryDto,
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx || this.prisma;
-    return await this.paginationService.paginate(client.user, params, {
+    return await this.paginationService.paginate<
+      Prisma.UserGetPayload<{ select: typeof this.FULL_USER_SELECT_ADMIN }>,
+      typeof client.user
+    >(client.user, params, {
       select: this.FULL_USER_SELECT_ADMIN,
       searchableFields: ['email', 'profile.name'],
       defaultSortField: 'createdAt',

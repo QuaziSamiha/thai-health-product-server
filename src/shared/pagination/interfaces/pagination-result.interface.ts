@@ -6,7 +6,8 @@ export interface IPaginationMeta {
   itemCount: number; // NUMBER OF RECORDS RETURNED IN THE CURRENT DATA ARRAY.
   itemsPerPage: number; // MAXIMUM RECORDS PERMITTED PER PAGE (LIMIT).
   totalPages: number; // TOTAL NAVIGABLE PAGES (TOTAL ITEMS / ITEMS PER PAGE).
-  currentPage: number; // CURRENT ACTIVE PAGE OFFSET (1-BASED INDEX).
+  currentPage: number; // CURRENT ACTIVE PAGE OFFSET (1-BASED INDEX), MEANINGLESS IN CURSOR MODE.
+  nextCursor: number | null; // ID TO PASS AS `cursor` TO FETCH THE NEXT PAGE; NULL ON THE LAST PAGE.
 }
 
 /**
@@ -17,18 +18,3 @@ export interface IPaginatedResult<T> {
   data: T[]; // ARRAY OF TYPE-SAFE ENTITIES RETURNED BY THE QUERY.
   meta: IPaginationMeta; // STANDARDIZED METADATA FOR THE CURRENT REQUEST.
 }
-
-/**
- * GOAL: DEFINE A STRICT TYPE THAT MATCHES PRISMA'S INTERNAL DELEGATE STRUCTURE.
- */
-export type TPrismaModelDelegate<T> = {
-  count: (args: { where?: any }) => Promise<number>;
-  findMany: (args: {
-    where?: any;
-    include?: any;
-    select?: any;
-    take?: number;
-    skip?: number;
-    orderBy?: any;
-  }) => Promise<T[]>;
-};

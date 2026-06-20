@@ -25,7 +25,10 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/auth/roles.decorator';
 import { UserRole } from '../../generated/prisma/enums';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { PaginationParamsDto } from '../../shared/pagination/dto/pagination-params.dto';
+import {
+  PaginationQueryDto,
+  ApiPaginatedResponse,
+} from '../../shared/pagination';
 import {
   Body,
   Controller,
@@ -135,14 +138,14 @@ export class CategoryController {
     summary: 'Get all categories (paginated)',
     description: 'Returns all categories with pagination support. Admin only.',
   })
-  @ApiOkResponse({
-    description: 'Categories retrieved successfully.',
-    type: [CategoryResponseDto],
-  })
+  @ApiPaginatedResponse(
+    CategoryResponseDto,
+    'Categories retrieved successfully.',
+  )
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
   @ApiForbiddenResponse({ description: 'Admin role required.' })
   async getAllCategories(
-    @Query() paginationParams: PaginationParamsDto,
+    @Query() paginationParams: PaginationQueryDto,
     @Res() res: Response,
   ) {
     try {

@@ -16,8 +16,7 @@ import {
 import { getBaseUrl } from '../../common/utils/env.util';
 import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
 import type { IStorageService } from '../../shared/storage/interfaces/storage.interface';
-import { PaginationParamsDto } from '../../shared/pagination/dto/pagination-params.dto';
-import { IPaginatedResult } from '../../shared/pagination/interfaces/pagination.interface';
+import { PaginationQueryDto, IPaginatedResult } from '../../shared/pagination';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ERROR_MESSAGES } from '../../common/constants/error-messages';
 
@@ -123,9 +122,13 @@ export class CategoryService {
             ? 'categories/icon-images'
             : 'categories/thumbnail-images';
         if (filename) {
-          await this.storageService.deleteFile(filename, folder).catch((e) =>
-            this.logger.warn(`Could not delete orphaned file ${filename}: ${e}`),
-          );
+          await this.storageService
+            .deleteFile(filename, folder)
+            .catch((e) =>
+              this.logger.warn(
+                `Could not delete orphaned file ${filename}: ${e}`,
+              ),
+            );
         }
       }
       throw uploadError;
@@ -136,7 +139,7 @@ export class CategoryService {
   }
 
   async getAllCategories(
-    params: PaginationParamsDto,
+    params: PaginationQueryDto,
   ): Promise<IPaginatedResult<CategoryResponseDto>> {
     const paginatedCategories =
       await this.categoryRepository.findAllCategories(params);

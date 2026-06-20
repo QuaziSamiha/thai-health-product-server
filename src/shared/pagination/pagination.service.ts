@@ -1,27 +1,32 @@
 import { Injectable } from '@nestjs/common';
-import { PaginationParamsDto } from './dto/pagination-params.dto';
+import { PaginationQueryDto } from './dto/pagination-query.dto';
+import { IPaginatedResult } from './interfaces/pagination-result.interface';
 import {
-  IPaginatedResult,
-  TPrismaModelDelegate,
-} from './interfaces/pagination.interface';
+  IPaginationDataSource,
+  TFindManyArgsOf,
+} from './interfaces/pagination-data-source.interface';
 
 @Injectable()
 export class PaginationService {
   /**
-   * GOAL: ELIMINATE UNSAFE CALL ERRORS BY USING A STRICT DELEGATE TYPE.
+   * GOAL: REUSABLE OFFSET/CURSOR PAGINATION OVER ANY IPaginationDataSource.
+   * CALLERS SUPPLY <T> EXPLICITLY (E.G. Prisma.UserGetPayload<{ select: ... }>)
+   * SO THE RETURNED data ARRAY MATCHES THE EXACT select/include THEY PASSED.
+   * WHEN params.cursor IS SET, CURSOR PAGINATION IS USED INSTEAD OF skip/take
+   * OFFSETS, WHICH STAYS PERFORMANT ON LARGE TABLES.
    */
-  async paginate<T>(
-    model: TPrismaModelDelegate<T>, // USE THE NEW TYPE HERE
-    params: PaginationParamsDto,
+  async paginate<T, TSource extends IPaginationDataSource>(
+    model: TSource,
+    params: PaginationQueryDto,
     options: {
-      where?: Record<string, any>;
-      include?: Record<string, any>;
-      select?: Record<string, any>;
+      where?: TFindManyArgsOf<TSource>['where'];
+      include?: TFindManyArgsOf<TSource>['include'];
+      select?: TFindManyArgsOf<TSource>['select'];
       searchableFields?: string[];
       defaultSortField?: string;
     } = {},
   ): Promise<IPaginatedResult<T>> {
-    const { page, limit, sortOrder, search } = params;
+    const { page, limit, sortOrder, search, cursor } = params;
     const {
       where = {},
       include,
@@ -49,7 +54,13 @@ export class PaginationService {
           }
         : {};
 
-    const combinedWhere = { ...where, ...searchCondition };
+    // MERGING A DYNAMICALLY-KEYED SEARCH CONDITION CANNOT BE EXPRESSED
+    // THROUGH THE SOURCE'S STRICT `where` TYPE, SO IT'S WIDENED HERE ONLY.
+    const combinedWhere = {
+      ...where,
+      ...searchCondition,
+    } as TFindManyArgsOf<TSource>['where'];
+    const isCursorMode = cursor !== undefined;
 
     const [totalItems, data] = await Promise.all([
       model.count({ where: combinedWhere }),
@@ -57,23 +68,31 @@ export class PaginationService {
         where: combinedWhere,
         include,
         select,
-        skip: page && limit ? (page - 1) * limit : undefined,
-        take: limit ? limit : undefined,
+        ...(isCursorMode
+          ? { cursor: { id: cursor }, skip: 1 }
+          : { skip: page && limit ? (page - 1) * limit : undefined }),
+        take: limit,
         orderBy: { [defaultSortField]: sortOrder },
-      }),
+      } as TFindManyArgsOf<TSource>),
     ]);
 
     const itemsPerPage = limit || totalItems;
     const currentPage = page || 1;
+    const lastItem = data[data.length - 1] as { id?: number } | undefined;
+    const nextCursor =
+      limit && data.length === limit && lastItem?.id !== undefined
+        ? lastItem.id
+        : null;
 
     return {
-      data,
+      data: data as T[],
       meta: {
         totalItems,
         itemCount: data.length,
         itemsPerPage,
         totalPages: Math.ceil(totalItems / itemsPerPage) || 1,
         currentPage,
+        nextCursor,
       },
     };
   }

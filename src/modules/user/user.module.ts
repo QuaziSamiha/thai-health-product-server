@@ -5,7 +5,7 @@ import { UserRepository } from './repositories/user.repository';
 import { UserSecurityRepository } from './repositories/user-security.repository';
 import { ProfileRepository } from './repositories/profile.repository';
 import { OtpModule } from '../otp/otp.module';
-import { PaginationModule } from '../../shared/pagination/pagination.module';
+import { PaginationModule } from '../../shared/pagination';
 
 @Module({
   imports: [forwardRef(() => OtpModule), PaginationModule],

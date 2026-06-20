@@ -1,2 +1,1 @@
-export * from "./error-messages";
-export * from "./pagination.constants";
+export * from './error-messages';

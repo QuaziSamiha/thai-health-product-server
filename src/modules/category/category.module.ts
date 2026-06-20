@@ -4,7 +4,7 @@ import { CategoryService } from './category.service';
 import { CategoryRepository } from './category.repository';
 import { PrismaModule } from '../../prisma/prisma.module';
 import { StorageModule } from '../../shared/storage/storage.module';
-import { PaginationModule } from '../../shared/pagination/pagination.module';
+import { PaginationModule } from '../../shared/pagination';
 
 @Module({
   imports: [PrismaModule, StorageModule, PaginationModule],

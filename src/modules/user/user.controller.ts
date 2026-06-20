@@ -35,7 +35,11 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/auth/roles.decorator';
 import { UserRole } from '../../generated/prisma/enums';
-import { PaginationParamsDto } from '../../shared/pagination/dto/pagination-params.dto';
+import {
+  PaginationQueryDto,
+  ApiPaginatedResponse,
+} from '../../shared/pagination';
+import { UserResponseDtoWithDetails } from './dto/user-response.dto';
 @ApiTags('Users')
 @Controller('user')
 export class UserController {
@@ -81,10 +85,13 @@ export class UserController {
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all users (Admin only)' })
-  @ApiResponse({ status: 200, description: 'Users retrieved successfully.' })
+  @ApiPaginatedResponse(
+    UserResponseDtoWithDetails,
+    'Users retrieved successfully.',
+  )
   @ApiResponse({ status: 403, description: 'Forbidden. Admin role required.' })
   async getAllUsers(
-    @Query() paginationParams: PaginationParamsDto,
+    @Query() paginationParams: PaginationQueryDto,
     @Res() res: Response,
   ) {
     try {

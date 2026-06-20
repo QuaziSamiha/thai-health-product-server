@@ -8,36 +8,43 @@ import {
   Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import {
+  DEFAULT_PAGE,
+  DEFAULT_PAGE_SIZE,
+  MAX_PAGE_SIZE,
+} from '../constants/pagination.constants';
 
 /**
  * GOAL: PROVIDE FULLY DOCUMENTED API SCHEMA FOR FRONTEND CONSUMPTION.
  */
-export class PaginationParamsDto {
+export class PaginationQueryDto {
   @ApiPropertyOptional({
     description: 'The active page number to fetch',
-    example: 1,
-    minimum: 1,
-    default: 1,
+    example: DEFAULT_PAGE,
+    minimum: DEFAULT_PAGE,
+    default: DEFAULT_PAGE,
   })
   @IsOptional()
   @Type(() => Number)
   @IsNumber({}, { message: 'Page must be a valid number' })
-  @Min(1, { message: 'Page number must be at least 1' })
-  page?: number = 1;
+  @Min(DEFAULT_PAGE, { message: 'Page number must be at least 1' })
+  page?: number = DEFAULT_PAGE;
 
   @ApiPropertyOptional({
     description: 'Amount of items returned per request',
-    example: 10,
+    example: DEFAULT_PAGE_SIZE,
     minimum: 1,
-    maximum: 100,
-    default: 10,
+    maximum: MAX_PAGE_SIZE,
+    default: DEFAULT_PAGE_SIZE,
   })
   @IsOptional()
   @Type(() => Number)
   @IsNumber({}, { message: 'Limit must be a valid number' })
   @Min(1, { message: 'Limit must be at least 1' })
-  @Max(100, { message: 'Limit cannot exceed 100 items per page' })
-  limit?: number = 10;
+  @Max(MAX_PAGE_SIZE, {
+    message: `Limit cannot exceed ${MAX_PAGE_SIZE} items per page`,
+  })
+  limit?: number = DEFAULT_PAGE_SIZE;
 
   @ApiPropertyOptional({
     description: 'Sorting direction for the list',
@@ -58,4 +65,15 @@ export class PaginationParamsDto {
   @IsOptional()
   @IsString({ message: 'Search term must be a valid text string' })
   search?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Last seen record ID for cursor-based pagination. Scales better than offset pagination on large tables. When provided, it takes precedence over `page` and the offset is ignored.',
+    example: 120,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber({}, { message: 'Cursor must be a valid number' })
+  @Min(1, { message: 'Cursor must be at least 1' })
+  cursor?: number;
 }

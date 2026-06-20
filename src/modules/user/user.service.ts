@@ -26,8 +26,7 @@ import {
 } from '../../generated/prisma/enums';
 import { Prisma } from '../../generated/prisma/client';
 import { UserSecurityMeResponseDto } from './dto/user-security-response.dto';
-import { PaginationParamsDto } from '../../shared/pagination/dto/pagination-params.dto';
-import { IPaginatedResult } from '../../shared/pagination/interfaces/pagination.interface';
+import { PaginationQueryDto, IPaginatedResult } from '../../shared/pagination';
 @Injectable()
 export class UserService {
   constructor(
@@ -153,7 +152,7 @@ export class UserService {
   }
 
   async getAllUsers(
-    params: PaginationParamsDto,
+    params: PaginationQueryDto,
   ): Promise<IPaginatedResult<UserResponseDtoWithDetails>> {
     const paginatedUsers = await this.userRepo.findAllUsers(params);
 
