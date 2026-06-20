@@ -13,12 +13,13 @@ import { SessionModule } from './modules/session/session.module';
 import { MailModule } from './modules/mail/mail.module';
 import { CategoryModule } from './modules/category/category.module';
 import { validate } from './config/env.validation';
+import appConfig from './config/app.config';
 import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
 
 @Module({
   imports: [
     //* GLOBAL ROOT — ONLY HANDLES ENV FILE LOADING + SHAPE VALIDATION
-    //* NAMESPACED CONFIG (AUTH, DATABASE, ...) IS OWNED AND REGISTERED BY EACH FEATURE MODULE
+    //* NAMESPACED CONFIG (APP, AUTH, DATABASE, ...) IS OWNED AND REGISTERED BY EACH FEATURE MODULE
     ConfigModule.forRoot({
       isGlobal: true, // Make ConfigModule available globally
       expandVariables: true,
@@ -30,6 +31,9 @@ import { CorrelationIdMiddleware } from './common/middleware/correlation-id.midd
       cache: true,
       validate,
     }),
+
+    //* APP-WIDE NAMESPACED CONFIG (PORT, API_PREFIX, BASE_URL, NODE_ENV) — OWNED BY THE ROOT MODULE ITSELF
+    ConfigModule.forFeature(appConfig),
 
     ThrottlerModule.forRoot([
       {

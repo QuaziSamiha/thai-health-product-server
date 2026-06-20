@@ -6,9 +6,10 @@ import { UserSecurityRepository } from './repositories/user-security.repository'
 import { ProfileRepository } from './repositories/profile.repository';
 import { OtpModule } from '../otp/otp.module';
 import { PaginationModule } from '../../shared/pagination';
+import { HashModule } from '../../shared/hash/hash.module';
 
 @Module({
-  imports: [forwardRef(() => OtpModule), PaginationModule],
+  imports: [forwardRef(() => OtpModule), PaginationModule, HashModule],
   controllers: [UserController],
   providers: [
     UserService,

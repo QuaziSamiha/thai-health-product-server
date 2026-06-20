@@ -16,7 +16,7 @@ import {
   UserResponseDtoWithDetails,
 } from './dto/user-response.dto';
 import { getBaseUrl } from '../../common/utils/env.util';
-import { HashUtil } from '../../common/utils/auth/hash.util';
+import { HashService } from '../../shared/hash/hash.service';
 import { OtpService } from '../otp/otp.service';
 import {
   AuthProvider,
@@ -35,6 +35,7 @@ export class UserService {
     private readonly securityRepo: UserSecurityRepository,
     @Inject(forwardRef(() => OtpService))
     private readonly otpService: OtpService,
+    private readonly hashService: HashService,
   ) {}
 
   async registerUser(
@@ -64,7 +65,7 @@ export class UserService {
     if (existing) throw new ConflictException('Email already registered');
 
     const hashedPassword = userData.password
-      ? await HashUtil.hash(userData.password)
+      ? await this.hashService.hash(userData.password)
       : undefined;
 
     // * RULE 4: Execute Transaction
@@ -222,12 +223,15 @@ export class UserService {
       );
     }
 
-    const isMatch = await HashUtil.compare(dto.currentPassword, user.password);
+    const isMatch = await this.hashService.compare(
+      dto.currentPassword,
+      user.password,
+    );
     if (!isMatch) {
       throw new BadRequestException('Current password does not match.');
     }
 
-    const hashedNewPassword = await HashUtil.hash(dto.newPassword);
+    const hashedNewPassword = await this.hashService.hash(dto.newPassword);
     const updatedUser = await this.userRepo.updatePassword(
       userId,
       hashedNewPassword,

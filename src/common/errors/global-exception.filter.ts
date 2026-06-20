@@ -12,7 +12,7 @@ import { Response } from 'express';
 import { ApiError } from './api-error';
 import { ValidationError } from 'class-validator';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
-import { constraintRecordFromUnknown } from '../../utils/validation.util';
+import { constraintRecordFromUnknown } from '../utils/validation.util';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {

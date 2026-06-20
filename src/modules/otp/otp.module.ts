@@ -4,9 +4,10 @@ import { OtpService } from './otp.service';
 import { OtpRepository } from './otp.repository';
 import { UserModule } from '../user/user.module';
 import { MailModule } from '../mail/mail.module';
+import { HashModule } from '../../shared/hash/hash.module';
 
 @Module({
-  imports: [forwardRef(() => UserModule), MailModule],
+  imports: [forwardRef(() => UserModule), MailModule, HashModule],
   controllers: [OtpController],
   providers: [OtpService, OtpRepository],
   exports: [OtpService],

@@ -6,15 +6,15 @@ import { GlobalExceptionFilter } from './common/errors/global-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { Request, Response } from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { swaggerMultipartLogoRequestInterceptor } from './utils/swagger-multipart-formdata.util';
+import { swaggerMultipartLogoRequestInterceptor } from './common/utils/swagger-multipart-formdata.util';
 import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('PORT') || 5001;
-  const prefix = configService.get<string>('API_PREFIX') || 'thp/api/v1';
+  const port = configService.get<number>('app.port') || 5001;
+  const prefix = configService.get<string>('app.apiPrefix') || 'api/v1';
 
   // * Security middleware
   app.enableCors({

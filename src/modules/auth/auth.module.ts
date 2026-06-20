@@ -10,12 +10,14 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import authConfig from './config/auth.config';
+import { HashModule } from '../../shared/hash/hash.module';
 
 @Module({
   imports: [
     //* PARTIAL REGISTRATION — AUTHMODULE OWNS THE 'AUTH' CONFIG NAMESPACE
     //* INSTEAD OF RELYING ON A SHARED GLOBAL CONFIG FOLDER
     ConfigModule.forFeature(authConfig),
+    HashModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

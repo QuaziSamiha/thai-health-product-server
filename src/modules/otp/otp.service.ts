@@ -10,7 +10,7 @@ import {
 // import { ConfigService } from '@nestjs/config';
 import { OtpRepository } from './otp.repository';
 import { OTPType } from '../../generated/prisma/enums';
-import { HashUtil } from '../../common/utils/auth/hash.util';
+import { HashService } from '../../shared/hash/hash.service';
 import * as crypto from 'crypto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { UserService } from '../user/user.service';
@@ -28,6 +28,7 @@ export class OtpService {
     // private readonly configService: ConfigService,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
+    private readonly hashService: HashService,
   ) {}
 
   // * Generates a secure 6-digit OTP, hashes it for the DB, and sends the plain code via email.
@@ -44,7 +45,7 @@ export class OtpService {
       this.logger.debug(`[DEV MODE] OTP for ${identifier}: ${plainOtp}`);
 
       // * Hash the OTP before saving
-      const hashedOtp = await HashUtil.hash(plainOtp);
+      const hashedOtp = await this.hashService.hash(plainOtp);
 
       // * Set expiration (e.g., 10 minutes from now)
       const expiresAt = new Date();
@@ -104,7 +105,7 @@ export class OtpService {
       );
     }
 
-    const isMatch = await HashUtil.compare(code, otpRecord.code);
+    const isMatch = await this.hashService.compare(code, otpRecord.code);
 
     if (!isMatch) {
       throw new BadRequestException('Invalid OTP code.');

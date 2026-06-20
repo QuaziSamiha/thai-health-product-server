@@ -7,7 +7,7 @@ import {
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { HashUtil } from '../../common/utils/auth/hash.util';
+import { HashService } from '../../shared/hash/hash.service';
 import { UserStatus } from '../../generated/prisma/enums';
 import { UserResponseDto } from '../user/dto/user-response.dto';
 // import type { SignOptions } from 'jsonwebtoken';
@@ -23,6 +23,7 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private hashService: HashService,
   ) {}
 
   async validateUser(
@@ -55,7 +56,7 @@ export class AuthService {
       );
     }
 
-    const isMatch = await HashUtil.compare(password, user.password);
+    const isMatch = await this.hashService.compare(password, user.password);
     if (!isMatch) {
       await this.userService.updateLoginAttempts(user.id); // * Increment failed attempts
       throw new UnauthorizedException('Invalid credentials');

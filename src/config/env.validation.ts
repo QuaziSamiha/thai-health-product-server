@@ -1,24 +1,18 @@
 import { z } from 'zod';
+import { databaseEnvSchema } from '../prisma/config/database.env';
+import { authEnvSchema } from '../modules/auth/config/auth.env';
 
-const envSchema = z.object({
+//* APP-SHELL-OWNED FIELDS ONLY — VARS NOT TIED TO ANY SELF-CONTAINED DOMAIN MODULE.
+//* EXPORTED SO app.config.ts CAN VALIDATE AGAINST THIS SLICE DIRECTLY, JUST LIKE EACH
+//* DOMAIN MODULE VALIDATES AGAINST ITS OWN SCHEMA (database.env.ts, auth.env.ts).
+export const appEnvSchema = z.object({
   NODE_ENV: z
     .enum(['development', 'production', 'test'])
     .default('development'),
   PORT: z.coerce.number().default(5001),
   API_PREFIX: z.string().default('api/v1'),
-
-  // Database
-  DATABASE_URL: z.string().min(1),
-  DATABASE_POOL_MAX: z.coerce.number().default(10),
-  DATABASE_POOL_IDLE_TIMEOUT_MS: z.coerce.number().default(10000),
-  DATABASE_POOL_CONNECTION_TIMEOUT_MS: z.coerce.number().default(0),
-
-  // JWT
-  JWT_ACCESS_SECRET: z.string().min(1),
-  JWT_REFRESH_SECRET: z.string().min(1),
-  JWT_ACCESS_EXPIRES_IN: z.string().default('5d'),
-  JWT_REFRESH_EXPIRES_IN: z.string().default('30d'),
-  JWT_REFRESH_EXPIRES_IN_MS: z.coerce.number().default(2592000000),
+  BASE_URL: z.string().url(),
+  HASH_SALT_ROUNDS: z.coerce.number().default(10),
 
   // Mail
   MAIL_HOST: z.string().optional(),
@@ -27,6 +21,11 @@ const envSchema = z.object({
   MAIL_PASS: z.string().optional(),
   MAIL_FROM: z.string().optional(),
 });
+
+//* COMPOSED ROOT SCHEMA — MERGES EVERY SELF-CONTAINED MODULE'S OWN SCHEMA SO THE APP
+//* STILL GETS ONE FAIL-FAST BOOT-TIME CHECK ACROSS ALL ENV VARS, WITHOUT THOSE MODULES
+//* DEPENDING ON THIS FILE. THE DEPENDENCY DIRECTION IS: APP SHELL → DOMAIN MODULES.
+const envSchema = appEnvSchema.merge(databaseEnvSchema).merge(authEnvSchema);
 
 export type EnvConfig = z.infer<typeof envSchema>;
 
