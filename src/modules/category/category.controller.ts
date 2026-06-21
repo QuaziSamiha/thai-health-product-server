@@ -18,8 +18,7 @@ import {
   CategoryResponseDto,
   RootActiveCategoryResponseDto,
 } from './dto/category-response.dto';
-import { sendResponse } from '../../common/responses/send-response';
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/auth/roles.decorator';
@@ -33,12 +32,9 @@ import {
   Body,
   Controller,
   Get,
-  HttpException,
-  HttpStatus,
   Post,
   Query,
   Req,
-  Res,
   UnauthorizedException,
   UploadedFiles,
   UseGuards,
@@ -48,6 +44,7 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { ResponseMessage } from '../../common/decorators/response/response-message.decorator';
 
 @ApiTags('Category')
 @Controller('category')
@@ -83,6 +80,7 @@ export class CategoryController {
   @ApiConflictResponse({
     description: 'A category with this name already exists.',
   })
+  @ResponseMessage('Category created successfully')
   async createCategory(
     @Body() createCategoryDto: CreateCategoryDto,
     @UploadedFiles()
@@ -92,42 +90,16 @@ export class CategoryController {
       bannerImage?: Express.Multer.File[];
     },
     @Req() req: Request & { user?: { id: number } },
-    @Res() res: Response,
   ) {
-    try {
-      if (!req.user?.id) {
-        throw new UnauthorizedException('User identity missing from request');
-      }
-
-      const result = await this.categoryService.createCategory(
-        req.user.id,
-        createCategoryDto,
-        {
-          iconImage: files?.iconImage?.[0],
-          thumbnailImage: files?.thumbnailImage?.[0],
-          bannerImage: files?.bannerImage?.[0],
-        },
-      );
-
-      sendResponse(res, {
-        statusCode: HttpStatus.CREATED,
-        success: true,
-        message: 'Category created successfully',
-        data: result,
-      });
-    } catch (error) {
-      const statusCode =
-        error instanceof HttpException
-          ? error.getStatus()
-          : HttpStatus.INTERNAL_SERVER_ERROR;
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to create category';
-      sendResponse(res, {
-        statusCode,
-        success: false,
-        message: errorMessage,
-      });
+    if (!req.user?.id) {
+      throw new UnauthorizedException('User identity missing from request');
     }
+
+    return this.categoryService.createCategory(req.user.id, createCategoryDto, {
+      iconImage: files?.iconImage?.[0],
+      thumbnailImage: files?.thumbnailImage?.[0],
+      bannerImage: files?.bannerImage?.[0],
+    });
   }
 
   @Get('all-categories')
@@ -144,35 +116,9 @@ export class CategoryController {
   )
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
   @ApiForbiddenResponse({ description: 'Admin role required.' })
-  async getAllCategories(
-    @Query() paginationParams: PaginationQueryDto,
-    @Res() res: Response,
-  ) {
-    try {
-      const result =
-        await this.categoryService.getAllCategories(paginationParams);
-      return sendResponse(res, {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Categories retrieved successfully',
-        data: result.data,
-        meta: result.meta,
-      });
-    } catch (error) {
-      const statusCode =
-        error instanceof HttpException
-          ? error.getStatus()
-          : HttpStatus.INTERNAL_SERVER_ERROR;
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Failed to retrieve categories';
-      return sendResponse(res, {
-        statusCode,
-        success: false,
-        message: errorMessage,
-      });
-    }
+  @ResponseMessage('Categories retrieved successfully')
+  async getAllCategories(@Query() paginationParams: PaginationQueryDto) {
+    return this.categoryService.getAllCategories(paginationParams);
   }
 
   @Get('all-active-categories')
@@ -184,30 +130,9 @@ export class CategoryController {
     description: 'Active categories retrieved successfully.',
     type: [CategoryResponseDto],
   })
-  async getAllActiveCategories(@Res() res: Response) {
-    try {
-      const result = await this.categoryService.getAllActiveCategories();
-      return sendResponse(res, {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Active categories retrieved successfully',
-        data: result,
-      });
-    } catch (error) {
-      const statusCode =
-        error instanceof HttpException
-          ? error.getStatus()
-          : HttpStatus.INTERNAL_SERVER_ERROR;
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Failed to retrieve active categories';
-      return sendResponse(res, {
-        statusCode,
-        success: false,
-        message: errorMessage,
-      });
-    }
+  @ResponseMessage('Active categories retrieved successfully')
+  async getAllActiveCategories() {
+    return this.categoryService.getAllActiveCategories();
   }
 
   @Get('active-root-categories')
@@ -220,30 +145,9 @@ export class CategoryController {
     description: 'Active root categories retrieved successfully.',
     type: [RootActiveCategoryResponseDto],
   })
-  async getRootCategories(@Res() res: Response) {
-    try {
-      const result = await this.categoryService.getActiveRootCategories();
-      return sendResponse(res, {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Active root categories retrieved successfully',
-        data: result,
-      });
-    } catch (error) {
-      const statusCode =
-        error instanceof HttpException
-          ? error.getStatus()
-          : HttpStatus.INTERNAL_SERVER_ERROR;
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Failed to retrieve active root categories';
-      return sendResponse(res, {
-        statusCode,
-        success: false,
-        message: errorMessage,
-      });
-    }
+  @ResponseMessage('Active root categories retrieved successfully')
+  async getRootCategories() {
+    return this.categoryService.getActiveRootCategories();
   }
 
   @Get('category-by-slug/:slug')
@@ -256,28 +160,9 @@ export class CategoryController {
     type: CategoryResponseDto,
   })
   @ApiNotFoundResponse({ description: 'Category not found.' })
-  async getCategoryBySlug(@Res() res: Response, @Param('slug') slug: string) {
-    try {
-      const result = await this.categoryService.getCategoryBySlug(slug);
-      return sendResponse(res, {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Category retrieved successfully',
-        data: result,
-      });
-    } catch (error) {
-      const statusCode =
-        error instanceof HttpException
-          ? error.getStatus()
-          : HttpStatus.INTERNAL_SERVER_ERROR;
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to retrieve category';
-      return sendResponse(res, {
-        statusCode,
-        success: false,
-        message: errorMessage,
-      });
-    }
+  @ResponseMessage('Category retrieved successfully')
+  async getCategoryBySlug(@Param('slug') slug: string) {
+    return this.categoryService.getCategoryBySlug(slug);
   }
 
   @Patch('update-category/:id')
@@ -314,6 +199,7 @@ export class CategoryController {
   @ApiConflictResponse({
     description: 'New name results in a duplicate slug.',
   })
+  @ResponseMessage('Category updated successfully')
   async updateCategory(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateCategoryDto: UpdateCategoryDto,
@@ -325,43 +211,21 @@ export class CategoryController {
       bannerImage?: Express.Multer.File[];
     },
     @Req() req: Request & { user?: { id: number } },
-    @Res() res: Response,
   ) {
-    try {
-      if (!req.user?.id) {
-        throw new UnauthorizedException('User identity missing from request');
-      }
-
-      const result = await this.categoryService.updateCategory(
-        id,
-        req.user.id,
-        updateCategoryDto,
-        {
-          image: files?.image?.[0],
-          iconImage: files?.iconImage?.[0],
-          thumbnailImage: files?.thumbnailImage?.[0],
-          bannerImage: files?.bannerImage?.[0],
-        },
-      );
-
-      sendResponse(res, {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Category updated successfully',
-        data: result,
-      });
-    } catch (error) {
-      const statusCode =
-        error instanceof HttpException
-          ? error.getStatus()
-          : HttpStatus.INTERNAL_SERVER_ERROR;
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to update category';
-      sendResponse(res, {
-        statusCode,
-        success: false,
-        message: errorMessage,
-      });
+    if (!req.user?.id) {
+      throw new UnauthorizedException('User identity missing from request');
     }
+
+    return this.categoryService.updateCategory(
+      id,
+      req.user.id,
+      updateCategoryDto,
+      {
+        image: files?.image?.[0],
+        iconImage: files?.iconImage?.[0],
+        thumbnailImage: files?.thumbnailImage?.[0],
+        bannerImage: files?.bannerImage?.[0],
+      },
+    );
   }
 }

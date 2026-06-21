@@ -25,8 +25,8 @@ import { ConfigService } from '@nestjs/config';
 import { LoginDto } from './dto/login.dto';
 import { TokensResponseDto } from './dto/token-response.dto';
 import type { Request, Response } from 'express';
-import { sendResponse } from '../../common/responses/send-response';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { ResponseMessage } from '../../common/decorators/response/response-message.decorator';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -60,46 +60,31 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
   @ApiBadRequestResponse({ description: 'Validation error' })
   @HttpCode(200)
+  @ResponseMessage('Login successful')
   async login(
     @Body() loginDto: LoginDto,
     @Ip() ip: string,
-    @Res() res: Response,
+    @Res({ passthrough: true }) res: Response,
   ) {
-    // console.log("res", res);
     const authConfig = this.configService.get('auth');
-    try {
-      this.logger.debug(`Login attempt for ${loginDto.email}`);
-      const tokens = await this.authService.login(loginDto, ip);
-      this.logger.log(`Successful login for ${loginDto.email}`);
-      const refreshTokenExpires = authConfig?.refreshExpiresInMs;
+    this.logger.debug(`Login attempt for ${loginDto.email}`);
+    const tokens = await this.authService.login(loginDto, ip);
+    this.logger.log(`Successful login for ${loginDto.email}`);
+    const refreshTokenExpires = authConfig?.refreshExpiresInMs;
 
-      // parseInt will stop at the first non-numeric character (like a space or #)
-      const maxAge = parseInt(refreshTokenExpires, 10);
-      res.cookie('refreshToken', tokens.refresh_token, {
-        httpOnly: true,
-        secure: authConfig?.nodeEnv === 'production',
-        sameSite: 'strict',
-        maxAge: isNaN(maxAge) ? Number(authConfig?.refreshExpiresInMs) : maxAge,
-      });
+    // parseInt will stop at the first non-numeric character (like a space or #)
+    const maxAge = parseInt(refreshTokenExpires, 10);
+    res.cookie('refreshToken', tokens.refresh_token, {
+      httpOnly: true,
+      secure: authConfig?.nodeEnv === 'production',
+      sameSite: 'strict',
+      maxAge: isNaN(maxAge) ? Number(authConfig?.refreshExpiresInMs) : maxAge,
+    });
 
-      sendResponse(res, {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Login successful',
-        data: {
-          access_token: tokens.access_token,
-          refresh_token: tokens.refresh_token, // Include refresh token in response
-        },
-      });
-    } catch (error: any) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to create user';
-      sendResponse(res, {
-        statusCode: HttpStatus.BAD_REQUEST,
-        success: false,
-        message: errorMessage,
-      });
-    }
+    return {
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token, // Include refresh token in response
+    };
   }
 
   @Post('refresh')
@@ -141,39 +126,19 @@ export class AuthController {
     description: 'Optional refresh token in body (if not using cookie)',
     required: false,
   })
+  @HttpCode(HttpStatus.OK)
+  @ResponseMessage('Token refreshed successfully')
   async refresh(
-    @Res() res: Response,
     @Req() req: Request,
     @Body() refreshTokenDto?: RefreshTokenDto,
   ) {
-    try {
-      const cookies = req.cookies as Record<string, string | undefined>;
+    const cookies = req.cookies as Record<string, string | undefined>;
+    const refreshToken = cookies?.refreshToken || refreshTokenDto?.refreshToken;
 
-      const refreshToken =
-        cookies?.refreshToken || refreshTokenDto?.refreshToken;
-
-      if (!refreshToken) {
-        throw new BadRequestException('No refresh token provided');
-      }
-
-      const tokens = await this.authService.refreshToken(refreshToken);
-
-      // Using your utility for consistent MERN team responses
-      return sendResponse(res, {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Token refreshed successfully',
-        data: tokens,
-      });
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Token refresh failed';
-
-      return sendResponse(res, {
-        statusCode: HttpStatus.BAD_REQUEST,
-        success: false,
-        message: errorMessage,
-      });
+    if (!refreshToken) {
+      throw new BadRequestException('No refresh token provided');
     }
+
+    return this.authService.refreshToken(refreshToken);
   }
 }

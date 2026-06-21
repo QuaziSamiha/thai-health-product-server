@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { GlobalExceptionFilter } from './common/errors/global-exception.filter';
-import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { Request, Response } from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { swaggerMultipartLogoRequestInterceptor } from './common/utils/swagger-multipart-formdata.util';
@@ -34,7 +33,6 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new GlobalExceptionFilter());
-  app.useGlobalInterceptors(new ResponseInterceptor());
 
   // Swagger configuration
   const config = new DocumentBuilder()

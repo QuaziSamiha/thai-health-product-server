@@ -313,14 +313,21 @@ describe('CategoryService', () => {
       const cat = makeCategory();
       repo.findAllCategories.mockResolvedValue({
         data: [cat],
-        meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
+        meta: {
+          totalItems: 1,
+          itemCount: 1,
+          itemsPerPage: 10,
+          totalPages: 1,
+          currentPage: 1,
+          nextCursor: null,
+        },
       });
 
       const result = await service.getAllCategories({ page: 1, limit: 10 });
 
       expect(result.data).toHaveLength(1);
       expect(result.data[0].name).toBe('Electronics');
-      expect(result.meta.total).toBe(1);
+      expect(result.meta.totalItems).toBe(1);
     });
   });
 

@@ -2,14 +2,12 @@ import {
   Body,
   Controller,
   Get,
-  HttpStatus,
   Ip,
   NotFoundException,
   ForbiddenException,
   Post,
   Query,
   Req,
-  Res,
   UseGuards,
   Patch,
   Param,
@@ -29,8 +27,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { sendResponse } from '../../common/responses/send-response';
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/auth/roles.decorator';
@@ -40,6 +37,8 @@ import {
   ApiPaginatedResponse,
 } from '../../shared/pagination';
 import { UserResponseDtoWithDetails } from './dto/user-response.dto';
+import { ResponseMessage } from '../../common/decorators/response/response-message.decorator';
+
 @ApiTags('Users')
 @Controller('user')
 export class UserController {
@@ -56,28 +55,9 @@ export class UserController {
   })
   @ApiBadRequestResponse({ description: 'Invalid input data' })
   @ApiBody({ type: CreateUserDto })
-  async register(
-    @Body() createUserDto: CreateUserDto,
-    @Ip() ip: string,
-    @Res() res: Response,
-  ) {
-    try {
-      const result = await this.userService.registerUser(createUserDto, ip);
-      sendResponse(res, {
-        statusCode: HttpStatus.CREATED,
-        success: true,
-        message: 'User created successfully',
-        data: result,
-      });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to create user';
-      sendResponse(res, {
-        statusCode: HttpStatus.BAD_REQUEST,
-        success: false,
-        message: errorMessage,
-      });
-    }
+  @ResponseMessage('User created successfully')
+  async register(@Body() createUserDto: CreateUserDto, @Ip() ip: string) {
+    return this.userService.registerUser(createUserDto, ip);
   }
 
   @Get('all-user')
@@ -90,28 +70,9 @@ export class UserController {
     'Users retrieved successfully.',
   )
   @ApiResponse({ status: 403, description: 'Forbidden. Admin role required.' })
-  async getAllUsers(
-    @Query() paginationParams: PaginationQueryDto,
-    @Res() res: Response,
-  ) {
-    try {
-      const result = await this.userService.getAllUsers(paginationParams);
-      return sendResponse(res, {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Users retrieved successfully',
-        data: result.data,
-        meta: result.meta, // RESULT: paginated users
-      });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to retrieve users';
-      return sendResponse(res, {
-        statusCode: HttpStatus.BAD_REQUEST,
-        success: false,
-        message: errorMessage,
-      });
-    }
+  @ResponseMessage('Users retrieved successfully')
+  async getAllUsers(@Query() paginationParams: PaginationQueryDto) {
+    return this.userService.getAllUsers(paginationParams);
   }
 
   @Get('my-profile')
@@ -120,31 +81,12 @@ export class UserController {
   @ApiOperation({ summary: 'Get logged in user profile' })
   @ApiResponse({ status: 200, description: 'Profile retrieved successfully.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  async getMyProfile(
-    @Req() req: Request & { user?: { id: number } },
-    @Res() res: Response,
-  ) {
-    try {
-      if (!req.user?.id) {
-        throw new NotFoundException('User identity missing from request');
-      }
-
-      const result = await this.userService.getMyProfile(req.user.id);
-      return sendResponse(res, {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Profile retrieved successfully',
-        data: result,
-      });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to retrieve profile';
-      return sendResponse(res, {
-        statusCode: HttpStatus.BAD_REQUEST,
-        success: false,
-        message: errorMessage,
-      });
+  @ResponseMessage('Profile retrieved successfully')
+  async getMyProfile(@Req() req: Request & { user?: { id: number } }) {
+    if (!req.user?.id) {
+      throw new NotFoundException('User identity missing from request');
     }
+    return this.userService.getMyProfile(req.user.id);
   }
 
   @Patch('update-user-role/:id')
@@ -155,36 +97,12 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'User role updated successfully.' })
   @ApiResponse({ status: 403, description: 'Forbidden. Admin role required.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
+  @ResponseMessage('User role updated successfully')
   async updateUserRole(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserRoleDto: UpdateUserRoleDto,
-    @Res() res: Response,
   ) {
-    try {
-      const result = await this.userService.updateUserRole(
-        id,
-        updateUserRoleDto.role,
-      );
-      return sendResponse(res, {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'User role updated successfully',
-        data: result,
-      });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to update user role';
-      const status =
-        error instanceof NotFoundException
-          ? HttpStatus.NOT_FOUND
-          : HttpStatus.BAD_REQUEST;
-
-      return sendResponse(res, {
-        statusCode: status,
-        success: false,
-        message: errorMessage,
-      });
-    }
+    return this.userService.updateUserRole(id, updateUserRoleDto.role);
   }
 
   @Patch('update-password/:id')
@@ -198,46 +116,20 @@ export class UserController {
     description: 'Forbidden. You can only update your own password.',
   })
   @ApiResponse({ status: 404, description: 'User not found.' })
+  @ResponseMessage('Password updated successfully')
   async updatePassword(
     @Param('id', ParseIntPipe) id: number,
     @Body() updatePasswordDto: UpdatePasswordDto,
     @Req() req: Request & { user?: { id: number; role?: string } },
-    @Res() res: Response,
   ) {
-    try {
-      if (!req.user?.id) {
-        throw new NotFoundException('User identity missing from request');
-      }
-
-      if (req.user.id !== id && req.user.role !== UserRole.ADMIN) {
-        throw new ForbiddenException('You can only update your own password');
-      }
-
-      const result = await this.userService.updatePassword(
-        id,
-        updatePasswordDto,
-      );
-      return sendResponse(res, {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Password updated successfully',
-        data: result,
-      });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to update password';
-      const status =
-        error instanceof NotFoundException
-          ? HttpStatus.NOT_FOUND
-          : error instanceof ForbiddenException
-            ? HttpStatus.FORBIDDEN
-            : HttpStatus.BAD_REQUEST;
-
-      return sendResponse(res, {
-        statusCode: status,
-        success: false,
-        message: errorMessage,
-      });
+    if (!req.user?.id) {
+      throw new NotFoundException('User identity missing from request');
     }
+
+    if (req.user.id !== id && req.user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('You can only update your own password');
+    }
+
+    return this.userService.updatePassword(id, updatePasswordDto);
   }
 }

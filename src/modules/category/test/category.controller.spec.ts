@@ -1,6 +1,5 @@
 import {
   ConflictException,
-  HttpStatus,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -12,10 +11,7 @@ import {
   CategoryResponseDto,
   RootActiveCategoryResponseDto,
 } from '../dto/category-response.dto';
-import {
-  CategoryProductStatus,
-  UserRole,
-} from '../../../generated/prisma/enums';
+import { CategoryProductStatus } from '../../../generated/prisma/enums';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -45,14 +41,6 @@ const makeRootDto = (): RootActiveCategoryResponseDto => ({
   id: 1,
   name: 'Electronics',
 });
-
-/** Creates a mock Express Response with a spy-able json() and status() chain. */
-const makeMockResponse = () => {
-  const res: Record<string, jest.Mock> = {};
-  res.status = jest.fn().mockReturnValue(res);
-  res.json = jest.fn().mockReturnValue(res);
-  return res as unknown as import('express').Response;
-};
 
 /** Creates a minimal authenticated request object. */
 const makeAuthReq = (userId = 1) =>
@@ -86,6 +74,11 @@ const mockCategoryService = () => ({
 // ---------------------------------------------------------------------------
 // Suite
 // ---------------------------------------------------------------------------
+//
+// The controller no longer wraps responses itself (@Res() + sendResponse()) —
+// it just returns data or throws, and the global ResponseInterceptor /
+// GlobalExceptionFilter take care of the envelope. So these tests assert on
+// the resolved/rejected value of the controller method directly.
 
 describe('CategoryController', () => {
   let controller: CategoryController;
@@ -109,90 +102,66 @@ describe('CategoryController', () => {
   // =========================================================================
 
   describe('createCategory', () => {
-    it('returns 201 with the created category on success', async () => {
+    it('returns the created category on success', async () => {
       const dto = makeCategoryDto();
       service.createCategory.mockResolvedValue(dto);
-      const res = makeMockResponse();
-      const req = makeAuthReq();
 
-      await controller.createCategory({ name: 'Electronics' }, {}, req, res);
-
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.CREATED);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ success: true, data: dto }),
+      const result = await controller.createCategory(
+        { name: 'Electronics' },
+        {},
+        makeAuthReq(),
       );
+
+      expect(result).toEqual(dto);
     });
 
-    it('returns 401 when user identity is missing from the request', async () => {
-      const res = makeMockResponse();
+    it('throws UnauthorizedException when user identity is missing from the request', async () => {
       const req = {
         user: undefined,
       } as unknown as import('express').Request & { user?: { id: number } };
 
-      await controller.createCategory({ name: 'X' }, {}, req, res);
-
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ success: false }),
-      );
+      await expect(
+        controller.createCategory({ name: 'X' }, {}, req),
+      ).rejects.toThrow(UnauthorizedException);
     });
 
-    it('returns 404 when service throws NotFoundException (parent not found)', async () => {
+    it('propagates NotFoundException from the service (parent not found)', async () => {
       service.createCategory.mockRejectedValue(
         new NotFoundException('Parent category not found'),
       );
-      const res = makeMockResponse();
 
-      await controller.createCategory(
-        { name: 'X', parentId: 999 },
-        {},
-        makeAuthReq(),
-        res,
-      );
-
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          success: false,
-          message: 'Parent category not found',
-        }),
-      );
+      await expect(
+        controller.createCategory(
+          { name: 'X', parentId: 999 },
+          {},
+          makeAuthReq(),
+        ),
+      ).rejects.toThrow(NotFoundException);
     });
 
-    it('returns 409 when service throws ConflictException (duplicate name)', async () => {
+    it('propagates ConflictException from the service (duplicate name)', async () => {
       service.createCategory.mockRejectedValue(
         new ConflictException('Category with this name already exists'),
       );
-      const res = makeMockResponse();
 
-      await controller.createCategory(
-        { name: 'Electronics' },
-        {},
-        makeAuthReq(),
-        res,
-      );
-
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ success: false }),
-      );
+      await expect(
+        controller.createCategory({ name: 'Electronics' }, {}, makeAuthReq()),
+      ).rejects.toThrow(ConflictException);
     });
 
-    it('returns 500 when service throws an unexpected error', async () => {
+    it('propagates unexpected service errors unchanged', async () => {
       service.createCategory.mockRejectedValue(new Error('DB connection lost'));
-      const res = makeMockResponse();
 
-      await controller.createCategory({ name: 'X' }, {}, makeAuthReq(), res);
-
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+      await expect(
+        controller.createCategory({ name: 'X' }, {}, makeAuthReq()),
+      ).rejects.toThrow('DB connection lost');
     });
 
     it('passes uploaded files to the service', async () => {
       service.createCategory.mockResolvedValue(makeCategoryDto());
-      const res = makeMockResponse();
       const files = { iconImage: [makeFile()], bannerImage: [makeFile()] };
 
-      await controller.createCategory({ name: 'X' }, files, makeAuthReq(), res);
+      await controller.createCategory({ name: 'X' }, files, makeAuthReq());
 
       expect(service.createCategory).toHaveBeenCalledWith(
         1,
@@ -211,36 +180,34 @@ describe('CategoryController', () => {
   // =========================================================================
 
   describe('getAllCategories', () => {
-    it('returns 200 with paginated data and meta', async () => {
+    it('returns the paginated result from the service untouched', async () => {
       const paginatedResult = {
         data: [makeCategoryDto()],
-        meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
+        meta: {
+          totalItems: 1,
+          itemCount: 1,
+          itemsPerPage: 10,
+          totalPages: 1,
+          currentPage: 1,
+          nextCursor: null,
+        },
       };
       service.getAllCategories.mockResolvedValue(paginatedResult);
-      const res = makeMockResponse();
 
-      await controller.getAllCategories({ page: 1, limit: 10 }, res);
+      const result = await controller.getAllCategories({
+        page: 1,
+        limit: 10,
+      } as never);
 
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          success: true,
-          data: paginatedResult.data,
-          meta: paginatedResult.meta,
-        }),
-      );
+      expect(result).toEqual(paginatedResult);
     });
 
-    it('returns 500 when service throws an unexpected error', async () => {
+    it('propagates unexpected service errors unchanged', async () => {
       service.getAllCategories.mockRejectedValue(new Error('DB error'));
-      const res = makeMockResponse();
 
-      await controller.getAllCategories({ page: 1, limit: 10 }, res);
-
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ success: false }),
-      );
+      await expect(
+        controller.getAllCategories({ page: 1, limit: 10 } as never),
+      ).rejects.toThrow('DB error');
     });
   });
 
@@ -249,29 +216,22 @@ describe('CategoryController', () => {
   // =========================================================================
 
   describe('getAllActiveCategories', () => {
-    it('returns 200 with the active category list', async () => {
+    it('returns the active category list', async () => {
       const categories = [
         makeCategoryDto(),
         makeCategoryDto({ id: 2, name: 'Fashion' }),
       ];
       service.getAllActiveCategories.mockResolvedValue(categories);
-      const res = makeMockResponse();
 
-      await controller.getAllActiveCategories(res);
+      const result = await controller.getAllActiveCategories();
 
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ success: true, data: categories }),
-      );
+      expect(result).toEqual(categories);
     });
 
-    it('returns 500 on unexpected service error', async () => {
+    it('propagates unexpected service errors unchanged', async () => {
       service.getAllActiveCategories.mockRejectedValue(new Error('fail'));
-      const res = makeMockResponse();
 
-      await controller.getAllActiveCategories(res);
-
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+      await expect(controller.getAllActiveCategories()).rejects.toThrow('fail');
     });
   });
 
@@ -280,26 +240,19 @@ describe('CategoryController', () => {
   // =========================================================================
 
   describe('getRootCategories', () => {
-    it('returns 200 with root category list', async () => {
+    it('returns the root category list', async () => {
       const roots = [makeRootDto()];
       service.getActiveRootCategories.mockResolvedValue(roots);
-      const res = makeMockResponse();
 
-      await controller.getRootCategories(res);
+      const result = await controller.getRootCategories();
 
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ success: true, data: roots }),
-      );
+      expect(result).toEqual(roots);
     });
 
-    it('returns 500 on unexpected service error', async () => {
+    it('propagates unexpected service errors unchanged', async () => {
       service.getActiveRootCategories.mockRejectedValue(new Error('fail'));
-      const res = makeMockResponse();
 
-      await controller.getRootCategories(res);
-
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+      await expect(controller.getRootCategories()).rejects.toThrow('fail');
     });
   });
 
@@ -308,34 +261,23 @@ describe('CategoryController', () => {
   // =========================================================================
 
   describe('getCategoryBySlug', () => {
-    it('returns 200 with the category when slug exists', async () => {
+    it('returns the category when the slug exists', async () => {
       const cat = makeCategoryDto();
       service.getCategoryBySlug.mockResolvedValue(cat);
-      const res = makeMockResponse();
 
-      await controller.getCategoryBySlug(res, 'electronics');
+      const result = await controller.getCategoryBySlug('electronics');
 
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ success: true, data: cat }),
-      );
+      expect(result).toEqual(cat);
     });
 
-    it('returns 404 when service throws NotFoundException', async () => {
+    it('propagates NotFoundException from the service', async () => {
       service.getCategoryBySlug.mockRejectedValue(
         new NotFoundException('Category not found'),
       );
-      const res = makeMockResponse();
 
-      await controller.getCategoryBySlug(res, 'unknown-slug');
-
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          success: false,
-          message: 'Category not found',
-        }),
-      );
+      await expect(
+        controller.getCategoryBySlug('unknown-slug'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -344,78 +286,52 @@ describe('CategoryController', () => {
   // =========================================================================
 
   describe('updateCategory', () => {
-    it('returns 200 with the updated category on success', async () => {
+    it('returns the updated category on success', async () => {
       const updated = makeCategoryDto({ name: 'New Name' });
       service.updateCategory.mockResolvedValue(updated);
-      const res = makeMockResponse();
 
-      await controller.updateCategory(
+      const result = await controller.updateCategory(
         1,
         { name: 'New Name' },
         {},
         makeAuthReq(),
-        res,
       );
 
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ success: true, data: updated }),
-      );
+      expect(result).toEqual(updated);
     });
 
-    it('returns 401 when user identity is missing', async () => {
-      const res = makeMockResponse();
+    it('throws UnauthorizedException when user identity is missing', async () => {
       const req = {
         user: undefined,
       } as unknown as import('express').Request & { user?: { id: number } };
 
-      await controller.updateCategory(1, {}, {}, req, res);
-
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
+      await expect(controller.updateCategory(1, {}, {}, req)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
-    it('returns 404 when service throws NotFoundException', async () => {
+    it('propagates NotFoundException from the service', async () => {
       service.updateCategory.mockRejectedValue(
         new NotFoundException(`Category with ID 1 not found`),
       );
-      const res = makeMockResponse();
 
-      await controller.updateCategory(1, {}, {}, makeAuthReq(), res);
-
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+      await expect(
+        controller.updateCategory(1, {}, {}, makeAuthReq()),
+      ).rejects.toThrow(NotFoundException);
     });
 
-    it('returns 409 when service throws ConflictException (duplicate slug)', async () => {
+    it('propagates ConflictException from the service (duplicate slug)', async () => {
       service.updateCategory.mockRejectedValue(
         new ConflictException('New category name results in a duplicate name'),
       );
-      const res = makeMockResponse();
 
-      await controller.updateCategory(
-        1,
-        { name: 'Duplicate' },
-        {},
-        makeAuthReq(),
-        res,
-      );
-
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
-    });
-
-    it('returns 400 when service throws UnauthorizedException via guard failure', async () => {
-      service.updateCategory.mockRejectedValue(
-        new UnauthorizedException('User identity missing from request'),
-      );
-      const res = makeMockResponse();
-
-      await controller.updateCategory(1, {}, {}, makeAuthReq(), res);
-
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
+      await expect(
+        controller.updateCategory(1, { name: 'Duplicate' }, {}, makeAuthReq()),
+      ).rejects.toThrow(ConflictException);
     });
 
     it('passes uploaded files to the service', async () => {
       service.updateCategory.mockResolvedValue(makeCategoryDto());
-      const res = makeMockResponse();
       const files = {
         image: [makeFile()],
         iconImage: [makeFile()],
@@ -423,7 +339,7 @@ describe('CategoryController', () => {
         bannerImage: [makeFile()],
       };
 
-      await controller.updateCategory(1, {}, files, makeAuthReq(), res);
+      await controller.updateCategory(1, {}, files, makeAuthReq());
 
       expect(service.updateCategory).toHaveBeenCalledWith(
         1,
@@ -438,13 +354,12 @@ describe('CategoryController', () => {
       );
     });
 
-    it('returns 500 on unexpected service error', async () => {
+    it('propagates unexpected service errors unchanged', async () => {
       service.updateCategory.mockRejectedValue(new Error('Unexpected'));
-      const res = makeMockResponse();
 
-      await controller.updateCategory(1, {}, {}, makeAuthReq(), res);
-
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+      await expect(
+        controller.updateCategory(1, {}, {}, makeAuthReq()),
+      ).rejects.toThrow('Unexpected');
     });
   });
 });
