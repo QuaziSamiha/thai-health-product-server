@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { databaseEnvSchema } from '../prisma/config/database.env';
 import { authEnvSchema } from '../modules/auth/config/auth.env';
+import { healthEnvSchema } from '../health/config/health.env';
 
 //* APP-SHELL-OWNED FIELDS ONLY — VARS NOT TIED TO ANY SELF-CONTAINED DOMAIN MODULE.
 //* EXPORTED SO app.config.ts CAN VALIDATE AGAINST THIS SLICE DIRECTLY, JUST LIKE EACH
@@ -25,7 +26,10 @@ export const appEnvSchema = z.object({
 //* COMPOSED ROOT SCHEMA — MERGES EVERY SELF-CONTAINED MODULE'S OWN SCHEMA SO THE APP
 //* STILL GETS ONE FAIL-FAST BOOT-TIME CHECK ACROSS ALL ENV VARS, WITHOUT THOSE MODULES
 //* DEPENDING ON THIS FILE. THE DEPENDENCY DIRECTION IS: APP SHELL → DOMAIN MODULES.
-const envSchema = appEnvSchema.merge(databaseEnvSchema).merge(authEnvSchema);
+const envSchema = appEnvSchema
+  .merge(databaseEnvSchema)
+  .merge(authEnvSchema)
+  .merge(healthEnvSchema);
 
 export type EnvConfig = z.infer<typeof envSchema>;
 

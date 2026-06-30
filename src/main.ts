@@ -24,7 +24,10 @@ async function bootstrap() {
   app.use(cookieParser());
 
   // * Enable global validation
-  app.setGlobalPrefix(prefix);
+  // * Health routes stay unprefixed/unversioned — orchestrator probe paths must not move when the API version bumps
+  app.setGlobalPrefix(prefix, {
+    exclude: ['health', 'health/live', 'health/ready'],
+  });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // Strips away fields that aren't in the DTO

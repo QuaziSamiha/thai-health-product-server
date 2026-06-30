@@ -13,6 +13,7 @@ import { OtpModule } from './modules/otp/otp.module';
 import { SessionModule } from './modules/session/session.module';
 import { MailModule } from './modules/mail/mail.module';
 import { CategoryModule } from './modules/category/category.module';
+import { HealthModule } from './health/health.module';
 import { validate } from './config/env.validation';
 import appConfig from './config/app.config';
 import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
@@ -50,6 +51,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     }),
 
     PrismaModule,
+    HealthModule,
     UserModule,
     AuthModule,
     OtpModule,
