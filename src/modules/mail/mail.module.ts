@@ -25,7 +25,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.ad
           },
         },
         defaults: {
-          from: `"Essence Lab" <${config.get('MAIL_FROM')}>`,
+          from: `"NestJS Codebase" <${config.get('MAIL_FROM')}>`,
         },
         template: {
           // __dirname points to the folder containing this file

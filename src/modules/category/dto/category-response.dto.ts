@@ -80,21 +80,21 @@ export class CategoryResponseDto {
   @ApiPropertyOptional({
     description: 'Absolute URL of the thumbnail image',
     example:
-      'http://localhost:5001/uploads/categories/thumbnail-images/abc.webp',
+      'http://localhost:8000/uploads/categories/thumbnail-images/abc.webp',
   })
   thumbnailUrl?: string;
 
   @Expose()
   @ApiPropertyOptional({
     description: 'Absolute URL of the hero banner image',
-    example: 'http://localhost:5001/uploads/categories/banner-images/abc.webp',
+    example: 'http://localhost:8000/uploads/categories/banner-images/abc.webp',
   })
   bannerUrl?: string;
 
   @Expose()
   @ApiPropertyOptional({
     description: 'Absolute URL of the icon image',
-    example: 'http://localhost:5001/uploads/categories/icon-images/abc.webp',
+    example: 'http://localhost:8000/uploads/categories/icon-images/abc.webp',
   })
   iconUrl?: string;
 

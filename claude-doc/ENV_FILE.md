@@ -60,10 +60,10 @@ DATABASE_URL="postgres://tsp_ecommerce:tsp_ecommerce@192.168.0.221:5432/tsp_ecom
 DATABASE_URL="postgres://postgres:samiha25@localhost:5432/thp_ecommerce?schema=public"
 
 NODE_ENV=development
-PORT=5001
+PORT=8000
 API_PREFIX=api/v1
-BASE_URL=http://localhost:5001
-ALLOWED_ORIGINS=http://localhost:5001
+BASE_URL=http://localhost:8000
+ALLOWED_ORIGINS=http://localhost:8000
 
 //* JWT CONFIGURATION — KEY GENERATED USING BCRYPT WITH 12 ROUNDS, CONVERTED TO HEX STRING
 JWT_ACCESS_SECRET=beb705cc...
@@ -89,8 +89,8 @@ MAIL_FROM=atidev@atilimited.net
 | Variable | `.env.development.local` | `.env.development` | `.env.office` | `.env.production` |
 |---|---|---|---|---|
 | `DATABASE_URL` | Developer A's local DB | Developer B's local DB | `192.168.0.221` office DB | Live DB — comment out if unknown |
-| `BASE_URL` | `localhost:5001` | `localhost:5001` | Office machine IP | Live domain |
-| `ALLOWED_ORIGINS` | `localhost:5001` | `localhost:5001` | Office machine IP | Live domain |
+| `BASE_URL` | `localhost:8000` | `localhost:8000` | Office machine IP | Live domain |
+| `ALLOWED_ORIGINS` | `localhost:8000` | `localhost:8000` | Office machine IP | Live domain |
 | `NODE_ENV` | `development` | `development` | `development` | `production` |
 | `MAIL_*` | ATI SMTP shared across all | same | same | Live SMTP or commented out |
 

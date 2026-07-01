@@ -57,7 +57,7 @@ model Category {
 
 ### **Database Documentation: Category Schema**
 
-This document outlines the purpose and structure of the `categories` table within the **Essence Lab** project. It is designed to support high-performance e-commerce features, including hierarchical menus, localized content, and SEO optimization.
+This document outlines the purpose and structure of the `categories` table within the **NestJS Codebase** project. It is designed to support high-performance e-commerce features, including hierarchical menus, localized content, and SEO optimization.
 
 ---
 

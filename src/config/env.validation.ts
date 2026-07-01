@@ -10,7 +10,7 @@ export const appEnvSchema = z.object({
   NODE_ENV: z
     .enum(['development', 'production', 'test'])
     .default('development'),
-  PORT: z.coerce.number().default(5001),
+  PORT: z.coerce.number().default(8000),
   API_PREFIX: z.string().default('api/v1'),
   BASE_URL: z.string().url(),
   HASH_SALT_ROUNDS: z.coerce.number().default(10),

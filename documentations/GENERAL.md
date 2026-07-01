@@ -11,7 +11,7 @@ NestJS Side: You create a Middleware or an Interceptor that reads this header an
 Method B: The Query Parameter (Easiest for Debugging)
 The frontend appends the language to the URL.
 
-URL: http://localhost:5001/api/v1/categories?lang=th
+URL: http://localhost:8000/api/v1/categories?lang=th
 
 NestJS Side: You extract it using @Query('lang').
 

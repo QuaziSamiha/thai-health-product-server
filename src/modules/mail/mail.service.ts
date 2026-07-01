@@ -11,7 +11,7 @@ export class MailService {
     try {
       await this.mailerService.sendMail({
         to: email,
-        subject: 'Verify Your Email - Essence Lab',
+        subject: 'Verify Your Email - NestJS Codebase',
         template: './otp', // Points to templates/otp.hbs
         context: {
           otpCode, // This replaces {{otp}} in the Handlebars file

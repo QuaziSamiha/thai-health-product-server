@@ -12,7 +12,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('app.port') || 5001;
+  const port = configService.get<number>('app.port') || 8000;
   const prefix = configService.get<string>('app.apiPrefix') || 'api/v1';
 
   // * Security middleware
@@ -39,9 +39,9 @@ async function bootstrap() {
 
   // Swagger configuration
   const config = new DocumentBuilder()
-    .setTitle('Essence Lab API')
+    .setTitle('NestJS Codebase API')
     .setDescription(
-      `API documentation for Essence Lab Backend. This documentation provides detailed information about all available endpoints, authentication methods, and data models used in the Essence Lab system.`,
+      `API documentation for NestJS Codebase Backend. This documentation provides detailed information about all available endpoints, authentication methods, and data models used in the NestJS Codebase system.`,
     )
     .setVersion('1.0.0')
     .addBearerAuth() // * For JWT headers
@@ -71,7 +71,7 @@ async function bootstrap() {
 
   // * ======= ROOT ENDPOINT =======
   app.getHttpAdapter().get('/', (req: Request, res: Response) => {
-    res.send('Essence Lab Server');
+    res.send('NestJS Codebase Server');
   });
 
   // Enable shutdown hooks

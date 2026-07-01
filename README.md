@@ -1,6 +1,6 @@
-# Essence Lab Backend (`thai-health-product-server`)
+# NestJS Codebase Backend (`thai-health-product-server`)
 
-NestJS backend for the Thai Health Product (Essence Lab) e-commerce platform — Prisma ORM on PostgreSQL via the `pg` driver adapter, JWT auth, and modular domain services.
+NestJS backend for the Thai Health Product (NestJS Codebase) e-commerce platform — Prisma ORM on PostgreSQL via the `pg` driver adapter, JWT auth, and modular domain services.
 
 ## Documentation
 
