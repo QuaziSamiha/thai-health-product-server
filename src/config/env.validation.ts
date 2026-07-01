@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { databaseEnvSchema } from '../prisma/config/database.env';
 import { authEnvSchema } from '../modules/auth/config/auth.env';
 import { healthEnvSchema } from '../health/config/health.env';
+import { loggerEnvSchema } from '../shared/logger/config/logger.env';
 
 //* APP-SHELL-OWNED FIELDS ONLY — VARS NOT TIED TO ANY SELF-CONTAINED DOMAIN MODULE.
 //* EXPORTED SO app.config.ts CAN VALIDATE AGAINST THIS SLICE DIRECTLY, JUST LIKE EACH
@@ -29,7 +30,8 @@ export const appEnvSchema = z.object({
 const envSchema = appEnvSchema
   .merge(databaseEnvSchema)
   .merge(authEnvSchema)
-  .merge(healthEnvSchema);
+  .merge(healthEnvSchema)
+  .merge(loggerEnvSchema);
 
 export type EnvConfig = z.infer<typeof envSchema>;
 

@@ -7,9 +7,13 @@ import { Request, Response } from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { swaggerMultipartLogoRequestInterceptor } from './common/utils/swagger-multipart-formdata.util';
 import cookieParser from 'cookie-parser';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  //* bufferLogs HOLDS FRAMEWORK BOOTSTRAP LOGS (ROUTE MAPPING, MODULE INIT) UNTIL app.useLogger()
+  //* ATTACHES WINSTON BELOW, SO EVERY LOG — INCLUDING NEST'S OWN — GOES THROUGH THE SAME PIPELINE
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('app.port') || 8000;

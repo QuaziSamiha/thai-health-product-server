@@ -41,6 +41,7 @@
     "cookie-parser": "^1.4.7",
     "handlebars": "^4.7.9",
     "jsonwebtoken": "^9.0.3",
+    "nest-winston": "^1.10.2",
     "nodemailer": "^8.0.5",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
@@ -48,6 +49,8 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.1",
+    "winston": "^3.19.0",
+    "winston-daily-rotate-file": "^5.0.0",
     "zod": "3.22.4"
   },
   "devDependencies": {

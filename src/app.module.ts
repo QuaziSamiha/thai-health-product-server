@@ -1,4 +1,9 @@
-import { Module, MiddlewareConsumer, NestModule, RequestMethod } from '@nestjs/common';
+import {
+  Module,
+  MiddlewareConsumer,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { join } from 'node:path';
 import { ConfigModule } from '@nestjs/config';
@@ -18,6 +23,11 @@ import { validate } from './config/env.validation';
 import appConfig from './config/app.config';
 import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import {
+  LoggerModule,
+  RequestContextMiddleware,
+  LoggingInterceptor,
+} from './shared/logger';
 
 @Module({
   imports: [
@@ -50,6 +60,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
       serveRoot: '/uploads',
     }),
 
+    LoggerModule,
     PrismaModule,
     HealthModule,
     UserModule,
@@ -62,11 +73,14 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
   controllers: [AppController],
   providers: [
     AppService,
+    { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
     { provide: APP_INTERCEPTOR, useClass: ResponseInterceptor },
   ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(CorrelationIdMiddleware).forRoutes({ path: '*path', method: RequestMethod.ALL });
+    consumer
+      .apply(CorrelationIdMiddleware, RequestContextMiddleware)
+      .forRoutes({ path: '*path', method: RequestMethod.ALL });
   }
 }
