@@ -50,7 +50,12 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  Blog: 'Blog',
   Category: 'Category',
+  ComboProduct: 'ComboProduct',
+  ComboItem: 'ComboItem',
+  ComboImage: 'ComboImage',
+  Batch: 'Batch',
   Inventory: 'Inventory',
   Product: 'Product',
   ProductVariant: 'ProductVariant',
@@ -76,6 +81,27 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 } as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
+
+
+export const BlogScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  status: 'status',
+  title: 'title',
+  slug: 'slug',
+  content: 'content',
+  blogCategory: 'blogCategory',
+  imageUrl: 'imageUrl',
+  totalComments: 'totalComments',
+  metaTitle: 'metaTitle',
+  metaDescription: 'metaDescription',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  publishedAt: 'publishedAt',
+  authorId: 'authorId'
+} as const
+
+export type BlogScalarFieldEnum = (typeof BlogScalarFieldEnum)[keyof typeof BlogScalarFieldEnum]
 
 
 export const CategoryScalarFieldEnum = {
@@ -106,6 +132,80 @@ export const CategoryScalarFieldEnum = {
 } as const
 
 export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
+
+
+export const ComboProductScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  title: 'title',
+  titleTh: 'titleTh',
+  slug: 'slug',
+  shortDescription: 'shortDescription',
+  shortDescTh: 'shortDescTh',
+  description: 'description',
+  descriptionTh: 'descriptionTh',
+  totalPrice: 'totalPrice',
+  comboPrice: 'comboPrice',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  status: 'status',
+  isFeatured: 'isFeatured',
+  seoMetadata: 'seoMetadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt',
+  publishedAt: 'publishedAt',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy'
+} as const
+
+export type ComboProductScalarFieldEnum = (typeof ComboProductScalarFieldEnum)[keyof typeof ComboProductScalarFieldEnum]
+
+
+export const ComboItemScalarFieldEnum = {
+  id: 'id',
+  comboId: 'comboId',
+  productId: 'productId',
+  variantId: 'variantId',
+  quantity: 'quantity',
+  unitPrice: 'unitPrice',
+  displayOrder: 'displayOrder'
+} as const
+
+export type ComboItemScalarFieldEnum = (typeof ComboItemScalarFieldEnum)[keyof typeof ComboItemScalarFieldEnum]
+
+
+export const ComboImageScalarFieldEnum = {
+  id: 'id',
+  url: 'url',
+  thumbnailUrl: 'thumbnailUrl',
+  bannerUrl: 'bannerUrl',
+  iconUrl: 'iconUrl',
+  altText: 'altText',
+  displayOrder: 'displayOrder',
+  isPrimary: 'isPrimary',
+  isActive: 'isActive',
+  comboId: 'comboId'
+} as const
+
+export type ComboImageScalarFieldEnum = (typeof ComboImageScalarFieldEnum)[keyof typeof ComboImageScalarFieldEnum]
+
+
+export const BatchScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  batchNo: 'batchNo',
+  quantity: 'quantity',
+  remaining: 'remaining',
+  manufacturingDate: 'manufacturingDate',
+  expiryDate: 'expiryDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  productId: 'productId',
+  variantId: 'variantId'
+} as const
+
+export type BatchScalarFieldEnum = (typeof BatchScalarFieldEnum)[keyof typeof BatchScalarFieldEnum]
 
 
 export const InventoryScalarFieldEnum = {
@@ -142,10 +242,11 @@ export const ProductScalarFieldEnum = {
   status: 'status',
   isFeatured: 'isFeatured',
   hasVariants: 'hasVariants',
-  basePrice: 'basePrice',
-  discountType: 'discountType',
-  salePrice: 'salePrice',
   costPrice: 'costPrice',
+  discountType: 'discountType',
+  discountValue: 'discountValue',
+  basePrice: 'basePrice',
+  salePrice: 'salePrice',
   quantity: 'quantity',
   totalStock: 'totalStock',
   stockStatus: 'stockStatus',
@@ -153,6 +254,18 @@ export const ProductScalarFieldEnum = {
   dimensions: 'dimensions',
   seoMetadata: 'seoMetadata',
   tags: 'tags',
+  dosage: 'dosage',
+  dosageTh: 'dosageTh',
+  ingredients: 'ingredients',
+  ingredientsTh: 'ingredientsTh',
+  healthBenefits: 'healthBenefits',
+  healthBenefitsTh: 'healthBenefitsTh',
+  warning: 'warning',
+  warningTh: 'warningTh',
+  storageInstructions: 'storageInstructions',
+  storageInstructionsTh: 'storageInstructionsTh',
+  origin: 'origin',
+  genericName: 'genericName',
   categoryId: 'categoryId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',

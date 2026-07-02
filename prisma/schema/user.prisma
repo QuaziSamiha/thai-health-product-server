@@ -70,6 +70,7 @@ model User {
   inventories       Inventory[]
   createdCombos     ComboProduct[] @relation("ComboCreatedBy")
   updatedCombos     ComboProduct[] @relation("ComboUpdatedBy")
+  blogs             Blog[]
 
   @@index([email, phone])
   @@map("users")

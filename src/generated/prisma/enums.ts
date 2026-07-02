@@ -8,6 +8,15 @@
 * 🟢 You can import this file directly.
 */
 
+export const BlogStatus = {
+  PUBLISHED: 'PUBLISHED',
+  DRAFT: 'DRAFT',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type BlogStatus = (typeof BlogStatus)[keyof typeof BlogStatus]
+
+
 export const InventoryExchangeType = {
   ADD: 'ADD',
   RESTOCK: 'RESTOCK',

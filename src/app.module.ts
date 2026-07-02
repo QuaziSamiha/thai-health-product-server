@@ -18,6 +18,8 @@ import { OtpModule } from './modules/otp/otp.module';
 import { SessionModule } from './modules/session/session.module';
 import { MailModule } from './modules/mail/mail.module';
 import { CategoryModule } from './modules/category/category.module';
+import { ProductModule } from './modules/product/product.module';
+import { BlogModule } from './modules/blog/blog.module';
 import { HealthModule } from './health/health.module';
 import { validate } from './config/env.validation';
 import appConfig from './config/app.config';
@@ -69,6 +71,8 @@ import {
     SessionModule,
     MailModule,
     CategoryModule,
+    ProductModule,
+    BlogModule,
   ],
   controllers: [AppController],
   providers: [

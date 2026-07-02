@@ -1,0 +1,236 @@
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../prisma/prisma.service';
+import { BaseRepository } from '../../prisma/base.repository';
+import { Prisma } from '../../generated/prisma/client';
+import {
+  CategoryProductStatus,
+  ProductType,
+} from '../../generated/prisma/enums';
+import { PaginationService, PaginationQueryDto } from '../../shared/pagination';
+import {
+  PRODUCT_SELECT_ADMIN,
+  PRODUCT_SELECT_PUBLIC,
+  PRODUCT_SELECT_MINIFIED,
+} from './product.select';
+
+@Injectable()
+export class ProductRepository extends BaseRepository {
+  constructor(
+    prisma: PrismaService,
+    private readonly paginationService: PaginationService,
+  ) {
+    super(prisma);
+  }
+
+  // ─── Reads — Single Lookups (role-based) ────────────────────────────────────
+
+  async findByIdAdmin(id: number, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.product.findUnique({
+      where: { id },
+      select: PRODUCT_SELECT_ADMIN,
+    });
+  }
+
+  async findBySlugAdmin(slug: string, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.product.findUnique({
+      where: { slug },
+      select: PRODUCT_SELECT_ADMIN,
+    });
+  }
+
+  async findByIdPublic(id: number, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.product.findUnique({
+      where: { id },
+      select: PRODUCT_SELECT_PUBLIC,
+    });
+  }
+
+  async findBySlugPublic(slug: string, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.product.findUnique({
+      where: { slug },
+      select: PRODUCT_SELECT_PUBLIC,
+    });
+  }
+
+  async findByIdMinified(id: number, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.product.findUnique({
+      where: { id },
+      select: PRODUCT_SELECT_MINIFIED,
+    });
+  }
+
+  /** Existence/uniqueness check — `name` is unique on the model. */
+  async findByName(name: string, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.product.findUnique({
+      where: { name },
+      select: { id: true, name: true },
+    });
+  }
+
+  // ─── Reads — Lists ───────────────────────────────────────────────────────────
+
+  async findAllProductsAdmin(
+    params: PaginationQueryDto,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return await this.paginationService.paginate<
+      Prisma.ProductGetPayload<{ select: typeof PRODUCT_SELECT_ADMIN }>,
+      typeof client.product
+    >(client.product, params, {
+      select: PRODUCT_SELECT_ADMIN,
+      searchableFields: ['name', 'slug', 'sku', 'nameTh'],
+      defaultSortField: 'createdAt',
+    });
+  }
+
+  /**
+   * Storefront listing — active products only, optionally narrowed by
+   * already-parsed category IDs / product type. Request-level parsing (e.g.
+   * splitting a CSV query param) belongs in the caller — this only builds
+   * the Prisma filter.
+   */
+  async findAllProductsPublic(
+    params: PaginationQueryDto,
+    filters: { categoryIds?: number[]; type?: ProductType } = {},
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    const where: Prisma.ProductWhereInput = {
+      status: CategoryProductStatus.ACTIVE,
+      ...(filters.categoryIds?.length && {
+        categoryId: { in: filters.categoryIds },
+      }),
+      ...(filters.type && { type: filters.type }),
+    };
+
+    return await this.paginationService.paginate<
+      Prisma.ProductGetPayload<{ select: typeof PRODUCT_SELECT_PUBLIC }>,
+      typeof client.product
+    >(client.product, params, {
+      select: PRODUCT_SELECT_PUBLIC,
+      where,
+      searchableFields: ['name', 'slug', 'sku', 'nameTh'],
+      defaultSortField: 'createdAt',
+    });
+  }
+
+  /** Lightweight id/name/variant list for select-input / dropdown UIs. */
+  async findProductDropdownOptions(tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.product.findMany({
+      where: { status: CategoryProductStatus.ACTIVE },
+      orderBy: { name: 'asc' },
+      select: {
+        id: true,
+        name: true,
+        variants: {
+          select: { id: true, name: true, size: true },
+          orderBy: { id: 'asc' },
+        },
+      },
+    });
+  }
+
+  // ─── Mutations ───────────────────────────────────────────────────────────────
+
+  async createProduct(
+    data: Omit<Prisma.ProductUncheckedCreateInput, 'images' | 'variants'> & {
+      images?: Prisma.ProductImageCreateManyProductInput[];
+      variants?: Prisma.ProductVariantCreateManyProductInput[];
+    },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    const { images, variants, ...productData } = data;
+
+    return await client.product.create({
+      data: {
+        ...productData,
+        images: images?.length ? { createMany: { data: images } } : undefined,
+        variants: variants?.length
+          ? { createMany: { data: variants } }
+          : undefined,
+      },
+      select: PRODUCT_SELECT_ADMIN,
+    });
+  }
+
+  async updateProduct(
+    id: number,
+    data: Prisma.ProductUncheckedUpdateInput,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return await client.product.update({
+      where: { id },
+      data,
+      select: PRODUCT_SELECT_ADMIN,
+    });
+  }
+
+  /** Irreversible — permanently removes the row. Prefer soft-deleting via `updateProduct` (set `deletedAt`/`deletedBy`) for anything that has shipped or been ordered. */
+  async hardDeleteProduct(id: number, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.product.delete({
+      where: { id },
+      select: { id: true, name: true },
+    });
+  }
+
+  // ─── Mutations — Images ──────────────────────────────────────────────────────
+
+  async createImages(
+    productId: number,
+    images: Prisma.ProductImageCreateManyProductInput[],
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return await client.productImage.createMany({
+      data: images.map((image) => ({ ...image, productId })),
+    });
+  }
+
+  async findImagesByIds(ids: number[], tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.productImage.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, url: true },
+    });
+  }
+
+  async deleteImages(ids: number[], tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.productImage.deleteMany({
+      where: { id: { in: ids } },
+    });
+  }
+
+  // ─── Mutations — Variants ────────────────────────────────────────────────────
+
+  /**
+   * Full replace: wipes existing variants and inserts the given set.
+   * Self-wraps in a transaction when the caller doesn't already supply one,
+   * so the delete+recreate is never left half-applied.
+   */
+  async replaceVariants(
+    productId: number,
+    variants: Prisma.ProductVariantCreateManyProductInput[],
+    tx?: Prisma.TransactionClient,
+  ) {
+    const run = async (client: Prisma.TransactionClient) => {
+      await client.productVariant.deleteMany({ where: { productId } });
+      return await client.productVariant.createMany({
+        data: variants.map((variant) => ({ ...variant, productId })),
+      });
+    };
+
+    return tx ? run(tx) : this.withTransaction(run);
+  }
+}

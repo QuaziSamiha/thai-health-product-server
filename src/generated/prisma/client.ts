@@ -28,8 +28,8 @@ export * from "./enums.js"
  * const prisma = new PrismaClient({
  *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
  * })
- * // Fetch zero or more Categories
- * const categories = await prisma.category.findMany()
+ * // Fetch zero or more Blogs
+ * const blogs = await prisma.blog.findMany()
  * ```
  * 
  * Read more in our [docs](https://pris.ly/d/client).
@@ -39,10 +39,35 @@ export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts exten
 export { Prisma }
 
 /**
+ * Model Blog
+ * 
+ */
+export type Blog = Prisma.BlogModel
+/**
  * Model Category
  * 
  */
 export type Category = Prisma.CategoryModel
+/**
+ * Model ComboProduct
+ * 
+ */
+export type ComboProduct = Prisma.ComboProductModel
+/**
+ * Model ComboItem
+ * 
+ */
+export type ComboItem = Prisma.ComboItemModel
+/**
+ * Model ComboImage
+ * 
+ */
+export type ComboImage = Prisma.ComboImageModel
+/**
+ * Model Batch
+ * 
+ */
+export type Batch = Prisma.BatchModel
 /**
  * Model Inventory
  * 

@@ -17,10 +17,35 @@ export { Prisma }
 export * as $Enums from './enums.js'
 export * from './enums.js';
 /**
+ * Model Blog
+ * 
+ */
+export type Blog = Prisma.BlogModel
+/**
  * Model Category
  * 
  */
 export type Category = Prisma.CategoryModel
+/**
+ * Model ComboProduct
+ * 
+ */
+export type ComboProduct = Prisma.ComboProductModel
+/**
+ * Model ComboItem
+ * 
+ */
+export type ComboItem = Prisma.ComboItemModel
+/**
+ * Model ComboImage
+ * 
+ */
+export type ComboImage = Prisma.ComboImageModel
+/**
+ * Model Batch
+ * 
+ */
+export type Batch = Prisma.BatchModel
 /**
  * Model Inventory
  * 

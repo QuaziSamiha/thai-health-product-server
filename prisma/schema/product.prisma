@@ -44,10 +44,11 @@ model Product {
   hasVariants Boolean               @default(false) //* DERIVED FIELD TO READ FASTER (variants.length)
 
   //* PRICING (USE DECIMAL FOR FINANCIAL ACCURACY)
-  costPrice    Decimal?      @db.Decimal(12, 2) //* FOR PROFIT CALCULATION
-  discountType DiscountType?
-  basePrice    Decimal       @default(0) @db.Decimal(12, 2)
-  salePrice    Decimal?      @db.Decimal(12, 2) //* SALE PRICE
+  costPrice     Decimal?      @db.Decimal(12, 2) //* FOR PROFIT CALCULATION
+  discountType  DiscountType?
+  discountValue Decimal?      @db.Decimal(12, 2) //* THE RAW CONFIGURED DISCOUNT — FIXED AMOUNT OR PERCENTAGE, PAIRED WITH discountType
+  basePrice     Decimal       @default(0) @db.Decimal(12, 2)
+  salePrice     Decimal?      @db.Decimal(12, 2) //* SALE PRICE
 
   //* STOCK
   quantity    Int         @default(0) // * TOTAL QUANTITY OF A PRODUCT WITHOUT VARIANTS
@@ -62,6 +63,20 @@ model Product {
   seoMetadata Json? @default("{}") //* Consolidating SEO fields for cleaner API: metaTitle,  metaDescription, metaTitleTh, metaDescriptionTh
 
   tags String[] //* POSTGRES NATIVE ARRAY SUPPORT
+
+  //* HEALTH & COMPLIANCE LABELING (SUPPLEMENT/HEALTH PRODUCT INFO) — CUSTOMER-VISIBLE
+  dosage                String? @db.Text
+  dosageTh              String? @db.Text
+  ingredients           String? @db.Text
+  ingredientsTh         String? @db.Text
+  healthBenefits        String? @db.Text
+  healthBenefitsTh      String? @db.Text
+  warning               String? @db.Text
+  warningTh             String? @db.Text
+  storageInstructions   String? @db.Text
+  storageInstructionsTh String? @db.Text
+  origin                String? @db.VarChar(255)
+  genericName           String? @db.VarChar(255)
 
   //* RELATIONS
   categoryId    Int
