@@ -62,12 +62,14 @@ model User {
   security          UserSecurity?
   sessions          Session[] // Replaces single refreshToken for multi-device support
   otps              OTP[]
-  createdCategories Category[]    @relation("CategoryCreatedBy")
-  updatedCategories Category[]    @relation("CategoryUpdatedBy")
-  createdProducts   Product[]     @relation("ProductCreatedBy")
-  updatedProducts   Product[]     @relation("ProductUpdatedBy")
-  deletedProducts   Product[]     @relation("ProductDeletedBy")
+  createdCategories Category[]     @relation("CategoryCreatedBy")
+  updatedCategories Category[]     @relation("CategoryUpdatedBy")
+  createdProducts   Product[]      @relation("ProductCreatedBy")
+  updatedProducts   Product[]      @relation("ProductUpdatedBy")
+  deletedProducts   Product[]      @relation("ProductDeletedBy")
   inventories       Inventory[]
+  createdCombos     ComboProduct[] @relation("ComboCreatedBy")
+  updatedCombos     ComboProduct[] @relation("ComboUpdatedBy")
 
   @@index([email, phone])
   @@map("users")

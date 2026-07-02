@@ -24,11 +24,11 @@ model Product {
   id  Int    @id @default(autoincrement())
   sid String @unique @default(uuid()) @db.Uuid //* Use native UUID type for performance
 
+  //* PRIMARY CONTENT (ENGLISH & GLOBAL SLUG)
   name             String  @unique @db.VarChar(255)
   slug             String  @unique @db.VarChar(255)
   sku              String? @unique @db.VarChar(100)
   barcode          String? @unique @db.VarChar(100)
-  //* PRIMARY CONTENT (ENGLISH & GLOBAL SLUG)
   description      String? @db.Text
   shortDescription String? @db.VarChar(500) // Restricted for UI consistency
 
@@ -44,13 +44,13 @@ model Product {
   hasVariants Boolean               @default(false) //* DERIVED FIELD TO READ FASTER (variants.length)
 
   //* PRICING (USE DECIMAL FOR FINANCIAL ACCURACY)
-  basePrice    Decimal       @default(0) @db.Decimal(12, 2)
-  discountType DiscountType?
-  salePrice    Decimal?      @db.Decimal(12, 2) //* SALE PRICE
   costPrice    Decimal?      @db.Decimal(12, 2) //* FOR PROFIT CALCULATION
+  discountType DiscountType?
+  basePrice    Decimal       @default(0) @db.Decimal(12, 2)
+  salePrice    Decimal?      @db.Decimal(12, 2) //* SALE PRICE
 
   //* STOCK
-  quantity    Int         @default(0) // * TOTAL QUANTITY OF A PRODUCT WIHTOUT VARIANTS
+  quantity    Int         @default(0) // * TOTAL QUANTITY OF A PRODUCT WITHOUT VARIANTS
   totalStock  Int         @default(0) @map("total_stock") // * TOTAL QUANTITY ACROSS ALL VARIANTS -- Denormalized cache: Represents sum of all variant stock. Must be kept in sync via application logic or DB trigger.
   stockStatus StockStatus @default(OUT_OF_STOCK)
 
@@ -69,6 +69,8 @@ model Product {
   images        ProductImage[]
   variants      ProductVariant[]
   inventoryLogs Inventory[]
+  batches       Batch[]
+  comboItems    ComboItem[]
 
   //* AUDIT & TIMESTAMPS
   createdAt   DateTime  @default(now()) @map("created_at")
@@ -124,6 +126,8 @@ model ProductVariant {
   product       Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
   images        ProductImage[]
   inventoryLogs Inventory[]
+  batches       Batch[]
+  comboItems    ComboItem[]
 
   @@map("product_variants")
 }

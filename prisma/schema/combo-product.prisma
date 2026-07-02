@@ -1,0 +1,98 @@
+// =========== COMBO PRODUCT MODEL ============
+//* A combo bundles existing products/variants together at a special price for a limited time window.
+//* Kept separate from the Product model because the lifecycle, pricing, and content fields differ.
+model ComboProduct {
+  //* SEARCH & IDENTITY
+  id  Int    @id @default(autoincrement())
+  sid String @unique @default(uuid()) @db.Uuid
+
+  title   String  @unique @db.VarChar(255)
+  titleTh String? @db.VarChar(255)
+  slug    String  @unique @db.VarChar(255)
+
+  //* CONTENT (EN + TH)
+  shortDescription String? @db.VarChar(500)
+  shortDescTh      String? @db.VarChar(500)
+  description      String? @db.Text
+  descriptionTh    String? @db.Text
+
+  //* PRICING (DECIMAL FOR FINANCIAL ACCURACY)
+  totalPrice Decimal @default(0) @db.Decimal(12, 2) //* SUM-OF-PARTS DISPLAY PRICE (CAN BE CACHED OR ENTERED MANUALLY)
+  comboPrice Decimal @default(0) @db.Decimal(12, 2) //* THE BUNDLE OFFER PRICE CUSTOMER PAYS
+
+  //* PROMOTION WINDOW (THE "COMBO LIMIT" / DURATION RANGE)
+  startsAt DateTime? @map("starts_at")
+  endsAt   DateTime? @map("ends_at")
+
+  //* STATE
+  status     CategoryProductStatus @default(DRAFT)
+  isFeatured Boolean               @default(false)
+
+  //* SEO METADATA
+  seoMetadata Json? @default("{}") //* metaTitle, metaDescription, metaTitleTh, metaDescriptionTh
+
+  //* RELATIONS
+  images ComboImage[]
+  items  ComboItem[]
+
+  //* AUDIT & TIMESTAMPS
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at") //* SOFT DELETE
+  publishedAt DateTime? @map("published_at")
+
+  createdBy     Int?  @map("created_by")
+  createdByUser User? @relation("ComboCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedBy     Int?  @map("updated_by")
+  updatedByUser User? @relation("ComboUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@index([slug])
+  @@index([status, isFeatured]) //* Fast featured/active listings on storefront
+  @@index([startsAt, endsAt]) //* Window queries for active promotions
+  @@map("combo_products")
+}
+
+// =========== COMBO ITEM MODEL ============
+//* One product (and optional variant) that belongs to a combo, with a quantity.
+model ComboItem {
+  id Int @id @default(autoincrement())
+
+  comboId Int          @map("combo_id")
+  combo   ComboProduct @relation(fields: [comboId], references: [id], onDelete: Cascade)
+
+  productId Int     @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict) //* PREVENT DELETING A PRODUCT THAT'S STILL BUNDLED
+
+  variantId Int?            @map("variant_id") //* OPTIONAL: pin to a specific size/variant
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  quantity     Int      @default(1)
+  unitPrice    Decimal? @db.Decimal(12, 2) //* SNAPSHOT PRICE AT TIME OF BUNDLING (PROTECTS HISTORICAL COMBO PRICING)
+  displayOrder Int      @default(0)
+
+  @@unique([comboId, productId, variantId]) //* PREVENT DUPLICATE ROWS PER (COMBO, PRODUCT, VARIANT)
+  @@index([productId])
+  @@index([variantId])
+  @@map("combo_items")
+}
+
+// =========== COMBO IMAGE MODEL ============
+//* Combo-specific imagery, mirrors the structure of ProductImage but scoped to a combo.
+model ComboImage {
+  id           Int     @id @default(autoincrement())
+  url          String  @db.VarChar(512)
+  thumbnailUrl String? @db.VarChar(512)
+  bannerUrl    String? @db.VarChar(512)
+  iconUrl      String? @db.VarChar(512)
+
+  altText      String?
+  displayOrder Int     @default(0)
+  isPrimary    Boolean @default(false)
+  isActive     Boolean @default(true)
+
+  comboId Int          @map("combo_id")
+  combo   ComboProduct @relation(fields: [comboId], references: [id], onDelete: Cascade)
+
+  @@index([comboId, isPrimary])
+  @@map("combo_images")
+}

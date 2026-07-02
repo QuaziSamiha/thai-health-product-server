@@ -10,6 +10,36 @@ enum InventoryExchangeType {
   EXPIRED
 }
 
+// ============= BATCH MANAGEMENT MODEL =============
+model Batch {
+  id  Int    @id @default(autoincrement())
+  sid String @unique @default(uuid()) @db.Uuid
+
+  batchNo String @unique @db.VarChar(100) // HUMAN READABLE BATCH NUMBER (E.G., 14-BEAUTY-001)
+
+  // QUANTITIES
+  quantity  Int @default(0) // INITIAL QUANTITY ADDED IN THIS BATCH
+  remaining Int @default(0) // QUANTITY REMAINING (DECREMENTS ON REMOVAL)
+
+  // METADATA FOR THE BATCH
+  manufacturingDate DateTime?
+  expiryDate        DateTime?
+
+  // TIME STAMPS
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // RELATIONS
+  productId Int?
+  product   Product?        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId Int?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([variantId])
+  @@map("batches")
+}
+
 model Inventory {
   id             Int                   @id @default(autoincrement())
   sid            String                @unique @default(uuid()) @db.Uuid
