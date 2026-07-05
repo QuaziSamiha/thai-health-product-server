@@ -1,10 +1,38 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  Inject,
+  Logger,
+} from '@nestjs/common';
 import { ProductRepository } from './product.repository';
-import { ProductResponsePublicDto } from './dto/product-response.dto';
+import {
+  ProductResponseDto,
+  ProductResponsePublicDto,
+} from './dto/product-response.dto';
+import { CreateProductDto } from './dto/create-product.dto';
+import { CreateProductVariantDto } from './dto/create-product-variant.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { PublishedProductsQueryDto } from './dto/published-products-query.dto';
+import { generateSlug } from '../../common/utils/slug.util';
+import { parseStoragePath } from '../../common/utils/storage-path.util';
+import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
+import type { IStorageService } from '../../shared/storage/interfaces/storage.interface';
+import { Prisma } from '../../generated/prisma/client';
+import { ProductType, StockStatus } from '../../generated/prisma/enums';
+import type { IPaginatedResult } from '../../shared/pagination';
+
+const PRODUCT_IMAGE_FOLDER = 'products/gallery';
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly productRepository: ProductRepository) {}
+  private readonly logger = new Logger(ProductService.name);
+
+  constructor(
+    private readonly productRepository: ProductRepository,
+    @Inject(STORAGE_SERVICE_TOKEN)
+    private readonly storageService: IStorageService,
+  ) {}
 
   async getProductBySlug(slug: string): Promise<ProductResponsePublicDto> {
     const product = await this.productRepository.findBySlugPublic(slug);
@@ -13,4 +41,490 @@ export class ProductService {
     }
     return new ProductResponsePublicDto(product);
   }
+
+  /**
+   * Storefront listing — the only parsing that belongs here (not in the
+   * repository, per `findAllProductsPublic`'s own contract) is turning the
+   * CSV `categoryIds` query param into `number[]`; everything else is passed
+   * straight through to the already-filtered repository query.
+   */
+  async getPublishedProducts(
+    query: PublishedProductsQueryDto,
+  ): Promise<IPaginatedResult<ProductResponsePublicDto>> {
+    const { categoryIds, productType, ...paginationParams } = query;
+
+    const paginated = await this.productRepository.findAllProductsPublic(
+      paginationParams,
+      {
+        categoryIds: categoryIds
+          ?.split(',')
+          .map((id) => Number(id.trim()))
+          .filter((id) => Number.isInteger(id)),
+        type: productType,
+      },
+    );
+
+    return {
+      ...paginated,
+      data: paginated.data.map((product) => new ProductResponsePublicDto(product)),
+    };
+  }
+
+  /**
+   * Creates a product with optional gallery images and variants.
+   *
+   * Order of operations matters: images are uploaded to disk *before* the DB
+   * write, because the nested `images`/`variants` create needs their final
+   * paths as input. If the DB write then fails, the already-uploaded files
+   * are rolled back — otherwise a failed create would leave orphaned files
+   * with nothing in the DB pointing at them.
+   */
+  async createProduct(
+    userId: number,
+    dto: CreateProductDto,
+    images: Express.Multer.File[],
+  ): Promise<ProductResponseDto> {
+    const existingByName = await this.productRepository.findByName(dto.name);
+    if (existingByName) {
+      throw new ConflictException('A product with this name already exists');
+    }
+
+    const slug = generateSlug(dto.name);
+    const existingBySlug = await this.productRepository.findBySlugAdmin(slug);
+    if (existingBySlug) {
+      throw new ConflictException(
+        'A product with this name results in a duplicate slug',
+      );
+    }
+
+    const uploadedPaths: string[] = [];
+    try {
+      for (const file of images) {
+        uploadedPaths.push(await this.uploadFile(file, PRODUCT_IMAGE_FOLDER));
+      }
+    } catch (uploadError) {
+      await Promise.all(
+        uploadedPaths.map((path) => this.deleteStoredFile(path)),
+      );
+      throw uploadError;
+    }
+
+    try {
+      const { hasVariants, quantity, totalStock, stockStatus, variants } =
+        this.buildStockAndVariants(slug, dto.variants, dto.quantity);
+
+      const created = await this.productRepository.createProduct({
+        name: dto.name,
+        slug,
+        nameTh: dto.nameTh,
+        sku: dto.sku,
+        barcode: dto.barcode,
+        description: dto.description,
+        descriptionTh: dto.descriptionTh,
+        shortDescription: dto.shortDescription,
+        shortDescTh: dto.shortDescTh,
+        type: dto.type,
+        status: dto.status,
+        isFeatured: dto.isFeatured,
+        publishedAt: dto.publishedAt ? new Date(dto.publishedAt) : undefined,
+        basePrice: dto.basePrice,
+        discountType: dto.discountType,
+        discountValue: dto.discountValue,
+        salePrice: dto.salePrice,
+        costPrice: dto.costPrice,
+        weight: dto.weight,
+        dimensions: toPlainJson(dto.dimensions),
+        seoMetadata: toPlainJson(dto.seoMetadata),
+        tags: dto.tags ?? [],
+        dosage: dto.dosage,
+        dosageTh: dto.dosageTh,
+        ingredients: dto.ingredients,
+        ingredientsTh: dto.ingredientsTh,
+        healthBenefits: dto.healthBenefits,
+        healthBenefitsTh: dto.healthBenefitsTh,
+        warning: dto.warning,
+        warningTh: dto.warningTh,
+        storageInstructions: dto.storageInstructions,
+        storageInstructionsTh: dto.storageInstructionsTh,
+        origin: dto.origin,
+        genericName: dto.genericName,
+        categoryId: dto.categoryId,
+        createdBy: userId,
+        hasVariants,
+        quantity,
+        totalStock,
+        stockStatus,
+        images: uploadedPaths.map((path, index) => ({
+          url: path,
+          displayOrder: index,
+          isPrimary: index === 0,
+        })),
+        variants,
+      });
+
+      return new ProductResponseDto(created);
+    } catch (createError) {
+      await Promise.all(
+        uploadedPaths.map((path) => this.deleteStoredFile(path)),
+      );
+      throw createError;
+    }
+  }
+
+  /**
+   * Derives the fields that must be computed rather than taken verbatim from
+   * the request: `hasVariants` (presence of `variants`), `quantity`/`totalStock`
+   * (SIMPLE: `quantity` — from the request's `dto.quantity` — is authoritative
+   * and `totalStock` mirrors it; VARIABLE: `quantity` is forced to 0 and
+   * `totalStock` is the sum of variant stock, regardless of what the client
+   * sent for `quantity`, since this invariant is what the rest of the app
+   * relies on), `stockStatus` (derived from the effective stock count), and
+   * each variant's own slug/stockStatus. If no variant is marked `isDefault`,
+   * the first one is — the storefront always needs some variant pre-selected.
+   */
+  private buildStockAndVariants(
+    productSlug: string,
+    variantDtos: CreateProductVariantDto[] | undefined,
+    simpleQuantity: number | undefined,
+  ): {
+    hasVariants: boolean;
+    quantity: number;
+    totalStock: number;
+    stockStatus: StockStatus;
+    variants: Prisma.ProductVariantCreateManyProductInput[];
+  } {
+    const hasVariants = Boolean(variantDtos?.length);
+
+    if (!hasVariants) {
+      const quantity = simpleQuantity ?? 0;
+      return {
+        hasVariants,
+        quantity,
+        totalStock: quantity,
+        stockStatus: this.computeStockStatus(quantity),
+        variants: [],
+      };
+    }
+
+    const variants = variantDtos!.map((variant, index) =>
+      this.buildVariantInput(productSlug, variant, index),
+    );
+    if (!variants.some((v) => v.isDefault)) {
+      variants[0].isDefault = true;
+    }
+
+    const totalStock = variants.reduce((sum, v) => sum + (v.quantity ?? 0), 0);
+
+    return {
+      hasVariants,
+      quantity: 0,
+      totalStock,
+      stockStatus: this.computeStockStatus(totalStock),
+      variants,
+    };
+  }
+
+  private buildVariantInput(
+    productSlug: string,
+    variant: CreateProductVariantDto,
+    index: number,
+  ): Prisma.ProductVariantCreateManyProductInput {
+    const quantity = variant.quantity ?? 0;
+    const slugSeed = variant.name ?? variant.size ?? `variant-${index + 1}`;
+
+    return {
+      // Variant name/slug are unique across ALL products in the current
+      // schema (not scoped per-product) — prefixing with the parent's own
+      // unique slug keeps this collision-free in practice.
+      name: variant.name ?? `${productSlug} ${variant.size ?? ''}`.trim(),
+      slug: `${productSlug}-${generateSlug(slugSeed)}`,
+      size: variant.size,
+      price: variant.price ?? 0,
+      discountType: variant.discountType,
+      discountPrice: variant.discountPrice,
+      costPerItem: variant.costPerItem,
+      quantity,
+      stockStatus: this.computeStockStatus(quantity),
+      sku: variant.sku,
+      barcode: variant.barcode,
+      weight: variant.weight,
+      attributes: toPlainJson(variant.attributes) ?? {},
+      isDefault: variant.isDefault ?? false,
+    };
+  }
+
+  private computeStockStatus(quantity: number): StockStatus {
+    return quantity > 0 ? StockStatus.IN_STOCK : StockStatus.OUT_OF_STOCK;
+  }
+
+  /**
+   * Partial update. Only fields actually present in `dto` are touched —
+   * everything else on the row is left exactly as it was.
+   *
+   * - **Name change** re-derives the slug and re-checks both for conflicts
+   *   (excluding the product's own row).
+   * - **New images** are *appended* to the existing gallery, never replace
+   *   or remove anything — that's a separate, more destructive operation
+   *   this endpoint intentionally doesn't attempt implicitly.
+   * - **`variants`, if provided, is a full replacement** (via the existing
+   *   `replaceVariants`), and re-triggers the same stock invariant as
+   *   `createProduct`. Omitting `variants` entirely leaves existing variants
+   *   untouched.
+   * - `replaceVariants` + the new images + the scalar field update all run
+   *   inside one transaction, so a failure partway never leaves, say, new
+   *   variants committed alongside stale scalar fields.
+   * - Uploaded files are rolled back if anything in the transaction fails,
+   *   same as `createProduct`.
+   */
+  async updateProduct(
+    id: number,
+    userId: number,
+    dto: UpdateProductDto,
+    images: Express.Multer.File[],
+  ): Promise<ProductResponseDto> {
+    const existing = await this.productRepository.findByIdAdmin(id);
+    if (!existing) {
+      throw new NotFoundException('Product not found');
+    }
+
+    let slug = existing.slug;
+    if (dto.name && dto.name !== existing.name) {
+      const nameConflict = await this.productRepository.findByName(dto.name);
+      if (nameConflict && nameConflict.id !== id) {
+        throw new ConflictException('A product with this name already exists');
+      }
+      const newSlug = generateSlug(dto.name);
+      const slugConflict =
+        await this.productRepository.findBySlugAdmin(newSlug);
+      if (slugConflict && slugConflict.id !== id) {
+        throw new ConflictException('This name results in a duplicate slug');
+      }
+      slug = newSlug;
+    }
+
+    const uploadedPaths: string[] = [];
+    try {
+      for (const file of images) {
+        uploadedPaths.push(await this.uploadFile(file, PRODUCT_IMAGE_FOLDER));
+      }
+    } catch (uploadError) {
+      await Promise.all(
+        uploadedPaths.map((path) => this.deleteStoredFile(path)),
+      );
+      throw uploadError;
+    }
+
+    try {
+      const { fields: stockFields, variantsToReplace } =
+        this.resolveStockUpdate(existing, dto, slug);
+
+      const updated = await this.productRepository.withTransaction(
+        async (tx) => {
+          if (variantsToReplace) {
+            await this.productRepository.replaceVariants(
+              id,
+              variantsToReplace,
+              tx,
+            );
+          }
+          if (uploadedPaths.length) {
+            const startOrder = existing.images.length;
+            await this.productRepository.createImages(
+              id,
+              uploadedPaths.map((path, index) => ({
+                url: path,
+                displayOrder: startOrder + index,
+                isPrimary: false,
+              })),
+              tx,
+            );
+          }
+          return await this.productRepository.updateProduct(
+            id,
+            {
+              name: dto.name,
+              slug: dto.name ? slug : undefined,
+              nameTh: dto.nameTh,
+              sku: dto.sku,
+              barcode: dto.barcode,
+              description: dto.description,
+              descriptionTh: dto.descriptionTh,
+              shortDescription: dto.shortDescription,
+              shortDescTh: dto.shortDescTh,
+              type: dto.type,
+              status: dto.status,
+              isFeatured: dto.isFeatured,
+              publishedAt: dto.publishedAt
+                ? new Date(dto.publishedAt)
+                : undefined,
+              basePrice: dto.basePrice,
+              discountType: dto.discountType,
+              discountValue: dto.discountValue,
+              salePrice: dto.salePrice,
+              costPrice: dto.costPrice,
+              weight: dto.weight,
+              dimensions: toPlainJson(dto.dimensions),
+              seoMetadata: toPlainJson(dto.seoMetadata),
+              tags: dto.tags,
+              dosage: dto.dosage,
+              dosageTh: dto.dosageTh,
+              ingredients: dto.ingredients,
+              ingredientsTh: dto.ingredientsTh,
+              healthBenefits: dto.healthBenefits,
+              healthBenefitsTh: dto.healthBenefitsTh,
+              warning: dto.warning,
+              warningTh: dto.warningTh,
+              storageInstructions: dto.storageInstructions,
+              storageInstructionsTh: dto.storageInstructionsTh,
+              origin: dto.origin,
+              genericName: dto.genericName,
+              categoryId: dto.categoryId,
+              updatedBy: userId,
+              ...stockFields,
+            },
+            tx,
+          );
+        },
+      );
+
+      return new ProductResponseDto(updated);
+    } catch (updateError) {
+      await Promise.all(
+        uploadedPaths.map((path) => this.deleteStoredFile(path)),
+      );
+      throw updateError;
+    }
+  }
+
+  /**
+   * Recomputes `hasVariants`/`quantity`/`totalStock`/`stockStatus` only when
+   * the update actually touches `type`, `quantity`, or `variants` — otherwise
+   * these cached fields are left out of the update payload entirely (Prisma
+   * ignores `undefined` keys, so they stay whatever they already were).
+   * Reuses the exact same invariant as `createProduct`.
+   *
+   * Known limitation: flipping `type` between SIMPLE and VARIABLE without
+   * also providing `variants` does not itself create/remove variant rows —
+   * that's a separate, more destructive operation this method intentionally
+   * doesn't attempt implicitly.
+   */
+  private resolveStockUpdate(
+    current: { type: ProductType; quantity: number },
+    dto: UpdateProductDto,
+    productSlug: string,
+  ): {
+    fields: Partial<Prisma.ProductUncheckedUpdateInput>;
+    variantsToReplace?: Prisma.ProductVariantCreateManyProductInput[];
+  } {
+    const touchesStock =
+      dto.type !== undefined ||
+      dto.quantity !== undefined ||
+      dto.variants !== undefined;
+    if (!touchesStock) {
+      return { fields: {} };
+    }
+
+    const effectiveType = dto.type ?? current.type;
+
+    if (effectiveType === ProductType.VARIABLE) {
+      if (dto.variants !== undefined) {
+        const variants = dto.variants.map((variant, index) =>
+          this.buildVariantInput(productSlug, variant, index),
+        );
+        if (!variants.some((v) => v.isDefault)) {
+          variants[0].isDefault = true;
+        }
+        const totalStock = variants.reduce(
+          (sum, v) => sum + (v.quantity ?? 0),
+          0,
+        );
+        return {
+          fields: {
+            hasVariants: true,
+            quantity: 0,
+            totalStock,
+            stockStatus: this.computeStockStatus(totalStock),
+          },
+          variantsToReplace: variants,
+        };
+      }
+      return { fields: { hasVariants: true, quantity: 0 } };
+    }
+
+    const quantity = dto.quantity ?? current.quantity;
+    return {
+      fields: {
+        hasVariants: false,
+        quantity,
+        totalStock: quantity,
+        stockStatus: this.computeStockStatus(quantity),
+      },
+    };
+  }
+
+  /**
+   * Soft delete — retires the product (status ARCHIVED, `deletedAt`/`deletedBy`
+   * set) and hides its gallery images. Reversible: nothing is destroyed.
+   */
+  async softDeleteProduct(id: number, deletedBy: number): Promise<void> {
+    const product = await this.productRepository.findByIdAdmin(id);
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    if (product.deletedAt) {
+      throw new ConflictException('Product is already deleted');
+    }
+
+    await this.productRepository.softDeleteProduct(id, deletedBy);
+  }
+
+  /**
+   * Hard delete — permanently removes the product row, its variants, and its
+   * images. The DB relations cascade the row deletion for us; the physical
+   * image files are cleaned up here afterward, best-effort, since a failed
+   * file unlink shouldn't roll back a delete the DB has already committed.
+   */
+  async hardDeleteProduct(id: number): Promise<void> {
+    const product = await this.productRepository.findImagePathsForDeletion(id);
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    await this.productRepository.hardDeleteProduct(id);
+
+    const filePaths = product.images.flatMap((image) =>
+      [image.url, image.thumbnailUrl, image.bannerUrl, image.iconUrl].filter(
+        (path): path is string => Boolean(path),
+      ),
+    );
+    await Promise.all(filePaths.map((path) => this.deleteStoredFile(path)));
+  }
+
+  private async uploadFile(
+    file: Express.Multer.File,
+    folder: string,
+  ): Promise<string> {
+    const saved = await this.storageService.saveFile(file, folder);
+    return saved.path;
+  }
+
+  private async deleteStoredFile(path: string): Promise<void> {
+    const { filename, folder } = parseStoragePath(path);
+    await this.storageService
+      .deleteFile(filename, folder)
+      .catch((e: unknown) => {
+        const message = e instanceof Error ? e.message : String(e);
+        this.logger.warn(`Could not delete orphaned file ${path}: ${message}`);
+      });
+  }
+}
+
+//* JSONB COLUMNS NEED A PLAIN, SERIALIZABLE VALUE — STRIPS class-transformer
+//* INSTANCE METADATA AND ANY undefined FIELDS FROM THE VALIDATED NESTED DTOS.
+function toPlainJson(
+  value: object | undefined,
+): Prisma.InputJsonValue | undefined {
+  return value
+    ? (JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue)
+    : undefined;
 }

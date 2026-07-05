@@ -191,7 +191,70 @@ export class ProductRepository extends BaseRepository {
     });
   }
 
-  /** Irreversible — permanently removes the row. Prefer soft-deleting via `updateProduct` (set `deletedAt`/`deletedBy`) for anything that has shipped or been ordered. */
+  /**
+   * Soft delete: marks the product retired (`deletedAt`/`deletedBy`, status
+   * ARCHIVED) and hides its whole gallery (`isActive: false` on every image —
+   * product-level and variant-level alike, since both are scoped by
+   * `productId`). Variants have no soft-delete field of their own — nothing
+   * queries them independently of their parent product, so once the parent
+   * drops out of `publicVisibilityWhere()`, its variants become unreachable
+   * through the API right along with it.
+   */
+  async softDeleteProduct(
+    id: number,
+    deletedBy: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const run = async (client: Prisma.TransactionClient) => {
+      const product = await client.product.update({
+        where: { id },
+        data: {
+          deletedAt: new Date(),
+          deletedBy,
+          status: CategoryProductStatus.ARCHIVED,
+        },
+        select: PRODUCT_SELECT_ADMIN,
+      });
+      await client.productImage.updateMany({
+        where: { productId: id },
+        data: { isActive: false },
+      });
+      return product;
+    };
+
+    return tx ? run(tx) : this.withTransaction(run);
+  }
+
+  /**
+   * Lean lookup used only to prepare a hard delete: just enough to confirm
+   * the product exists and to collect every stored file path so the caller
+   * can clean them up after. Returns `null` if the product doesn't exist.
+   */
+  async findImagePathsForDeletion(id: number, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.product.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        images: {
+          select: {
+            url: true,
+            thumbnailUrl: true,
+            bannerUrl: true,
+            iconUrl: true,
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Irreversible — permanently removes the row. `ON DELETE CASCADE` on the
+   * ProductImage/ProductVariant relations removes their DB rows
+   * automatically; it does NOT touch the actual files on disk — the caller
+   * is responsible for cleaning those up (see `findImagePathsForDeletion`).
+   * Prefer `softDeleteProduct` for anything that has shipped or been ordered.
+   */
   async hardDeleteProduct(id: number, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return await client.product.delete({
