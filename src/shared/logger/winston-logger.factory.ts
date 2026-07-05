@@ -5,6 +5,11 @@ import { RequestContextService } from './request-context.service';
 import { redactSensitiveFields } from './utils/redact.util';
 import { DEFAULT_REDACTED_KEYS } from './constants/logger.constants';
 
+//* winston.format.colorize() LOOKS UP LEVEL->COLOR IN Colorizer.allColors, WHICH IS ONLY
+//* POPULATED BY winston.addColors() — WITHOUT THIS CALL IT THROWS "colors[...] IS NOT A FUNCTION"
+//* THE FIRST TIME THE NON-JSON CONSOLE FORMAT ACTUALLY RUNS.
+winston.addColors(winston.config.npm.colors);
+
 export interface LoggerConfig {
   level: string;
   dir: string;
@@ -37,9 +42,20 @@ const buildContextEnrichmentFormat = (
 
 //* REDACTS SENSITIVE FIELDS FROM ANY OBJECT METADATA ATTACHED TO A LOG CALL
 //* (E.G. `logger.log('msg', { password: '...' })`) BEFORE IT REACHES A TRANSPORT.
-const redactionFormat = winston.format((info) =>
-  redactSensitiveFields(info, DEFAULT_REDACTED_KEYS),
-);
+//* redactSensitiveFields REBUILDS THE OBJECT VIA Object.entries(), WHICH ONLY COPIES OWN
+//* ENUMERABLE STRING KEYS — IT DROPS THE triple-beam LEVEL/MESSAGE SYMBOLS THAT WINSTON ATTACHES
+//* TO THE TOP-LEVEL `info` OBJECT. WITHOUT THEM, format.colorize() CAN'T LOOK UP info[LEVEL] AND
+//* CRASHES. COPY ANY SYMBOL-KEYED PROPS BACK ONTO THE REDACTED RESULT TO KEEP THEM INTACT.
+const redactionFormat = winston.format((info) => {
+  const redacted = redactSensitiveFields(info, DEFAULT_REDACTED_KEYS) as Record<
+    PropertyKey,
+    unknown
+  >;
+  for (const sym of Object.getOwnPropertySymbols(info)) {
+    redacted[sym] = (info as Record<PropertyKey, unknown>)[sym];
+  }
+  return redacted as typeof info;
+});
 
 export function buildWinstonModuleOptions(
   config: LoggerConfig,
