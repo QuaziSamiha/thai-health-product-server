@@ -10,11 +10,56 @@ import {
 import { Response } from 'express';
 import { ValidationError } from 'class-validator';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
+import { Prisma } from '../../generated/prisma/client';
 import { constraintRecordFromUnknown } from '../utils/validation.util';
+
+//* MAPS THE MOST COMMON PRISMA ERROR CODES TO A SAFE, ACTIONABLE CLIENT
+//* RESPONSE. CODES NOT LISTED HERE (E.G. P2021 "TABLE/COLUMN DOES NOT
+//* EXIST" — A SCHEMA/MIGRATION DRIFT BUG, NOT A CLIENT MISTAKE) FALL
+//* THROUGH TO THE GENERIC 500 BELOW.
+function mapPrismaError(
+  exception: Prisma.PrismaClientKnownRequestError,
+): { statusCode: number; message: string; error: string } | null {
+  switch (exception.code) {
+    case 'P2002': {
+      const target = exception.meta?.target;
+      const fields = Array.isArray(target) ? target.join(', ') : 'field';
+      return {
+        statusCode: HttpStatus.CONFLICT,
+        message: `A record with this ${fields} already exists`,
+        error: 'Conflict',
+      };
+    }
+    case 'P2025':
+      return {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'The requested record was not found',
+        error: 'Not Found',
+      };
+    case 'P2003':
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'This action references a record that does not exist',
+        error: 'Bad Request',
+      };
+    case 'P2000':
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'One of the provided values is too long for its field',
+        error: 'Bad Request',
+      };
+    default:
+      return null;
+  }
+}
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(GlobalExceptionFilter.name);
+  //* NEVER LEAK RAW ERROR DETAILS (SCHEMA NAMES, STACK TRACES) TO A PRODUCTION
+  //* CLIENT — BUT IN DEV/LOCAL, SURFACING THE REAL MESSAGE SAVES A TRIP TO
+  //* THE LOG FILE FOR EVERY UNEXPECTED 500.
+  private readonly isProduction = process.env.NODE_ENV === 'production';
 
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -65,6 +110,20 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         message = exceptionResponse;
         error = exceptionResponse;
       }
+    } else if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+      const mapped = mapPrismaError(exception);
+      if (mapped) {
+        statusCode = mapped.statusCode;
+        message = mapped.message;
+        error = mapped.error;
+      } else if (!this.isProduction) {
+        const lines = exception.message.split('\n').map((l) => l.trim());
+        message = lines.filter(Boolean).pop() || exception.message;
+        error = `Database Error (${exception.code})`;
+      }
+    } else if (!this.isProduction && exception instanceof Error) {
+      message = exception.message;
+      error = exception.name;
     }
 
     if ((statusCode as number) >= 500) {

@@ -5,6 +5,7 @@ import {
   Inject,
   Logger,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { BlogRepository } from './blog.repository';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
@@ -13,7 +14,6 @@ import {
   BlogResponsePublicDto,
 } from './dto/blog-response.dto';
 import { generateSlug } from '../../common/utils/slug.util';
-import { getBaseUrl } from '../../common/utils/env.util';
 import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
 import type { IStorageService } from '../../shared/storage/interfaces/storage.interface';
 import { PaginationQueryDto, IPaginatedResult } from '../../shared/pagination';
@@ -28,6 +28,7 @@ export class BlogService {
     private readonly blogRepository: BlogRepository,
     @Inject(STORAGE_SERVICE_TOKEN)
     private readonly storageService: IStorageService,
+    private readonly configService: ConfigService,
   ) {}
 
   async createBlog(
@@ -61,7 +62,10 @@ export class BlogService {
         ...(imagePath && { imageUrl: imagePath }),
       });
 
-      return new BlogResponseDto(newBlog, getBaseUrl());
+      return new BlogResponseDto(
+        newBlog,
+        this.configService.get<string>('app.baseUrl'),
+      );
     } catch (error) {
       if (imagePath) {
         await this.deleteFile(imagePath, BLOG_IMAGE_FOLDER);
@@ -78,7 +82,11 @@ export class BlogService {
     return {
       ...paginatedBlogs,
       data: paginatedBlogs.data.map(
-        (blog) => new BlogResponseDto(blog, getBaseUrl()),
+        (blog) =>
+          new BlogResponseDto(
+            blog,
+            this.configService.get<string>('app.baseUrl'),
+          ),
       ),
     };
   }
@@ -88,7 +96,10 @@ export class BlogService {
     if (!blog) {
       throw new NotFoundException('Blog post not found');
     }
-    return new BlogResponsePublicDto(blog, getBaseUrl());
+    return new BlogResponsePublicDto(
+      blog,
+      this.configService.get<string>('app.baseUrl'),
+    );
   }
 
   async updateBlog(
@@ -131,7 +142,10 @@ export class BlogService {
     }
 
     const updatedBlog = await this.blogRepository.updateBlog(id, updateData);
-    return new BlogResponseDto(updatedBlog, getBaseUrl());
+    return new BlogResponseDto(
+      updatedBlog,
+      this.configService.get<string>('app.baseUrl'),
+    );
   }
 
   async deleteBlog(id: number): Promise<void> {

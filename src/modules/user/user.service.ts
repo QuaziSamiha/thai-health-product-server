@@ -6,6 +6,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { UserRepository } from './repositories/user.repository';
 import { ProfileRepository } from './repositories/profile.repository';
 import { UserSecurityRepository } from './repositories/user-security.repository';
@@ -15,7 +16,6 @@ import {
   UserResponseDto,
   UserResponseDtoWithDetails,
 } from './dto/user-response.dto';
-import { getBaseUrl } from '../../common/utils/env.util';
 import { HashService } from '../../shared/hash/hash.service';
 import { OtpService } from '../otp/otp.service';
 import {
@@ -36,6 +36,7 @@ export class UserService {
     @Inject(forwardRef(() => OtpService))
     private readonly otpService: OtpService,
     private readonly hashService: HashService,
+    private readonly configService: ConfigService,
   ) {}
 
   async registerUser(
@@ -128,7 +129,10 @@ export class UserService {
         );
       }
 
-      return new UserResponseDtoWithDetails(fullUser, getBaseUrl());
+      return new UserResponseDtoWithDetails(
+        fullUser,
+        this.configService.get<string>('app.baseUrl'),
+      );
     });
   }
 
@@ -149,7 +153,10 @@ export class UserService {
       throw new NotFoundException(`User with ID ${id} not found.`);
     }
 
-    return new UserResponseDtoWithDetails(existingUser, getBaseUrl());
+    return new UserResponseDtoWithDetails(
+      existingUser,
+      this.configService.get<string>('app.baseUrl'),
+    );
   }
 
   async getAllUsers(
@@ -160,7 +167,11 @@ export class UserService {
     return {
       ...paginatedUsers,
       data: paginatedUsers.data.map(
-        (user) => new UserResponseDtoWithDetails(user, getBaseUrl()),
+        (user) =>
+          new UserResponseDtoWithDetails(
+            user,
+            this.configService.get<string>('app.baseUrl'),
+          ),
       ),
     };
   }
@@ -190,7 +201,10 @@ export class UserService {
       throw new ConflictException('Failed to retrieve user after registration');
     }
 
-    return new UserResponseDtoWithDetails(user, getBaseUrl());
+    return new UserResponseDtoWithDetails(
+      user,
+      this.configService.get<string>('app.baseUrl'),
+    );
   }
 
   async updateUserRole(
@@ -204,7 +218,10 @@ export class UserService {
     }
 
     const updatedUser = await this.userRepo.updateUserRole(userId, role);
-    return new UserResponseDtoWithDetails(updatedUser, getBaseUrl());
+    return new UserResponseDtoWithDetails(
+      updatedUser,
+      this.configService.get<string>('app.baseUrl'),
+    );
   }
 
   async updatePassword(
@@ -237,7 +254,10 @@ export class UserService {
       hashedNewPassword,
     );
 
-    return new UserResponseDtoWithDetails(updatedUser, getBaseUrl());
+    return new UserResponseDtoWithDetails(
+      updatedUser,
+      this.configService.get<string>('app.baseUrl'),
+    );
   }
 
   async findForAuth(email: string) {

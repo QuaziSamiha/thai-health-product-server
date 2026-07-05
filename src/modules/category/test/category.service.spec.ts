@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
 
 import { CategoryService } from '../category.service';
 import { CategoryRepository } from '../category.repository';
@@ -90,9 +91,9 @@ const mockStorageService = (): jest.Mocked<IStorageService> => ({
   getUploadPath: jest.fn(),
 });
 
-jest.mock('../../../common/utils/env.util', () => ({
-  getBaseUrl: () => BASE_URL,
-}));
+const mockConfigService = (): jest.Mocked<Pick<ConfigService, 'get'>> => ({
+  get: jest.fn().mockReturnValue(BASE_URL),
+});
 
 // ---------------------------------------------------------------------------
 // Suite
@@ -112,6 +113,7 @@ describe('CategoryService', () => {
         CategoryService,
         { provide: CategoryRepository, useValue: repo },
         { provide: STORAGE_SERVICE_TOKEN, useValue: storage },
+        { provide: ConfigService, useValue: mockConfigService() },
       ],
     }).compile();
 

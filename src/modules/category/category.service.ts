@@ -6,6 +6,7 @@ import {
   Inject,
   Logger,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { CategoryRepository } from './category.repository';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { generateSlug } from '../../common/utils/slug.util';
@@ -13,7 +14,6 @@ import {
   CategoryResponseDto,
   RootActiveCategoryResponseDto,
 } from './dto/category-response.dto';
-import { getBaseUrl } from '../../common/utils/env.util';
 import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
 import type { IStorageService } from '../../shared/storage/interfaces/storage.interface';
 import { PaginationQueryDto, IPaginatedResult } from '../../shared/pagination';
@@ -27,6 +27,7 @@ export class CategoryService {
     private readonly categoryRepository: CategoryRepository,
     @Inject(STORAGE_SERVICE_TOKEN)
     private readonly storageService: IStorageService,
+    private readonly configService: ConfigService,
   ) {}
 
   async createCategory(
@@ -134,7 +135,10 @@ export class CategoryService {
     }
 
     const created = await this.categoryRepository.findById(newCategory.id);
-    return new CategoryResponseDto(created ?? newCategory, getBaseUrl());
+    return new CategoryResponseDto(
+      created ?? newCategory,
+      this.configService.get<string>('app.baseUrl'),
+    );
   }
 
   async getAllCategories(
@@ -146,7 +150,11 @@ export class CategoryService {
     return {
       ...paginatedCategories,
       data: paginatedCategories.data.map(
-        (category) => new CategoryResponseDto(category, getBaseUrl()),
+        (category) =>
+          new CategoryResponseDto(
+            category,
+            this.configService.get<string>('app.baseUrl'),
+          ),
       ),
     };
   }
@@ -154,7 +162,11 @@ export class CategoryService {
   async getAllActiveCategories(): Promise<CategoryResponseDto[]> {
     const categories = await this.categoryRepository.findAllActiveCategories();
     return categories.map(
-      (category) => new CategoryResponseDto(category, getBaseUrl()),
+      (category) =>
+        new CategoryResponseDto(
+          category,
+          this.configService.get<string>('app.baseUrl'),
+        ),
     );
   }
 
@@ -170,7 +182,10 @@ export class CategoryService {
     if (!existingCategory) {
       throw new NotFoundException('Category not found');
     }
-    return new CategoryResponseDto(existingCategory, getBaseUrl());
+    return new CategoryResponseDto(
+      existingCategory,
+      this.configService.get<string>('app.baseUrl'),
+    );
   }
 
   async updateCategory(
@@ -283,7 +298,10 @@ export class CategoryService {
       userId,
     });
 
-    return new CategoryResponseDto(updatedCategory, getBaseUrl());
+    return new CategoryResponseDto(
+      updatedCategory,
+      this.configService.get<string>('app.baseUrl'),
+    );
   }
 
   private async uploadFile(

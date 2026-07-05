@@ -76,7 +76,7 @@ model Product {
   storageInstructions   String? @db.Text
   storageInstructionsTh String? @db.Text
   origin                String? @db.VarChar(255)
-  genericName           String? @db.VarChar(255)
+  genericName           String? @map("generic") @db.VarChar(255)
 
   //* RELATIONS
   categoryId    Int

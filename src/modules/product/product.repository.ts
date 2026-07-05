@@ -40,18 +40,34 @@ export class ProductRepository extends BaseRepository {
     });
   }
 
+  /**
+   * Public visibility gate, applied to every storefront-facing read below:
+   * not soft-deleted, status ACTIVE, and `publishedAt` in the past (a null
+   * `publishedAt` never matches `lte`, so an un-scheduled product stays
+   * hidden until an admin explicitly publishes it). Built fresh on every
+   * call — this repository is a singleton, so a captured `new Date()` would
+   * freeze "now" at server-startup time instead of the actual request time.
+   */
+  private publicVisibilityWhere(): Prisma.ProductWhereInput {
+    return {
+      deletedAt: null,
+      status: CategoryProductStatus.ACTIVE,
+      publishedAt: { lte: new Date() },
+    };
+  }
+
   async findByIdPublic(id: number, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
-    return await client.product.findUnique({
-      where: { id },
+    return await client.product.findFirst({
+      where: { id, ...this.publicVisibilityWhere() },
       select: PRODUCT_SELECT_PUBLIC,
     });
   }
 
   async findBySlugPublic(slug: string, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
-    return await client.product.findUnique({
-      where: { slug },
+    return await client.product.findFirst({
+      where: { slug, ...this.publicVisibilityWhere() },
       select: PRODUCT_SELECT_PUBLIC,
     });
   }
@@ -103,7 +119,7 @@ export class ProductRepository extends BaseRepository {
   ) {
     const client = tx || this.prisma;
     const where: Prisma.ProductWhereInput = {
-      status: CategoryProductStatus.ACTIVE,
+      ...this.publicVisibilityWhere(),
       ...(filters.categoryIds?.length && {
         categoryId: { in: filters.categoryIds },
       }),
