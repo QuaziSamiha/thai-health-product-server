@@ -18,6 +18,7 @@ import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
 import type { IStorageService } from '../../shared/storage/interfaces/storage.interface';
 import { PaginationQueryDto, IPaginatedResult } from '../../shared/pagination';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CategoryProductStatus } from '../../generated/prisma/enums';
 
 @Injectable()
 export class CategoryService {
@@ -186,6 +187,31 @@ export class CategoryService {
       existingCategory,
       this.configService.get<string>('app.baseUrl'),
     );
+  }
+
+  /**
+   * Validates that a category is a legal target to file a product under:
+   * it must exist, be ACTIVE, and must NOT be a root category. Root
+   * categories (`parentId IS NULL`) are organizational containers only —
+   * every product must be filed under one of their children instead, so the
+   * storefront's category browsing tree never has products sitting directly
+   * on a top-level node alongside its subcategories.
+   */
+  async assertCategoryAssignableToProduct(categoryId: number): Promise<void> {
+    const category = await this.categoryRepository.findById(categoryId);
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+    if (category.status !== CategoryProductStatus.ACTIVE) {
+      throw new BadRequestException(
+        'Category is not active and cannot be assigned to a product',
+      );
+    }
+    if (category.parentId === null) {
+      throw new BadRequestException(
+        'Products cannot be assigned directly to a root category — choose one of its subcategories',
+      );
+    }
   }
 
   async updateCategory(

@@ -4,6 +4,8 @@ This document maps every **currently exposed** `product` HTTP endpoint (`Product
 
 > Scope note: the repository/service layer already has more capability than is wired to a route today (admin/public listing, standalone image/variant management). Those are listed at the bottom under [Built but not yet exposed](#built-but-not-yet-exposed) — this document only describes what's actually reachable over HTTP right now.
 
+> Image URLs: `ProductImage.url`/`thumbnailUrl`/`bannerUrl`/`iconUrl` are stored as relative paths (e.g. `/uploads/products/gallery/abc.webp`). Every response DTO that returns one (`ProductImageDto`, and `ProductMinifiedResponseDto.thumbnailUrl`) prefixes it with `ConfigService.get('app.baseUrl')` via the shared `toAbsoluteUrl()` helper (`dto/product-shared.dto.ts`) before it reaches the client — a value already starting with `http` is left untouched, so this is safe to apply unconditionally.
+
 ---
 
 ## `POST /api/v1/product/create-product`
@@ -15,35 +17,41 @@ This document maps every **currently exposed** `product` HTTP endpoint (`Product
 | Layer | What happens |
 | :--- | :--- |
 | Controller | `ProductController.createProduct(dto, images, req)` — reads the acting admin's id off `req.user.id` (`UnauthorizedException` if missing); no other logic. |
-| Service | `ProductService.createProduct(userId, dto, images)` — uniqueness checks, uploads images, computes derived fields, builds variant inputs, creates the row, rolls back uploaded files if anything downstream fails. |
-| Repository | `findByName` / `findBySlugAdmin` (uniqueness) → `createProduct(data)` — a single `product.create()` with nested `images`/`variants`, atomic as one Prisma call. |
+| Service | `ProductService.createProduct(userId, dto, images)` — validates `categoryId` via `CategoryService`, uniqueness checks, uploads images, computes derived fields, builds variant inputs, creates the row, rolls back uploaded files if anything downstream fails. |
+| Repository | `CategoryRepository.findById` (via `CategoryService`) → `findByName` / `findBySlugAdmin` (uniqueness) → `createProduct(data)` — a single `product.create()` with nested `images`/`variants`, atomic as one Prisma call. |
 
 **Business logic — in order:**
 
-1. **Uniqueness checks.** `findByName(dto.name)` → `409` if taken. Slug is derived via `generateSlug(dto.name)`, then `findBySlugAdmin(slug)` → `409` if that collides too (only possible if two different names sanitize to the same slug, since name itself is already unique).
-2. **Images are uploaded to disk *before* the DB write**, because the nested `images` create needs each file's final path as input — there's no "create empty then attach" step. If upload of any file fails partway, whatever succeeded so far is deleted immediately and the error propagates.
-3. **Derived fields, computed regardless of what the client sent** (`buildStockAndVariants`):
+1. **Category eligibility check** — `CategoryService.assertCategoryAssignableToProduct(dto.categoryId)` (injected from `CategoryModule`), run *before* any uniqueness check or file upload since it's a pure read with no side effects to unwind. A product's category must:
+   - **Exist** — `404 Not Found` otherwise.
+   - **Be `ACTIVE`** — `400 Bad Request` if `DRAFT`/`ARCHIVED`/`HIDDEN`/`INACTIVE`.
+   - **Not be a root category** (`parentId IS NULL`) — `400 Bad Request` otherwise. Root categories are organizational containers only (top-level nodes in the category tree); every product must be filed under one of their children, so the storefront browsing tree never has products sitting directly on a top-level node alongside its subcategories.
+2. **Uniqueness checks.** `findByName(dto.name)` → `409` if taken. Slug is derived via `generateSlug(dto.name)`, then `findBySlugAdmin(slug)` → `409` if that collides too (only possible if two different names sanitize to the same slug, since name itself is already unique).
+3. **Images are uploaded to disk *before* the DB write**, because the nested `images` create needs each file's final path as input — there's no "create empty then attach" step. If upload of any file fails partway, whatever succeeded so far is deleted immediately and the error propagates.
+4. **`type` defaults to `VARIABLE`, not `SIMPLE`.** If `dto.type` is omitted, the service resolves it to `ProductType.VARIABLE` explicitly before the DB write — this is deliberate: the Product model's own column default is `SIMPLE` (`@default(SIMPLE)` in the schema), so simply forwarding `dto.type` unchanged would silently create a `SIMPLE` product whenever the client didn't specify one. **DTO-level consequence**: `variants` is required (`@ArrayMinSize(1)`) whenever the *effective* type is `VARIABLE` — i.e. whenever `dto.type === 'VARIABLE'` **or** `dto.type` is omitted entirely. Only an explicit `type: 'SIMPLE'` skips the variant requirement.
+5. **Derived fields, computed regardless of what the client sent** (`buildStockAndVariants`):
    - `hasVariants` — `true` if `dto.variants` is a non-empty array, otherwise `false`. Never taken from the request directly (the DTO doesn't even expose this field).
    - `quantity` / `totalStock` — enforces the same invariant documented for the model: **SIMPLE** → `dto.quantity` (default `0`) is authoritative, `totalStock` mirrors it. **VARIABLE** → `quantity` is forced to `0` and `totalStock` is the sum of every variant's `quantity`, even if the client also sent a top-level `quantity` (it's discarded).
    - `stockStatus` — `IN_STOCK` if the effective stock count (`totalStock` for VARIABLE, `quantity` for SIMPLE) is `> 0`, else `OUT_OF_STOCK`. No `LOW_STOCK` computation — the schema has no `lowStockThreshold` column to compute it against.
-4. **Per-variant computation** (`buildVariantInput`), for each entry in `dto.variants`:
+6. **Per-variant computation** (`buildVariantInput`), for each entry in `dto.variants`:
    - `name` — the client's value, or `"${productName} ${size}"` if omitted.
    - `slug` — `${productSlug}-${generateSlug(name ?? size ?? 'variant-N')}`. `ProductVariant.slug` is unique **globally**, not scoped per product (a known schema characteristic, not something this endpoint changes) — prefixing with the parent's own already-unique slug keeps this collision-free in practice without altering the schema.
    - `stockStatus` — computed from that variant's own `quantity`, independently of the aggregate.
    - `attributes` — defaults to `{}` if omitted; passed through `toPlainJson()` to strip it down to a plain serializable value.
    - Everything else (`price`, `discountType`, `discountPrice`, `costPerItem`, `sku`, `barcode`, `weight`, `size`, `isDefault`) passes through as given.
-5. **Default-variant guarantee**: if `type = VARIABLE` and no variant in the payload has `isDefault: true`, the **first** variant is forced to `isDefault: true` after the fact. The storefront always needs some variant pre-selected; the DTO doesn't require the client to mark one.
-6. **The DB write itself is one atomic call** — `product.create({ data: { ..., images: { createMany }, variants: { createMany } } })`. Prisma wraps a single `create()` with nested writes in one transaction; there's no window where the product row exists without its images/variants or vice versa.
-7. **Rollback on DB failure**: if step 6 throws (e.g. a category FK violation), every file uploaded in step 2 is deleted before the error propagates — otherwise a failed create would leave orphaned files with no DB row pointing at them.
+7. **Default-variant guarantee**: if `type = VARIABLE` and no variant in the payload has `isDefault: true`, the **first** variant is forced to `isDefault: true` after the fact. The storefront always needs some variant pre-selected; the DTO doesn't require the client to mark one.
+8. **The DB write itself is one atomic call** — `product.create({ data: { ..., images: { createMany }, variants: { createMany } } })`. Prisma wraps a single `create()` with nested writes in one transaction; there's no window where the product row exists without its images/variants or vice versa.
+9. **Rollback on DB failure**: if step 8 throws, every file uploaded in step 3 is deleted before the error propagates — otherwise a failed create would leave orphaned files with no DB row pointing at them.
 
 **Response shape**: `ProductResponseDto` (full admin detail — the creator needs to see everything just created, including `costPrice`, the audit trail, and the raw `categoryId`), with the newly created `images` and `variants` nested in.
 
 | Status | Cause |
 | :--- | :--- |
 | `201` | Product created successfully. |
-| `400` | DTO validation failed (see `CreateProductDto`/`CreateProductVariantDto` — e.g. `salePrice > basePrice`, a `VARIABLE` product with no `variants`, malformed `dimensions`/`seoMetadata`). |
+| `400` | DTO validation failed (see `CreateProductDto`/`CreateProductVariantDto` — e.g. `salePrice > basePrice`, a `VARIABLE` product with no `variants`, malformed `dimensions`/`seoMetadata`), **or** `categoryId` points at an inactive or root category. |
 | `401` | Missing/invalid JWT. |
 | `403` | Authenticated but not `ADMIN`. |
+| `404` | `categoryId` doesn't exist. |
 | `409` | A product with this name (or the derived slug) already exists. |
 
 ---
@@ -57,35 +65,65 @@ This document maps every **currently exposed** `product` HTTP endpoint (`Product
 | Layer | What happens |
 | :--- | :--- |
 | Controller | `ProductController.updateProduct(id, dto, images, req)` — reads the acting admin's id off `req.user.id` (`UnauthorizedException` if missing); no other logic. |
-| Service | `ProductService.updateProduct(id, userId, dto, images)` — existence check, conditional name/slug re-check, uploads new images, resolves which stock fields (if any) need recomputing, runs the DB writes in one transaction, rolls back uploaded files if anything downstream fails. |
+| Service | `ProductService.updateProduct(id, userId, dto, images)` — existence check, conditional category eligibility check, conditional name/slug re-check, uploads new images, resolves which stock fields (if any) need recomputing, runs the DB writes in one transaction, rolls back uploaded files if anything downstream fails. |
 | Repository | `findByIdAdmin` (existence + current state) → `findByName` / `findBySlugAdmin` (conflict re-check) → `withTransaction(async tx => { replaceVariants?; createImages?; updateProduct })`. |
 
 **Business logic — in order:**
 
 1. **Existence check.** `findByIdAdmin(id)` → `404` if missing. Its result also supplies the *current* `name`, `slug`, `type`, `quantity`, and `images` needed by the steps below — this endpoint never blindly trusts the request for anything comparative.
-2. **Conditional name/slug conflict check** — only runs if `dto.name` is present **and** differs from the current name. `findByName(dto.name)` and `findBySlugAdmin(newSlug)` are both re-checked, but a match only counts as a conflict if it belongs to a *different* row (`match.id !== id`) — otherwise a product would conflict with itself on every update that includes its own unchanged name.
-3. **New images are uploaded to disk before the transaction**, same rollback-on-failure behavior as create. Unlike create, there's no "attach to the create call" step — they're inserted via `createImages` inside the transaction below, with `displayOrder` continuing from `existing.images.length` (never `0`), and `isPrimary: false` (existing primary image is never silently displaced by an update).
-4. **`resolveStockUpdate(existing, dto, slug)`** decides whether `hasVariants`/`quantity`/`totalStock`/`stockStatus` need recomputing at all:
+2. **Conditional category eligibility check** — only runs if `dto.categoryId` is present in the request. Same rule as create: `CategoryService.assertCategoryAssignableToProduct(dto.categoryId)` must find the category, confirm it's `ACTIVE`, and confirm it's not a root category (`404`/`400`/`400` respectively). Omitting `categoryId` entirely leaves the product filed under its existing category untouched, no re-check performed.
+3. **Conditional name/slug conflict check** — only runs if `dto.name` is present **and** differs from the current name. `findByName(dto.name)` and `findBySlugAdmin(newSlug)` are both re-checked, but a match only counts as a conflict if it belongs to a *different* row (`match.id !== id`) — otherwise a product would conflict with itself on every update that includes its own unchanged name.
+4. **New images are uploaded to disk before the transaction**, same rollback-on-failure behavior as create. Unlike create, there's no "attach to the create call" step — they're inserted via `createImages` inside the transaction below, with `displayOrder` continuing from `existing.images.length` (never `0`), and `isPrimary: false` (existing primary image is never silently displaced by an update).
+5. **`resolveStockUpdate(existing, dto, slug)`** decides whether `hasVariants`/`quantity`/`totalStock`/`stockStatus` need recomputing at all:
    - **Not touched** unless the request includes `type`, `quantity`, or `variants` — otherwise these fields are omitted from the update payload entirely (Prisma ignores `undefined` keys, so whatever was already stored stays exactly as it was).
    - **Effective type** = `dto.type ?? existing.type`.
    - If effective type is `VARIABLE` **and** `dto.variants` is provided: every entry is rebuilt via the same `buildVariantInput` used by create (own slug/stockStatus/attributes computation, first-variant-default fallback), `totalStock` becomes the sum of the new set, `quantity` is forced to `0`.
    - If effective type is `VARIABLE` but `variants` is *not* provided (e.g. only `isFeatured` changed): only `hasVariants: true, quantity: 0` are set — existing variants and `totalStock` are left alone.
    - If effective type is `SIMPLE`: `quantity = dto.quantity ?? existing.quantity`, `totalStock` mirrors it, `stockStatus` recomputed.
    - **Known limitation, by design**: flipping `type` between `SIMPLE` and `VARIABLE` without also sending `variants` does **not** itself create or delete variant rows — that's treated as a separate, more destructive operation this endpoint won't trigger implicitly.
-5. **`variants`, if provided, is a full replacement** — `replaceVariants` wipes the existing set and inserts the new one (the same repository method already built for this exact purpose). Omitting `variants` entirely leaves the current variants completely untouched.
-6. **One transaction** wraps `replaceVariants` (if applicable) → `createImages` (if applicable) → the scalar `updateProduct` call, via `productRepository.withTransaction(...)` called from the service layer (per the documented `withTransaction` convention — see `docs/concepts/prisma-concepts.md`). A failure partway never leaves new variants committed alongside stale scalar fields, or new images attached to a row whose other fields never actually updated.
-7. **Rollback on transaction failure**: if any step inside the transaction throws, every file uploaded in step 3 is deleted before the error propagates — same reasoning as create.
+6. **`variants`, if provided, is a full replacement** — `replaceVariants` wipes the existing set and inserts the new one (the same repository method already built for this exact purpose). Omitting `variants` entirely leaves the current variants completely untouched.
+7. **One transaction** wraps `replaceVariants` (if applicable) → `createImages` (if applicable) → the scalar `updateProduct` call, via `productRepository.withTransaction(...)` called from the service layer (per the documented `withTransaction` convention — see `docs/concepts/prisma-concepts.md`). A failure partway never leaves new variants committed alongside stale scalar fields, or new images attached to a row whose other fields never actually updated.
+8. **Rollback on transaction failure**: if any step inside the transaction throws, every file uploaded in step 4 is deleted before the error propagates — same reasoning as create.
 
 **Response shape**: `ProductResponseDto` (full admin detail), reflecting the row *after* all of the above — including newly appended images and/or the replaced variant set.
 
 | Status | Cause |
 | :--- | :--- |
 | `200` | Product updated successfully. |
-| `400` | DTO validation failed (see `UpdateProductDto` — e.g. `salePrice > basePrice`, malformed `dimensions`/`seoMetadata`/`variants`). |
+| `400` | DTO validation failed (see `UpdateProductDto` — e.g. `salePrice > basePrice`, malformed `dimensions`/`seoMetadata`/`variants`), **or** `categoryId` (if provided) points at an inactive or root category. |
 | `401` | Missing/invalid JWT. |
 | `403` | Authenticated but not `ADMIN`. |
-| `404` | Product doesn't exist. |
+| `404` | Product doesn't exist, **or** `categoryId` (if provided) doesn't exist. |
 | `409` | The new `name` (or its derived slug) collides with a *different* product. |
+
+---
+
+## `GET /api/v1/product/all-product`
+
+**Purpose**: Admin management-dashboard product listing — paginated, searchable, but with **no visibility filter at all**.
+
+**Access**: Admin only — `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.ADMIN)`.
+
+| Layer | What happens |
+| :--- | :--- |
+| Controller | `ProductController.getAllProducts(query)` — binds the shared `PaginationQueryDto` off the query string; no other logic. |
+| Service | `ProductService.getAllProducts(query)` — passes the params straight through to the repository, then wraps each row in `ProductResponseDto` (full admin detail). |
+| Repository | `ProductRepository.findAllProductsAdmin(params)` — already-existing method; no `where` clause at all, so `PaginationService.paginate()` runs against every row unconditionally. |
+
+**Business logic:**
+
+1. **No visibility filtering, by design.** Unlike `published-products`, this endpoint applies none of `publicVisibilityWhere()`'s three conditions — `DRAFT`, `ARCHIVED`, `HIDDEN`, `INACTIVE`, scheduled-future, and even soft-deleted (`deletedAt IS NOT NULL`) rows are all included. A management dashboard needs to see and act on everything, not just what the storefront shows customers.
+2. **Search** — `search` matches `name`/`slug`/`sku`/`nameTh` (identical `searchableFields` to the public list), handled inside `PaginationService.paginate()`.
+3. **Sorting/pagination** — standard `page`/`limit` or `cursor`-based, default sort field `createdAt`, direction from `sortOrder` (default `desc`).
+4. **Response mapping** — every row is wrapped in `new ProductResponseDto(product)`, the full admin shape (includes `costPrice`, `discountValue`, raw `categoryId`, exact `quantity`/`totalStock`, and the complete audit trail with `createdByUser`/`updatedByUser`/`deletedByUser` snapshots).
+
+**Response shape**: `{ data: ProductResponseDto[], meta: IPaginationMeta }`.
+
+| Status | Cause |
+| :--- | :--- |
+| `200` | Always — an empty `data` array is a valid response, not a `404`. |
+| `401` | Missing/invalid JWT. |
+| `403` | Authenticated but not `ADMIN`. |
 
 ---
 
@@ -211,7 +249,6 @@ These exist in `ProductRepository`/`ProductService` (or a matching DTO already e
 
 | Capability | Repository method | Notes |
 | :--- | :--- | :--- |
-| Admin product list (paginated) | `findAllProductsAdmin` | |
 | Admin single lookups | `findByIdAdmin`, `findBySlugAdmin` | No route restricts these to admin yet. |
 | Dropdown/autocomplete list | `findProductDropdownOptions` | |
 | Minified lookups (cart/order/wishlist embedding) | `findByIdMinified`, `findByIdPublic` | |

@@ -45,7 +45,10 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/auth/roles.decorator';
 import { UserRole } from '../../generated/prisma/enums';
-import { ApiPaginatedResponse } from '../../shared/pagination';
+import {
+  ApiPaginatedResponse,
+  PaginationQueryDto,
+} from '../../shared/pagination';
 
 @ApiTags('Product')
 @Controller('product')
@@ -90,6 +93,53 @@ export class ProductController {
     );
   }
 
+  @Get('all-product')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get all products (paginated)',
+    description:
+      'Returns every product regardless of visibility — including drafts, archived, hidden, and soft-deleted rows. Admin only.',
+  })
+  @ApiPaginatedResponse(ProductResponseDto, 'Products retrieved successfully.')
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
+  @ApiForbiddenResponse({ description: 'Admin role required.' })
+  @ResponseMessage('Products retrieved successfully')
+  async getAllProducts(@Query() query: PaginationQueryDto) {
+    return this.productService.getAllProducts(query);
+  }
+
+  @Get('published-products')
+  @ApiOperation({
+    summary: 'Get published products (Public)',
+    description:
+      'Paginated storefront listing — only products that are ACTIVE, not soft-deleted, and whose `publishedAt` has passed. Filterable by search term, category IDs (CSV), and product type.',
+  })
+  @ApiPaginatedResponse(
+    ProductResponsePublicDto,
+    'Published products retrieved successfully.',
+  )
+  @ResponseMessage('Published products retrieved successfully')
+  async getPublishedProducts(@Query() query: PublishedProductsQueryDto) {
+    return this.productService.getPublishedProducts(query);
+  }
+
+  @Get('product-by-slug/:slug')
+  @ApiOperation({
+    summary: 'Get product by slug (Public)',
+    description: 'Looks up a single product by its URL-friendly slug.',
+  })
+  @ApiOkResponse({
+    description: 'Product retrieved successfully.',
+    type: ProductResponsePublicDto,
+  })
+  @ApiNotFoundResponse({ description: 'Product not found.' })
+  @ResponseMessage('Product retrieved successfully')
+  async getProductBySlug(@Param('slug') slug: string) {
+    return this.productService.getProductBySlug(slug);
+  }
+
   @Patch('update-product/:id')
   @ApiConsumes('multipart/form-data')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -129,36 +179,6 @@ export class ProductController {
       updateProductDto,
       images ?? [],
     );
-  }
-
-  @Get('published-products')
-  @ApiOperation({
-    summary: 'Get published products (Public)',
-    description:
-      'Paginated storefront listing — only products that are ACTIVE, not soft-deleted, and whose `publishedAt` has passed. Filterable by search term, category IDs (CSV), and product type.',
-  })
-  @ApiPaginatedResponse(
-    ProductResponsePublicDto,
-    'Published products retrieved successfully.',
-  )
-  @ResponseMessage('Published products retrieved successfully')
-  async getPublishedProducts(@Query() query: PublishedProductsQueryDto) {
-    return this.productService.getPublishedProducts(query);
-  }
-
-  @Get('product-by-slug/:slug')
-  @ApiOperation({
-    summary: 'Get product by slug (Public)',
-    description: 'Looks up a single product by its URL-friendly slug.',
-  })
-  @ApiOkResponse({
-    description: 'Product retrieved successfully.',
-    type: ProductResponsePublicDto,
-  })
-  @ApiNotFoundResponse({ description: 'Product not found.' })
-  @ResponseMessage('Product retrieved successfully')
-  async getProductBySlug(@Param('slug') slug: string) {
-    return this.productService.getProductBySlug(slug);
   }
 
   @Delete('soft-delete-product/:id')

@@ -23,6 +23,7 @@ import {
   toDimensionsDto,
   toSeoMetadataDto,
   toPrice,
+  toAbsoluteUrl,
 } from './product-shared.dto';
 import { ProductImageDto } from './product-image-response.dto';
 import {
@@ -415,6 +416,7 @@ export class ProductResponseDto {
       updatedByUser?: MinifiedUser | null;
       deletedByUser?: MinifiedUser | null;
     },
+    baseUrl?: string,
   ) {
     this.id = product.id!;
     this.sid = product.sid!;
@@ -459,7 +461,9 @@ export class ProductResponseDto {
     this.category = product.category
       ? new ProductCategoryMinifiedDto(product.category)
       : undefined;
-    this.images = (product.images ?? []).map((img) => new ProductImageDto(img));
+    this.images = (product.images ?? []).map(
+      (img) => new ProductImageDto(img, baseUrl),
+    );
     this.variants = (product.variants ?? []).map(
       (v) => new ProductVariantDto(v),
     );
@@ -736,6 +740,7 @@ export class ProductResponsePublicDto {
       images?: Partial<ProductImageModel>[] | null;
       variants?: Partial<ProductVariantModel>[] | null;
     },
+    baseUrl?: string,
   ) {
     this.id = product.id!;
     this.sid = product.sid!;
@@ -772,7 +777,9 @@ export class ProductResponsePublicDto {
     this.category = product.category
       ? new ProductCategoryMinifiedDto(product.category)
       : undefined;
-    this.images = (product.images ?? []).map((img) => new ProductImageDto(img));
+    this.images = (product.images ?? []).map(
+      (img) => new ProductImageDto(img, baseUrl),
+    );
     this.variants = (product.variants ?? []).map(
       (v) => new ProductVariantPublicDto(v),
     );
@@ -852,6 +859,7 @@ export class ProductMinifiedResponseDto {
 
   constructor(
     product: Partial<ProductModel> & { thumbnailUrl?: string | null },
+    baseUrl?: string,
   ) {
     this.id = product.id!;
     this.sid = product.sid!;
@@ -860,6 +868,6 @@ export class ProductMinifiedResponseDto {
     this.basePrice = Number(product.basePrice);
     this.salePrice = toPrice(product.salePrice);
     this.stockStatus = product.stockStatus!;
-    this.thumbnailUrl = product.thumbnailUrl ?? undefined;
+    this.thumbnailUrl = toAbsoluteUrl(product.thumbnailUrl, baseUrl);
   }
 }

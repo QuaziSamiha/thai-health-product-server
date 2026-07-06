@@ -5,7 +5,9 @@ import {
   Inject,
   Logger,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ProductRepository } from './product.repository';
+import { CategoryService } from '../category/category.service';
 import {
   ProductResponseDto,
   ProductResponsePublicDto,
@@ -20,7 +22,10 @@ import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
 import type { IStorageService } from '../../shared/storage/interfaces/storage.interface';
 import { Prisma } from '../../generated/prisma/client';
 import { ProductType, StockStatus } from '../../generated/prisma/enums';
-import type { IPaginatedResult } from '../../shared/pagination';
+import type {
+  IPaginatedResult,
+  PaginationQueryDto,
+} from '../../shared/pagination';
 
 const PRODUCT_IMAGE_FOLDER = 'products/gallery';
 
@@ -30,6 +35,8 @@ export class ProductService {
 
   constructor(
     private readonly productRepository: ProductRepository,
+    private readonly categoryService: CategoryService,
+    private readonly configService: ConfigService,
     @Inject(STORAGE_SERVICE_TOKEN)
     private readonly storageService: IStorageService,
   ) {}
@@ -39,7 +46,29 @@ export class ProductService {
     if (!product) {
       throw new NotFoundException('Product not found');
     }
-    return new ProductResponsePublicDto(product);
+    return new ProductResponsePublicDto(
+      product,
+      this.configService.get<string>('app.baseUrl'),
+    );
+  }
+
+  /**
+   * Admin listing — unlike the public storefront list, this applies no
+   * visibility filter at all: drafts, archived, hidden, and soft-deleted
+   * products are all included, since a management dashboard needs to see
+   * everything, not just what customers can.
+   */
+  async getAllProducts(
+    params: PaginationQueryDto,
+  ): Promise<IPaginatedResult<ProductResponseDto>> {
+    const paginated = await this.productRepository.findAllProductsAdmin(params);
+    const baseUrl = this.configService.get<string>('app.baseUrl');
+    return {
+      ...paginated,
+      data: paginated.data.map(
+        (product) => new ProductResponseDto(product, baseUrl),
+      ),
+    };
   }
 
   /**
@@ -64,9 +93,12 @@ export class ProductService {
       },
     );
 
+    const baseUrl = this.configService.get<string>('app.baseUrl');
     return {
       ...paginated,
-      data: paginated.data.map((product) => new ProductResponsePublicDto(product)),
+      data: paginated.data.map(
+        (product) => new ProductResponsePublicDto(product, baseUrl),
+      ),
     };
   }
 
@@ -84,6 +116,10 @@ export class ProductService {
     dto: CreateProductDto,
     images: Express.Multer.File[],
   ): Promise<ProductResponseDto> {
+    await this.categoryService.assertCategoryAssignableToProduct(
+      dto.categoryId,
+    );
+
     const existingByName = await this.productRepository.findByName(dto.name);
     if (existingByName) {
       throw new ConflictException('A product with this name already exists');
@@ -123,7 +159,10 @@ export class ProductService {
         descriptionTh: dto.descriptionTh,
         shortDescription: dto.shortDescription,
         shortDescTh: dto.shortDescTh,
-        type: dto.type,
+        //* VARIABLE IS THE DEFAULT PRODUCT TYPE — FALLING THROUGH TO THE SCHEMA'S
+        //* OWN COLUMN DEFAULT HERE WOULD SILENTLY CREATE A SIMPLE PRODUCT INSTEAD
+        //* WHENEVER `dto.type` IS OMITTED.
+        type: dto.type ?? ProductType.VARIABLE,
         status: dto.status,
         isFeatured: dto.isFeatured,
         publishedAt: dto.publishedAt ? new Date(dto.publishedAt) : undefined,
@@ -162,7 +201,10 @@ export class ProductService {
         variants,
       });
 
-      return new ProductResponseDto(created);
+      return new ProductResponseDto(
+        created,
+        this.configService.get<string>('app.baseUrl'),
+      );
     } catch (createError) {
       await Promise.all(
         uploadedPaths.map((path) => this.deleteStoredFile(path)),
@@ -287,6 +329,12 @@ export class ProductService {
       throw new NotFoundException('Product not found');
     }
 
+    if (dto.categoryId !== undefined) {
+      await this.categoryService.assertCategoryAssignableToProduct(
+        dto.categoryId,
+      );
+    }
+
     let slug = existing.slug;
     if (dto.name && dto.name !== existing.name) {
       const nameConflict = await this.productRepository.findByName(dto.name);
@@ -387,7 +435,10 @@ export class ProductService {
         },
       );
 
-      return new ProductResponseDto(updated);
+      return new ProductResponseDto(
+        updated,
+        this.configService.get<string>('app.baseUrl'),
+      );
     } catch (updateError) {
       await Promise.all(
         uploadedPaths.map((path) => this.deleteStoredFile(path)),

@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { ProductImageModel } from '../../../generated/prisma/models';
+import { toAbsoluteUrl } from './product-shared.dto';
 
 //* SHARED — PRODUCT GALLERY IMAGE. NO SENSITIVE FIELDS, SAFE FOR BOTH ADMIN
 //* AND PUBLIC RESPONSES.
@@ -60,12 +61,12 @@ export class ProductImageDto {
   })
   variantId?: number;
 
-  constructor(image: Partial<ProductImageModel>) {
+  constructor(image: Partial<ProductImageModel>, baseUrl?: string) {
     this.id = image.id!;
-    this.url = image.url!;
-    this.thumbnailUrl = image.thumbnailUrl ?? undefined;
-    this.bannerUrl = image.bannerUrl ?? undefined;
-    this.iconUrl = image.iconUrl ?? undefined;
+    this.url = toAbsoluteUrl(image.url, baseUrl)!;
+    this.thumbnailUrl = toAbsoluteUrl(image.thumbnailUrl, baseUrl);
+    this.bannerUrl = toAbsoluteUrl(image.bannerUrl, baseUrl);
+    this.iconUrl = toAbsoluteUrl(image.iconUrl, baseUrl);
     this.altText = image.altText ?? undefined;
     this.displayOrder = image.displayOrder!;
     this.isPrimary = image.isPrimary!;

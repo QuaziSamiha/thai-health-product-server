@@ -189,11 +189,11 @@ export class CreateProductDto {
 
   @ApiPropertyOptional({
     description:
-      'SIMPLE (standalone, uses `quantity`) or VARIABLE (has `variants`, each with its own stock/price). Defaults to SIMPLE.',
+      'SIMPLE (standalone, uses `quantity`) or VARIABLE (has `variants`, each with its own stock/price). Defaults to VARIABLE — pass `type: SIMPLE` explicitly to create a standalone product with no variants.',
     enum: ProductType,
     enumName: 'ProductType',
-    default: ProductType.SIMPLE,
-    example: ProductType.SIMPLE,
+    default: ProductType.VARIABLE,
+    example: ProductType.VARIABLE,
   })
   @IsOptional()
   @IsEnum(ProductType, { message: 'Please select a valid product type' })
@@ -475,7 +475,7 @@ export class CreateProductDto {
 
   @ApiPropertyOptional({
     description:
-      'Variant configurations (size/color/etc.). Required (at least one) when `type = VARIABLE`. Send as a JSON array normally, or a JSON-encoded string when using multipart/form-data.',
+      'Variant configurations (size/color/etc.). Required (at least one) unless `type` is explicitly set to SIMPLE — VARIABLE is the default `type`, and every VARIABLE product needs at least one variant. Send as a JSON array normally, or a JSON-encoded string when using multipart/form-data.',
     type: () => [CreateProductVariantDto],
   })
   @Transform(({ value }) => {
@@ -483,10 +483,14 @@ export class CreateProductDto {
     if (!Array.isArray(parsed)) return parsed;
     return plainToInstance(CreateProductVariantDto, parsed);
   })
-  @ValidateIf((dto: CreateProductDto) => dto.type === ProductType.VARIABLE)
+  @ValidateIf(
+    (dto: CreateProductDto) =>
+      dto.type === ProductType.VARIABLE || dto.type === undefined,
+  )
   @IsArray({ message: 'Variants must be an array' })
   @ArrayMinSize(1, {
-    message: 'At least one variant is required for a VARIABLE product',
+    message:
+      'At least one variant is required unless `type` is explicitly set to SIMPLE',
   })
   @ValidateNested({ each: true })
   variants?: CreateProductVariantDto[];
