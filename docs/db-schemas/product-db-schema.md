@@ -54,8 +54,11 @@ erDiagram
         string sku UK "nullable"
         string barcode "nullable, NOT unique"
         int productId FK
-        decimal price
-        decimal discountPrice "nullable"
+        decimal costPrice "nullable"
+        enum discountType "nullable"
+        decimal discountValue "nullable"
+        decimal basePrice
+        decimal salePrice "nullable"
         int quantity
         enum stockStatus
         json attributes "e.g. {color, size}"
@@ -122,9 +125,9 @@ erDiagram
 | Value        | Meaning                                                                 |
 | :----------- | :----------------------------------------------------------------------- |
 | `FIXED`      | The discount is a flat currency amount.                                  |
-| `PERCENTAGE` | The discount is a percentage of `basePrice` / `price`.                   |
+| `PERCENTAGE` | The discount is a percentage of `basePrice`.                             |
 
-> `DiscountType` only tags *how a discount was configured*. It does not itself compute anything — `salePrice` (Product) / `discountPrice` (ProductVariant) is expected to already hold the final, resolved price. There is no DB-level relationship enforcing `salePrice` against `discountType`; keep that consistent in the service layer (see [Financial Integrity](#financial-integrity--pricing) below).
+> `DiscountType` only tags *how a discount was configured*, paired with `discountValue` (the raw configured amount/percentage) — identical shape on `Product` and `ProductVariant`. Neither field itself computes anything — `salePrice` is expected to already hold the final, resolved price. There is no DB-level relationship enforcing `salePrice` against `discountType`/`discountValue`; keep that consistent in the service layer (see [Financial Integrity](#financial-integrity--pricing) below).
 
 ### `StockStatus`
 
@@ -213,10 +216,11 @@ erDiagram
 | `stockStatus`       | `ENUM(StockStatus)`   | NOT NULL, DEFAULT `OUT_OF_STOCK`                              | Cached badge state.                                                            |
 | `weight`            | `DECIMAL(10,3)`        | NULLABLE                                                    | Weight in kg (overrides parent for shipping calc, if set).                    |
 | `size`              | `VARCHAR(50)`          | NULLABLE                                                    | Free-text size label (e.g. `"500ml"`).                                        |
-| `price`             | `DECIMAL(12,2)`        | NOT NULL, DEFAULT `0`                                        | Variant-specific list price.                                                  |
-| `discountType`      | `ENUM(DiscountType)`   | NULLABLE                                                    | `FIXED` or `PERCENTAGE` tag for `discountPrice`.                              |
-| `discountPrice`     | `DECIMAL(12,2)`        | NULLABLE                                                    | Final discounted price for this variant.                                      |
-| `costPerItem`       | `DECIMAL(12,2)`        | NULLABLE                                                    | Cost basis for margin reporting.                                              |
+| `costPrice`         | `DECIMAL(12,2)`        | NULLABLE                                                    | Cost basis for margin reporting.                                              |
+| `discountType`      | `ENUM(DiscountType)`   | NULLABLE                                                    | `FIXED` or `PERCENTAGE` tag for `discountValue`/`salePrice`.                   |
+| `discountValue`     | `DECIMAL(12,2)`        | NULLABLE                                                    | Raw configured discount, paired with `discountType`.                          |
+| `basePrice`         | `DECIMAL(12,2)`        | NOT NULL, DEFAULT `0`                                        | Variant-specific list price.                                                  |
+| `salePrice`         | `DECIMAL(12,2)`        | NULLABLE                                                    | Final discounted price for this variant.                                      |
 | `attributes`        | `JSONB`                 | NOT NULL, DEFAULT `{}`                                       | Free-form key/value pairs, e.g. `{"color": "Red", "size": "XL"}`.             |
 | `isDefault`         | `BOOLEAN`               | NOT NULL, DEFAULT `false`                                    | Marks the variant pre-selected on the PDP. **No DB constraint** prevents multiple defaults per product — see Known Gaps. |
 | `productId`         | `INT`                   | FK → `products.id`, NOT NULL, **ON DELETE CASCADE**            | Parent product. Deleting the parent deletes all variants.                     |
@@ -332,9 +336,10 @@ erDiagram
       "name": "Elite Running Shoes - EU 42",
       "slug": "elite-running-shoes-eu-42",
       "sku": "SHOE-ELITE-42",
-      "price": 4500.0,
+      "basePrice": 4500.0,
       "discountType": "PERCENTAGE",
-      "discountPrice": 3800.0,
+      "discountValue": 15.5,
+      "salePrice": 3800.0,
       "quantity": 60,
       "stockStatus": "IN_STOCK",
       "attributes": { "size": "EU 42", "color": "Black" },
@@ -345,9 +350,10 @@ erDiagram
       "name": "Elite Running Shoes - EU 44",
       "slug": "elite-running-shoes-eu-44",
       "sku": "SHOE-ELITE-44",
-      "price": 4500.0,
+      "basePrice": 4500.0,
       "discountType": "PERCENTAGE",
-      "discountPrice": 3800.0,
+      "discountValue": 15.5,
+      "salePrice": 3800.0,
       "quantity": 60,
       "stockStatus": "IN_STOCK",
       "attributes": { "size": "EU 44", "color": "Black" },
@@ -472,7 +478,7 @@ None currently defined for this domain. If reporting needs (e.g. "products with 
 
 ### 2. Financial Integrity & Pricing
 
-- `basePrice`/`price` is always the pre-discount reference price. If `salePrice`/`discountPrice` is present, it is expected to be the final, already-resolved price — **not** a raw percentage.
+- `basePrice` (identical field name/shape on `Product` and `ProductVariant`) is always the pre-discount reference price. If `salePrice` is present, it is expected to be the final, already-resolved price — **not** a raw percentage. `discountValue` is the raw configured amount/percentage that produced it, paired with `discountType`.
 - There is **no DB `CHECK` constraint** enforcing `salePrice < basePrice` or non-negative prices/quantities. Validate this at the DTO/service boundary (e.g. `class-validator` custom validator) before writing.
 - Never do price arithmetic in plain JS floating point — use `Decimal` consistently end-to-end (Prisma already returns `Decimal.js`-backed values for these columns; don't coerce to `number` before doing math).
 

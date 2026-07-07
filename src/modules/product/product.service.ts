@@ -149,6 +149,12 @@ export class ProductService {
       const { hasVariants, quantity, totalStock, stockStatus, variants } =
         this.buildStockAndVariants(slug, dto.variants, dto.quantity);
 
+      //* A VARIABLE PRODUCT MAY OMIT ITS OWN BASE PRICE — FALL BACK TO THE
+      //* DEFAULT VARIANT'S SO LISTINGS SHOW A REAL PRICE INSTEAD OF THE
+      //* COLUMN DEFAULT 0.
+      const defaultVariant = variants.find((v) => v.isDefault) ?? variants[0];
+      const basePrice = dto.basePrice ?? defaultVariant?.basePrice;
+
       const created = await this.productRepository.createProduct({
         name: dto.name,
         slug,
@@ -166,7 +172,7 @@ export class ProductService {
         status: dto.status,
         isFeatured: dto.isFeatured,
         publishedAt: dto.publishedAt ? new Date(dto.publishedAt) : undefined,
-        basePrice: dto.basePrice,
+        basePrice,
         discountType: dto.discountType,
         discountValue: dto.discountValue,
         salePrice: dto.salePrice,
@@ -226,7 +232,7 @@ export class ProductService {
    */
   private buildStockAndVariants(
     productSlug: string,
-    variantDtos: CreateProductVariantDto[] | undefined,
+    variantDto: CreateProductVariantDto[] | undefined,
     simpleQuantity: number | undefined,
   ): {
     hasVariants: boolean;
@@ -235,7 +241,7 @@ export class ProductService {
     stockStatus: StockStatus;
     variants: Prisma.ProductVariantCreateManyProductInput[];
   } {
-    const hasVariants = Boolean(variantDtos?.length);
+    const hasVariants = Boolean(variantDto?.length);
 
     if (!hasVariants) {
       const quantity = simpleQuantity ?? 0;
@@ -248,7 +254,7 @@ export class ProductService {
       };
     }
 
-    const variants = variantDtos!.map((variant, index) =>
+    const variants = variantDto!.map((variant, index) =>
       this.buildVariantInput(productSlug, variant, index),
     );
     if (!variants.some((v) => v.isDefault)) {
@@ -281,10 +287,11 @@ export class ProductService {
       name: variant.name ?? `${productSlug} ${variant.size ?? ''}`.trim(),
       slug: `${productSlug}-${generateSlug(slugSeed)}`,
       size: variant.size,
-      price: variant.price ?? 0,
+      basePrice: variant.basePrice ?? 0,
       discountType: variant.discountType,
-      discountPrice: variant.discountPrice,
-      costPerItem: variant.costPerItem,
+      discountValue: variant.discountValue,
+      salePrice: variant.salePrice,
+      costPrice: variant.costPrice,
       quantity,
       stockStatus: this.computeStockStatus(quantity),
       sku: variant.sku,

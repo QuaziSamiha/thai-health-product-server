@@ -166,6 +166,24 @@ export class CategoryRepository extends BaseRepository {
     });
   }
 
+  /**
+   * Active, level-1 categories (direct children of a root) — the set of
+   * categories legal to assign to a product via `categoryId`. Level 1
+   * specifically, not "any non-root": a root itself (level 0) is never
+   * assignable, and this listing is scoped to the first tier below it.
+   */
+  async findProductCategories(tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.category.findMany({
+      where: {
+        status: CategoryProductStatus.ACTIVE,
+        parentId: { not: null },
+        level: 1,
+      },
+      select: this.ROOT_ACTIVE_CATEGORY_SELECT,
+    });
+  }
+
   async deleteCategory(id: number, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return await client.category.delete({ where: { id } });

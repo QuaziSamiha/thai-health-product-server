@@ -236,15 +236,22 @@ export class CreateProductDto {
 
   // ─── Pricing ─────────────────────────────────────────────────────────────────
 
-  @ApiProperty({
-    description: 'MSRP / list price',
+  @ApiPropertyOptional({
+    description:
+      "MSRP / list price. Required for SIMPLE products; optional for VARIABLE products, where it falls back to the default variant's base price.",
     example: 450.0,
     minimum: 0,
   })
+  //* PRICING LIVES ON THE VARIANTS FOR VARIABLE PRODUCTS — ONLY A SIMPLE
+  //* PRODUCT MUST CARRY ITS OWN BASE PRICE. STILL VALIDATED WHEN PROVIDED.
+  @ValidateIf(
+    (dto: CreateProductDto) =>
+      dto.type === ProductType.SIMPLE || dto.basePrice !== undefined,
+  )
   @Type(() => Number)
   @IsNumber({}, { message: 'Base price must be a valid number' })
   @Min(0, { message: 'Base price cannot be negative' })
-  basePrice!: number;
+  basePrice?: number;
 
   @ApiPropertyOptional({
     description:
@@ -480,8 +487,14 @@ export class CreateProductDto {
   })
   @Transform(({ value }) => {
     const parsed = tryParseJson(value);
-    if (!Array.isArray(parsed)) return parsed;
-    return plainToInstance(CreateProductVariantDto, parsed);
+    //* ACCEPT A LONE VARIANT OBJECT (SWAGGER UI SENDS `{...}` INSTEAD OF `[{...}]`
+    //* FOR MULTIPART ARRAY FIELDS) BY WRAPPING IT INTO A SINGLE-ELEMENT ARRAY
+    const normalized =
+      parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed)
+        ? [parsed]
+        : parsed;
+    if (!Array.isArray(normalized)) return normalized;
+    return plainToInstance(CreateProductVariantDto, normalized);
   })
   @ValidateIf(
     (dto: CreateProductDto) =>

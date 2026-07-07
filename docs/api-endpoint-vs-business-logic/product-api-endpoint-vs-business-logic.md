@@ -38,7 +38,7 @@ This document maps every **currently exposed** `product` HTTP endpoint (`Product
    - `slug` — `${productSlug}-${generateSlug(name ?? size ?? 'variant-N')}`. `ProductVariant.slug` is unique **globally**, not scoped per product (a known schema characteristic, not something this endpoint changes) — prefixing with the parent's own already-unique slug keeps this collision-free in practice without altering the schema.
    - `stockStatus` — computed from that variant's own `quantity`, independently of the aggregate.
    - `attributes` — defaults to `{}` if omitted; passed through `toPlainJson()` to strip it down to a plain serializable value.
-   - Everything else (`price`, `discountType`, `discountPrice`, `costPerItem`, `sku`, `barcode`, `weight`, `size`, `isDefault`) passes through as given.
+   - Everything else (`basePrice`, `discountType`, `discountValue`, `salePrice`, `costPrice`, `sku`, `barcode`, `weight`, `size`, `isDefault`) passes through as given.
 7. **Default-variant guarantee**: if `type = VARIABLE` and no variant in the payload has `isDefault: true`, the **first** variant is forced to `isDefault: true` after the fact. The storefront always needs some variant pre-selected; the DTO doesn't require the client to mark one.
 8. **The DB write itself is one atomic call** — `product.create({ data: { ..., images: { createMany }, variants: { createMany } } })`. Prisma wraps a single `create()` with nested writes in one transaction; there's no window where the product row exists without its images/variants or vice versa.
 9. **Rollback on DB failure**: if step 8 throws, every file uploaded in step 3 is deleted before the error propagates — otherwise a failed create would leave orphaned files with no DB row pointing at them.
@@ -176,7 +176,7 @@ This document maps every **currently exposed** `product` HTTP endpoint (`Product
 
 A product that's `DRAFT`, `ARCHIVED`, `HIDDEN`, `INACTIVE`, soft-deleted, or scheduled for a future date returns **404**, identical to a genuinely nonexistent slug — this is intentional: the response never reveals *why* a product isn't visible, only that it isn't.
 
-**Response shape**: `ProductResponsePublicDto` — includes `id`/`sid`; excludes `barcode`, `status`, `costPrice`, `discountType`, `discountValue`, exact `quantity`/`totalStock` (only the `stockStatus` badge), the raw `categoryId`, and the entire audit trail (`createdBy`/`updatedBy`/`deletedBy` + user snapshots). Includes nested `images` (`ProductImageDto[]`) and `variants` (`ProductVariantPublicDto[]`, itself excluding `barcode`/`costPerItem`/raw `quantity`).
+**Response shape**: `ProductResponsePublicDto` — includes `id`/`sid`; excludes `barcode`, `status`, `costPrice`, `discountType`, `discountValue`, exact `quantity`/`totalStock` (only the `stockStatus` badge), the raw `categoryId`, and the entire audit trail (`createdBy`/`updatedBy`/`deletedBy` + user snapshots). Includes nested `images` (`ProductImageDto[]`) and `variants` (`ProductVariantPublicDto[]`, itself excluding `barcode`/`discountType`/`discountValue`/`costPrice`/raw `quantity`).
 
 | Status | Cause |
 | :--- | :--- |

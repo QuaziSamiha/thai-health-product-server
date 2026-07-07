@@ -150,6 +150,26 @@ export class CategoryController {
     return this.categoryService.getActiveRootCategories();
   }
 
+  @Get('product-categories')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get active level-1 product categories',
+    description:
+      'Returns active categories that are direct children of a root category (level = 1) — the set legal to assign to a product via `categoryId`. Admin only.',
+  })
+  @ApiOkResponse({
+    description: 'Product categories retrieved successfully.',
+    type: [RootActiveCategoryResponseDto],
+  })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
+  @ApiForbiddenResponse({ description: 'Admin role required.' })
+  @ResponseMessage('Product categories retrieved successfully')
+  async getProductCategories() {
+    return this.categoryService.getProductCategories();
+  }
+
   @Get('category-by-slug/:slug')
   @ApiOperation({
     summary: 'Get category by slug (Public)',

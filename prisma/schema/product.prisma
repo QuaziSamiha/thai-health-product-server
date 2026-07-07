@@ -129,12 +129,15 @@ model ProductVariant {
   weight      Decimal?    @db.Decimal(10, 3) //* WEIGHT IN KG
   size        String?     @db.VarChar(50) // * PRODUCT WITHOUT VARIANTS
 
-  price         Decimal       @default(0) @db.Decimal(12, 2)
+  //* PRICING (SAME SHAPE AS Product — SEE Product's OWN PRICING BLOCK ABOVE)
+  costPrice     Decimal?      @db.Decimal(12, 2) //* FOR PROFIT CALCULATION
   discountType  DiscountType?
-  discountPrice Decimal?      @db.Decimal(12, 2)
-  costPerItem   Decimal?      @db.Decimal(12, 2) //* FOR PROFIT CALCULATION
-  attributes    Json          @default("{}") // The JSON structure for attributes (e.g., {"color": "Red", "size": "XL"})  //* E.G. { "size": "500ml", "flavor": "Honey" }
-  isDefault     Boolean       @default(false)
+  discountValue Decimal?      @db.Decimal(12, 2) //* THE RAW CONFIGURED DISCOUNT — FIXED AMOUNT OR PERCENTAGE, PAIRED WITH discountType
+  basePrice     Decimal       @default(0) @db.Decimal(12, 2)
+  salePrice     Decimal?      @db.Decimal(12, 2) //* SALE PRICE
+
+  attributes Json    @default("{}") // The JSON structure for attributes (e.g., {"color": "Red", "size": "XL"})  //* E.G. { "size": "500ml", "flavor": "Honey" }
+  isDefault  Boolean @default(false)
 
   // * RELATIONS
   productId     Int

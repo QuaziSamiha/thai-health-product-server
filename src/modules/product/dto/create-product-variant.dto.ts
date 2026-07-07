@@ -44,12 +44,13 @@ export class CreateProductVariantDto {
   })
   @IsOptional()
   @Type(() => Number)
-  @IsNumber({}, { message: 'Price must be a valid number' })
-  @Min(0, { message: 'Price cannot be negative' })
-  price?: number;
+  @IsNumber({}, { message: 'Base price must be a valid number' })
+  @Min(0, { message: 'Base price cannot be negative' })
+  basePrice?: number;
 
   @ApiPropertyOptional({
-    description: 'How `discountPrice` was configured — FIXED or PERCENTAGE.',
+    description:
+      'How `discountValue`/`salePrice` was configured — FIXED or PERCENTAGE.',
     enum: DiscountType,
     enumName: 'DiscountType',
     example: DiscountType.PERCENTAGE,
@@ -60,18 +61,30 @@ export class CreateProductVariantDto {
 
   @ApiPropertyOptional({
     description:
-      'Final discounted price for this variant. Must not exceed `price`.',
+      'The raw configured discount, paired with `discountType` — a currency amount when FIXED, or a percentage number when PERCENTAGE. Admin/management only; `salePrice` is the resolved value customers see.',
+    example: 10,
+    minimum: 0,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber({}, { message: 'Discount value must be a valid number' })
+  @Min(0, { message: 'Discount value cannot be negative' })
+  discountValue?: number;
+
+  @ApiPropertyOptional({
+    description:
+      'Final discounted price for this variant. Must not exceed `basePrice`.',
     example: 1350.0,
     minimum: 0,
   })
   @IsOptional()
   @Type(() => Number)
-  @IsNumber({}, { message: 'Discount price must be a valid number' })
-  @Min(0, { message: 'Discount price cannot be negative' })
-  @IsLessThanOrEqualTo('price', {
-    message: 'Discount price cannot be greater than the variant price',
+  @IsNumber({}, { message: 'Sale price must be a valid number' })
+  @Min(0, { message: 'Sale price cannot be negative' })
+  @IsLessThanOrEqualTo('basePrice', {
+    message: 'Sale price cannot be greater than the variant base price',
   })
-  discountPrice?: number;
+  salePrice?: number;
 
   @ApiPropertyOptional({
     description: 'Cost basis for margin reporting. Admin/management use only.',
@@ -80,9 +93,9 @@ export class CreateProductVariantDto {
   })
   @IsOptional()
   @Type(() => Number)
-  @IsNumber({}, { message: 'Cost per item must be a valid number' })
-  @Min(0, { message: 'Cost per item cannot be negative' })
-  costPerItem?: number;
+  @IsNumber({}, { message: 'Cost price must be a valid number' })
+  @Min(0, { message: 'Cost price cannot be negative' })
+  costPrice?: number;
 
   @ApiPropertyOptional({
     description: 'Stock count for this variant. Defaults to 0 if omitted.',

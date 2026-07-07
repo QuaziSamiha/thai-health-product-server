@@ -111,16 +111,26 @@ export class ProductVariantDto {
     type: 'number',
     format: 'float',
   })
-  price!: number;
+  basePrice!: number;
 
   @Expose()
   @ApiPropertyOptional({
     enum: DiscountType,
     enumName: 'DiscountType',
-    description: 'How `discountPrice` was configured',
+    description: 'How `discountValue`/`salePrice` was configured',
     example: DiscountType.PERCENTAGE,
   })
   discountType?: DiscountType;
+
+  @Expose()
+  @ApiPropertyOptional({
+    description:
+      'The raw configured discount, paired with `discountType` — a currency amount when FIXED, or a percentage number when PERCENTAGE. Admin/management only; `salePrice` is the resolved value customers see.',
+    example: 10,
+    type: 'number',
+    format: 'float',
+  })
+  discountValue?: number;
 
   @Expose()
   @ApiPropertyOptional({
@@ -129,7 +139,7 @@ export class ProductVariantDto {
     type: 'number',
     format: 'float',
   })
-  discountPrice?: number;
+  salePrice?: number;
 
   @Expose()
   @ApiPropertyOptional({
@@ -139,7 +149,7 @@ export class ProductVariantDto {
     type: 'number',
     format: 'float',
   })
-  costPerItem?: number;
+  costPrice?: number;
 
   @Expose()
   @ApiPropertyOptional({
@@ -172,17 +182,19 @@ export class ProductVariantDto {
     this.stockStatus = variant.stockStatus!;
     this.weight = toPrice(variant.weight);
     this.size = variant.size ?? undefined;
-    this.price = Number(variant.price);
+    this.basePrice = Number(variant.basePrice);
     this.discountType = variant.discountType ?? undefined;
-    this.discountPrice = toPrice(variant.discountPrice);
-    this.costPerItem = toPrice(variant.costPerItem);
+    this.discountValue = toPrice(variant.discountValue);
+    this.salePrice = toPrice(variant.salePrice);
+    this.costPrice = toPrice(variant.costPrice);
     this.attributes = toAttributes(variant.attributes);
     this.isDefault = variant.isDefault!;
   }
 }
 
-//* VARIANT — PUBLIC. Excludes `barcode`, `costPerItem`, and raw `quantity`
-//* (same rationale as the product-level public DTO).
+//* VARIANT — PUBLIC. Excludes `barcode`, `discountType`, `discountValue`,
+//* `costPrice`, and raw `quantity` (same rationale as the product-level
+//* public DTO).
 export class ProductVariantPublicDto {
   @Expose()
   @ApiProperty({ description: 'Variant ID', example: 4 })
@@ -261,7 +273,7 @@ export class ProductVariantPublicDto {
     type: 'number',
     format: 'float',
   })
-  price!: number;
+  basePrice!: number;
 
   @Expose()
   @ApiPropertyOptional({
@@ -270,7 +282,7 @@ export class ProductVariantPublicDto {
     type: 'number',
     format: 'float',
   })
-  discountPrice?: number;
+  salePrice?: number;
 
   @Expose()
   @ApiPropertyOptional({
@@ -301,8 +313,8 @@ export class ProductVariantPublicDto {
     this.stockStatus = variant.stockStatus!;
     this.weight = toPrice(variant.weight);
     this.size = variant.size ?? undefined;
-    this.price = Number(variant.price);
-    this.discountPrice = toPrice(variant.discountPrice);
+    this.basePrice = Number(variant.basePrice);
+    this.salePrice = toPrice(variant.salePrice);
     this.attributes = toAttributes(variant.attributes);
     this.isDefault = variant.isDefault!;
   }

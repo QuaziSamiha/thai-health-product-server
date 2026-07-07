@@ -52,22 +52,23 @@ const VARIANT_SELECT_COMMON = {
   stockStatus: true,
   weight: true,
   size: true,
-  price: true,
-  discountPrice: true,
+  basePrice: true,
+  salePrice: true,
   attributes: true,
   isDefault: true,
 } as const;
 
-//* MATCHES ProductVariantDto (admin) — adds barcode/quantity/discountType/costPerItem
+//* MATCHES ProductVariantDto (admin) — adds barcode/quantity/discountType/discountValue/costPrice
 export const VARIANT_SELECT_ADMIN = {
   ...VARIANT_SELECT_COMMON,
   barcode: true,
   quantity: true,
   discountType: true,
-  costPerItem: true,
+  discountValue: true,
+  costPrice: true,
 } as const;
 
-//* MATCHES ProductVariantPublicDto — excludes barcode/costPerItem/quantity/discountType
+//* MATCHES ProductVariantPublicDto — excludes barcode/costPrice/quantity/discountType/discountValue
 export const VARIANT_SELECT_PUBLIC = VARIANT_SELECT_COMMON;
 
 //* ═══════════════════════════════════════════════════════════════════════

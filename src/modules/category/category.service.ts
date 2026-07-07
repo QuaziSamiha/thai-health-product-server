@@ -178,6 +178,13 @@ export class CategoryService {
     );
   }
 
+  async getProductCategories(): Promise<RootActiveCategoryResponseDto[]> {
+    const categories = await this.categoryRepository.findProductCategories();
+    return categories.map(
+      (category) => new RootActiveCategoryResponseDto(category),
+    );
+  }
+
   async getCategoryBySlug(slug: string): Promise<CategoryResponseDto> {
     const existingCategory = await this.categoryRepository.findBySlug(slug);
     if (!existingCategory) {
