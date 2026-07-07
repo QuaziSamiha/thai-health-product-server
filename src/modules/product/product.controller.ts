@@ -149,7 +149,7 @@ export class ProductController {
   @ApiOperation({
     summary: 'Update a product',
     description:
-      'Partially updates an existing product. New images are appended to the gallery (never replaced); providing `variants` fully replaces the existing set, omitting it leaves variants untouched. Admin only.',
+      'Partially updates an existing product. New images are appended to the gallery (never replaced). `variants` is reconciled by id: entries with an `id` update that variant, entries without one are added, and existing variants missing from the list are removed — at least one variant must remain. Omitting `variants` leaves them untouched. Admin only.',
   })
   @ApiBody({ type: UpdateProductDto })
   @ApiOkResponse({

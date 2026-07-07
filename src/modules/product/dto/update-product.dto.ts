@@ -9,6 +9,7 @@ import {
   IsNumber,
   MaxLength,
   IsArray,
+  ArrayMinSize,
   ValidateNested,
   IsDateString,
 } from 'class-validator';
@@ -18,9 +19,12 @@ import {
   DiscountType,
   ProductType,
 } from '../../../generated/prisma/enums';
-import { tryParseJson } from '../../../common/utils/json-transform.util';
+import {
+  tryParseJson,
+  parseStringArrayInput,
+} from '../../../common/utils/json-transform.util';
 import { IsLessThanOrEqualTo } from '../../../common/decorators/validation/is-less-than-or-equal-to.decorator';
-import { CreateProductVariantDto } from './create-product-variant.dto';
+import { UpdateProductVariantDto } from './update-product-variant.dto';
 import {
   ProductDimensionsInputDto,
   ProductSeoMetadataInputDto,
@@ -270,7 +274,7 @@ export class UpdateProductDto {
     example: ['coffee', 'organic', 'beverage'],
   })
   @IsOptional()
-  @Transform(({ value }) => tryParseJson(value))
+  @Transform(({ value }) => parseStringArrayInput(value))
   @IsArray({ message: 'Tags must be an array' })
   @IsString({ each: true, message: 'Each tag must be a valid text string' })
   tags?: string[];
@@ -368,8 +372,8 @@ export class UpdateProductDto {
 
   @ApiPropertyOptional({
     description:
-      'Full replacement set of variants — providing this WIPES all existing variants and inserts these instead. Omit entirely to leave existing variants untouched. Send as a JSON array normally, or a JSON-encoded string when using multipart/form-data.',
-    type: () => [CreateProductVariantDto],
+      'Desired final set of variants, reconciled by `id`: entries WITH an `id` update that variant in place, entries WITHOUT an `id` are created, and existing variants missing from the list are removed. At least one variant must remain. Omit entirely to leave variants untouched. Send as a JSON array normally, or a JSON-encoded string when using multipart/form-data.',
+    type: () => [UpdateProductVariantDto],
   })
   @IsOptional()
   @Transform(({ value }) => {
@@ -381,11 +385,12 @@ export class UpdateProductDto {
         ? [parsed]
         : parsed;
     if (!Array.isArray(normalized)) return normalized;
-    return plainToInstance(CreateProductVariantDto, normalized);
+    return plainToInstance(UpdateProductVariantDto, normalized);
   })
   @IsArray({ message: 'Variants must be an array' })
+  @ArrayMinSize(1, { message: 'A product must keep at least one variant' })
   @ValidateNested({ each: true })
-  variants?: CreateProductVariantDto[];
+  variants?: UpdateProductVariantDto[];
 
   // ─── Images ──────────────────────────────────────────────────────────────────
 
@@ -393,8 +398,23 @@ export class UpdateProductDto {
     type: 'array',
     items: { type: 'string', format: 'binary' },
     description:
-      'New gallery image files to ADD to the existing gallery (up to 10). This does not remove or replace existing images — use the image-management endpoints for that.',
+      'New gallery image files to ADD to the existing gallery (up to 10). Existing images are only removed via `deleteImageIds`.',
   })
   @IsOptional()
   images?: Express.Multer.File[];
+
+  @ApiPropertyOptional({
+    description:
+      'IDs of existing gallery images to remove from this product (DB rows and stored files). Send as a JSON array normally, or a JSON-encoded string when using multipart/form-data.',
+    type: [Number],
+    example: [4, 7],
+  })
+  @IsOptional()
+  @Transform(({ value }) => {
+    const parsed = tryParseJson(value);
+    return Array.isArray(parsed) ? parsed.map((id) => Number(id)) : parsed;
+  })
+  @IsArray({ message: 'deleteImageIds must be an array' })
+  @IsInt({ each: true, message: 'Each image ID must be a whole number' })
+  deleteImageIds?: number[];
 }

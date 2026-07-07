@@ -2,11 +2,15 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  BadRequestException,
   Inject,
   Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ProductRepository } from './product.repository';
+import {
+  ProductRepository,
+  VariantReconcilePlan,
+} from './product.repository';
 import { CategoryService } from '../category/category.service';
 import {
   ProductResponseDto,
@@ -14,6 +18,7 @@ import {
 } from './dto/product-response.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { CreateProductVariantDto } from './dto/create-product-variant.dto';
+import { UpdateProductVariantDto } from './dto/update-product-variant.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PublishedProductsQueryDto } from './dto/published-products-query.dto';
 import { generateSlug } from '../../common/utils/slug.util';
@@ -28,6 +33,15 @@ import type {
 } from '../../shared/pagination';
 
 const PRODUCT_IMAGE_FOLDER = 'products/gallery';
+
+//* THE SLICE OF A STORED VARIANT THE RECONCILE LOGIC NEEDS — STRUCTURALLY
+//* SATISFIED BY THE ROWS `findByIdAdmin` ALREADY LOADS.
+interface ExistingVariantState {
+  id: number;
+  name: string;
+  quantity: number;
+  isDefault: boolean;
+}
 
 @Injectable()
 export class ProductService {
@@ -312,14 +326,17 @@ export class ProductService {
    *
    * - **Name change** re-derives the slug and re-checks both for conflicts
    *   (excluding the product's own row).
-   * - **New images** are *appended* to the existing gallery, never replace
-   *   or remove anything — that's a separate, more destructive operation
-   *   this endpoint intentionally doesn't attempt implicitly.
-   * - **`variants`, if provided, is a full replacement** (via the existing
-   *   `replaceVariants`), and re-triggers the same stock invariant as
-   *   `createProduct`. Omitting `variants` entirely leaves existing variants
-   *   untouched.
-   * - `replaceVariants` + the new images + the scalar field update all run
+   * - **New images** are *appended* to the existing gallery; existing images
+   *   are only removed when explicitly listed in `deleteImageIds` (rows in
+   *   the transaction, physical files best-effort after commit).
+   * - **`variants`, if provided, is reconciled by `id`** (see
+   *   `buildVariantReconcilePlan`): entries with an `id` update that variant
+   *   in place, entries without one are created, and existing variants
+   *   missing from the list are deleted — while guaranteeing at least one
+   *   variant survives. Omitting `variants` entirely leaves existing
+   *   variants untouched. Re-triggers the same stock invariant as
+   *   `createProduct`.
+   * - `reconcileVariants` + the new images + the scalar field update all run
    *   inside one transaction, so a failure partway never leaves, say, new
    *   variants committed alongside stale scalar fields.
    * - Uploaded files are rolled back if anything in the transaction fails,
@@ -357,6 +374,19 @@ export class ProductService {
       slug = newSlug;
     }
 
+    //* RESOLVE IMAGE DELETIONS AGAINST THE PRODUCT'S OWN GALLERY UP FRONT —
+    //* A FOREIGN OR UNKNOWN IMAGE ID FAILS THE WHOLE REQUEST BEFORE ANY
+    //* FILES ARE UPLOADED OR ROWS TOUCHED.
+    const requestedImageIds = [...new Set(dto.deleteImageIds ?? [])];
+    const imagesToDelete = existing.images.filter((img) =>
+      requestedImageIds.includes(img.id),
+    );
+    if (imagesToDelete.length !== requestedImageIds.length) {
+      throw new BadRequestException(
+        'One or more image IDs do not belong to this product',
+      );
+    }
+
     const uploadedPaths: string[] = [];
     try {
       for (const file of images) {
@@ -370,15 +400,24 @@ export class ProductService {
     }
 
     try {
-      const { fields: stockFields, variantsToReplace } =
-        this.resolveStockUpdate(existing, dto, slug);
+      const { fields: stockFields, variantPlan } = this.resolveStockUpdate(
+        existing,
+        dto,
+        slug,
+      );
 
       const updated = await this.productRepository.withTransaction(
         async (tx) => {
-          if (variantsToReplace) {
-            await this.productRepository.replaceVariants(
+          if (variantPlan) {
+            await this.productRepository.reconcileVariants(
               id,
-              variantsToReplace,
+              variantPlan,
+              tx,
+            );
+          }
+          if (imagesToDelete.length) {
+            await this.productRepository.deleteImages(
+              imagesToDelete.map((img) => img.id),
               tx,
             );
           }
@@ -442,6 +481,17 @@ export class ProductService {
         },
       );
 
+      //* ROWS ARE GONE — REMOVE THE PHYSICAL FILES BEST-EFFORT, SAME
+      //* RATIONALE AS hardDeleteProduct: A FAILED UNLINK MUST NOT ROLL BACK
+      //* A COMMITTED UPDATE.
+      await Promise.all(
+        imagesToDelete.flatMap((img) =>
+          [img.url, img.thumbnailUrl, img.bannerUrl, img.iconUrl]
+            .filter((path): path is string => Boolean(path))
+            .map((path) => this.deleteStoredFile(path)),
+        ),
+      );
+
       return new ProductResponseDto(
         updated,
         this.configService.get<string>('app.baseUrl'),
@@ -467,12 +517,16 @@ export class ProductService {
    * doesn't attempt implicitly.
    */
   private resolveStockUpdate(
-    current: { type: ProductType; quantity: number },
+    current: {
+      type: ProductType;
+      quantity: number;
+      variants: ExistingVariantState[];
+    },
     dto: UpdateProductDto,
     productSlug: string,
   ): {
     fields: Partial<Prisma.ProductUncheckedUpdateInput>;
-    variantsToReplace?: Prisma.ProductVariantCreateManyProductInput[];
+    variantPlan?: VariantReconcilePlan;
   } {
     const touchesStock =
       dto.type !== undefined ||
@@ -486,15 +540,10 @@ export class ProductService {
 
     if (effectiveType === ProductType.VARIABLE) {
       if (dto.variants !== undefined) {
-        const variants = dto.variants.map((variant, index) =>
-          this.buildVariantInput(productSlug, variant, index),
-        );
-        if (!variants.some((v) => v.isDefault)) {
-          variants[0].isDefault = true;
-        }
-        const totalStock = variants.reduce(
-          (sum, v) => sum + (v.quantity ?? 0),
-          0,
+        const { plan, totalStock } = this.buildVariantReconcilePlan(
+          productSlug,
+          current.variants,
+          dto.variants,
         );
         return {
           fields: {
@@ -503,7 +552,7 @@ export class ProductService {
             totalStock,
             stockStatus: this.computeStockStatus(totalStock),
           },
-          variantsToReplace: variants,
+          variantPlan: plan,
         };
       }
       return { fields: { hasVariants: true, quantity: 0 } };
@@ -518,6 +567,119 @@ export class ProductService {
         stockStatus: this.computeStockStatus(quantity),
       },
     };
+  }
+
+  /**
+   * Turns the requested variant list into a reconcile plan against the
+   * product's current variants. The list is the desired FINAL state:
+   *
+   * - An entry **with `id`** updates that variant in place — only the fields
+   *   actually present in the entry are touched, the variant row (and its
+   *   id) survives.
+   * - An entry **without `id`** creates a new variant.
+   * - An existing variant **absent from the list** is deleted.
+   *
+   * Guards: an `id` that doesn't belong to this product is a 404, a
+   * duplicated `id` is a 400, and the DTO's `@ArrayMinSize(1)` upstream
+   * guarantees the final set is never empty. Exactly one variant ends up
+   * `isDefault` — an explicit flag in the payload wins, an existing default
+   * that survives is kept, otherwise the first entry is promoted.
+   *
+   * Also returns `totalStock` for the final set (payload quantity when
+   * given, the variant's current quantity otherwise) so the caller can
+   * refresh the product's cached stock fields.
+   */
+  private buildVariantReconcilePlan(
+    productSlug: string,
+    existingVariants: ExistingVariantState[],
+    requested: UpdateProductVariantDto[],
+  ): { plan: VariantReconcilePlan; totalStock: number } {
+    const existingById = new Map(existingVariants.map((v) => [v.id, v]));
+
+    const seenIds = new Set<number>();
+    for (const entry of requested) {
+      if (entry.id === undefined) continue;
+      if (!existingById.has(entry.id)) {
+        throw new NotFoundException(
+          `Variant with id ${entry.id} does not exist on this product`,
+        );
+      }
+      if (seenIds.has(entry.id)) {
+        throw new BadRequestException(
+          `Variant id ${entry.id} appears more than once`,
+        );
+      }
+      seenIds.add(entry.id);
+    }
+
+    const deleteIds = existingVariants
+      .filter((variant) => !seenIds.has(variant.id))
+      .map((variant) => variant.id);
+
+    //* RESOLVE THE FINAL isDefault FLAGS ACROSS THE WHOLE SET UP FRONT:
+    //* PAYLOAD FLAG > SURVIVING EXISTING FLAG > NONE. THEN FORCE EXACTLY ONE
+    //* DEFAULT — THE FIRST FLAGGED ENTRY WINS, OR THE FIRST ENTRY OVERALL IF
+    //* NOBODY IS FLAGGED (E.G. THE OLD DEFAULT WAS JUST DELETED).
+    const intendedDefaults = requested.map(
+      (entry) =>
+        entry.isDefault ??
+        (entry.id !== undefined
+          ? existingById.get(entry.id)!.isDefault
+          : false),
+    );
+    const firstDefault = intendedDefaults.indexOf(true);
+    const defaultIndex = firstDefault === -1 ? 0 : firstDefault;
+
+    const updates: VariantReconcilePlan['updates'] = [];
+    const creates: VariantReconcilePlan['creates'] = [];
+    let totalStock = 0;
+
+    requested.forEach((entry, index) => {
+      const isDefault = index === defaultIndex;
+      const existing =
+        entry.id !== undefined ? existingById.get(entry.id)! : undefined;
+
+      if (existing) {
+        totalStock += entry.quantity ?? existing.quantity;
+        updates.push({
+          id: existing.id,
+          //* undefined FIELDS ARE SKIPPED BY PRISMA — ONLY WHAT THE PAYLOAD
+          //* ACTUALLY PROVIDED (PLUS DERIVED slug/stockStatus/isDefault)
+          //* GETS WRITTEN.
+          data: {
+            name: entry.name,
+            slug:
+              entry.name && entry.name !== existing.name
+                ? `${productSlug}-${generateSlug(entry.name)}`
+                : undefined,
+            size: entry.size,
+            basePrice: entry.basePrice,
+            discountType: entry.discountType,
+            discountValue: entry.discountValue,
+            salePrice: entry.salePrice,
+            costPrice: entry.costPrice,
+            quantity: entry.quantity,
+            stockStatus:
+              entry.quantity !== undefined
+                ? this.computeStockStatus(entry.quantity)
+                : undefined,
+            sku: entry.sku,
+            barcode: entry.barcode,
+            weight: entry.weight,
+            attributes: toPlainJson(entry.attributes),
+            isDefault,
+          },
+        });
+      } else {
+        totalStock += entry.quantity ?? 0;
+        creates.push({
+          ...this.buildVariantInput(productSlug, entry, index),
+          isDefault,
+        });
+      }
+    });
+
+    return { plan: { deleteIds, updates, creates }, totalStock };
   }
 
   /**

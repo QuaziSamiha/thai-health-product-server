@@ -294,22 +294,46 @@ export class ProductRepository extends BaseRepository {
   // ─── Mutations — Variants ────────────────────────────────────────────────────
 
   /**
-   * Full replace: wipes existing variants and inserts the given set.
-   * Self-wraps in a transaction when the caller doesn't already supply one,
-   * so the delete+recreate is never left half-applied.
+   * Applies a pre-computed variant reconcile plan: removes the listed IDs,
+   * updates surviving variants in place (preserving their IDs and any
+   * references to them), and inserts the new ones. Self-wraps in a
+   * transaction when the caller doesn't already supply one, so the plan is
+   * never left half-applied.
    */
-  async replaceVariants(
+  async reconcileVariants(
     productId: number,
-    variants: Prisma.ProductVariantCreateManyProductInput[],
+    plan: VariantReconcilePlan,
     tx?: Prisma.TransactionClient,
   ) {
     const run = async (client: Prisma.TransactionClient) => {
-      await client.productVariant.deleteMany({ where: { productId } });
-      return await client.productVariant.createMany({
-        data: variants.map((variant) => ({ ...variant, productId })),
-      });
+      if (plan.deleteIds.length) {
+        await client.productVariant.deleteMany({
+          where: { productId, id: { in: plan.deleteIds } },
+        });
+      }
+      for (const { id, data } of plan.updates) {
+        await client.productVariant.update({
+          //* SCOPED BY productId SO A FOREIGN VARIANT ID CAN NEVER BE UPDATED
+          //* THROUGH ANOTHER PRODUCT'S PAYLOAD
+          where: { id, productId },
+          data,
+        });
+      }
+      if (plan.creates.length) {
+        await client.productVariant.createMany({
+          data: plan.creates.map((variant) => ({ ...variant, productId })),
+        });
+      }
     };
 
     return tx ? run(tx) : this.withTransaction(run);
   }
+}
+
+//* THE SERVICE COMPUTES THIS PLAN (WHAT TO REMOVE / UPDATE / INSERT) AND THE
+//* REPOSITORY ONLY EXECUTES IT — KEEPS THE MERGE RULES OUT OF THE DATA LAYER.
+export interface VariantReconcilePlan {
+  deleteIds: number[];
+  updates: { id: number; data: Prisma.ProductVariantUncheckedUpdateInput }[];
+  creates: Prisma.ProductVariantCreateManyProductInput[];
 }

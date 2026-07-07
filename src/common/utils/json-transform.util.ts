@@ -11,3 +11,19 @@ export function tryParseJson(value: unknown): unknown {
     return value;
   }
 }
+
+//* FORGIVING PARSER FOR STRING-ARRAY FIELDS (E.G. TAGS) IN multipart
+//* FORMS. ACCEPTS A REAL ARRAY, A JSON-ENCODED ARRAY STRING, OR A
+//* PLAIN/COMMA-SEPARATED STRING ("coffee, organic" → ['coffee','organic']).
+//* NON-STRING INPUT IS PASSED THROUGH SO @IsArray CAN STILL REJECT IT.
+export function parseStringArrayInput(value: unknown): unknown {
+  const parsed = tryParseJson(value);
+  if (Array.isArray(parsed)) return parsed;
+  if (typeof parsed === 'string') {
+    return parsed
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return parsed;
+}

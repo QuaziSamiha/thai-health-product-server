@@ -22,7 +22,10 @@ import {
   DiscountType,
   ProductType,
 } from '../../../generated/prisma/enums';
-import { tryParseJson } from '../../../common/utils/json-transform.util';
+import {
+  tryParseJson,
+  parseStringArrayInput,
+} from '../../../common/utils/json-transform.util';
 import { IsLessThanOrEqualTo } from '../../../common/decorators/validation/is-less-than-or-equal-to.decorator';
 import { CreateProductVariantDto } from './create-product-variant.dto';
 
@@ -367,7 +370,7 @@ export class CreateProductDto {
     example: ['coffee', 'organic', 'beverage'],
   })
   @IsOptional()
-  @Transform(({ value }) => tryParseJson(value))
+  @Transform(({ value }) => parseStringArrayInput(value))
   @IsArray({ message: 'Tags must be an array' })
   @IsString({ each: true, message: 'Each tag must be a valid text string' })
   tags?: string[];

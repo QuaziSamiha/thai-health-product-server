@@ -330,9 +330,9 @@ export class ProductResponseDto {
   })
   genericName?: string;
 
-  // @Expose()
-  // @ApiProperty({ description: 'Owning category ID (raw FK)', example: 3 })
-  // categoryId!: number;
+  @Expose()
+  @ApiProperty({ description: 'Owning category ID (raw FK)', example: 3 })
+  categoryId!: number;
 
   @Expose()
   @ApiPropertyOptional({ type: () => ProductCategoryMinifiedDto })
@@ -385,12 +385,12 @@ export class ProductResponseDto {
   @ApiPropertyOptional({ type: () => UserMinifiedResponseDto })
   createdByUser?: UserMinifiedResponseDto;
 
-  @Expose()
-  @ApiPropertyOptional({
-    description: 'Actor ID who last modified the row',
-    example: 12,
-  })
-  updatedBy?: number;
+  // @Expose()
+  // @ApiPropertyOptional({
+  //   description: 'Actor ID who last modified the row',
+  //   example: 12,
+  // })
+  // updatedBy?: number;
 
   @Expose()
   @ApiPropertyOptional({ type: () => UserMinifiedResponseDto })
@@ -457,7 +457,7 @@ export class ProductResponseDto {
     this.storageInstructionsTh = product.storageInstructionsTh ?? undefined;
     this.origin = product.origin ?? undefined;
     this.genericName = product.genericName ?? undefined;
-    // this.categoryId = product.categoryId!;
+    this.categoryId = product.categoryId!;
     this.category = product.category
       ? new ProductCategoryMinifiedDto(product.category)
       : undefined;
@@ -475,7 +475,7 @@ export class ProductResponseDto {
     this.createdByUser = product.createdByUser
       ? new UserMinifiedResponseDto(product.createdByUser)
       : undefined;
-    this.updatedBy = product.updatedBy ?? undefined;
+    // this.updatedBy = product.updatedBy ?? undefined;
     this.updatedByUser = product.updatedByUser
       ? new UserMinifiedResponseDto(product.updatedByUser)
       : undefined;
