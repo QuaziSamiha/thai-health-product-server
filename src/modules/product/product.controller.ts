@@ -35,7 +35,7 @@ import type { Request } from 'express';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PublishedProductsQueryDto } from './dto/published-products-query.dto';
+import { ActiveProductsQueryDto } from './dto/active-products-query.dto';
 import {
   ProductResponseDto,
   ProductResponsePublicDto,
@@ -110,19 +110,19 @@ export class ProductController {
     return this.productService.getAllProducts(query);
   }
 
-  @Get('published-products')
+  @Get('active-products')
   @ApiOperation({
-    summary: 'Get published products (Public)',
+    summary: 'Get active products (Public)',
     description:
-      'Paginated storefront listing — only products that are ACTIVE, not soft-deleted, and whose `publishedAt` has passed. Filterable by search term, category IDs (CSV), and product type.',
+      'Paginated storefront listing of every ACTIVE, non-soft-deleted product. Filterable by search term, category IDs (CSV), and product type; sortable by createdAt / basePrice / name.',
   })
   @ApiPaginatedResponse(
     ProductResponsePublicDto,
-    'Published products retrieved successfully.',
+    'Active products retrieved successfully.',
   )
-  @ResponseMessage('Published products retrieved successfully')
-  async getPublishedProducts(@Query() query: PublishedProductsQueryDto) {
-    return this.productService.getPublishedProducts(query);
+  @ResponseMessage('Active products retrieved successfully')
+  async getActiveProducts(@Query() query: ActiveProductsQueryDto) {
+    return await this.productService.getActiveProducts(query);
   }
 
   @Get('product-by-id/:id')

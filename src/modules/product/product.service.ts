@@ -7,7 +7,11 @@ import {
   Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ProductRepository, VariantReconcilePlan } from './product.repository';
+import {
+  ProductRepository,
+  VariantReconcilePlan,
+  StorefrontListFilters,
+} from './product.repository';
 import { CategoryService } from '../category/category.service';
 import {
   ProductResponseDto,
@@ -17,7 +21,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { CreateProductVariantDto } from './dto/create-product-variant.dto';
 import { UpdateProductVariantDto } from './dto/update-product-variant.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PublishedProductsQueryDto } from './dto/published-products-query.dto';
+import { ActiveProductsQueryDto } from './dto/active-products-query.dto';
 import { generateSlug } from '../../common/utils/slug.util';
 import { parseStoragePath } from '../../common/utils/storage-path.util';
 import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
@@ -103,27 +107,32 @@ export class ProductService {
   }
 
   /**
-   * Storefront listing — the only parsing that belongs here (not in the
-   * repository, per `findAllProductsPublic`'s own contract) is turning the
-   * CSV `categoryIds` query param into `number[]`; everything else is passed
-   * straight through to the already-filtered repository query.
+   * Shared query parsing for the storefront lists — the only parsing that
+   * belongs here (not in the repository, per its own contract) is turning
+   * the CSV `categoryIds` query param into `number[]`; everything else is
+   * passed straight through to the already-filtered repository query.
    */
-  async getPublishedProducts(
-    query: PublishedProductsQueryDto,
-  ): Promise<IPaginatedResult<ProductResponsePublicDto>> {
-    const { categoryIds, productType, ...paginationParams } = query;
-
-    const paginated = await this.productRepository.findAllProductsPublic(
+  private parseStorefrontQuery(query: ActiveProductsQueryDto): {
+    paginationParams: PaginationQueryDto;
+    filters: StorefrontListFilters;
+  } {
+    const { categoryIds, productType, sortBy, ...paginationParams } = query;
+    return {
       paginationParams,
-      {
+      filters: {
         categoryIds: categoryIds
           ?.split(',')
           .map((id) => Number(id.trim()))
           .filter((id) => Number.isInteger(id)),
         type: productType,
+        sortBy,
       },
-    );
+    };
+  }
 
+  private toPublicList(
+    paginated: Awaited<ReturnType<ProductRepository['findAllProductsActive']>>,
+  ): IPaginatedResult<ProductResponsePublicDto> {
     const baseUrl = this.configService.get<string>('app.baseUrl');
     return {
       ...paginated,
@@ -131,6 +140,22 @@ export class ProductService {
         (product) => new ProductResponsePublicDto(product, baseUrl),
       ),
     };
+  }
+
+  /**
+   * Storefront listing — every ACTIVE, non-deleted product. `publishedAt`
+   * is recorded in the DB but is intentionally not a visibility condition.
+   */
+  async getActiveProducts(
+    query: ActiveProductsQueryDto,
+  ): Promise<IPaginatedResult<ProductResponsePublicDto>> {
+    const { paginationParams, filters } = this.parseStorefrontQuery(query);
+    return this.toPublicList(
+      await this.productRepository.findAllProductsActive(
+        paginationParams,
+        filters,
+      ),
+    );
   }
 
   /**

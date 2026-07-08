@@ -12,6 +12,16 @@ import {
   PRODUCT_SELECT_PUBLIC,
   PRODUCT_SELECT_MINIFIED,
 } from './product.select';
+import type { ProductSortField } from './dto/active-products-query.dto';
+
+//* ALREADY-PARSED STOREFRONT LIST FILTERS — CSV/QUERY-STRING PARSING IS THE
+//* SERVICE'S JOB; sortBy IS SAFE TO INTERPOLATE INTO orderBy BECAUSE THE
+//* QUERY DTO WHITELISTS ITS VALUES.
+export interface StorefrontListFilters {
+  categoryIds?: number[];
+  type?: ProductType;
+  sortBy?: ProductSortField;
+}
 
 @Injectable()
 export class ProductRepository extends BaseRepository {
@@ -41,25 +51,23 @@ export class ProductRepository extends BaseRepository {
   }
 
   /**
-   * Public visibility gate, applied to every storefront-facing read below:
-   * not soft-deleted, status ACTIVE, and `publishedAt` in the past (a null
-   * `publishedAt` never matches `lte`, so an un-scheduled product stays
-   * hidden until an admin explicitly publishes it). Built fresh on every
-   * call — this repository is a singleton, so a captured `new Date()` would
-   * freeze "now" at server-startup time instead of the actual request time.
+   * Storefront visibility gate, applied to every public-facing read below:
+   * not soft-deleted and status ACTIVE. The `publishedAt` column still
+   * exists in the DB (and is stamped on create/update), but it is
+   * deliberately NOT part of public visibility — the storefront shows all
+   * active products regardless of launch schedule.
    */
-  private publicVisibilityWhere(): Prisma.ProductWhereInput {
+  private activeVisibilityWhere(): Prisma.ProductWhereInput {
     return {
       deletedAt: null,
       status: CategoryProductStatus.ACTIVE,
-      publishedAt: { lte: new Date() },
     };
   }
 
   async findByIdPublic(id: number, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return await client.product.findFirst({
-      where: { id, ...this.publicVisibilityWhere() },
+      where: { id, ...this.activeVisibilityWhere() },
       select: PRODUCT_SELECT_PUBLIC,
     });
   }
@@ -67,7 +75,7 @@ export class ProductRepository extends BaseRepository {
   async findBySlugPublic(slug: string, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return await client.product.findFirst({
-      where: { slug, ...this.publicVisibilityWhere() },
+      where: { slug, ...this.activeVisibilityWhere() },
       select: PRODUCT_SELECT_PUBLIC,
     });
   }
@@ -111,19 +119,21 @@ export class ProductRepository extends BaseRepository {
   }
 
   /**
-   * Storefront listing — active products only, optionally narrowed by
-   * already-parsed category IDs / product type. Request-level parsing (e.g.
-   * splitting a CSV query param) belongs in the caller — this only builds
-   * the Prisma filter.
+   * Shared storefront list query. Callers pick the visibility gate; the
+   * filters arrive already parsed (e.g. CSV splitting belongs in the
+   * service) — this only builds the Prisma filter. `sortBy` is applied as
+   * the orderBy column and MUST come from the query DTO's whitelist, never
+   * raw user input.
    */
-  async findAllProductsPublic(
+  private async paginateStorefrontList(
     params: PaginationQueryDto,
-    filters: { categoryIds?: number[]; type?: ProductType } = {},
+    filters: StorefrontListFilters,
+    baseWhere: Prisma.ProductWhereInput,
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx || this.prisma;
     const where: Prisma.ProductWhereInput = {
-      ...this.publicVisibilityWhere(),
+      ...baseWhere,
       ...(filters.categoryIds?.length && {
         categoryId: { in: filters.categoryIds },
       }),
@@ -137,8 +147,25 @@ export class ProductRepository extends BaseRepository {
       select: PRODUCT_SELECT_PUBLIC,
       where,
       searchableFields: ['name', 'slug', 'sku', 'nameTh'],
-      defaultSortField: 'createdAt',
+      defaultSortField: filters.sortBy ?? 'createdAt',
     });
+  }
+
+  /**
+   * Storefront listing — every ACTIVE, non-deleted product, optionally
+   * narrowed by category IDs / type and sorted by a whitelisted column.
+   */
+  async findAllProductsActive(
+    params: PaginationQueryDto,
+    filters: StorefrontListFilters = {},
+    tx?: Prisma.TransactionClient,
+  ) {
+    return await this.paginateStorefrontList(
+      params,
+      filters,
+      this.activeVisibilityWhere(),
+      tx,
+    );
   }
 
   /** Lightweight id/name/variant list for select-input / dropdown UIs. */
@@ -201,7 +228,7 @@ export class ProductRepository extends BaseRepository {
    * product-level and variant-level alike, since both are scoped by
    * `productId`). Variants have no soft-delete field of their own — nothing
    * queries them independently of their parent product, so once the parent
-   * drops out of `publicVisibilityWhere()`, its variants become unreachable
+   * drops out of `activeVisibilityWhere()`, its variants become unreachable
    * through the API right along with it.
    */
   async softDeleteProduct(
