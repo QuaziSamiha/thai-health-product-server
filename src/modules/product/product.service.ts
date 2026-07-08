@@ -7,10 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  ProductRepository,
-  VariantReconcilePlan,
-} from './product.repository';
+import { ProductRepository, VariantReconcilePlan } from './product.repository';
 import { CategoryService } from '../category/category.service';
 import {
   ProductResponseDto,
@@ -26,7 +23,11 @@ import { parseStoragePath } from '../../common/utils/storage-path.util';
 import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
 import type { IStorageService } from '../../shared/storage/interfaces/storage.interface';
 import { Prisma } from '../../generated/prisma/client';
-import { ProductType, StockStatus } from '../../generated/prisma/enums';
+import {
+  CategoryProductStatus,
+  ProductType,
+  StockStatus,
+} from '../../generated/prisma/enums';
 import type {
   IPaginatedResult,
   PaginationQueryDto,
@@ -83,6 +84,22 @@ export class ProductService {
         (product) => new ProductResponseDto(product, baseUrl),
       ),
     };
+  }
+
+  /**
+   * Admin detail — same visibility rules as the admin list: no filter at
+   * all, so drafts, archived, hidden, and soft-deleted products are all
+   * retrievable by id.
+   */
+  async getProductById(id: number): Promise<ProductResponseDto> {
+    const product = await this.productRepository.findByIdAdmin(id);
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    return new ProductResponseDto(
+      product,
+      this.configService.get<string>('app.baseUrl'),
+    );
   }
 
   /**
@@ -185,7 +202,18 @@ export class ProductService {
         type: dto.type ?? ProductType.VARIABLE,
         status: dto.status,
         isFeatured: dto.isFeatured,
-        publishedAt: dto.publishedAt ? new Date(dto.publishedAt) : undefined,
+        //* THE PUBLIC VISIBILITY GATE IS status = ACTIVE AND publishedAt <=
+        //* now(), AND A null publishedAt NEVER MATCHES — SO AN ACTIVE
+        //* PRODUCT CREATED WITHOUT AN EXPLICIT LAUNCH DATE MUST GO LIVE
+        //* IMMEDIATELY, OTHERWISE EVERY DASHBOARD-CREATED PRODUCT 404s ON
+        //* THE STOREFRONT. AN EXPLICIT dto.publishedAt (SCHEDULED LAUNCH)
+        //* ALWAYS WINS.
+        publishedAt: dto.publishedAt
+          ? new Date(dto.publishedAt)
+          : (dto.status ?? CategoryProductStatus.ACTIVE) ===
+              CategoryProductStatus.ACTIVE
+            ? new Date()
+            : undefined,
         basePrice,
         discountType: dto.discountType,
         discountValue: dto.discountValue,
@@ -409,11 +437,7 @@ export class ProductService {
       const updated = await this.productRepository.withTransaction(
         async (tx) => {
           if (variantPlan) {
-            await this.productRepository.reconcileVariants(
-              id,
-              variantPlan,
-              tx,
-            );
+            await this.productRepository.reconcileVariants(id, variantPlan, tx);
           }
           if (imagesToDelete.length) {
             await this.productRepository.deleteImages(
@@ -448,9 +472,16 @@ export class ProductService {
               type: dto.type,
               status: dto.status,
               isFeatured: dto.isFeatured,
+              //* SAME RULE AS CREATE: A PRODUCT THAT IS (OR BECOMES) ACTIVE
+              //* WITH NO LAUNCH DATE ON RECORD IS PUBLISHED IMMEDIATELY —
+              //* null NEVER PASSES THE PUBLIC publishedAt <= now() GATE.
+              //* ALSO BACKFILLS PRE-FIX ROWS ON THEIR NEXT SAVE.
               publishedAt: dto.publishedAt
                 ? new Date(dto.publishedAt)
-                : undefined,
+                : (dto.status ?? existing.status) ===
+                      CategoryProductStatus.ACTIVE && !existing.publishedAt
+                  ? new Date()
+                  : undefined,
               basePrice: dto.basePrice,
               discountType: dto.discountType,
               discountValue: dto.discountValue,

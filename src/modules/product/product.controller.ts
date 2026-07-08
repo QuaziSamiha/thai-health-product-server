@@ -125,6 +125,27 @@ export class ProductController {
     return this.productService.getPublishedProducts(query);
   }
 
+  @Get('product-by-id/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get product by ID',
+    description:
+      'Returns the full admin detail for a single product — variants, images, pricing, stock, and audit fields. No visibility filter: drafts, archived, hidden, and soft-deleted rows are all retrievable. Admin only.',
+  })
+  @ApiOkResponse({
+    description: 'Product retrieved successfully.',
+    type: ProductResponseDto,
+  })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
+  @ApiForbiddenResponse({ description: 'Admin role required.' })
+  @ApiNotFoundResponse({ description: 'Product not found.' })
+  @ResponseMessage('Product retrieved successfully')
+  async getProductById(@Param('id', ParseIntPipe) id: number) {
+    return await this.productService.getProductById(id);
+  }
+
   @Get('product-by-slug/:slug')
   @ApiOperation({
     summary: 'Get product by slug (Public)',
