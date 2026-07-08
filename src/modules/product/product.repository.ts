@@ -64,10 +64,16 @@ export class ProductRepository extends BaseRepository {
     };
   }
 
+  //* THE GATE IS ALWAYS COMPOSED VIA `AND`, NEVER OBJECT-SPREAD-MERGED WITH
+  //* CALLER CONDITIONS. SPREADING (`{ ...activeVisibilityWhere(), ...rest }`)
+  //* LETS A LATER KEY IN `rest` SILENTLY OVERWRITE status/deletedAt IF IT
+  //* EVER HAPPENS TO SHARE A FIELD NAME — `AND` MAKES THAT STRUCTURALLY
+  //* IMPOSSIBLE: BOTH CONDITIONS MUST HOLD, SO A CONFLICTING CONDITION CAN
+  //* ONLY NARROW THE RESULT (TO NOTHING), NEVER WIDEN IT PAST "ACTIVE".
   async findByIdPublic(id: number, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return await client.product.findFirst({
-      where: { id, ...this.activeVisibilityWhere() },
+      where: { AND: [{ id }, this.activeVisibilityWhere()] },
       select: PRODUCT_SELECT_PUBLIC,
     });
   }
@@ -75,7 +81,7 @@ export class ProductRepository extends BaseRepository {
   async findBySlugPublic(slug: string, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return await client.product.findFirst({
-      where: { slug, ...this.activeVisibilityWhere() },
+      where: { AND: [{ slug }, this.activeVisibilityWhere()] },
       select: PRODUCT_SELECT_PUBLIC,
     });
   }
@@ -132,12 +138,18 @@ export class ProductRepository extends BaseRepository {
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx || this.prisma;
+    //* `baseWhere` (THE VISIBILITY GATE) IS COMPOSED VIA `AND`, NEVER
+    //* SPREAD-MERGED WITH THE CALLER'S FILTERS — SEE THE NOTE ABOVE
+    //* `findByIdPublic`. NO FILTER FIELD CAN EVER WIDEN VISIBILITY PAST
+    //* WHATEVER `baseWhere` REQUIRES.
     const where: Prisma.ProductWhereInput = {
-      ...baseWhere,
-      ...(filters.categoryIds?.length && {
-        categoryId: { in: filters.categoryIds },
-      }),
-      ...(filters.type && { type: filters.type }),
+      AND: [
+        baseWhere,
+        ...(filters.categoryIds?.length
+          ? [{ categoryId: { in: filters.categoryIds } }]
+          : []),
+        ...(filters.type ? [{ type: filters.type }] : []),
+      ],
     };
 
     return await this.paginationService.paginate<
@@ -166,6 +178,52 @@ export class ProductRepository extends BaseRepository {
       this.activeVisibilityWhere(),
       tx,
     );
+  }
+
+  /**
+   * Shared unpaginated storefront list — active products matching
+   * `extraWhere`, newest first, capped at `limit`. Used for the small,
+   * fixed-size sections a home/landing page needs (combos, featured,
+   * best-sellers) where full pagination metadata is unnecessary overhead.
+   */
+  private async findActiveProductsList(
+    extraWhere: Prisma.ProductWhereInput,
+    limit: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    //* AND-COMPOSED, NOT SPREAD-MERGED — SAME REASONING AS `findByIdPublic`.
+    return await client.product.findMany({
+      where: { AND: [this.activeVisibilityWhere(), extraWhere] },
+      select: PRODUCT_SELECT_PUBLIC,
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    });
+  }
+
+  /** Active COMBO products, newest first — for a "Combo Deals" home section. */
+  async findComboProducts(limit: number, tx?: Prisma.TransactionClient) {
+    return await this.findActiveProductsList(
+      { type: ProductType.COMBO },
+      limit,
+      tx,
+    );
+  }
+
+  /** Active products flagged `isFeatured`, newest first. */
+  async findFeaturedProducts(limit: number, tx?: Prisma.TransactionClient) {
+    return await this.findActiveProductsList({ isFeatured: true }, limit, tx);
+  }
+
+  /**
+   * "Best" products — no sales/order-volume ranking exists yet in this
+   * schema, so this is the same active-product pool as everything else,
+   * newest first. Swap the `orderBy` here for a real popularity metric
+   * (e.g. order-line aggregation) once that data is available; callers
+   * don't need to change.
+   */
+  async findBestProducts(limit: number, tx?: Prisma.TransactionClient) {
+    return await this.findActiveProductsList({}, limit, tx);
   }
 
   /** Lightweight id/name/variant list for select-input / dropdown UIs. */

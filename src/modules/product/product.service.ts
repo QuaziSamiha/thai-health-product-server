@@ -39,6 +39,11 @@ import type {
 
 const PRODUCT_IMAGE_FOLDER = 'products/gallery';
 
+//* DEFAULT SECTION SIZE FOR THE UNPAGINATED HOME-PAGE-STYLE LISTS
+//* (combo/featured/best) — CALLERS (E.G. A FUTURE home-content MODULE) MAY
+//* OVERRIDE PER SECTION.
+const DEFAULT_HOME_SECTION_LIMIT = 8;
+
 //* THE SLICE OF A STORED VARIANT THE RECONCILE LOGIC NEEDS — STRUCTURALLY
 //* SATISFIED BY THE ROWS `findByIdAdmin` ALREADY LOADS.
 interface ExistingVariantState {
@@ -155,6 +160,51 @@ export class ProductService {
         paginationParams,
         filters,
       ),
+    );
+  }
+
+  //* ═══════════════════════════════════════════════════════════════════════
+  //* HOME-PAGE-STYLE SECTIONS — small, unpaginated, fixed-size product
+  //* arrays for landing-page widgets. Not exposed via this module's own
+  //* controller: callers needing an HTTP surface (e.g. a home-content
+  //* module composing categories + these sections into one response) import
+  //* ProductModule and inject ProductService directly, which already
+  //* exports it.
+  //* ═══════════════════════════════════════════════════════════════════════
+
+  private toPublicDtoList(
+    rows: Awaited<ReturnType<ProductRepository['findBestProducts']>>,
+  ): ProductResponsePublicDto[] {
+    const baseUrl = this.configService.get<string>('app.baseUrl');
+    return rows.map(
+      (product) => new ProductResponsePublicDto(product, baseUrl),
+    );
+  }
+
+  /** Active COMBO products for a "Combo Deals" home section. */
+  async getComboProducts(
+    limit = DEFAULT_HOME_SECTION_LIMIT,
+  ): Promise<ProductResponsePublicDto[]> {
+    return this.toPublicDtoList(
+      await this.productRepository.findComboProducts(limit),
+    );
+  }
+
+  /** Active products flagged `isFeatured`. */
+  async getFeaturedProducts(
+    limit = DEFAULT_HOME_SECTION_LIMIT,
+  ): Promise<ProductResponsePublicDto[]> {
+    return this.toPublicDtoList(
+      await this.productRepository.findFeaturedProducts(limit),
+    );
+  }
+
+  /** "Best" products — see `findBestProducts` for the ranking caveat. */
+  async getBestProducts(
+    limit = DEFAULT_HOME_SECTION_LIMIT,
+  ): Promise<ProductResponsePublicDto[]> {
+    return this.toPublicDtoList(
+      await this.productRepository.findBestProducts(limit),
     );
   }
 
