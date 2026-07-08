@@ -13,6 +13,7 @@ import {
 import { Type, Transform } from 'class-transformer';
 import { DiscountType } from '../../../generated/prisma/enums';
 import { IsLessThanOrEqualTo } from '../../../common/decorators/validation/is-less-than-or-equal-to.decorator';
+import { emptyStringToUndefined } from '../../../common/utils/json-transform.util';
 
 export class CreateProductVariantDto {
   @ApiPropertyOptional({
@@ -114,6 +115,9 @@ export class CreateProductVariantDto {
     example: 'THP-RJ-60',
     maxLength: 100,
   })
+  //* sku IS A UNIQUE COLUMN — "" FROM A FORM MUST BECOME undefined OR THE
+  //* SECOND VARIANT EVER SAVED WITH AN EMPTY SKU 409s (P2002)
+  @Transform(({ value }) => emptyStringToUndefined(value))
   @IsOptional()
   @IsString({ message: 'SKU must be a valid text string' })
   @MaxLength(100, { message: 'SKU cannot exceed 100 characters' })
@@ -124,6 +128,7 @@ export class CreateProductVariantDto {
     example: '8850123457',
     maxLength: 100,
   })
+  @Transform(({ value }) => emptyStringToUndefined(value))
   @IsOptional()
   @IsString({ message: 'Barcode must be a valid text string' })
   @MaxLength(100, { message: 'Barcode cannot exceed 100 characters' })

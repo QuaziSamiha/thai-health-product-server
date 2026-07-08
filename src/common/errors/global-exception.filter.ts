@@ -23,7 +23,14 @@ function mapPrismaError(
   switch (exception.code) {
     case 'P2002': {
       const target = exception.meta?.target;
-      const fields = Array.isArray(target) ? target.join(', ') : 'field';
+      //* meta.target IS AN ARRAY OF COLUMN NAMES ON SOME PROVIDERS BUT A
+      //* SINGLE CONSTRAINT-NAME STRING (E.G. "product_variants_sku_key") ON
+      //* OTHERS — SURFACE BOTH SO THE 409 SAYS WHICH FIELD COLLIDED
+      const fields = Array.isArray(target)
+        ? target.join(', ')
+        : typeof target === 'string' && target
+          ? target
+          : 'field';
       return {
         statusCode: HttpStatus.CONFLICT,
         message: `A record with this ${fields} already exists`,

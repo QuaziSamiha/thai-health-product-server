@@ -25,6 +25,7 @@ import {
 import {
   tryParseJson,
   parseStringArrayInput,
+  emptyStringToUndefined,
 } from '../../../common/utils/json-transform.util';
 import { IsLessThanOrEqualTo } from '../../../common/decorators/validation/is-less-than-or-equal-to.decorator';
 import { CreateProductVariantDto } from './create-product-variant.dto';
@@ -140,6 +141,9 @@ export class CreateProductDto {
     example: 'COF-DRK-500',
     maxLength: 100,
   })
+  //* sku/barcode ARE UNIQUE COLUMNS — "" FROM A FORM MUST BECOME undefined
+  //* OR THE SECOND PRODUCT EVER SAVED WITH AN EMPTY VALUE 409s (P2002)
+  @Transform(({ value }) => emptyStringToUndefined(value))
   @IsOptional()
   @IsString({ message: 'SKU must be a valid text string' })
   @MaxLength(100, { message: 'SKU cannot exceed 100 characters' })
@@ -150,6 +154,7 @@ export class CreateProductDto {
     example: '8850123456',
     maxLength: 100,
   })
+  @Transform(({ value }) => emptyStringToUndefined(value))
   @IsOptional()
   @IsString({ message: 'Barcode must be a valid text string' })
   @MaxLength(100, { message: 'Barcode cannot exceed 100 characters' })
