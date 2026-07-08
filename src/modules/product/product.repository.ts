@@ -101,6 +101,10 @@ export class ProductRepository extends BaseRepository {
       typeof client.product
     >(client.product, params, {
       select: PRODUCT_SELECT_ADMIN,
+      //* SOFT-DELETED PRODUCTS STAY OUT OF THE ADMIN LIST — LEAVING THEM IN
+      //* SHOWS A DELETE BUTTON THAT CAN ONLY 409 ("Product is already
+      //* deleted"). MANUALLY ARCHIVED (NOT DELETED) PRODUCTS STILL APPEAR.
+      where: { deletedAt: null },
       searchableFields: ['name', 'slug', 'sku', 'nameTh'],
       defaultSortField: 'createdAt',
     });

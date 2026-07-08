@@ -245,11 +245,15 @@ export class CreateProductDto {
     example: 450.0,
     minimum: 0,
   })
-  //* PRICING LIVES ON THE VARIANTS FOR VARIABLE PRODUCTS — ONLY A SIMPLE
-  //* PRODUCT MUST CARRY ITS OWN BASE PRICE. STILL VALIDATED WHEN PROVIDED.
+  //* PRICING LIVES ON THE VARIANTS — WHEN ANY VARIANT IS SENT, THE SERVICE
+  //* DERIVES THE PRODUCT'S basePrice FROM THE DEFAULT VARIANT, SO A TOP-LEVEL
+  //* basePrice IS ONLY REQUIRED FOR A SIMPLE PRODUCT WITH NO VARIANTS.
+  //* STILL VALIDATED WHEN PROVIDED.
   @ValidateIf(
     (dto: CreateProductDto) =>
-      dto.type === ProductType.SIMPLE || dto.basePrice !== undefined,
+      dto.basePrice !== undefined ||
+      (dto.type === ProductType.SIMPLE &&
+        (!Array.isArray(dto.variants) || dto.variants.length === 0)),
   )
   @Type(() => Number)
   @IsNumber({}, { message: 'Base price must be a valid number' })
