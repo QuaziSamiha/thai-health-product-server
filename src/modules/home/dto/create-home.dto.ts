@@ -15,6 +15,7 @@ import {
   HomeContentStatus,
 } from '../../../generated/prisma/enums';
 import { trimString } from '../../../common/utils/json-transform.util';
+import { IsEmptyWhen } from '../../../common/decorators/validation/is-empty-when.decorator';
 
 export class CreateHomeDto {
   // ─── Identity ────────────────────────────────────────────────────────────────
@@ -105,15 +106,18 @@ export class CreateHomeDto {
     description:
       'Cover image, required for every content type (used as the video thumbnail for OVC). Stored at `imageUrl`.',
   })
-  //* NO class-validator DECORATORS ON PURPOSE — MULTER STRIPS FILES OUT OF THE
-  //* BODY BEFORE class-validator EVER SEES THIS PROPERTY (@UploadedFiles(),
-  //* NOT @Body(), IS WHAT ACTUALLY POPULATES IT). REQUIREDNESS IS ENFORCED
-  //* MANUALLY IN HomeService.createHome — DO NOT REMOVE THAT CHECK ASSUMING
-  //* THIS DTO ALREADY GUARDS IT.
+  //* @IsOptional() IS LOAD-BEARING, NOT DECORATIVE — WITH useDefineForClassFields
+  //* (IMPLIED BY tsconfig's target: ES2023), AN UNDECORATED CLASS FIELD STILL
+  //* BECOMES AN OWN `undefined` PROPERTY ON EVERY INSTANCE, WHICH whitelist +
+  //* forbidNonWhitelisted (main.ts) THEN REJECTS AS "property image should not
+  //* exist" — REGARDLESS OF WHAT MULTER DID WITH THE REQUEST. REQUIREDNESS IS
+  //* STILL ENFORCED MANUALLY IN HomeService.createHome, NOT HERE.
+  @IsOptional()
   image?: Express.Multer.File;
 
   @ApiPropertyOptional({
-    description: 'Video source URL. Required when type = OVC.',
+    description:
+      'Video source URL. Required when type = OVC; not allowed when type = HERO_SLIDER.',
     example: 'https://cdn.example.com/ovc/ad.mp4',
     maxLength: 512,
   })
@@ -125,6 +129,14 @@ export class CreateHomeDto {
   @IsNotEmpty({ message: 'Video URL is required for OVC content' })
   @IsString({ message: 'Video URL must be a valid text string' })
   @MaxLength(512, { message: 'Video URL cannot exceed 512 characters' })
+  //* videoUrl IS OVC-ONLY CONTENT — A HERO SLIDER MUST NEVER CARRY ONE. THIS
+  //* RUNS INSIDE THE SAME @ValidateIf GATE ABOVE, WHICH IS FINE: THAT GATE
+  //* OPENS WHENEVER videoUrl IS ACTUALLY PROVIDED, WHICH IS EXACTLY WHEN THIS
+  //* CHECK NEEDS TO FIRE. SEE UpdateHomeDto'S SERVICE-LAYER EQUIVALENT — `type`
+  //* IS IMMUTABLE ON UPDATE, SO THAT DIRECTION CAN'T BE VALIDATED HERE.
+  @IsEmptyWhen('type', HomeContentType.HERO_SLIDER, {
+    message: 'Video URL is not allowed for hero slider content',
+  })
   videoUrl?: string;
 
   @ApiPropertyOptional({

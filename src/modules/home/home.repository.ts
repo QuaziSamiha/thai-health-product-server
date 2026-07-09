@@ -56,6 +56,71 @@ export class HomeRepository extends BaseRepository {
     });
   }
 
+  // ─── Ordering ────────────────────────────────────────────────────────────────
+
+  /** Highest displayOrder currently used within `type`, or -1 if the type has no rows yet. */
+  async findMaxDisplayOrderByType(
+    type: HomeContentType,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    const result = await client.home.aggregate({
+      where: { type },
+      _max: { displayOrder: true },
+    });
+    return result._max.displayOrder ?? -1;
+  }
+
+  /**
+   * Pushes every row of `type` at or after `fromOrder` down by one slot, freeing
+   * `fromOrder` up for a row being inserted at that position. Scoped to `type`
+   * so inserting a hero slide never renumbers promotion banners/OVC rows.
+   */
+  async shiftDisplayOrders(
+    type: HomeContentType,
+    fromOrder: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    await client.home.updateMany({
+      where: { type, displayOrder: { gte: fromOrder } },
+      data: { displayOrder: { increment: 1 } },
+    });
+  }
+
+  /** Current displayOrder for a single row — read fresh inside a transaction to avoid a lost update on concurrent reorders. */
+  async findDisplayOrderById(id: number, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return client.home.findUnique({
+      where: { id },
+      select: { displayOrder: true },
+    });
+  }
+
+  /**
+   * Shifts every row of `type` whose displayOrder falls within [from, to]
+   * (inclusive) by `delta` (+1 or -1). `excludeId` skips the row being moved —
+   * its own displayOrder is set explicitly by the caller, not via this shift.
+   */
+  async shiftDisplayOrdersInRange(
+    type: HomeContentType,
+    from: number,
+    to: number,
+    delta: 1 | -1,
+    excludeId: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    await client.home.updateMany({
+      where: {
+        type,
+        id: { not: excludeId },
+        displayOrder: { gte: from, lte: to },
+      },
+      data: { displayOrder: { increment: delta } },
+    });
+  }
+
   // ─── Mutations ───────────────────────────────────────────────────────────────
 
   async createHome(

@@ -98,18 +98,18 @@ export class HomeResponseDto {
   @Expose()
   @ApiPropertyOptional({
     type: () => UserMinifiedResponseDto,
-    description: 'Admin who created this row',
+    description: 'Admin who created this row. null if unassigned/deleted.',
   })
   @Type(() => UserMinifiedResponseDto)
-  createdByUser?: UserMinifiedResponseDto | null;
+  createdByUser!: UserMinifiedResponseDto | null;
 
   @Expose()
   @ApiPropertyOptional({
     type: () => UserMinifiedResponseDto,
-    description: 'Admin who last updated this row',
+    description: 'Admin who last updated this row. null if unassigned/deleted.',
   })
   @Type(() => UserMinifiedResponseDto)
-  updatedByUser?: UserMinifiedResponseDto | null;
+  updatedByUser!: UserMinifiedResponseDto | null;
 
   constructor(
     home: Partial<HomeModel> & {
@@ -126,11 +126,10 @@ export class HomeResponseDto {
     this.bodyText = home.bodyText ?? undefined;
     this.headingTh = home.headingTh ?? undefined;
     this.bodyTextTh = home.bodyTextTh ?? undefined;
-    this.imageUrl = home.imageUrl
-      ? home.imageUrl.startsWith('http')
-        ? home.imageUrl
-        : `${baseUrl}${home.imageUrl}`
-      : home.imageUrl!;
+    //* imageUrl IS NOT NULL AT THE DB LAYER — NO FALSY BRANCH TO HANDLE HERE
+    this.imageUrl = home.imageUrl!.startsWith('http')
+      ? home.imageUrl!
+      : `${baseUrl}${home.imageUrl}`;
     this.videoUrl = home.videoUrl ?? undefined;
     this.redirectUrl = home.redirectUrl ?? undefined;
     this.displayOrder = home.displayOrder!;
@@ -221,11 +220,10 @@ export class HomeResponsePublicDto {
     this.bodyText = home.bodyText ?? undefined;
     this.headingTh = home.headingTh ?? undefined;
     this.bodyTextTh = home.bodyTextTh ?? undefined;
-    this.imageUrl = home.imageUrl
-      ? home.imageUrl.startsWith('http')
-        ? home.imageUrl
-        : `${baseUrl}${home.imageUrl}`
-      : home.imageUrl!;
+    //* imageUrl IS NOT NULL AT THE DB LAYER — NO FALSY BRANCH TO HANDLE HERE
+    this.imageUrl = home.imageUrl!.startsWith('http')
+      ? home.imageUrl!
+      : `${baseUrl}${home.imageUrl}`;
     this.videoUrl = home.videoUrl ?? undefined;
     this.redirectUrl = home.redirectUrl ?? undefined;
     this.displayOrder = home.displayOrder!;

@@ -16,8 +16,9 @@ import {
 } from './dto/home-response.dto';
 import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
 import type { IStorageService } from '../../shared/storage/interfaces/storage.interface';
-import { IPaginatedResult } from '../../shared/pagination';
+import { IPaginatedResult, PaginationQueryDto } from '../../shared/pagination';
 import { HomeContentType } from '../../generated/prisma/enums';
+import { Prisma } from '../../generated/prisma/client';
 
 const HOME_IMAGE_FOLDER = 'home/images';
 
@@ -58,19 +59,26 @@ export class HomeService {
     const imagePath = await this.uploadFile(image, HOME_IMAGE_FOLDER);
 
     try {
-      const newHome = await this.homeRepository.createHome({
-        type,
-        status,
-        heading,
-        bodyText,
-        headingTh,
-        bodyTextTh,
-        videoUrl,
-        redirectUrl,
-        displayOrder,
-        imageUrl: imagePath,
-        createdBy: userId,
-      });
+      //* ORDER RESOLUTION + INSERT RUN AS ONE TRANSACTION SO A CONCURRENT
+      //* CREATE CAN'T OBSERVE A PARTIALLY-SHIFTED displayOrder SEQUENCE
+      const newHome = await this.homeRepository.withTransaction((tx) =>
+        this.insertAtDisplayOrder(
+          {
+            type,
+            status,
+            heading,
+            bodyText,
+            headingTh,
+            bodyTextTh,
+            videoUrl,
+            redirectUrl,
+            imageUrl: imagePath,
+            createdBy: userId,
+          },
+          displayOrder,
+          tx,
+        ),
+      );
 
       return new HomeResponseDto(
         newHome,
@@ -82,12 +90,57 @@ export class HomeService {
     }
   }
 
+  /**
+   * Resolves the row's final displayOrder, scoped to its own `type`, then creates it:
+   * - No position requested  → appended after the current last row of this type.
+   * - Explicit position      → inserted there, pushing every later row of this
+   *   type down by one, so two rows of the same type never collide on displayOrder.
+   */
+  private async insertAtDisplayOrder(
+    data: Omit<Prisma.HomeUncheckedCreateInput, 'displayOrder'>,
+    requestedOrder: number | undefined,
+    tx: Prisma.TransactionClient,
+  ) {
+    let targetOrder = requestedOrder;
+    if (targetOrder === undefined) {
+      targetOrder =
+        (await this.homeRepository.findMaxDisplayOrderByType(data.type, tx)) +
+        1;
+    } else {
+      await this.homeRepository.shiftDisplayOrders(data.type, targetOrder, tx);
+    }
+
+    return this.homeRepository.createHome(
+      { ...data, displayOrder: targetOrder },
+      tx,
+    );
+  }
+
   async getAllHomeContents(
     params: HomeQueryDto,
   ): Promise<IPaginatedResult<HomeResponseDto>> {
     const { type, ...paginationParams } = params;
+    return this.getHomeContentsByType(paginationParams, type);
+  }
+
+  async getHeroSliderContents(
+    params: PaginationQueryDto,
+  ): Promise<IPaginatedResult<HomeResponseDto>> {
+    return this.getHomeContentsByType(params, HomeContentType.HERO_SLIDER);
+  }
+
+  async getPromotionBannerContents(
+    params: PaginationQueryDto,
+  ): Promise<IPaginatedResult<HomeResponseDto>> {
+    return this.getHomeContentsByType(params, HomeContentType.PROMOTION_BANNER);
+  }
+
+  private async getHomeContentsByType(
+    params: PaginationQueryDto,
+    type?: HomeContentType,
+  ): Promise<IPaginatedResult<HomeResponseDto>> {
     const paginatedHomeContents = await this.homeRepository.findAllAdmin(
-      paginationParams,
+      params,
       type,
     );
 
@@ -120,6 +173,7 @@ export class HomeService {
     if (!home) {
       throw new NotFoundException(`Home content with ID ${id} not found`);
     }
+    this.assertVideoUrlAllowed(home.type, updateHomeDto.videoUrl);
 
     const {
       status,
@@ -149,7 +203,6 @@ export class HomeService {
       bodyTextTh,
       videoUrl,
       redirectUrl,
-      displayOrder,
     };
 
     if (image) {
@@ -159,11 +212,79 @@ export class HomeService {
       }
     }
 
-    const updatedHome = await this.homeRepository.updateHome(id, updateData);
+    //* REORDER + UPDATE RUN AS ONE TRANSACTION SO A CONCURRENT REORDER ON THE
+    //* SAME type CAN'T INTERLEAVE WITH THIS ROW'S SHIFT AND PRODUCE A COLLISION
+    const updatedHome = await this.homeRepository.withTransaction(
+      async (tx) => {
+        if (displayOrder !== undefined) {
+          updateData.displayOrder = await this.moveDisplayOrder(
+            id,
+            home.type,
+            displayOrder,
+            tx,
+          );
+        }
+        return this.homeRepository.updateHome(id, updateData, tx);
+      },
+    );
+
     return new HomeResponseDto(
       updatedHome,
       this.configService.get<string>('app.baseUrl'),
     );
+  }
+
+  /**
+   * Moves a row to `requestedOrder` within its own `type`, shifting every row
+   * between the old and new position by one slot so the sequence stays dense —
+   * no gaps, no collisions. `requestedOrder` is clamped to the last valid
+   * position for the type (can't move past the end, that would leave a gap).
+   * Re-reads the row's current position inside the transaction rather than
+   * trusting a value captured before it started, so a concurrent reorder on
+   * the same type can't produce a lost update.
+   */
+  private async moveDisplayOrder(
+    id: number,
+    type: HomeContentType,
+    requestedOrder: number,
+    tx: Prisma.TransactionClient,
+  ): Promise<number> {
+    const [current, maxOrder] = await Promise.all([
+      this.homeRepository.findDisplayOrderById(id, tx),
+      this.homeRepository.findMaxDisplayOrderByType(type, tx),
+    ]);
+    const currentOrder = current?.displayOrder ?? 0;
+    const targetOrder = Math.min(Math.max(requestedOrder, 0), maxOrder);
+
+    if (targetOrder === currentOrder) {
+      return currentOrder;
+    }
+
+    if (targetOrder < currentOrder) {
+      //* MOVING EARLIER — EVERYTHING FROM targetOrder UP TO (BUT NOT INCLUDING) THE
+      //* ROW'S OLD POSITION SHIFTS ONE SLOT LATER TO MAKE ROOM
+      await this.homeRepository.shiftDisplayOrdersInRange(
+        type,
+        targetOrder,
+        currentOrder - 1,
+        1,
+        id,
+        tx,
+      );
+    } else {
+      //* MOVING LATER — EVERYTHING BETWEEN THE ROW'S OLD POSITION AND ITS NEW
+      //* ONE SHIFTS ONE SLOT EARLIER TO CLOSE THE GAP LEFT BEHIND
+      await this.homeRepository.shiftDisplayOrdersInRange(
+        type,
+        currentOrder + 1,
+        targetOrder,
+        -1,
+        id,
+        tx,
+      );
+    }
+
+    return targetOrder;
   }
 
   async deleteHome(id: number): Promise<void> {
@@ -174,6 +295,24 @@ export class HomeService {
     await this.homeRepository.deleteHome(id);
     if (home.imageUrl) {
       await this.deleteFile(home.imageUrl, HOME_IMAGE_FOLDER);
+    }
+  }
+
+  /**
+   * videoUrl is OVC-only content — a hero slider must never carry one.
+   * CreateHomeDto enforces this at the DTO layer via @IsEmptyWhen since `type`
+   * is part of that payload; `type` is immutable on update (omitted from
+   * UpdateHomeDto by design), so this direction can only be checked here,
+   * against the row's actual stored type.
+   */
+  private assertVideoUrlAllowed(
+    type: HomeContentType,
+    videoUrl: string | undefined,
+  ): void {
+    if (type === HomeContentType.HERO_SLIDER && videoUrl) {
+      throw new BadRequestException(
+        'Video URL is not allowed for hero slider content',
+      );
     }
   }
 
