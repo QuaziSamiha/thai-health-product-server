@@ -65,6 +65,11 @@ export type ComboItem = Prisma.ComboItemModel
  */
 export type ComboImage = Prisma.ComboImageModel
 /**
+ * Model Home
+ * 
+ */
+export type Home = Prisma.HomeModel
+/**
  * Model Batch
  * 
  */

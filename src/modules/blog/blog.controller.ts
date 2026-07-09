@@ -108,6 +108,21 @@ export class BlogController {
     return this.blogService.getAllBlogs(paginationParams);
   }
 
+  @Get('published-blogs')
+  @ApiOperation({
+    summary: 'Get all published blog posts (paginated) (Public)',
+    description:
+      'Returns PUBLISHED blog posts with pagination support, most recently published first.',
+  })
+  @ApiPaginatedResponse(
+    BlogResponsePublicDto,
+    'Published blog posts retrieved successfully.',
+  )
+  @ResponseMessage('Published blog posts retrieved successfully')
+  async getAllPublishedBlogs(@Query() paginationParams: PaginationQueryDto) {
+    return await this.blogService.getAllPublishedBlogs(paginationParams);
+  }
+
   @Get('blog-by-slug/:slug')
   @ApiOperation({
     summary: 'Get blog post by slug (Public)',

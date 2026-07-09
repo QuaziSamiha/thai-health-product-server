@@ -1,0 +1,57 @@
+//* ============= HOME / LANDING PAGE DOMAIN =============
+//* SINGLE POLYMORPHIC MODEL FOR ALL STOREFRONT HOMEPAGE CONTENT (HERO SLIDER, PROMOTION
+//* BANNER, OVC). `type` DRIVES WHICH OPTIONAL FIELDS ARE IN USE FOR A GIVEN ROW — E.G.
+//* PROMOTION_BANNER ROWS TYPICALLY LEAVE heading/bodyText NULL. PER-TYPE REQUIRED-FIELD
+//* VALIDATION IS ENFORCED IN THE SERVICE LAYER, NOT THE DB SCHEMA
+
+enum HomeContentStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum HomeContentType {
+  PROMOTION_BANNER
+  HERO_SLIDER
+  OVC //* Online Video Commercial (Web/Social Media)
+}
+
+model Home {
+  id     Int               @id @default(autoincrement())
+  sid    String            @unique @default(uuid()) @db.Uuid //* Use native UUID type for performance
+  type   HomeContentType
+  status HomeContentStatus @default(ACTIVE)
+
+  //* PRIMARY CONTENT (ENGLISH) — OPTIONAL: ONLY HERO_SLIDER USES THESE
+  heading  String? @db.VarChar(255)
+  bodyText String? @db.Text
+
+  //* SECONDARY CONTENT (THAI DISPLAY ONLY)
+  headingTh  String? @db.VarChar(255)
+  bodyTextTh String? @db.Text
+
+  //* IMAGE
+  imageUrl String @db.VarChar(512)
+
+  //* VIDEO (OVC ONLY)
+  videoUrl String? @db.VarChar(512)
+
+  //* CLICK-THROUGH TARGET (E.G. "SHOP NOW" / "LEARN MORE")
+  redirectUrl String? @db.VarChar(512)
+
+  //* UI ORDERING
+  displayOrder Int @default(0)
+
+  //* AUDIT TRAIL & TIMESTAMPS
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //* RELATIONS
+  createdBy     Int?
+  createdByUser User? @relation("HomeCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedBy     Int?
+  updatedByUser User? @relation("HomeUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  //* INDEXING STRATEGY
+  @@index([type, status, displayOrder]) //* FAST FETCHING OF ACTIVE ROWS PER SECTION, IN ORDER
+  @@map("home_content")
+}

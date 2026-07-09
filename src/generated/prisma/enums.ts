@@ -18,6 +18,23 @@ export const BlogStatus = {
 export type BlogStatus = (typeof BlogStatus)[keyof typeof BlogStatus]
 
 
+export const HomeContentStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE'
+} as const
+
+export type HomeContentStatus = (typeof HomeContentStatus)[keyof typeof HomeContentStatus]
+
+
+export const HomeContentType = {
+  PROMOTION_BANNER: 'PROMOTION_BANNER',
+  HERO_SLIDER: 'HERO_SLIDER',
+  OVC: 'OVC'
+} as const
+
+export type HomeContentType = (typeof HomeContentType)[keyof typeof HomeContentType]
+
+
 export const InventoryExchangeType = {
   ADD: 'ADD',
   RESTOCK: 'RESTOCK',

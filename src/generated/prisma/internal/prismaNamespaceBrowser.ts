@@ -56,6 +56,7 @@ export const ModelName = {
   ComboProduct: 'ComboProduct',
   ComboItem: 'ComboItem',
   ComboImage: 'ComboImage',
+  Home: 'Home',
   Batch: 'Batch',
   Inventory: 'Inventory',
   Product: 'Product',
@@ -190,6 +191,28 @@ export const ComboImageScalarFieldEnum = {
 } as const
 
 export type ComboImageScalarFieldEnum = (typeof ComboImageScalarFieldEnum)[keyof typeof ComboImageScalarFieldEnum]
+
+
+export const HomeScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  type: 'type',
+  status: 'status',
+  heading: 'heading',
+  bodyText: 'bodyText',
+  headingTh: 'headingTh',
+  bodyTextTh: 'bodyTextTh',
+  imageUrl: 'imageUrl',
+  videoUrl: 'videoUrl',
+  redirectUrl: 'redirectUrl',
+  displayOrder: 'displayOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy'
+} as const
+
+export type HomeScalarFieldEnum = (typeof HomeScalarFieldEnum)[keyof typeof HomeScalarFieldEnum]
 
 
 export const BatchScalarFieldEnum = {

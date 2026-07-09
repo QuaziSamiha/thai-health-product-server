@@ -20,6 +20,14 @@ export function emptyStringToUndefined(value: unknown): unknown {
   return typeof value === 'string' && value.trim() === '' ? undefined : value;
 }
 
+//* TRIMS SURROUNDING WHITESPACE BEFORE VALIDATION RUNS, SO @IsNotEmpty
+//* CORRECTLY REJECTS A WHITESPACE-ONLY SUBMISSION (E.G. "   ") INSTEAD OF
+//* LETTING IT THROUGH AS "VALID". NON-STRING INPUT PASSES THROUGH
+//* UNCHANGED SO @IsString CAN STILL REJECT IT.
+export function trimString(value: unknown): unknown {
+  return typeof value === 'string' ? value.trim() : value;
+}
+
 //* FORGIVING PARSER FOR STRING-ARRAY FIELDS (E.G. TAGS) IN multipart
 //* FORMS. ACCEPTS A REAL ARRAY, A JSON-ENCODED ARRAY STRING, OR A
 //* PLAIN/COMMA-SEPARATED STRING ("coffee, organic" → ['coffee','organic']).

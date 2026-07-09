@@ -17,6 +17,7 @@ import { generateSlug } from '../../common/utils/slug.util';
 import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
 import type { IStorageService } from '../../shared/storage/interfaces/storage.interface';
 import { PaginationQueryDto, IPaginatedResult } from '../../shared/pagination';
+import { BlogStatus } from '../../generated/prisma/enums';
 
 const BLOG_IMAGE_FOLDER = 'blogs/images';
 
@@ -60,6 +61,7 @@ export class BlogService {
         slug,
         authorId,
         ...(imagePath && { imageUrl: imagePath }),
+        publishedAt: status === BlogStatus.PUBLISHED ? new Date() : null,
       });
 
       return new BlogResponseDto(
@@ -84,6 +86,24 @@ export class BlogService {
       data: paginatedBlogs.data.map(
         (blog) =>
           new BlogResponseDto(
+            blog,
+            this.configService.get<string>('app.baseUrl'),
+          ),
+      ),
+    };
+  }
+
+  async getAllPublishedBlogs(
+    params: PaginationQueryDto,
+  ): Promise<IPaginatedResult<BlogResponsePublicDto>> {
+    const paginatedBlogs =
+      await this.blogRepository.findAllPublishedBlogs(params);
+
+    return {
+      ...paginatedBlogs,
+      data: paginatedBlogs.data.map(
+        (blog) =>
+          new BlogResponsePublicDto(
             blog,
             this.configService.get<string>('app.baseUrl'),
           ),
@@ -123,6 +143,7 @@ export class BlogService {
       metaDescription?: string;
       slug?: string;
       imageUrl?: string;
+      publishedAt?: Date | null;
     } = { title, content, status, blogCategory, metaTitle, metaDescription };
 
     if (updateBlogDto.title && updateBlogDto.title !== blog.title) {
@@ -132,6 +153,14 @@ export class BlogService {
         throw new ConflictException('New title results in a duplicate slug');
       }
       updateData.slug = newSlug;
+    }
+
+    //* STAMP/CLEAR publishedAt ONLY ON AN ACTUAL STATUS TRANSITION — RE-SAVING
+    //* AN ALREADY-PUBLISHED POST MUST NOT RESET ITS ORIGINAL PUBLISH TIME
+    if (status === BlogStatus.PUBLISHED && blog.status !== BlogStatus.PUBLISHED) {
+      updateData.publishedAt = new Date();
+    } else if (status && status !== BlogStatus.PUBLISHED) {
+      updateData.publishedAt = null;
     }
 
     if (image) {

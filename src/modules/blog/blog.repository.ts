@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { BaseRepository } from '../../prisma/base.repository';
-import { Prisma } from '../../generated/prisma/client';
+import { Prisma, BlogStatus } from '../../generated/prisma/client';
 import { PaginationService, PaginationQueryDto } from '../../shared/pagination';
 import {
   BLOG_SELECT_ADMIN,
@@ -59,6 +59,22 @@ export class BlogRepository extends BaseRepository {
       select: BLOG_SELECT_ADMIN,
       searchableFields: ['title', 'slug'],
       defaultSortField: 'createdAt',
+    });
+  }
+
+  async findAllPublishedBlogs(
+    params: PaginationQueryDto,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return await this.paginationService.paginate<
+      Prisma.BlogGetPayload<{ select: typeof BLOG_SELECT_PUBLIC }>,
+      typeof client.blog
+    >(client.blog, params, {
+      where: { status: BlogStatus.PUBLISHED },
+      select: BLOG_SELECT_PUBLIC,
+      searchableFields: ['title', 'slug'],
+      defaultSortField: 'publishedAt',
     });
   }
 

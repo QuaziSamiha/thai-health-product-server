@@ -285,6 +285,8 @@ export type UserWhereInput = {
   createdCombos?: Prisma.ComboProductListRelationFilter
   updatedCombos?: Prisma.ComboProductListRelationFilter
   blogs?: Prisma.BlogListRelationFilter
+  createdHomeContents?: Prisma.HomeListRelationFilter
+  updatedHomeContents?: Prisma.HomeListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -313,6 +315,8 @@ export type UserOrderByWithRelationInput = {
   createdCombos?: Prisma.ComboProductOrderByRelationAggregateInput
   updatedCombos?: Prisma.ComboProductOrderByRelationAggregateInput
   blogs?: Prisma.BlogOrderByRelationAggregateInput
+  createdHomeContents?: Prisma.HomeOrderByRelationAggregateInput
+  updatedHomeContents?: Prisma.HomeOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -344,6 +348,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   createdCombos?: Prisma.ComboProductListRelationFilter
   updatedCombos?: Prisma.ComboProductListRelationFilter
   blogs?: Prisma.BlogListRelationFilter
+  createdHomeContents?: Prisma.HomeListRelationFilter
+  updatedHomeContents?: Prisma.HomeListRelationFilter
 }, "id" | "sid" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -409,6 +415,8 @@ export type UserCreateInput = {
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -437,6 +445,8 @@ export type UserUncheckedCreateInput = {
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUpdateInput = {
@@ -464,6 +474,8 @@ export type UserUpdateInput = {
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -492,6 +504,8 @@ export type UserUncheckedUpdateInput = {
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -681,6 +695,38 @@ export type UserUpdateOneWithoutUpdatedCombosNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUpdatedCombosInput, Prisma.UserUpdateWithoutUpdatedCombosInput>, Prisma.UserUncheckedUpdateWithoutUpdatedCombosInput>
 }
 
+export type UserCreateNestedOneWithoutCreatedHomeContentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedHomeContentsInput, Prisma.UserUncheckedCreateWithoutCreatedHomeContentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedHomeContentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutUpdatedHomeContentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedHomeContentsInput, Prisma.UserUncheckedCreateWithoutUpdatedHomeContentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedHomeContentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutCreatedHomeContentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedHomeContentsInput, Prisma.UserUncheckedCreateWithoutCreatedHomeContentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedHomeContentsInput
+  upsert?: Prisma.UserUpsertWithoutCreatedHomeContentsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedHomeContentsInput, Prisma.UserUpdateWithoutCreatedHomeContentsInput>, Prisma.UserUncheckedUpdateWithoutCreatedHomeContentsInput>
+}
+
+export type UserUpdateOneWithoutUpdatedHomeContentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedHomeContentsInput, Prisma.UserUncheckedCreateWithoutUpdatedHomeContentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedHomeContentsInput
+  upsert?: Prisma.UserUpsertWithoutUpdatedHomeContentsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUpdatedHomeContentsInput, Prisma.UserUpdateWithoutUpdatedHomeContentsInput>, Prisma.UserUncheckedUpdateWithoutUpdatedHomeContentsInput>
+}
+
 export type UserCreateNestedOneWithoutInventoriesInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutInventoriesInput, Prisma.UserUncheckedCreateWithoutInventoriesInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutInventoriesInput
@@ -839,6 +885,8 @@ export type UserCreateWithoutBlogsInput = {
   inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutBlogsInput = {
@@ -866,6 +914,8 @@ export type UserUncheckedCreateWithoutBlogsInput = {
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutBlogsInput = {
@@ -908,6 +958,8 @@ export type UserUpdateWithoutBlogsInput = {
   inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBlogsInput = {
@@ -935,6 +987,8 @@ export type UserUncheckedUpdateWithoutBlogsInput = {
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutCreatedCategoriesInput = {
@@ -961,6 +1015,8 @@ export type UserCreateWithoutCreatedCategoriesInput = {
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedCategoriesInput = {
@@ -988,6 +1044,8 @@ export type UserUncheckedCreateWithoutCreatedCategoriesInput = {
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedCategoriesInput = {
@@ -1019,6 +1077,8 @@ export type UserCreateWithoutUpdatedCategoriesInput = {
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedCategoriesInput = {
@@ -1046,6 +1106,8 @@ export type UserUncheckedCreateWithoutUpdatedCategoriesInput = {
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedCategoriesInput = {
@@ -1088,6 +1150,8 @@ export type UserUpdateWithoutCreatedCategoriesInput = {
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedCategoriesInput = {
@@ -1115,6 +1179,8 @@ export type UserUncheckedUpdateWithoutCreatedCategoriesInput = {
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutUpdatedCategoriesInput = {
@@ -1152,6 +1218,8 @@ export type UserUpdateWithoutUpdatedCategoriesInput = {
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedCategoriesInput = {
@@ -1179,6 +1247,8 @@ export type UserUncheckedUpdateWithoutUpdatedCategoriesInput = {
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutCreatedCombosInput = {
@@ -1205,6 +1275,8 @@ export type UserCreateWithoutCreatedCombosInput = {
   inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedCombosInput = {
@@ -1232,6 +1304,8 @@ export type UserUncheckedCreateWithoutCreatedCombosInput = {
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedCombosInput = {
@@ -1263,6 +1337,8 @@ export type UserCreateWithoutUpdatedCombosInput = {
   inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedCombosInput = {
@@ -1290,6 +1366,8 @@ export type UserUncheckedCreateWithoutUpdatedCombosInput = {
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedCombosInput = {
@@ -1332,6 +1410,8 @@ export type UserUpdateWithoutCreatedCombosInput = {
   inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedCombosInput = {
@@ -1359,6 +1439,8 @@ export type UserUncheckedUpdateWithoutCreatedCombosInput = {
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutUpdatedCombosInput = {
@@ -1396,6 +1478,8 @@ export type UserUpdateWithoutUpdatedCombosInput = {
   inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedCombosInput = {
@@ -1423,6 +1507,268 @@ export type UserUncheckedUpdateWithoutUpdatedCombosInput = {
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserCreateWithoutCreatedHomeContentsInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutCreatedHomeContentsInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutCreatedHomeContentsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedHomeContentsInput, Prisma.UserUncheckedCreateWithoutCreatedHomeContentsInput>
+}
+
+export type UserCreateWithoutUpdatedHomeContentsInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutUpdatedHomeContentsInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutUpdatedHomeContentsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedHomeContentsInput, Prisma.UserUncheckedCreateWithoutUpdatedHomeContentsInput>
+}
+
+export type UserUpsertWithoutCreatedHomeContentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedHomeContentsInput, Prisma.UserUncheckedUpdateWithoutCreatedHomeContentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedHomeContentsInput, Prisma.UserUncheckedCreateWithoutCreatedHomeContentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCreatedHomeContentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedHomeContentsInput, Prisma.UserUncheckedUpdateWithoutCreatedHomeContentsInput>
+}
+
+export type UserUpdateWithoutCreatedHomeContentsInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCreatedHomeContentsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUpsertWithoutUpdatedHomeContentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedHomeContentsInput, Prisma.UserUncheckedUpdateWithoutUpdatedHomeContentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedHomeContentsInput, Prisma.UserUncheckedCreateWithoutUpdatedHomeContentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutUpdatedHomeContentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedHomeContentsInput, Prisma.UserUncheckedUpdateWithoutUpdatedHomeContentsInput>
+}
+
+export type UserUpdateWithoutUpdatedHomeContentsInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutUpdatedHomeContentsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
 }
 
 export type UserCreateWithoutInventoriesInput = {
@@ -1449,6 +1795,8 @@ export type UserCreateWithoutInventoriesInput = {
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutInventoriesInput = {
@@ -1476,6 +1824,8 @@ export type UserUncheckedCreateWithoutInventoriesInput = {
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutInventoriesInput = {
@@ -1518,6 +1868,8 @@ export type UserUpdateWithoutInventoriesInput = {
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInventoriesInput = {
@@ -1545,6 +1897,8 @@ export type UserUncheckedUpdateWithoutInventoriesInput = {
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutCreatedProductsInput = {
@@ -1571,6 +1925,8 @@ export type UserCreateWithoutCreatedProductsInput = {
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedProductsInput = {
@@ -1598,6 +1954,8 @@ export type UserUncheckedCreateWithoutCreatedProductsInput = {
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedProductsInput = {
@@ -1629,6 +1987,8 @@ export type UserCreateWithoutUpdatedProductsInput = {
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedProductsInput = {
@@ -1656,6 +2016,8 @@ export type UserUncheckedCreateWithoutUpdatedProductsInput = {
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedProductsInput = {
@@ -1687,6 +2049,8 @@ export type UserCreateWithoutDeletedProductsInput = {
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutDeletedProductsInput = {
@@ -1714,6 +2078,8 @@ export type UserUncheckedCreateWithoutDeletedProductsInput = {
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutDeletedProductsInput = {
@@ -1756,6 +2122,8 @@ export type UserUpdateWithoutCreatedProductsInput = {
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedProductsInput = {
@@ -1783,6 +2151,8 @@ export type UserUncheckedUpdateWithoutCreatedProductsInput = {
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutUpdatedProductsInput = {
@@ -1820,6 +2190,8 @@ export type UserUpdateWithoutUpdatedProductsInput = {
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedProductsInput = {
@@ -1847,6 +2219,8 @@ export type UserUncheckedUpdateWithoutUpdatedProductsInput = {
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutDeletedProductsInput = {
@@ -1884,6 +2258,8 @@ export type UserUpdateWithoutDeletedProductsInput = {
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeletedProductsInput = {
@@ -1911,6 +2287,8 @@ export type UserUncheckedUpdateWithoutDeletedProductsInput = {
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutProfileInput = {
@@ -1937,6 +2315,8 @@ export type UserCreateWithoutProfileInput = {
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutProfileInput = {
@@ -1964,6 +2344,8 @@ export type UserUncheckedCreateWithoutProfileInput = {
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutProfileInput = {
@@ -2006,6 +2388,8 @@ export type UserUpdateWithoutProfileInput = {
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProfileInput = {
@@ -2033,6 +2417,8 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutSecurityInput = {
@@ -2059,6 +2445,8 @@ export type UserCreateWithoutSecurityInput = {
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutSecurityInput = {
@@ -2086,6 +2474,8 @@ export type UserUncheckedCreateWithoutSecurityInput = {
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutSecurityInput = {
@@ -2128,6 +2518,8 @@ export type UserUpdateWithoutSecurityInput = {
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSecurityInput = {
@@ -2155,6 +2547,8 @@ export type UserUncheckedUpdateWithoutSecurityInput = {
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -2181,6 +2575,8 @@ export type UserCreateWithoutSessionsInput = {
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -2208,6 +2604,8 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -2250,6 +2648,8 @@ export type UserUpdateWithoutSessionsInput = {
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -2277,6 +2677,8 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutOtpsInput = {
@@ -2303,6 +2705,8 @@ export type UserCreateWithoutOtpsInput = {
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutOtpsInput = {
@@ -2330,6 +2734,8 @@ export type UserUncheckedCreateWithoutOtpsInput = {
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutOtpsInput = {
@@ -2372,6 +2778,8 @@ export type UserUpdateWithoutOtpsInput = {
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOtpsInput = {
@@ -2399,6 +2807,8 @@ export type UserUncheckedUpdateWithoutOtpsInput = {
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 
@@ -2418,6 +2828,8 @@ export type UserCountOutputType = {
   createdCombos: number
   updatedCombos: number
   blogs: number
+  createdHomeContents: number
+  updatedHomeContents: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2432,6 +2844,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   createdCombos?: boolean | UserCountOutputTypeCountCreatedCombosArgs
   updatedCombos?: boolean | UserCountOutputTypeCountUpdatedCombosArgs
   blogs?: boolean | UserCountOutputTypeCountBlogsArgs
+  createdHomeContents?: boolean | UserCountOutputTypeCountCreatedHomeContentsArgs
+  updatedHomeContents?: boolean | UserCountOutputTypeCountUpdatedHomeContentsArgs
 }
 
 /**
@@ -2521,6 +2935,20 @@ export type UserCountOutputTypeCountBlogsArgs<ExtArgs extends runtime.Types.Exte
   where?: Prisma.BlogWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCreatedHomeContentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.HomeWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountUpdatedHomeContentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.HomeWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2548,6 +2976,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdCombos?: boolean | Prisma.User$createdCombosArgs<ExtArgs>
   updatedCombos?: boolean | Prisma.User$updatedCombosArgs<ExtArgs>
   blogs?: boolean | Prisma.User$blogsArgs<ExtArgs>
+  createdHomeContents?: boolean | Prisma.User$createdHomeContentsArgs<ExtArgs>
+  updatedHomeContents?: boolean | Prisma.User$updatedHomeContentsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -2611,6 +3041,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   createdCombos?: boolean | Prisma.User$createdCombosArgs<ExtArgs>
   updatedCombos?: boolean | Prisma.User$updatedCombosArgs<ExtArgs>
   blogs?: boolean | Prisma.User$blogsArgs<ExtArgs>
+  createdHomeContents?: boolean | Prisma.User$createdHomeContentsArgs<ExtArgs>
+  updatedHomeContents?: boolean | Prisma.User$updatedHomeContentsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2632,6 +3064,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     createdCombos: Prisma.$ComboProductPayload<ExtArgs>[]
     updatedCombos: Prisma.$ComboProductPayload<ExtArgs>[]
     blogs: Prisma.$BlogPayload<ExtArgs>[]
+    createdHomeContents: Prisma.$HomePayload<ExtArgs>[]
+    updatedHomeContents: Prisma.$HomePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -3053,6 +3487,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   createdCombos<T extends Prisma.User$createdCombosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdCombosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComboProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   updatedCombos<T extends Prisma.User$updatedCombosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$updatedCombosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComboProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   blogs<T extends Prisma.User$blogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$blogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BlogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  createdHomeContents<T extends Prisma.User$createdHomeContentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdHomeContentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HomePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  updatedHomeContents<T extends Prisma.User$updatedHomeContentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$updatedHomeContentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HomePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3786,6 +4222,54 @@ export type User$blogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
   take?: number
   skip?: number
   distinct?: Prisma.BlogScalarFieldEnum | Prisma.BlogScalarFieldEnum[]
+}
+
+/**
+ * User.createdHomeContents
+ */
+export type User$createdHomeContentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Home
+   */
+  select?: Prisma.HomeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Home
+   */
+  omit?: Prisma.HomeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.HomeInclude<ExtArgs> | null
+  where?: Prisma.HomeWhereInput
+  orderBy?: Prisma.HomeOrderByWithRelationInput | Prisma.HomeOrderByWithRelationInput[]
+  cursor?: Prisma.HomeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.HomeScalarFieldEnum | Prisma.HomeScalarFieldEnum[]
+}
+
+/**
+ * User.updatedHomeContents
+ */
+export type User$updatedHomeContentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Home
+   */
+  select?: Prisma.HomeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Home
+   */
+  omit?: Prisma.HomeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.HomeInclude<ExtArgs> | null
+  where?: Prisma.HomeWhereInput
+  orderBy?: Prisma.HomeOrderByWithRelationInput | Prisma.HomeOrderByWithRelationInput[]
+  cursor?: Prisma.HomeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.HomeScalarFieldEnum | Prisma.HomeScalarFieldEnum[]
 }
 
 /**
