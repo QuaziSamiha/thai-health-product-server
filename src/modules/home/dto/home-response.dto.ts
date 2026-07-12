@@ -7,6 +7,8 @@ import {
 import { HomeModel } from '../../../generated/prisma/models';
 import { UserMinifiedResponseDto } from '../../user/dto/user-response.dto';
 import type { MinifiedUser } from '../../user/dto/user-response.dto';
+import { CategoryHomeResponseDto } from '../../category/dto/category-response.dto';
+import { ProductResponsePublicDto } from '../../product/dto/product-response.dto';
 
 export class HomeResponseDto {
   @Expose()
@@ -227,5 +229,82 @@ export class HomeResponsePublicDto {
     this.videoUrl = home.videoUrl ?? undefined;
     this.redirectUrl = home.redirectUrl ?? undefined;
     this.displayOrder = home.displayOrder!;
+  }
+}
+
+//* ═══════════════════════════════════════════════════════════════════════
+//* FEATURED RESPONSE — everything the public storefront homepage needs in
+//* one call: the two "above the fold" slots (lowest-displayOrder ACTIVE hero
+//* slider / promotion banner, either null if that type has no ACTIVE row),
+//* the root category list, and three product sections. Composed from
+//* CategoryService/ProductService — home.service.ts never queries their
+//* tables directly.
+//* ═══════════════════════════════════════════════════════════════════════
+
+export class FeaturedHomeContentsResponseDto {
+  @Expose()
+  @ApiPropertyOptional({
+    type: () => HomeResponsePublicDto,
+    description:
+      'The ACTIVE hero slider with the lowest displayOrder. null if no hero slider is ACTIVE.',
+  })
+  @Type(() => HomeResponsePublicDto)
+  heroSlider!: HomeResponsePublicDto | null;
+
+  @Expose()
+  @ApiPropertyOptional({
+    type: () => HomeResponsePublicDto,
+    description:
+      'The ACTIVE promotion banner with the lowest displayOrder. null if no promotion banner is ACTIVE.',
+  })
+  @Type(() => HomeResponsePublicDto)
+  promotionBanner!: HomeResponsePublicDto | null;
+
+  @Expose()
+  @ApiProperty({
+    type: () => [CategoryHomeResponseDto],
+    description: 'Every ACTIVE root category, for a "shop by category" widget.',
+  })
+  @Type(() => CategoryHomeResponseDto)
+  categories!: CategoryHomeResponseDto[];
+
+  @Expose()
+  @ApiProperty({
+    type: () => [ProductResponsePublicDto],
+    description: 'Active products of type COMBO, for a "Combo Deals" section.',
+  })
+  @Type(() => ProductResponsePublicDto)
+  comboProducts!: ProductResponsePublicDto[];
+
+  @Expose()
+  @ApiProperty({
+    type: () => [ProductResponsePublicDto],
+    description: 'Active products flagged isFeatured.',
+  })
+  @Type(() => ProductResponsePublicDto)
+  featuredProducts!: ProductResponsePublicDto[];
+
+  @Expose()
+  @ApiProperty({
+    type: () => [ProductResponsePublicDto],
+    description: 'Active products NOT flagged isFeatured — the general product grid.',
+  })
+  @Type(() => ProductResponsePublicDto)
+  products!: ProductResponsePublicDto[];
+
+  constructor(
+    heroSlider: HomeResponsePublicDto | null,
+    promotionBanner: HomeResponsePublicDto | null,
+    categories: CategoryHomeResponseDto[],
+    comboProducts: ProductResponsePublicDto[],
+    featuredProducts: ProductResponsePublicDto[],
+    products: ProductResponsePublicDto[],
+  ) {
+    this.heroSlider = heroSlider;
+    this.promotionBanner = promotionBanner;
+    this.categories = categories;
+    this.comboProducts = comboProducts;
+    this.featuredProducts = featuredProducts;
+    this.products = products;
   }
 }

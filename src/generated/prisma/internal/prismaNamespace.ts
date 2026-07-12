@@ -395,6 +395,7 @@ export const ModelName = {
   Product: 'Product',
   ProductVariant: 'ProductVariant',
   ProductImage: 'ProductImage',
+  Support: 'Support',
   User: 'User',
   Profile: 'Profile',
   UserSecurity: 'UserSecurity',
@@ -415,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "blog" | "category" | "comboProduct" | "comboItem" | "comboImage" | "home" | "batch" | "inventory" | "product" | "productVariant" | "productImage" | "user" | "profile" | "userSecurity" | "session" | "oTP"
+    modelProps: "blog" | "category" | "comboProduct" | "comboItem" | "comboImage" | "home" | "batch" | "inventory" | "product" | "productVariant" | "productImage" | "support" | "user" | "profile" | "userSecurity" | "session" | "oTP"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1233,6 +1234,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Support: {
+      payload: Prisma.$SupportPayload<ExtArgs>
+      fields: Prisma.SupportFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SupportFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SupportFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload>
+        }
+        findFirst: {
+          args: Prisma.SupportFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SupportFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload>
+        }
+        findMany: {
+          args: Prisma.SupportFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload>[]
+        }
+        create: {
+          args: Prisma.SupportCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload>
+        }
+        createMany: {
+          args: Prisma.SupportCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SupportCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload>[]
+        }
+        delete: {
+          args: Prisma.SupportDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload>
+        }
+        update: {
+          args: Prisma.SupportUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload>
+        }
+        deleteMany: {
+          args: Prisma.SupportDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SupportUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SupportUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload>[]
+        }
+        upsert: {
+          args: Prisma.SupportUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload>
+        }
+        aggregate: {
+          args: Prisma.SupportAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSupport>
+        }
+        groupBy: {
+          args: Prisma.SupportGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SupportCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportCountAggregateOutputType> | number
+        }
+      }
+    }
     User: {
       payload: Prisma.$UserPayload<ExtArgs>
       fields: Prisma.UserFieldRefs
@@ -1905,6 +1980,27 @@ export const ProductImageScalarFieldEnum = {
 export type ProductImageScalarFieldEnum = (typeof ProductImageScalarFieldEnum)[keyof typeof ProductImageScalarFieldEnum]
 
 
+export const SupportScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  type: 'type',
+  status: 'status',
+  title: 'title',
+  slug: 'slug',
+  content: 'content',
+  note: 'note',
+  titleTh: 'titleTh',
+  contentTh: 'contentTh',
+  noteTh: 'noteTh',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy'
+} as const
+
+export type SupportScalarFieldEnum = (typeof SupportScalarFieldEnum)[keyof typeof SupportScalarFieldEnum]
+
+
 export const UserScalarFieldEnum = {
   id: 'id',
   sid: 'sid',
@@ -2227,6 +2323,34 @@ export type ListEnumStockStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
+ * Reference to a field of type 'SupportType'
+ */
+export type EnumSupportTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportType'>
+    
+
+
+/**
+ * Reference to a field of type 'SupportType[]'
+ */
+export type ListEnumSupportTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SupportStatus'
+ */
+export type EnumSupportStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SupportStatus[]'
+ */
+export type ListEnumSupportStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'UserRole'
  */
 export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
@@ -2401,6 +2525,7 @@ export type GlobalOmitConfig = {
   product?: Prisma.ProductOmit
   productVariant?: Prisma.ProductVariantOmit
   productImage?: Prisma.ProductImageOmit
+  support?: Prisma.SupportOmit
   user?: Prisma.UserOmit
   profile?: Prisma.ProfileOmit
   userSecurity?: Prisma.UserSecurityOmit

@@ -1,0 +1,55 @@
+//* ============= SUPPORT / POLICY PAGES DOMAIN =============
+//* SINGLE MODEL FOR ALL STATIC SUPPORT/POLICY PAGES (DELIVERY POLICY, TERMS &
+//* CONDITIONS, PRIVACY POLICY, CANCELLATION POLICY, RETURN POLICY). `type` DRIVES
+//* WHICH TAB/ROUTE A ROW BELONGS TO. THE KNOWN POLICY TYPES ARE SINGLETON PAGES —
+//* ONE ROW PER TYPE — ENFORCED IN THE SERVICE LAYER, NOT THE DB SCHEMA. `OTHERS`
+//* IS THE ESCAPE HATCH FOR AD-HOC EXTRA PAGES AND MAY HAVE MULTIPLE ROWS,
+//* DISAMBIGUATED BY `slug`
+
+enum SupportStatus {
+  ACTIVE
+  INACTIVE
+  DRAFT
+}
+
+enum SupportType {
+  DELIVERY_POLICY
+  TERMS_AND_CONDITIONS
+  PRIVACY_POLICY
+  CANCELLATION_POLICY
+  RETURN_POLICY
+  OTHERS //* CATCH-ALL FOR ANY POLICY/INFO PAGE NOT COVERED ABOVE
+}
+
+model Support {
+  id     Int           @id @default(autoincrement())
+  sid    String        @unique @default(uuid()) @db.Uuid //* USE NATIVE UUID TYPE FOR PERFORMANCE
+  type   SupportType
+  status SupportStatus @default(ACTIVE)
+
+  //* PRIMARY CONTENT (ENGLISH & GLOBAL SLUG)
+  title   String  @db.VarChar(255)
+  slug    String  @unique @db.VarChar(255) //* ROUTE/URL IDENTIFIER, ALSO DISAMBIGUATES MULTIPLE `OTHERS` ROWS
+  content String  @db.Text
+  note    String? @db.Text //* EXTRA NOTE / DISCLAIMER RENDERED BELOW THE MAIN CONTENT
+
+  //* SECONDARY CONTENT (THAI DISPLAY ONLY)
+  titleTh   String? @db.VarChar(255)
+  contentTh String? @db.Text
+  noteTh    String? @db.Text
+
+  //* AUDIT TRAIL & TIMESTAMPS
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //* RELATIONS
+  createdBy     Int?
+  createdByUser User? @relation("SupportCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedBy     Int?
+  updatedByUser User? @relation("SupportUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  //* INDEXING STRATEGY
+  @@index([slug]) //* PRIMARY INDEX FOR URL LOOKUPS
+  @@index([type, status]) //* FAST FETCHING OF THE ACTIVE PAGE FOR A GIVEN TAB
+  @@map("support_pages")
+}

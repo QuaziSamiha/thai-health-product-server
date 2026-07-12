@@ -73,6 +73,11 @@ export type ProductVariant = Prisma.ProductVariantModel
  */
 export type ProductImage = Prisma.ProductImageModel
 /**
+ * Model Support
+ * 
+ */
+export type Support = Prisma.SupportModel
+/**
  * Model User
  * 
  */

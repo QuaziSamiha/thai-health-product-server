@@ -85,6 +85,27 @@ export const CategoryProductStatus = {
 export type CategoryProductStatus = (typeof CategoryProductStatus)[keyof typeof CategoryProductStatus]
 
 
+export const SupportStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  DRAFT: 'DRAFT'
+} as const
+
+export type SupportStatus = (typeof SupportStatus)[keyof typeof SupportStatus]
+
+
+export const SupportType = {
+  DELIVERY_POLICY: 'DELIVERY_POLICY',
+  TERMS_AND_CONDITIONS: 'TERMS_AND_CONDITIONS',
+  PRIVACY_POLICY: 'PRIVACY_POLICY',
+  CANCELLATION_POLICY: 'CANCELLATION_POLICY',
+  RETURN_POLICY: 'RETURN_POLICY',
+  OTHERS: 'OTHERS'
+} as const
+
+export type SupportType = (typeof SupportType)[keyof typeof SupportType]
+
+
 export const UserRole = {
   ADMIN: 'ADMIN',
   SUPER_ADMIN: 'SUPER_ADMIN',

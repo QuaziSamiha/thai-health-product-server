@@ -82,6 +82,17 @@ export class CategoryRepository extends BaseRepository {
     name: true,
   } as const;
 
+  //* HOME-PAGE CARD SHAPE — a "shop by category" widget needs a bit more than
+  //* the nav dropdown (slug to link to, bannerUrl to render, productCount to
+  //* display), but still far less than the full CATEGORY_SELECT.
+  private readonly HOME_ROOT_CATEGORY_SELECT = {
+    id: true,
+    name: true,
+    slug: true,
+    bannerUrl: true,
+    productCount: true,
+  } as const;
+
   async findById(id: number, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return await client.category.findUnique({
@@ -163,6 +174,19 @@ export class CategoryRepository extends BaseRepository {
         parentId: null,
       },
       select: this.ROOT_ACTIVE_CATEGORY_SELECT,
+    });
+  }
+
+  /** Active root categories with the extra fields a home-page category card needs. */
+  async findActiveRootCategoriesForHome(tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.category.findMany({
+      where: {
+        status: CategoryProductStatus.ACTIVE,
+        parentId: null,
+      },
+      select: this.HOME_ROOT_CATEGORY_SELECT,
+      orderBy: { displayOrder: 'asc' },
     });
   }
 

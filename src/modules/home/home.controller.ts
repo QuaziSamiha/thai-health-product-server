@@ -17,18 +17,15 @@ import { UpdateHomeDto } from './dto/update-home.dto';
 import { HomeQueryDto } from './dto/home-query.dto';
 import {
   HomeResponseDto,
-  HomeResponsePublicDto,
+  FeaturedHomeContentsResponseDto,
 } from './dto/home-response.dto';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/auth/roles.decorator';
-import { UserRole, HomeContentType } from '../../generated/prisma/enums';
+import { UserRole } from '../../generated/prisma/enums';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import {
-  ApiPaginatedResponse,
-  PaginationQueryDto,
-} from '../../shared/pagination';
+import { ApiPaginatedResponse } from '../../shared/pagination';
 import {
   Body,
   Controller,
@@ -42,7 +39,6 @@ import {
   UseInterceptors,
   UploadedFiles,
   Param,
-  ParseEnumPipe,
   Patch,
   ParseIntPipe,
   HttpCode,
@@ -113,61 +109,19 @@ export class HomeController {
     return this.homeService.getAllHomeContents(queryParams);
   }
 
-  @Get('hero-slider-contents')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.MARKETING)
-  @ApiBearerAuth()
+  @Get('featured-home-contents')
   @ApiOperation({
-    summary: 'Get hero slider content rows (paginated)',
+    summary: 'Get featured home page content (Public)',
     description:
-      'Returns paginated hero slider rows only — backs the admin dashboard Hero Slider tab.',
-  })
-  @ApiPaginatedResponse(
-    HomeResponseDto,
-    'Hero slider contents retrieved successfully.',
-  )
-  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
-  @ApiForbiddenResponse({ description: 'Admin or Marketing role required.' })
-  @ResponseMessage('Hero slider contents retrieved successfully')
-  async getHeroSliderContents(@Query() queryParams: PaginationQueryDto) {
-    return this.homeService.getHeroSliderContents(queryParams);
-  }
-
-  @Get('promotion-banner-contents')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.MARKETING)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Get promotion banner content rows (paginated)',
-    description:
-      'Returns paginated promotion banner rows only — backs the admin dashboard Promotional Banner tab.',
-  })
-  @ApiPaginatedResponse(
-    HomeResponseDto,
-    'Promotion banner contents retrieved successfully.',
-  )
-  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
-  @ApiForbiddenResponse({ description: 'Admin or Marketing role required.' })
-  @ResponseMessage('Promotion banner contents retrieved successfully')
-  async getPromotionBannerContents(@Query() queryParams: PaginationQueryDto) {
-    return this.homeService.getPromotionBannerContents(queryParams);
-  }
-
-  @Get('active-home-contents/:type')
-  @ApiOperation({
-    summary: 'Get active home content rows by type (Public)',
-    description:
-      'Returns every ACTIVE row of the given type, ordered by displayOrder — used to render a single storefront section (hero carousel, promo banners, OVC).',
+      'Everything the public storefront homepage needs in one call: the single ACTIVE hero slider and single ACTIVE promotion banner with the lowest displayOrder each (either null if that type has no ACTIVE row), every ACTIVE root category, and three product sections — combo (type=COMBO), featured (isFeatured=true), and general (isFeatured=false). Categories/products are sourced from CategoryService/ProductService, not queried directly by this module.',
   })
   @ApiOkResponse({
-    description: 'Active home contents retrieved successfully.',
-    type: [HomeResponsePublicDto],
+    description: 'Featured home contents retrieved successfully.',
+    type: FeaturedHomeContentsResponseDto,
   })
-  @ResponseMessage('Active home contents retrieved successfully')
-  async getActiveHomeContentsByType(
-    @Param('type', new ParseEnumPipe(HomeContentType)) type: HomeContentType,
-  ) {
-    return this.homeService.getActiveHomeContentsByType(type);
+  @ResponseMessage('Featured home contents retrieved successfully')
+  async getFeaturedHomeContents() {
+    return this.homeService.getFeaturedHomeContents();
   }
 
   @Patch('update-home-content/:id')

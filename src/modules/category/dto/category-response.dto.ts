@@ -456,3 +456,55 @@ export class RootActiveCategoryResponseDto {
     this.name = category.name!;
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HOME-PAGE CARD — root category list for a "shop by category" landing-page
+// widget. A bit more than RootActiveCategoryResponseDto (nav dropdown) needs:
+// a slug to link to, a banner image to render, and a product count to display.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export class CategoryHomeResponseDto {
+  @Expose()
+  @ApiProperty({ description: 'Category ID', example: 1 })
+  id!: number;
+
+  @Expose()
+  @ApiProperty({
+    description: 'Category name in English',
+    example: 'Beauty & Anti-Aging',
+  })
+  name!: string;
+
+  @Expose()
+  @ApiProperty({
+    description: 'URL-friendly slug auto-generated from the English name',
+    example: 'beauty-anti-aging',
+  })
+  slug!: string;
+
+  @Expose()
+  @ApiPropertyOptional({
+    description: 'Absolute URL of the hero banner image',
+    example: 'http://localhost:8000/uploads/categories/banner-images/abc.webp',
+  })
+  bannerUrl?: string;
+
+  @Expose()
+  @ApiProperty({
+    description: 'Denormalized count of products assigned to this category',
+    example: 25,
+  })
+  productCount!: number;
+
+  constructor(category: Partial<CategoryModel>, baseUrl?: string) {
+    this.id = category.id!;
+    this.name = category.name!;
+    this.slug = category.slug!;
+    this.bannerUrl = category.bannerUrl
+      ? category.bannerUrl.startsWith('http')
+        ? category.bannerUrl
+        : `${baseUrl}${category.bannerUrl}`
+      : undefined;
+    this.productCount = category.productCount!;
+  }
+}

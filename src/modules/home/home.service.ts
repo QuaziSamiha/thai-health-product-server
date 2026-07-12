@@ -13,12 +13,15 @@ import { HomeQueryDto } from './dto/home-query.dto';
 import {
   HomeResponseDto,
   HomeResponsePublicDto,
+  FeaturedHomeContentsResponseDto,
 } from './dto/home-response.dto';
 import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
 import type { IStorageService } from '../../shared/storage/interfaces/storage.interface';
 import { IPaginatedResult, PaginationQueryDto } from '../../shared/pagination';
 import { HomeContentType } from '../../generated/prisma/enums';
 import { Prisma } from '../../generated/prisma/client';
+import { CategoryService } from '../category/category.service';
+import { ProductService } from '../product/product.service';
 
 const HOME_IMAGE_FOLDER = 'home/images';
 
@@ -31,6 +34,8 @@ export class HomeService {
     @Inject(STORAGE_SERVICE_TOKEN)
     private readonly storageService: IStorageService,
     private readonly configService: ConfigService,
+    private readonly categoryService: CategoryService,
+    private readonly productService: ProductService,
   ) {}
 
   async createHome(
@@ -123,18 +128,6 @@ export class HomeService {
     return this.getHomeContentsByType(paginationParams, type);
   }
 
-  async getHeroSliderContents(
-    params: PaginationQueryDto,
-  ): Promise<IPaginatedResult<HomeResponseDto>> {
-    return this.getHomeContentsByType(params, HomeContentType.HERO_SLIDER);
-  }
-
-  async getPromotionBannerContents(
-    params: PaginationQueryDto,
-  ): Promise<IPaginatedResult<HomeResponseDto>> {
-    return this.getHomeContentsByType(params, HomeContentType.PROMOTION_BANNER);
-  }
-
   private async getHomeContentsByType(
     params: PaginationQueryDto,
     type?: HomeContentType,
@@ -156,12 +149,42 @@ export class HomeService {
     };
   }
 
-  async getActiveHomeContentsByType(
-    type: HomeContentType,
-  ): Promise<HomeResponsePublicDto[]> {
-    const homeContents = await this.homeRepository.findActiveByType(type);
+  /**
+   * Everything the public storefront homepage needs in one call: the two
+   * "above the fold" slots, the root category list, and three product
+   * sections. Categories/products are fetched via CategoryService/
+   * ProductService, never queried directly here — this method only
+   * composes what those modules already expose, in parallel since none of
+   * the six lookups depend on another.
+   */
+  async getFeaturedHomeContents(): Promise<FeaturedHomeContentsResponseDto> {
     const baseUrl = this.configService.get<string>('app.baseUrl');
-    return homeContents.map((home) => new HomeResponsePublicDto(home, baseUrl));
+    const [
+      heroSlider,
+      promotionBanner,
+      categories,
+      comboProducts,
+      featuredProducts,
+      products,
+    ] = await Promise.all([
+      this.homeRepository.findFeaturedByType(HomeContentType.HERO_SLIDER),
+      this.homeRepository.findFeaturedByType(HomeContentType.PROMOTION_BANNER),
+      this.categoryService.getActiveRootCategoriesForHome(),
+      this.productService.getComboProducts(),
+      this.productService.getFeaturedProducts(),
+      this.productService.getNonFeaturedProducts(),
+    ]);
+
+    return new FeaturedHomeContentsResponseDto(
+      heroSlider ? new HomeResponsePublicDto(heroSlider, baseUrl) : null,
+      promotionBanner
+        ? new HomeResponsePublicDto(promotionBanner, baseUrl)
+        : null,
+      categories,
+      comboProducts,
+      featuredProducts,
+      products,
+    );
   }
 
   async updateHome(
@@ -292,7 +315,18 @@ export class HomeService {
     if (!home) {
       throw new NotFoundException(`Home content with ID ${id} not found`);
     }
-    await this.homeRepository.deleteHome(id);
+
+    //* DELETE + GAP-CLOSE RUN AS ONE TRANSACTION SO A CONCURRENT CREATE/REORDER
+    //* ON THE SAME type CAN'T INTERLEAVE WITH THE SHIFT AND LEAVE A GAP OR COLLISION
+    await this.homeRepository.withTransaction(async (tx) => {
+      await this.homeRepository.deleteHome(id, tx);
+      await this.homeRepository.closeDisplayOrderGap(
+        home.type,
+        home.displayOrder,
+        tx,
+      );
+    });
+
     if (home.imageUrl) {
       await this.deleteFile(home.imageUrl, HOME_IMAGE_FOLDER);
     }

@@ -199,6 +199,15 @@ export class ProductService {
     );
   }
 
+  /** Active products NOT flagged `isFeatured` — the general product grid. */
+  async getNonFeaturedProducts(
+    limit = DEFAULT_HOME_SECTION_LIMIT,
+  ): Promise<ProductResponsePublicDto[]> {
+    return this.toPublicDtoList(
+      await this.productRepository.findNonFeaturedProducts(limit),
+    );
+  }
+
   /** "Best" products — see `findBestProducts` for the ranking caveat. */
   async getBestProducts(
     limit = DEFAULT_HOME_SECTION_LIMIT,

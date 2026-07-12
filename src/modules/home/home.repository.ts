@@ -3,11 +3,73 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { BaseRepository } from '../../prisma/base.repository';
 import {
   Prisma,
-  HomeContentStatus,
   HomeContentType,
+  HomeContentStatus,
 } from '../../generated/prisma/client';
 import { PaginationService, PaginationQueryDto } from '../../shared/pagination';
-import { HOME_SELECT_ADMIN, HOME_SELECT_PUBLIC } from './home.select';
+
+//* ADMIN SELECT SHAPE — feeds HomeResponseDto (see dto/home-response.dto.ts).
+//* Full detail: status, raw audit FKs, plus the resolved creator/updater for
+//* the back-office dashboard. Never reuse this select for a public/
+//* unauthenticated route.
+const HOME_SELECT_ADMIN = {
+  id: true,
+  sid: true,
+  type: true,
+  status: true,
+  heading: true,
+  bodyText: true,
+  headingTh: true,
+  bodyTextTh: true,
+  imageUrl: true,
+  videoUrl: true,
+  redirectUrl: true,
+  displayOrder: true,
+  createdAt: true,
+  updatedAt: true,
+  createdBy: true,
+  updatedBy: true,
+  //* MATCHES UserMinifiedResponseDto / MinifiedUser (user/dto/user-response.dto.ts)
+  createdByUser: {
+    select: {
+      id: true,
+      email: true,
+      status: true,
+      role: true,
+      profile: {
+        select: { name: true },
+      },
+    },
+  },
+  updatedByUser: {
+    select: {
+      id: true,
+      email: true,
+      status: true,
+      role: true,
+      profile: {
+        select: { name: true },
+      },
+    },
+  },
+} as const;
+
+//* PUBLIC SELECT SHAPE — feeds HomeResponsePublicDto. Storefront/landing-page
+//* view: no `status` (internal workflow state) and no audit fields — a
+//* public reader only needs the content itself.
+const HOME_SELECT_PUBLIC = {
+  id: true,
+  sid: true,
+  type: true,
+  heading: true,
+  bodyText: true,
+  headingTh: true,
+  bodyTextTh: true,
+  imageUrl: true,
+  videoUrl: true,
+  redirectUrl: true,
+  displayOrder: true,
+} as const;
 
 @Injectable()
 export class HomeRepository extends BaseRepository {
@@ -47,9 +109,17 @@ export class HomeRepository extends BaseRepository {
     });
   }
 
-  async findActiveByType(type: HomeContentType, tx?: Prisma.TransactionClient) {
+  /**
+   * The single ACTIVE row of `type` with the lowest displayOrder — the
+   * "featured" slot rendered above the fold on the public storefront
+   * homepage. `findFirst` (not `findMany`) since only one row is ever needed.
+   */
+  async findFeaturedByType(
+    type: HomeContentType,
+    tx?: Prisma.TransactionClient,
+  ) {
     const client = tx || this.prisma;
-    return await client.home.findMany({
+    return client.home.findFirst({
       where: { type, status: HomeContentStatus.ACTIVE },
       select: HOME_SELECT_PUBLIC,
       orderBy: { displayOrder: 'asc' },
@@ -118,6 +188,23 @@ export class HomeRepository extends BaseRepository {
         displayOrder: { gte: from, lte: to },
       },
       data: { displayOrder: { increment: delta } },
+    });
+  }
+
+  /**
+   * Pulls every row of `type` after `deletedOrder` up by one slot, closing the
+   * gap a deleted row leaves behind so the sequence stays dense (0,1,2,...)
+   * instead of skipping the position the deleted row used to occupy.
+   */
+  async closeDisplayOrderGap(
+    type: HomeContentType,
+    deletedOrder: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    await client.home.updateMany({
+      where: { type, displayOrder: { gt: deletedOrder } },
+      data: { displayOrder: { decrement: 1 } },
     });
   }
 

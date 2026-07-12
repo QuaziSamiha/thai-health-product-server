@@ -73,6 +73,8 @@ model User {
   blogs               Blog[]
   createdHomeContents Home[]         @relation("HomeCreatedBy")
   updatedHomeContents Home[]         @relation("HomeUpdatedBy")
+  createdSupports     Support[]      @relation("SupportCreatedBy")
+  updatedSupports     Support[]      @relation("SupportUpdatedBy")
 
   @@index([email, phone])
   @@map("users")

@@ -215,6 +215,11 @@ export class ProductRepository extends BaseRepository {
     return await this.findActiveProductsList({ isFeatured: true }, limit, tx);
   }
 
+  /** Active products NOT flagged `isFeatured`, newest first. */
+  async findNonFeaturedProducts(limit: number, tx?: Prisma.TransactionClient) {
+    return await this.findActiveProductsList({ isFeatured: false }, limit, tx);
+  }
+
   /**
    * "Best" products — no sales/order-volume ranking exists yet in this
    * schema, so this is the same active-product pool as everything else,

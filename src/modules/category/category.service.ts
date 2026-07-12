@@ -13,6 +13,7 @@ import { generateSlug } from '../../common/utils/slug.util';
 import {
   CategoryResponseDto,
   RootActiveCategoryResponseDto,
+  CategoryHomeResponseDto,
 } from './dto/category-response.dto';
 import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
 import type { IStorageService } from '../../shared/storage/interfaces/storage.interface';
@@ -175,6 +176,21 @@ export class CategoryService {
     const categories = await this.categoryRepository.findActiveRootCategories();
     return categories.map(
       (category) => new RootActiveCategoryResponseDto(category),
+    );
+  }
+
+  /**
+   * Root categories for a home-page "shop by category" widget. Not exposed
+   * via this module's own controller — a home-content module composing
+   * this alongside product sections imports CategoryModule and injects
+   * CategoryService directly, which already exports it.
+   */
+  async getActiveRootCategoriesForHome(): Promise<CategoryHomeResponseDto[]> {
+    const categories =
+      await this.categoryRepository.findActiveRootCategoriesForHome();
+    const baseUrl = this.configService.get<string>('app.baseUrl');
+    return categories.map(
+      (category) => new CategoryHomeResponseDto(category, baseUrl),
     );
   }
 
