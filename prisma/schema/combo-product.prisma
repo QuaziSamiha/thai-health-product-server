@@ -6,15 +6,15 @@ model ComboProduct {
   id  Int    @id @default(autoincrement())
   sid String @unique @default(uuid()) @db.Uuid
 
-  title   String  @unique @db.VarChar(255)
-  titleTh String? @db.VarChar(255)
-  slug    String  @unique @db.VarChar(255)
-
-  //* CONTENT (EN + TH)
-  shortDescription String? @db.VarChar(500)
-  shortDescTh      String? @db.VarChar(500)
+  title            String  @unique @db.VarChar(255)
+  slug             String  @unique @db.VarChar(255)
   description      String? @db.Text
-  descriptionTh    String? @db.Text
+  shortDescription String? @db.VarChar(500)
+
+  //* CONTENT (TH)
+  titleTh       String? @db.VarChar(255)
+  shortDescTh   String? @db.VarChar(500)
+  descriptionTh String? @db.Text
 
   //* PRICING (DECIMAL FOR FINANCIAL ACCURACY)
   totalPrice Decimal @default(0) @db.Decimal(12, 2) //* SUM-OF-PARTS DISPLAY PRICE (CAN BE CACHED OR ENTERED MANUALLY)

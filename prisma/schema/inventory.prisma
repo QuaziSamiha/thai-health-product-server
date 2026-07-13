@@ -64,18 +64,3 @@ model Inventory {
   @@index([changeType])
   @@map("inventory")
 }
-
-// =========== COMBO ITEM MODEL (THE MISSING LINK) ============
-// model ComboItem {
-//   id             Int     @id @default(autoincrement())
-//   comboProductId Int //* THE ID OF THE COMBO PRODUCT
-//   comboProduct   Product @relation("MainCombo", fields: [comboProductId], references: [id], onDelete: Cascade)
-
-//   includedProductId Int //* THE ID OF THE INDIVIDUAL PRODUCT INSIDE THE COMBO
-//   includedProduct   Product @relation("IncludedProduct", fields: [includedProductId], references: [id], onDelete: Cascade)
-
-//   quantity Int @default(1) //* HOW MANY OF THIS ITEM ARE IN THE COMBO
-
-//   @@unique([comboProductId, includedProductId])
-//   @@map("product_combo_items")
-// }

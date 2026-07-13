@@ -22,6 +22,8 @@ import { ProductModule } from './modules/product/product.module';
 import { BlogModule } from './modules/blog/blog.module';
 import { HomeModule } from './modules/home/home.module';
 import { SupportModule } from './modules/support/support.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
+import { ComboProductModule } from './modules/combo-product/combo-product.module';
 import { HealthModule } from './health/health.module';
 import { validate } from './config/env.validation';
 import appConfig from './config/app.config';
@@ -77,6 +79,8 @@ import {
     BlogModule,
     HomeModule,
     SupportModule,
+    ComboProductModule,
+    InventoryModule,
   ],
   controllers: [AppController],
   providers: [
