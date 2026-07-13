@@ -2,14 +2,15 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { toAbsoluteUrl, toPrice } from './combo-product-shared.dto';
 
-//* NESTED SUMMARIES BELOW ARE INTENTIONALLY MINIMAL (id/name/slug/price —
-//* NO STOCK COUNTS, COST BASIS, OR OTHER ADMIN-ONLY FIELDS), SO A SINGLE
+//* NESTED SUMMARIES BELOW ARE INTENTIONALLY MINIMAL (name/slug/price — NO
+//* STOCK COUNTS, COST BASIS, OR OTHER ADMIN-ONLY FIELDS), SO A SINGLE
 //* ComboItemResponseDto IS SAFE TO REUSE IN BOTH THE ADMIN AND PUBLIC COMBO
 //* RESPONSES BELOW, UNLIKE Product WHICH NEEDS SEPARATE ADMIN/PUBLIC VARIANT
-//* DTOS FOR ITS OWN top-level variants LIST.
+//* DTOS FOR ITS OWN top-level variants LIST. NEITHER SUMMARY REPEATS ITS OWN
+//* `id` — THE OWNING ComboItemResponseDto ALREADY EXPOSES IT AS THE RAW
+//* `productId`/`variantId` FK ONE LEVEL UP.
 
 export type ComboItemProductInput = {
-  id: number;
   name: string;
   slug: string;
   categoryId?: number | null;
@@ -18,10 +19,6 @@ export type ComboItemProductInput = {
 };
 
 export class ComboItemProductResponseDto {
-  @Expose()
-  @ApiProperty({ description: 'Bundled product ID', example: 12 })
-  id!: number;
-
   @Expose()
   @ApiProperty({
     description: 'Product name in English',
@@ -55,7 +52,6 @@ export class ComboItemProductResponseDto {
   primaryImageUrl?: string;
 
   constructor(product: ComboItemProductInput, baseUrl?: string) {
-    this.id = product.id;
     this.name = product.name;
     this.slug = product.slug;
     this.categoryId = product.category?.id ?? product.categoryId ?? undefined;
@@ -68,23 +64,27 @@ export class ComboItemProductResponseDto {
 }
 
 export type ComboItemVariantInput = {
-  id: number;
   name: string;
+  slug: string;
   size?: string | null;
-  price: unknown;
+  basePrice: unknown;
+  salePrice?: unknown;
 };
 
 export class ComboItemVariantResponseDto {
-  @Expose()
-  @ApiProperty({ description: 'Bundled variant ID', example: 104 })
-  id!: number;
-
   @Expose()
   @ApiProperty({
     description: 'Variant name in English',
     example: 'Organic Royal Jelly - 60 Capsules',
   })
   name!: string;
+
+  @Expose()
+  @ApiProperty({
+    description: 'URL-friendly slug',
+    example: 'organic-royal-jelly-60-capsules',
+  })
+  slug!: string;
 
   @Expose()
   @ApiPropertyOptional({
@@ -95,18 +95,23 @@ export class ComboItemVariantResponseDto {
 
   @Expose()
   @ApiProperty({
-    description: "Variant's list price",
+    description:
+      "Variant's effective price shown to the customer — `salePrice` when discounted, otherwise `basePrice`",
     example: 700.0,
     type: 'number',
     format: 'float',
   })
   price!: number;
 
+  //* TAKES THE VARIANT'S REAL COLUMN NAMES (basePrice/salePrice) DIRECTLY —
+  //* SAME SHAPE THE REPOSITORY'S select ACTUALLY PRODUCES — AND RESOLVES THE
+  //* EFFECTIVE PRICE HERE, SO NO SEPARATE SERVICE-LAYER MAPPING STEP IS
+  //* NEEDED JUST TO RENAME A FIELD.
   constructor(variant: ComboItemVariantInput) {
-    this.id = variant.id;
     this.name = variant.name;
+    this.slug = variant.slug;
     this.size = variant.size ?? undefined;
-    this.price = Number(variant.price);
+    this.price = Number(variant.salePrice ?? variant.basePrice);
   }
 }
 

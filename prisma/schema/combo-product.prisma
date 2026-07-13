@@ -72,6 +72,9 @@ model ComboItem {
 
   @@unique([comboId, productId, variantId]) //* PREVENT DUPLICATE ROWS PER (COMBO, PRODUCT, VARIANT)
   @@index([productId])
+
+
+  
   @@index([variantId])
   @@map("combo_items")
 }

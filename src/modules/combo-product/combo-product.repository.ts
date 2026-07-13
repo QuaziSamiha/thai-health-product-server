@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { BaseRepository } from '../../prisma/base.repository';
+import { Prisma } from '../../generated/prisma/client';
 import { PaginationService } from '../../shared/pagination';
+import {
+  COMBO_PRODUCT_SELECT_ADMIN,
+  COMBO_PRODUCT_SELECT_PUBLIC,
+} from './combo-product.select';
 
 @Injectable()
 export class ComboProductRepository extends BaseRepository {
@@ -12,112 +17,91 @@ export class ComboProductRepository extends BaseRepository {
     super(prisma);
   }
 
-  //* ADMIN — full detail: raw workflow `status`, soft-delete/publish
-  //* timestamps, plus the resolved creator/updater for the back-office
-  //* dashboard. Never reuse for a public/unauthenticated route.
-  private readonly COMBO_PRODUCT_SELECT = {
-    id: true,
-    sid: true,
-    status: true,
-    title: true,
-    titleTh: true,
-    slug: true,
-    shortDescription: true,
-    shortDescTh: true,
-    description: true,
-    descriptionTh: true,
-    totalPrice: true,
-    comboPrice: true,
-    startsAt: true,
-    endsAt: true,
-    isFeatured: true,
-    seoMetadata: true,
-    images: {
-      orderBy: { displayOrder: 'asc' },
-    },
-    items: {
-      orderBy: { displayOrder: 'asc' },
-      include: {
-        product: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            categoryId: true,
-            category: { select: { id: true, name: true } },
-            images: { select: { url: true, isPrimary: true } },
-          },
-        },
-        variant: {
-          select: { id: true, name: true, size: true, basePrice: true },
-        },
-      },
-    },
-    createdAt: true,
-    updatedAt: true,
-    deletedAt: true,
-    publishedAt: true,
-    //* MATCHES UserMinifiedResponseDto / MinifiedUser (user/dto/user-response.dto.ts)
-    createdByUser: {
-      select: {
-        id: true,
-        email: true,
-        status: true,
-        role: true,
-        profile: { select: { name: true } },
-      },
-    },
-    updatedByUser: {
-      select: {
-        id: true,
-        email: true,
-        status: true,
-        role: true,
-        profile: { select: { name: true } },
-      },
-    },
-  } as const;
+  // ─── Reads — Single Lookups (role-based) ────────────────────────────────────
 
-  //* PUBLIC — storefront view: no `status` (internal workflow state — only
-  //* ACTIVE rows are ever queried for this shape) and no audit fields.
-  private readonly COMBO_PRODUCT_SELECT_PUBLIC = {
-    id: true,
-    sid: true,
-    title: true,
-    titleTh: true,
-    slug: true,
-    shortDescription: true,
-    shortDescTh: true,
-    description: true,
-    descriptionTh: true,
-    totalPrice: true,
-    comboPrice: true,
-    startsAt: true,
-    endsAt: true,
-    isFeatured: true,
-    seoMetadata: true,
-    images: {
-      where: { isActive: true },
-      orderBy: { displayOrder: 'asc' },
+  async findByIdAdmin(id: number, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.comboProduct.findUnique({
+      where: { id },
+      select: COMBO_PRODUCT_SELECT_ADMIN,
+    });
+  }
+
+  async findBySlugAdmin(slug: string, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.comboProduct.findUnique({
+      where: { slug },
+      select: COMBO_PRODUCT_SELECT_ADMIN,
+    });
+  }
+
+  async findByTitle(title: string, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.comboProduct.findUnique({
+      where: { title },
+      select: COMBO_PRODUCT_SELECT_ADMIN,
+    });
+  }
+
+  async findBySlugPublic(slug: string, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.comboProduct.findUnique({
+      where: { slug },
+      select: COMBO_PRODUCT_SELECT_PUBLIC,
+    });
+  }
+
+  // ─── Reads — Item Bundling Validation ────────────────────────────────────────
+  //* USED BY THE SERVICE TO CONFIRM EVERY BUNDLED product/variantId ACTUALLY
+  //* EXISTS AND TO RESOLVE THE FALLBACK unitPrice SNAPSHOT WHEN THE CLIENT
+  //* DOESN'T SUPPLY ONE. KEPT DELIBERATELY LEAN — NO GALLERY/CATEGORY JOINS.
+
+  async findProductsByIds(ids: number[], tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    if (ids.length === 0) return [];
+    return await client.product.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, basePrice: true, salePrice: true },
+    });
+  }
+
+  async findVariantsByIds(ids: number[], tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    if (ids.length === 0) return [];
+    return await client.productVariant.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, productId: true, basePrice: true, salePrice: true },
+    });
+  }
+
+  // ─── Mutations ───────────────────────────────────────────────────────────────
+
+  async createComboProduct(
+    data: Omit<Prisma.ComboProductUncheckedCreateInput, 'images' | 'items'> & {
+      images?: Prisma.ComboImageCreateManyComboInput[];
+      items?: Prisma.ComboItemCreateManyComboInput[];
     },
-    items: {
-      orderBy: { displayOrder: 'asc' },
-      include: {
-        product: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            categoryId: true,
-            category: { select: { id: true, name: true } },
-            images: { select: { url: true, isPrimary: true } },
-          },
-        },
-        variant: {
-          select: { id: true, name: true, size: true, basePrice: true },
-        },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    const { images, items, ...comboData } = data;
+
+    return await client.comboProduct.create({
+      data: {
+        ...comboData,
+        images: images?.length ? { createMany: { data: images } } : undefined,
+        items: items?.length ? { createMany: { data: items } } : undefined,
       },
-    },
-    publishedAt: true,
-  } as const;
+      select: COMBO_PRODUCT_SELECT_ADMIN,
+    });
+  }
+
+  /** Rollback path for a create that failed after the row was written (e.g. a later image upload). */
+  async deleteComboProduct(id: number, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.comboProduct.delete({
+      where: { id },
+      select: { id: true },
+    });
+  }
 }
