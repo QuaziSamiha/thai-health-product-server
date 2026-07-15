@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { BaseRepository } from '../../prisma/base.repository';
 import { Prisma } from '../../generated/prisma/client';
+import { CategoryProductStatus } from '../../generated/prisma/enums';
 import { PaginationService } from '../../shared/pagination';
 import {
   COMBO_PRODUCT_SELECT_ADMIN,
@@ -48,6 +49,20 @@ export class ComboProductRepository extends BaseRepository {
     return await client.comboProduct.findUnique({
       where: { slug },
       select: COMBO_PRODUCT_SELECT_PUBLIC,
+    });
+  }
+
+  /** Active combos, newest first — for a "Combo Deals" home section. */
+  async findActiveCombosForHome(
+    limit: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return await client.comboProduct.findMany({
+      where: { deletedAt: null, status: CategoryProductStatus.ACTIVE },
+      select: COMBO_PRODUCT_SELECT_PUBLIC,
+      orderBy: { createdAt: 'desc' },
+      take: limit,
     });
   }
 

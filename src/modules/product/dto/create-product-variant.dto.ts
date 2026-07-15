@@ -12,7 +12,6 @@ import {
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 import { DiscountType } from '../../../generated/prisma/enums';
-import { IsLessThanOrEqualTo } from '../../../common/decorators/validation/is-less-than-or-equal-to.decorator';
 import { emptyStringToUndefined } from '../../../common/utils/json-transform.util';
 
 export class CreateProductVariantDto {
@@ -51,9 +50,10 @@ export class CreateProductVariantDto {
 
   @ApiPropertyOptional({
     description:
-      'How `discountValue`/`salePrice` was configured — FIXED or PERCENTAGE.',
+      'How `discountValue` is applied — FIXED (a currency amount subtracted from `basePrice`) or PERCENTAGE (a percentage of `basePrice` subtracted). Defaults to PERCENTAGE when omitted, even with no discount. The server derives `salePrice` from these — it is never accepted as input.',
     enum: DiscountType,
     enumName: 'DiscountType',
+    default: DiscountType.PERCENTAGE,
     example: DiscountType.PERCENTAGE,
   })
   @IsOptional()
@@ -62,7 +62,7 @@ export class CreateProductVariantDto {
 
   @ApiPropertyOptional({
     description:
-      'The raw configured discount, paired with `discountType` — a currency amount when FIXED, or a percentage number when PERCENTAGE. Admin/management only; `salePrice` is the resolved value customers see.',
+      'The raw configured discount, paired with `discountType` — a currency amount when FIXED (must not exceed `basePrice`), or a percentage when PERCENTAGE (must not exceed 100).',
     example: 10,
     minimum: 0,
   })
@@ -71,21 +71,6 @@ export class CreateProductVariantDto {
   @IsNumber({}, { message: 'Discount value must be a valid number' })
   @Min(0, { message: 'Discount value cannot be negative' })
   discountValue?: number;
-
-  @ApiPropertyOptional({
-    description:
-      'Final discounted price for this variant. Must not exceed `basePrice`.',
-    example: 1350.0,
-    minimum: 0,
-  })
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber({}, { message: 'Sale price must be a valid number' })
-  @Min(0, { message: 'Sale price cannot be negative' })
-  @IsLessThanOrEqualTo('basePrice', {
-    message: 'Sale price cannot be greater than the variant base price',
-  })
-  salePrice?: number;
 
   @ApiPropertyOptional({
     description: 'Cost basis for margin reporting. Admin/management use only.',
@@ -109,6 +94,19 @@ export class CreateProductVariantDto {
   @IsInt({ message: 'Quantity must be a whole number' })
   @Min(0, { message: 'Quantity cannot be negative' })
   quantity?: number;
+
+  @ApiPropertyOptional({
+    description:
+      "Stock count at/below which this variant's `stockStatus` becomes LOW_STOCK instead of IN_STOCK (still IN_STOCK above it, OUT_OF_STOCK at 0). Defaults to 10.",
+    example: 10,
+    minimum: 0,
+    default: 10,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt({ message: 'Low stock threshold must be a whole number' })
+  @Min(0, { message: 'Low stock threshold cannot be negative' })
+  lowStockThreshold?: number;
 
   @ApiPropertyOptional({
     description: 'Variant-level SKU. Must be unique across all variants.',

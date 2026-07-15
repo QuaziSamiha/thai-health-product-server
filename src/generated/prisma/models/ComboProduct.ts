@@ -46,11 +46,11 @@ export type ComboProductMinAggregateOutputType = {
   id: number | null
   sid: string | null
   title: string | null
-  titleTh: string | null
   slug: string | null
-  shortDescription: string | null
-  shortDescTh: string | null
   description: string | null
+  shortDescription: string | null
+  titleTh: string | null
+  shortDescTh: string | null
   descriptionTh: string | null
   totalPrice: runtime.Decimal | null
   comboPrice: runtime.Decimal | null
@@ -70,11 +70,11 @@ export type ComboProductMaxAggregateOutputType = {
   id: number | null
   sid: string | null
   title: string | null
-  titleTh: string | null
   slug: string | null
-  shortDescription: string | null
-  shortDescTh: string | null
   description: string | null
+  shortDescription: string | null
+  titleTh: string | null
+  shortDescTh: string | null
   descriptionTh: string | null
   totalPrice: runtime.Decimal | null
   comboPrice: runtime.Decimal | null
@@ -94,11 +94,11 @@ export type ComboProductCountAggregateOutputType = {
   id: number
   sid: number
   title: number
-  titleTh: number
   slug: number
-  shortDescription: number
-  shortDescTh: number
   description: number
+  shortDescription: number
+  titleTh: number
+  shortDescTh: number
   descriptionTh: number
   totalPrice: number
   comboPrice: number
@@ -137,11 +137,11 @@ export type ComboProductMinAggregateInputType = {
   id?: true
   sid?: true
   title?: true
-  titleTh?: true
   slug?: true
-  shortDescription?: true
-  shortDescTh?: true
   description?: true
+  shortDescription?: true
+  titleTh?: true
+  shortDescTh?: true
   descriptionTh?: true
   totalPrice?: true
   comboPrice?: true
@@ -161,11 +161,11 @@ export type ComboProductMaxAggregateInputType = {
   id?: true
   sid?: true
   title?: true
-  titleTh?: true
   slug?: true
-  shortDescription?: true
-  shortDescTh?: true
   description?: true
+  shortDescription?: true
+  titleTh?: true
+  shortDescTh?: true
   descriptionTh?: true
   totalPrice?: true
   comboPrice?: true
@@ -185,11 +185,11 @@ export type ComboProductCountAggregateInputType = {
   id?: true
   sid?: true
   title?: true
-  titleTh?: true
   slug?: true
-  shortDescription?: true
-  shortDescTh?: true
   description?: true
+  shortDescription?: true
+  titleTh?: true
+  shortDescTh?: true
   descriptionTh?: true
   totalPrice?: true
   comboPrice?: true
@@ -297,11 +297,11 @@ export type ComboProductGroupByOutputType = {
   id: number
   sid: string
   title: string
-  titleTh: string | null
   slug: string
-  shortDescription: string | null
-  shortDescTh: string | null
   description: string | null
+  shortDescription: string | null
+  titleTh: string | null
+  shortDescTh: string | null
   descriptionTh: string | null
   totalPrice: runtime.Decimal
   comboPrice: runtime.Decimal
@@ -345,11 +345,11 @@ export type ComboProductWhereInput = {
   id?: Prisma.IntFilter<"ComboProduct"> | number
   sid?: Prisma.UuidFilter<"ComboProduct"> | string
   title?: Prisma.StringFilter<"ComboProduct"> | string
-  titleTh?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
   slug?: Prisma.StringFilter<"ComboProduct"> | string
-  shortDescription?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
-  shortDescTh?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
   description?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
+  shortDescription?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
+  titleTh?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
+  shortDescTh?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
   descriptionTh?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
   totalPrice?: Prisma.DecimalFilter<"ComboProduct"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: Prisma.DecimalFilter<"ComboProduct"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -374,11 +374,11 @@ export type ComboProductOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   sid?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  titleTh?: Prisma.SortOrderInput | Prisma.SortOrder
   slug?: Prisma.SortOrder
-  shortDescription?: Prisma.SortOrderInput | Prisma.SortOrder
-  shortDescTh?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  shortDescription?: Prisma.SortOrderInput | Prisma.SortOrder
+  titleTh?: Prisma.SortOrderInput | Prisma.SortOrder
+  shortDescTh?: Prisma.SortOrderInput | Prisma.SortOrder
   descriptionTh?: Prisma.SortOrderInput | Prisma.SortOrder
   totalPrice?: Prisma.SortOrder
   comboPrice?: Prisma.SortOrder
@@ -407,10 +407,10 @@ export type ComboProductWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.ComboProductWhereInput | Prisma.ComboProductWhereInput[]
   OR?: Prisma.ComboProductWhereInput[]
   NOT?: Prisma.ComboProductWhereInput | Prisma.ComboProductWhereInput[]
-  titleTh?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
-  shortDescription?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
-  shortDescTh?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
   description?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
+  shortDescription?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
+  titleTh?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
+  shortDescTh?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
   descriptionTh?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
   totalPrice?: Prisma.DecimalFilter<"ComboProduct"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: Prisma.DecimalFilter<"ComboProduct"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -435,11 +435,11 @@ export type ComboProductOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   sid?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  titleTh?: Prisma.SortOrderInput | Prisma.SortOrder
   slug?: Prisma.SortOrder
-  shortDescription?: Prisma.SortOrderInput | Prisma.SortOrder
-  shortDescTh?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  shortDescription?: Prisma.SortOrderInput | Prisma.SortOrder
+  titleTh?: Prisma.SortOrderInput | Prisma.SortOrder
+  shortDescTh?: Prisma.SortOrderInput | Prisma.SortOrder
   descriptionTh?: Prisma.SortOrderInput | Prisma.SortOrder
   totalPrice?: Prisma.SortOrder
   comboPrice?: Prisma.SortOrder
@@ -468,11 +468,11 @@ export type ComboProductScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"ComboProduct"> | number
   sid?: Prisma.UuidWithAggregatesFilter<"ComboProduct"> | string
   title?: Prisma.StringWithAggregatesFilter<"ComboProduct"> | string
-  titleTh?: Prisma.StringNullableWithAggregatesFilter<"ComboProduct"> | string | null
   slug?: Prisma.StringWithAggregatesFilter<"ComboProduct"> | string
-  shortDescription?: Prisma.StringNullableWithAggregatesFilter<"ComboProduct"> | string | null
-  shortDescTh?: Prisma.StringNullableWithAggregatesFilter<"ComboProduct"> | string | null
   description?: Prisma.StringNullableWithAggregatesFilter<"ComboProduct"> | string | null
+  shortDescription?: Prisma.StringNullableWithAggregatesFilter<"ComboProduct"> | string | null
+  titleTh?: Prisma.StringNullableWithAggregatesFilter<"ComboProduct"> | string | null
+  shortDescTh?: Prisma.StringNullableWithAggregatesFilter<"ComboProduct"> | string | null
   descriptionTh?: Prisma.StringNullableWithAggregatesFilter<"ComboProduct"> | string | null
   totalPrice?: Prisma.DecimalWithAggregatesFilter<"ComboProduct"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: Prisma.DecimalWithAggregatesFilter<"ComboProduct"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -492,11 +492,11 @@ export type ComboProductScalarWhereWithAggregatesInput = {
 export type ComboProductCreateInput = {
   sid?: string
   title: string
-  titleTh?: string | null
   slug: string
-  shortDescription?: string | null
-  shortDescTh?: string | null
   description?: string | null
+  shortDescription?: string | null
+  titleTh?: string | null
+  shortDescTh?: string | null
   descriptionTh?: string | null
   totalPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -519,11 +519,11 @@ export type ComboProductUncheckedCreateInput = {
   id?: number
   sid?: string
   title: string
-  titleTh?: string | null
   slug: string
-  shortDescription?: string | null
-  shortDescTh?: string | null
   description?: string | null
+  shortDescription?: string | null
+  titleTh?: string | null
+  shortDescTh?: string | null
   descriptionTh?: string | null
   totalPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -545,11 +545,11 @@ export type ComboProductUncheckedCreateInput = {
 export type ComboProductUpdateInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -572,11 +572,11 @@ export type ComboProductUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -599,11 +599,11 @@ export type ComboProductCreateManyInput = {
   id?: number
   sid?: string
   title: string
-  titleTh?: string | null
   slug: string
-  shortDescription?: string | null
-  shortDescTh?: string | null
   description?: string | null
+  shortDescription?: string | null
+  titleTh?: string | null
+  shortDescTh?: string | null
   descriptionTh?: string | null
   totalPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -623,11 +623,11 @@ export type ComboProductCreateManyInput = {
 export type ComboProductUpdateManyMutationInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -646,11 +646,11 @@ export type ComboProductUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -671,11 +671,11 @@ export type ComboProductCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   sid?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  titleTh?: Prisma.SortOrder
   slug?: Prisma.SortOrder
-  shortDescription?: Prisma.SortOrder
-  shortDescTh?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  shortDescription?: Prisma.SortOrder
+  titleTh?: Prisma.SortOrder
+  shortDescTh?: Prisma.SortOrder
   descriptionTh?: Prisma.SortOrder
   totalPrice?: Prisma.SortOrder
   comboPrice?: Prisma.SortOrder
@@ -704,11 +704,11 @@ export type ComboProductMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   sid?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  titleTh?: Prisma.SortOrder
   slug?: Prisma.SortOrder
-  shortDescription?: Prisma.SortOrder
-  shortDescTh?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  shortDescription?: Prisma.SortOrder
+  titleTh?: Prisma.SortOrder
+  shortDescTh?: Prisma.SortOrder
   descriptionTh?: Prisma.SortOrder
   totalPrice?: Prisma.SortOrder
   comboPrice?: Prisma.SortOrder
@@ -728,11 +728,11 @@ export type ComboProductMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   sid?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  titleTh?: Prisma.SortOrder
   slug?: Prisma.SortOrder
-  shortDescription?: Prisma.SortOrder
-  shortDescTh?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  shortDescription?: Prisma.SortOrder
+  titleTh?: Prisma.SortOrder
+  shortDescTh?: Prisma.SortOrder
   descriptionTh?: Prisma.SortOrder
   totalPrice?: Prisma.SortOrder
   comboPrice?: Prisma.SortOrder
@@ -894,11 +894,11 @@ export type ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput = {
 export type ComboProductCreateWithoutItemsInput = {
   sid?: string
   title: string
-  titleTh?: string | null
   slug: string
-  shortDescription?: string | null
-  shortDescTh?: string | null
   description?: string | null
+  shortDescription?: string | null
+  titleTh?: string | null
+  shortDescTh?: string | null
   descriptionTh?: string | null
   totalPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -920,11 +920,11 @@ export type ComboProductUncheckedCreateWithoutItemsInput = {
   id?: number
   sid?: string
   title: string
-  titleTh?: string | null
   slug: string
-  shortDescription?: string | null
-  shortDescTh?: string | null
   description?: string | null
+  shortDescription?: string | null
+  titleTh?: string | null
+  shortDescTh?: string | null
   descriptionTh?: string | null
   totalPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -961,11 +961,11 @@ export type ComboProductUpdateToOneWithWhereWithoutItemsInput = {
 export type ComboProductUpdateWithoutItemsInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -987,11 +987,11 @@ export type ComboProductUncheckedUpdateWithoutItemsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1012,11 +1012,11 @@ export type ComboProductUncheckedUpdateWithoutItemsInput = {
 export type ComboProductCreateWithoutImagesInput = {
   sid?: string
   title: string
-  titleTh?: string | null
   slug: string
-  shortDescription?: string | null
-  shortDescTh?: string | null
   description?: string | null
+  shortDescription?: string | null
+  titleTh?: string | null
+  shortDescTh?: string | null
   descriptionTh?: string | null
   totalPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1038,11 +1038,11 @@ export type ComboProductUncheckedCreateWithoutImagesInput = {
   id?: number
   sid?: string
   title: string
-  titleTh?: string | null
   slug: string
-  shortDescription?: string | null
-  shortDescTh?: string | null
   description?: string | null
+  shortDescription?: string | null
+  titleTh?: string | null
+  shortDescTh?: string | null
   descriptionTh?: string | null
   totalPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1079,11 +1079,11 @@ export type ComboProductUpdateToOneWithWhereWithoutImagesInput = {
 export type ComboProductUpdateWithoutImagesInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1105,11 +1105,11 @@ export type ComboProductUncheckedUpdateWithoutImagesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1130,11 +1130,11 @@ export type ComboProductUncheckedUpdateWithoutImagesInput = {
 export type ComboProductCreateWithoutCreatedByUserInput = {
   sid?: string
   title: string
-  titleTh?: string | null
   slug: string
-  shortDescription?: string | null
-  shortDescTh?: string | null
   description?: string | null
+  shortDescription?: string | null
+  titleTh?: string | null
+  shortDescTh?: string | null
   descriptionTh?: string | null
   totalPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1156,11 +1156,11 @@ export type ComboProductUncheckedCreateWithoutCreatedByUserInput = {
   id?: number
   sid?: string
   title: string
-  titleTh?: string | null
   slug: string
-  shortDescription?: string | null
-  shortDescTh?: string | null
   description?: string | null
+  shortDescription?: string | null
+  titleTh?: string | null
+  shortDescTh?: string | null
   descriptionTh?: string | null
   totalPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1191,11 +1191,11 @@ export type ComboProductCreateManyCreatedByUserInputEnvelope = {
 export type ComboProductCreateWithoutUpdatedByUserInput = {
   sid?: string
   title: string
-  titleTh?: string | null
   slug: string
-  shortDescription?: string | null
-  shortDescTh?: string | null
   description?: string | null
+  shortDescription?: string | null
+  titleTh?: string | null
+  shortDescTh?: string | null
   descriptionTh?: string | null
   totalPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1217,11 +1217,11 @@ export type ComboProductUncheckedCreateWithoutUpdatedByUserInput = {
   id?: number
   sid?: string
   title: string
-  titleTh?: string | null
   slug: string
-  shortDescription?: string | null
-  shortDescTh?: string | null
   description?: string | null
+  shortDescription?: string | null
+  titleTh?: string | null
+  shortDescTh?: string | null
   descriptionTh?: string | null
   totalPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1272,11 +1272,11 @@ export type ComboProductScalarWhereInput = {
   id?: Prisma.IntFilter<"ComboProduct"> | number
   sid?: Prisma.UuidFilter<"ComboProduct"> | string
   title?: Prisma.StringFilter<"ComboProduct"> | string
-  titleTh?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
   slug?: Prisma.StringFilter<"ComboProduct"> | string
-  shortDescription?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
-  shortDescTh?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
   description?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
+  shortDescription?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
+  titleTh?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
+  shortDescTh?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
   descriptionTh?: Prisma.StringNullableFilter<"ComboProduct"> | string | null
   totalPrice?: Prisma.DecimalFilter<"ComboProduct"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: Prisma.DecimalFilter<"ComboProduct"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1313,11 +1313,11 @@ export type ComboProductCreateManyCreatedByUserInput = {
   id?: number
   sid?: string
   title: string
-  titleTh?: string | null
   slug: string
-  shortDescription?: string | null
-  shortDescTh?: string | null
   description?: string | null
+  shortDescription?: string | null
+  titleTh?: string | null
+  shortDescTh?: string | null
   descriptionTh?: string | null
   totalPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1337,11 +1337,11 @@ export type ComboProductCreateManyUpdatedByUserInput = {
   id?: number
   sid?: string
   title: string
-  titleTh?: string | null
   slug: string
-  shortDescription?: string | null
-  shortDescTh?: string | null
   description?: string | null
+  shortDescription?: string | null
+  titleTh?: string | null
+  shortDescTh?: string | null
   descriptionTh?: string | null
   totalPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1360,11 +1360,11 @@ export type ComboProductCreateManyUpdatedByUserInput = {
 export type ComboProductUpdateWithoutCreatedByUserInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1386,11 +1386,11 @@ export type ComboProductUncheckedUpdateWithoutCreatedByUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1412,11 +1412,11 @@ export type ComboProductUncheckedUpdateManyWithoutCreatedByUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1435,11 +1435,11 @@ export type ComboProductUncheckedUpdateManyWithoutCreatedByUserInput = {
 export type ComboProductUpdateWithoutUpdatedByUserInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1461,11 +1461,11 @@ export type ComboProductUncheckedUpdateWithoutUpdatedByUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1487,11 +1487,11 @@ export type ComboProductUncheckedUpdateManyWithoutUpdatedByUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionTh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   comboPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1551,11 +1551,11 @@ export type ComboProductSelect<ExtArgs extends runtime.Types.Extensions.Internal
   id?: boolean
   sid?: boolean
   title?: boolean
-  titleTh?: boolean
   slug?: boolean
-  shortDescription?: boolean
-  shortDescTh?: boolean
   description?: boolean
+  shortDescription?: boolean
+  titleTh?: boolean
+  shortDescTh?: boolean
   descriptionTh?: boolean
   totalPrice?: boolean
   comboPrice?: boolean
@@ -1581,11 +1581,11 @@ export type ComboProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   id?: boolean
   sid?: boolean
   title?: boolean
-  titleTh?: boolean
   slug?: boolean
-  shortDescription?: boolean
-  shortDescTh?: boolean
   description?: boolean
+  shortDescription?: boolean
+  titleTh?: boolean
+  shortDescTh?: boolean
   descriptionTh?: boolean
   totalPrice?: boolean
   comboPrice?: boolean
@@ -1608,11 +1608,11 @@ export type ComboProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   id?: boolean
   sid?: boolean
   title?: boolean
-  titleTh?: boolean
   slug?: boolean
-  shortDescription?: boolean
-  shortDescTh?: boolean
   description?: boolean
+  shortDescription?: boolean
+  titleTh?: boolean
+  shortDescTh?: boolean
   descriptionTh?: boolean
   totalPrice?: boolean
   comboPrice?: boolean
@@ -1635,11 +1635,11 @@ export type ComboProductSelectScalar = {
   id?: boolean
   sid?: boolean
   title?: boolean
-  titleTh?: boolean
   slug?: boolean
-  shortDescription?: boolean
-  shortDescTh?: boolean
   description?: boolean
+  shortDescription?: boolean
+  titleTh?: boolean
+  shortDescTh?: boolean
   descriptionTh?: boolean
   totalPrice?: boolean
   comboPrice?: boolean
@@ -1656,7 +1656,7 @@ export type ComboProductSelectScalar = {
   updatedBy?: boolean
 }
 
-export type ComboProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "title" | "titleTh" | "slug" | "shortDescription" | "shortDescTh" | "description" | "descriptionTh" | "totalPrice" | "comboPrice" | "startsAt" | "endsAt" | "status" | "isFeatured" | "seoMetadata" | "createdAt" | "updatedAt" | "deletedAt" | "publishedAt" | "createdBy" | "updatedBy", ExtArgs["result"]["comboProduct"]>
+export type ComboProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "title" | "slug" | "description" | "shortDescription" | "titleTh" | "shortDescTh" | "descriptionTh" | "totalPrice" | "comboPrice" | "startsAt" | "endsAt" | "status" | "isFeatured" | "seoMetadata" | "createdAt" | "updatedAt" | "deletedAt" | "publishedAt" | "createdBy" | "updatedBy", ExtArgs["result"]["comboProduct"]>
 export type ComboProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   images?: boolean | Prisma.ComboProduct$imagesArgs<ExtArgs>
   items?: boolean | Prisma.ComboProduct$itemsArgs<ExtArgs>
@@ -1685,11 +1685,11 @@ export type $ComboProductPayload<ExtArgs extends runtime.Types.Extensions.Intern
     id: number
     sid: string
     title: string
-    titleTh: string | null
     slug: string
-    shortDescription: string | null
-    shortDescTh: string | null
     description: string | null
+    shortDescription: string | null
+    titleTh: string | null
+    shortDescTh: string | null
     descriptionTh: string | null
     totalPrice: runtime.Decimal
     comboPrice: runtime.Decimal
@@ -2134,11 +2134,11 @@ export interface ComboProductFieldRefs {
   readonly id: Prisma.FieldRef<"ComboProduct", 'Int'>
   readonly sid: Prisma.FieldRef<"ComboProduct", 'String'>
   readonly title: Prisma.FieldRef<"ComboProduct", 'String'>
-  readonly titleTh: Prisma.FieldRef<"ComboProduct", 'String'>
   readonly slug: Prisma.FieldRef<"ComboProduct", 'String'>
-  readonly shortDescription: Prisma.FieldRef<"ComboProduct", 'String'>
-  readonly shortDescTh: Prisma.FieldRef<"ComboProduct", 'String'>
   readonly description: Prisma.FieldRef<"ComboProduct", 'String'>
+  readonly shortDescription: Prisma.FieldRef<"ComboProduct", 'String'>
+  readonly titleTh: Prisma.FieldRef<"ComboProduct", 'String'>
+  readonly shortDescTh: Prisma.FieldRef<"ComboProduct", 'String'>
   readonly descriptionTh: Prisma.FieldRef<"ComboProduct", 'String'>
   readonly totalPrice: Prisma.FieldRef<"ComboProduct", 'Decimal'>
   readonly comboPrice: Prisma.FieldRef<"ComboProduct", 'Decimal'>

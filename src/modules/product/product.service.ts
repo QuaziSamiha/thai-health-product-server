@@ -31,6 +31,7 @@ import {
   CategoryProductStatus,
   ProductType,
   StockStatus,
+  DiscountType,
 } from '../../generated/prisma/enums';
 import type {
   IPaginatedResult,
@@ -44,13 +45,23 @@ const PRODUCT_IMAGE_FOLDER = 'products/gallery';
 //* OVERRIDE PER SECTION.
 const DEFAULT_HOME_SECTION_LIMIT = 8;
 
+//* MIRRORS THE SCHEMA COLUMN DEFAULT (Product.lowStockThreshold /
+//* ProductVariant.lowStockThreshold) — USED WHEN A CREATE PAYLOAD OMITS IT,
+//* SO THE APP-COMPUTED stockStatus MATCHES WHAT THE DB TRIGGER WILL ALSO
+//* DERIVE FROM THE COLUMN'S OWN DEFAULT.
+const DEFAULT_LOW_STOCK_THRESHOLD = 10;
+
 //* THE SLICE OF A STORED VARIANT THE RECONCILE LOGIC NEEDS — STRUCTURALLY
 //* SATISFIED BY THE ROWS `findByIdAdmin` ALREADY LOADS.
 interface ExistingVariantState {
   id: number;
   name: string;
   quantity: number;
+  lowStockThreshold: number;
   isDefault: boolean;
+  basePrice: unknown;
+  discountType: DiscountType;
+  discountValue: unknown;
 }
 
 @Injectable()
@@ -181,15 +192,6 @@ export class ProductService {
     );
   }
 
-  /** Active COMBO products for a "Combo Deals" home section. */
-  async getComboProducts(
-    limit = DEFAULT_HOME_SECTION_LIMIT,
-  ): Promise<ProductResponsePublicDto[]> {
-    return this.toPublicDtoList(
-      await this.productRepository.findComboProducts(limit),
-    );
-  }
-
   /** Active products flagged `isFeatured`. */
   async getFeaturedProducts(
     limit = DEFAULT_HOME_SECTION_LIMIT,
@@ -248,6 +250,10 @@ export class ProductService {
       );
     }
 
+    if (dto.type === ProductType.SIMPLE && dto.variants?.length) {
+      throw new BadRequestException('SIMPLE products cannot have variants');
+    }
+
     const uploadedPaths: string[] = [];
     try {
       for (const file of images) {
@@ -261,14 +267,30 @@ export class ProductService {
     }
 
     try {
-      const { hasVariants, quantity, totalStock, stockStatus, variants } =
-        this.buildStockAndVariants(slug, dto.variants, dto.quantity);
+      const {
+        hasVariants,
+        quantity,
+        totalStock,
+        stockStatus,
+        lowStockThreshold,
+        variants,
+      } = this.buildStockAndVariants(
+        slug,
+        dto.variants,
+        dto.quantity,
+        dto.lowStockThreshold,
+      );
 
       //* A VARIABLE PRODUCT MAY OMIT ITS OWN BASE PRICE — FALL BACK TO THE
       //* DEFAULT VARIANT'S SO LISTINGS SHOW A REAL PRICE INSTEAD OF THE
       //* COLUMN DEFAULT 0.
       const defaultVariant = variants.find((v) => v.isDefault) ?? variants[0];
-      const basePrice = dto.basePrice ?? defaultVariant?.basePrice;
+      const basePrice = dto.basePrice ?? Number(defaultVariant?.basePrice ?? 0);
+      const { discountType, discountValue, salePrice } = this.resolveSalePrice(
+        basePrice,
+        dto.discountType,
+        dto.discountValue,
+      );
 
       const created = await this.productRepository.createProduct({
         name: dto.name,
@@ -299,9 +321,9 @@ export class ProductService {
             ? new Date()
             : undefined,
         basePrice,
-        discountType: dto.discountType,
-        discountValue: dto.discountValue,
-        salePrice: dto.salePrice,
+        discountType,
+        discountValue,
+        salePrice,
         costPrice: dto.costPrice,
         weight: dto.weight,
         dimensions: toPlainJson(dto.dimensions),
@@ -325,6 +347,7 @@ export class ProductService {
         quantity,
         totalStock,
         stockStatus,
+        lowStockThreshold,
         images: uploadedPaths.map((path, index) => ({
           url: path,
           displayOrder: index,
@@ -360,22 +383,27 @@ export class ProductService {
     productSlug: string,
     variantDto: CreateProductVariantDto[] | undefined,
     simpleQuantity: number | undefined,
+    productLowStockThreshold: number | undefined,
   ): {
     hasVariants: boolean;
     quantity: number;
     totalStock: number;
     stockStatus: StockStatus;
+    lowStockThreshold: number;
     variants: Prisma.ProductVariantCreateManyProductInput[];
   } {
     const hasVariants = Boolean(variantDto?.length);
 
     if (!hasVariants) {
       const quantity = simpleQuantity ?? 0;
+      const lowStockThreshold =
+        productLowStockThreshold ?? DEFAULT_LOW_STOCK_THRESHOLD;
       return {
         hasVariants,
         quantity,
         totalStock: quantity,
-        stockStatus: this.computeStockStatus(quantity),
+        stockStatus: this.computeStockStatus(quantity, lowStockThreshold),
+        lowStockThreshold,
         variants: [],
       };
     }
@@ -388,12 +416,15 @@ export class ProductService {
     }
 
     const totalStock = variants.reduce((sum, v) => sum + (v.quantity ?? 0), 0);
+    const lowStockThreshold =
+      productLowStockThreshold ?? DEFAULT_LOW_STOCK_THRESHOLD;
 
     return {
       hasVariants,
       quantity: 0,
       totalStock,
-      stockStatus: this.computeStockStatus(totalStock),
+      stockStatus: this.computeStockStatus(totalStock, lowStockThreshold),
+      lowStockThreshold,
       variants,
     };
   }
@@ -404,7 +435,10 @@ export class ProductService {
     index: number,
   ): Prisma.ProductVariantCreateManyProductInput {
     const quantity = variant.quantity ?? 0;
+    const lowStockThreshold =
+      variant.lowStockThreshold ?? DEFAULT_LOW_STOCK_THRESHOLD;
     const slugSeed = variant.name ?? variant.size ?? `variant-${index + 1}`;
+    const basePrice = variant.basePrice ?? 0;
 
     return {
       // Variant name/slug are unique across ALL products in the current
@@ -413,13 +447,16 @@ export class ProductService {
       name: variant.name ?? `${productSlug} ${variant.size ?? ''}`.trim(),
       slug: `${productSlug}-${generateSlug(slugSeed)}`,
       size: variant.size,
-      basePrice: variant.basePrice ?? 0,
-      discountType: variant.discountType,
-      discountValue: variant.discountValue,
-      salePrice: variant.salePrice,
+      basePrice,
+      ...this.resolveSalePrice(
+        basePrice,
+        variant.discountType,
+        variant.discountValue,
+      ),
       costPrice: variant.costPrice,
       quantity,
-      stockStatus: this.computeStockStatus(quantity),
+      lowStockThreshold,
+      stockStatus: this.computeStockStatus(quantity, lowStockThreshold),
       sku: variant.sku,
       barcode: variant.barcode,
       weight: variant.weight,
@@ -428,8 +465,111 @@ export class ProductService {
     };
   }
 
-  private computeStockStatus(quantity: number): StockStatus {
-    return quantity > 0 ? StockStatus.IN_STOCK : StockStatus.OUT_OF_STOCK;
+  private computeStockStatus(
+    quantity: number,
+    lowStockThreshold: number,
+  ): StockStatus {
+    if (quantity <= 0) return StockStatus.OUT_OF_STOCK;
+    if (quantity <= lowStockThreshold) return StockStatus.LOW_STOCK;
+    return StockStatus.IN_STOCK;
+  }
+
+  /**
+   * `salePrice` is never accepted from the client — it's always derived here
+   * from `basePrice` + `discountType`/`discountValue`, for both the product
+   * and each variant. `discountType` defaults to PERCENTAGE whenever it's
+   * omitted — including when there's no discount at all, since the column
+   * is `NOT NULL DEFAULT PERCENTAGE`. No discount value means no discount:
+   * `salePrice` mirrors `basePrice`. Rounded to 2 decimal places (currency).
+   */
+  private resolveSalePrice(
+    basePrice: number,
+    discountType: DiscountType | undefined,
+    discountValue: number | undefined,
+  ): {
+    discountType: DiscountType;
+    discountValue: number | undefined;
+    salePrice: number;
+  } {
+    const effectiveType = discountType ?? DiscountType.PERCENTAGE;
+
+    if (discountValue === undefined) {
+      return {
+        discountType: effectiveType,
+        discountValue: undefined,
+        salePrice: basePrice,
+      };
+    }
+
+    let salePrice: number;
+    if (effectiveType === DiscountType.PERCENTAGE) {
+      if (discountValue > 100) {
+        throw new BadRequestException(
+          'Percentage discount value cannot exceed 100',
+        );
+      }
+      salePrice = basePrice * (1 - discountValue / 100);
+    } else {
+      if (discountValue > basePrice) {
+        throw new BadRequestException(
+          'Fixed discount value cannot exceed the base price',
+        );
+      }
+      salePrice = basePrice - discountValue;
+    }
+
+    return {
+      discountType: effectiveType,
+      discountValue,
+      salePrice: Math.round(salePrice * 100) / 100,
+    };
+  }
+
+  /**
+   * Update-path counterpart to `resolveSalePrice`: only recomputes pricing
+   * fields when this request actually touches `basePrice`/`discountType`/
+   * `discountValue`, falling back to the row's current values for whatever
+   * wasn't sent. Returns `{}` (nothing touched) when none of the three are
+   * part of the payload.
+   */
+  private resolvePricingUpdate(
+    current: {
+      basePrice: unknown;
+      discountType: DiscountType;
+      discountValue: unknown;
+    },
+    dto: {
+      basePrice?: number;
+      discountType?: DiscountType;
+      discountValue?: number;
+    },
+  ): {
+    discountType?: DiscountType;
+    discountValue?: number | null;
+    salePrice?: number;
+  } {
+    const touchesPricing =
+      dto.basePrice !== undefined ||
+      dto.discountType !== undefined ||
+      dto.discountValue !== undefined;
+    if (!touchesPricing) {
+      return {};
+    }
+
+    const { discountType, discountValue, salePrice } = this.resolveSalePrice(
+      dto.basePrice ?? Number(current.basePrice),
+      dto.discountType ?? current.discountType,
+      dto.discountValue ??
+        (current.discountValue !== null
+          ? Number(current.discountValue)
+          : undefined),
+    );
+
+    return {
+      discountType,
+      discountValue: discountValue ?? null,
+      salePrice,
+    };
   }
 
   /**
@@ -518,6 +658,8 @@ export class ProductService {
         slug,
       );
 
+      const pricingFields = this.resolvePricingUpdate(existing, dto);
+
       const updated = await this.productRepository.withTransaction(
         async (tx) => {
           if (variantPlan) {
@@ -567,9 +709,6 @@ export class ProductService {
                   ? new Date()
                   : undefined,
               basePrice: dto.basePrice,
-              discountType: dto.discountType,
-              discountValue: dto.discountValue,
-              salePrice: dto.salePrice,
               costPrice: dto.costPrice,
               weight: dto.weight,
               dimensions: toPlainJson(dto.dimensions),
@@ -590,6 +729,7 @@ export class ProductService {
               categoryId: dto.categoryId,
               updatedBy: userId,
               ...stockFields,
+              ...pricingFields,
             },
             tx,
           );
@@ -626,15 +766,21 @@ export class ProductService {
    * ignores `undefined` keys, so they stay whatever they already were).
    * Reuses the exact same invariant as `createProduct`.
    *
-   * Known limitation: flipping `type` between SIMPLE and VARIABLE without
-   * also providing `variants` does not itself create/remove variant rows —
-   * that's a separate, more destructive operation this method intentionally
-   * doesn't attempt implicitly.
+   * Also enforces the two type invariants against the product's *current*
+   * DB state, which the DTO layer can't see on its own:
+   * - VARIABLE must end up with at least one variant — flipping to VARIABLE
+   *   (or re-affirming it) requires either an existing variant or a
+   *   `variants` array in this same request.
+   * - SIMPLE must end up with none — rejected if `variants` is sent, or if
+   *   the product already has variants (remove them first, in a separate
+   *   request, before flipping to SIMPLE).
    */
   private resolveStockUpdate(
     current: {
       type: ProductType;
       quantity: number;
+      totalStock: number;
+      lowStockThreshold: number;
       variants: ExistingVariantState[];
     },
     dto: UpdateProductDto,
@@ -646,12 +792,15 @@ export class ProductService {
     const touchesStock =
       dto.type !== undefined ||
       dto.quantity !== undefined ||
-      dto.variants !== undefined;
+      dto.variants !== undefined ||
+      dto.lowStockThreshold !== undefined;
     if (!touchesStock) {
       return { fields: {} };
     }
 
     const effectiveType = dto.type ?? current.type;
+    const lowStockThreshold =
+      dto.lowStockThreshold ?? current.lowStockThreshold;
 
     if (effectiveType === ProductType.VARIABLE) {
       if (dto.variants !== undefined) {
@@ -665,12 +814,40 @@ export class ProductService {
             hasVariants: true,
             quantity: 0,
             totalStock,
-            stockStatus: this.computeStockStatus(totalStock),
+            lowStockThreshold,
+            stockStatus: this.computeStockStatus(totalStock, lowStockThreshold),
           },
           variantPlan: plan,
         };
       }
-      return { fields: { hasVariants: true, quantity: 0 } };
+      if (current.variants.length === 0) {
+        throw new BadRequestException(
+          'At least one variant is required when type is VARIABLE — include a `variants` array in this request',
+        );
+      }
+      return {
+        fields: {
+          hasVariants: true,
+          quantity: 0,
+          lowStockThreshold,
+          //* totalStock ISN'T CHANGING HERE (NO `variants` IN THIS REQUEST) —
+          //* BUT stockStatus STILL NEEDS RECOMPUTING AGAINST current.totalStock
+          //* SINCE THIS BRANCH CAN BE REACHED BY AN lowStockThreshold-ONLY UPDATE.
+          stockStatus: this.computeStockStatus(
+            current.totalStock,
+            lowStockThreshold,
+          ),
+        },
+      };
+    }
+
+    if (dto.variants !== undefined) {
+      throw new BadRequestException('SIMPLE products cannot have variants');
+    }
+    if (current.variants.length > 0) {
+      throw new BadRequestException(
+        'Cannot switch to SIMPLE while variants exist — remove all variants first',
+      );
     }
 
     const quantity = dto.quantity ?? current.quantity;
@@ -679,7 +856,8 @@ export class ProductService {
         hasVariants: false,
         quantity,
         totalStock: quantity,
-        stockStatus: this.computeStockStatus(quantity),
+        lowStockThreshold,
+        stockStatus: this.computeStockStatus(quantity, lowStockThreshold),
       },
     };
   }
@@ -756,11 +934,12 @@ export class ProductService {
 
       if (existing) {
         totalStock += entry.quantity ?? existing.quantity;
+        const pricingFields = this.resolvePricingUpdate(existing, entry);
         updates.push({
           id: existing.id,
           //* undefined FIELDS ARE SKIPPED BY PRISMA — ONLY WHAT THE PAYLOAD
-          //* ACTUALLY PROVIDED (PLUS DERIVED slug/stockStatus/isDefault)
-          //* GETS WRITTEN.
+          //* ACTUALLY PROVIDED (PLUS DERIVED slug/stockStatus/isDefault/
+          //* PRICING) GETS WRITTEN.
           data: {
             name: entry.name,
             slug:
@@ -769,14 +948,17 @@ export class ProductService {
                 : undefined,
             size: entry.size,
             basePrice: entry.basePrice,
-            discountType: entry.discountType,
-            discountValue: entry.discountValue,
-            salePrice: entry.salePrice,
+            ...pricingFields,
             costPrice: entry.costPrice,
             quantity: entry.quantity,
+            lowStockThreshold: entry.lowStockThreshold,
             stockStatus:
-              entry.quantity !== undefined
-                ? this.computeStockStatus(entry.quantity)
+              entry.quantity !== undefined ||
+              entry.lowStockThreshold !== undefined
+                ? this.computeStockStatus(
+                    entry.quantity ?? existing.quantity,
+                    entry.lowStockThreshold ?? existing.lowStockThreshold,
+                  )
                 : undefined,
             sku: entry.sku,
             barcode: entry.barcode,

@@ -89,6 +89,14 @@ export class ProductVariantDto {
   stockStatus!: StockStatus;
 
   @Expose()
+  @ApiProperty({
+    description:
+      "Stock count at/below which this variant's `stockStatus` becomes LOW_STOCK",
+    example: 10,
+  })
+  lowStockThreshold!: number;
+
+  @Expose()
   @ApiPropertyOptional({
     description: 'Weight in kilograms',
     example: 0.2,
@@ -114,13 +122,14 @@ export class ProductVariantDto {
   basePrice!: number;
 
   @Expose()
-  @ApiPropertyOptional({
+  @ApiProperty({
     enum: DiscountType,
     enumName: 'DiscountType',
-    description: 'How `discountValue`/`salePrice` was configured',
+    description:
+      'How `discountValue` is applied to derive `salePrice`. Defaults to PERCENTAGE when no discount is configured.',
     example: DiscountType.PERCENTAGE,
   })
-  discountType?: DiscountType;
+  discountType!: DiscountType;
 
   @Expose()
   @ApiPropertyOptional({
@@ -180,10 +189,11 @@ export class ProductVariantDto {
     this.barcode = variant.barcode ?? undefined;
     this.quantity = variant.quantity!;
     this.stockStatus = variant.stockStatus!;
+    this.lowStockThreshold = variant.lowStockThreshold!;
     this.weight = toPrice(variant.weight);
     this.size = variant.size ?? undefined;
     this.basePrice = Number(variant.basePrice);
-    this.discountType = variant.discountType ?? undefined;
+    this.discountType = variant.discountType!;
     this.discountValue = toPrice(variant.discountValue);
     this.salePrice = toPrice(variant.salePrice);
     this.costPrice = toPrice(variant.costPrice);

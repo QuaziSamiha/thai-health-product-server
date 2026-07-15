@@ -10,7 +10,10 @@ import { ConfigService } from '@nestjs/config';
 import { ComboProductRepository } from './combo-product.repository';
 import { CreateComboProductDto } from './dto/create-combo-product.dto';
 import { ComboItemDto } from './dto/combo-item.dto';
-import { ComboProductResponseDto } from './dto/combo-product-response.dto';
+import {
+  ComboProductResponseDto,
+  ComboProductResponsePublicDto,
+} from './dto/combo-product-response.dto';
 import { generateSlug } from '../../common/utils/slug.util';
 import { parseStoragePath } from '../../common/utils/storage-path.util';
 import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
@@ -19,6 +22,7 @@ import { Prisma } from '../../generated/prisma/client';
 import { CategoryProductStatus } from '../../generated/prisma/enums';
 
 const COMBO_IMAGE_FOLDER = 'combos/gallery';
+const DEFAULT_HOME_SECTION_LIMIT = 8;
 
 @Injectable()
 export class ComboProductService {
@@ -119,6 +123,18 @@ export class ComboProductService {
       );
       throw createError;
     }
+  }
+
+  /** Active combos for a "Combo Deals" home section. */
+  async getActiveCombosForHome(
+    limit = DEFAULT_HOME_SECTION_LIMIT,
+  ): Promise<ComboProductResponsePublicDto[]> {
+    const baseUrl = this.configService.get<string>('app.baseUrl');
+    const combos =
+      await this.comboProductRepository.findActiveCombosForHome(limit);
+    return combos.map(
+      (combo) => new ComboProductResponsePublicDto(combo, baseUrl),
+    );
   }
 
   /**

@@ -127,15 +127,17 @@ erDiagram
 | `FIXED`      | The discount is a flat currency amount.                                  |
 | `PERCENTAGE` | The discount is a percentage of `basePrice`.                             |
 
-> `DiscountType` only tags *how a discount was configured*, paired with `discountValue` (the raw configured amount/percentage) — identical shape on `Product` and `ProductVariant`. Neither field itself computes anything — `salePrice` is expected to already hold the final, resolved price. There is no DB-level relationship enforcing `salePrice` against `discountType`/`discountValue`; keep that consistent in the service layer (see [Financial Integrity](#financial-integrity--pricing) below).
+> `DiscountType` only tags *how a discount was configured*, paired with `discountValue` (the raw configured amount/percentage) — identical shape on `Product` and `ProductVariant`. Neither field itself computes anything — `salePrice` is expected to already hold the final, resolved price. A DB `CHECK` constraint bounds `discountValue` against `discountType` (see [Financial Integrity](#financial-integrity--pricing) below), but nothing at the DB level ties the *resolved* `salePrice` back to `discountType`/`discountValue` — that derivation stays a service-layer responsibility.
 
 ### `StockStatus`
 
 | Value          | Meaning                                                                                 |
 | :------------- | :----------------------------------------------------------------------------------------- |
-| `IN_STOCK`     | Available quantity above the low-stock threshold.                                          |
-| `LOW_STOCK`    | Available but below a reorder threshold. **Note:** the schema has no `lowStockThreshold` column, so this value currently has no defined derivation rule — it must be computed and set by application logic. |
+| `IN_STOCK`     | Available quantity above `lowStockThreshold`.                                              |
+| `LOW_STOCK`    | Available (quantity > 0) but at or below `lowStockThreshold`.                              |
 | `OUT_OF_STOCK` | Zero available quantity. Default value on creation.                                        |
+
+`lowStockThreshold` lives on both `Product` and `ProductVariant` (default `10`), compared against the row's own effective count — `quantity`/`totalStock` for `Product` (whichever is authoritative per `type`), `quantity` for `ProductVariant`. Both `stockStatus` and `lowStockThreshold` are kept in sync by the same DB triggers described under `total_stock` above, not purely application logic — see `sync_variant_stock_status` / `sync_product_stock_fields` (`prisma/migrations/20260715130000_add_low_stock_threshold`).
 
 ### `CategoryProductStatus` (shared with `Category`, defined in `shared.prisma`)
 
@@ -174,12 +176,14 @@ erDiagram
 | `isFeatured`        | `BOOLEAN`               | NOT NULL, DEFAULT `false`                                         | Drives homepage/featured sections.                                            |
 | `hasVariants`       | `BOOLEAN`                | NOT NULL, DEFAULT `false`                                         | **Denormalized cache** of `variants.length > 0` — read-fast flag for UI branching (Add-to-Cart vs. Select-Options). |
 | `costPrice`         | `DECIMAL(12,2)`          | NULLABLE                                                          | Internal cost basis for margin reporting. Never expose on public API.         |
-| `discountType`      | `ENUM(DiscountType)`     | NULLABLE                                                          | `FIXED` or `PERCENTAGE` — informational tag for how `salePrice` was set.      |
+| `discountType`      | `ENUM(DiscountType)`     | NOT NULL, DEFAULT `PERCENTAGE`                                    | `FIXED` or `PERCENTAGE` — informational tag for how `salePrice` was set.      |
+| `discountValue`     | `DECIMAL(12,2)`          | NULLABLE, `CHECK` (see below)                                     | Raw configured discount, paired with `discountType`. `CHECK`: `NULL`, or `>= 0` and (`PERCENTAGE` → `<= 100`, `FIXED` → `<= basePrice`). |
 | `basePrice`         | `DECIMAL(12,2)`          | NOT NULL, DEFAULT `0`                                             | MSRP / list price. `Decimal` avoids floating-point rounding errors.           |
-| `salePrice`         | `DECIMAL(12,2)`          | NULLABLE                                                          | Final discounted price shown on storefront. No DB `CHECK` enforcing `salePrice < basePrice` — validate in the service layer. |
+| `salePrice`         | `DECIMAL(12,2)`          | NOT NULL, `CHECK` (`0 <= salePrice <= basePrice`)                 | Final discounted price shown on storefront.                                   |
 | `quantity`          | `INT`                    | NOT NULL, DEFAULT `0`                                             | Stock count — authoritative only when `type = SIMPLE`.                        |
 | `totalStock`        | `INT`                    | NOT NULL, DEFAULT `0`, `@map("total_stock")`                       | **Denormalized cache** — sum of all `ProductVariant.quantity` for `VARIABLE` products. Must be kept in sync by application logic or a DB trigger; nothing enforces it automatically today. |
 | `stockStatus`       | `ENUM(StockStatus)`      | NOT NULL, DEFAULT `OUT_OF_STOCK`                                  | Cached badge state for listing pages.                                         |
+| `lowStockThreshold` | `INT`                    | NOT NULL, DEFAULT `10`, `@map("low_stock_threshold")`               | Threshold `stockStatus` compares the effective count against to decide `LOW_STOCK`. |
 | `weight`            | `DECIMAL(10,3)`          | NULLABLE                                                          | Weight in kilograms, used for shipping cost calculation.                      |
 | `dimensions`        | `JSONB`                  | DEFAULT `{}`                                                      | `{ length, width, height, unit }` — see [Detailed Field Examples](#detailed-field-examples-json-objects). |
 | `seoMetadata`       | `JSONB`                  | DEFAULT `{}`                                                      | Consolidated `metaTitle`/`metaDescription` (EN + TH) for a cleaner API shape.  |
@@ -214,13 +218,14 @@ erDiagram
 | `barcode`           | `VARCHAR(100)`        | NULLABLE, **no unique constraint**                            | ⚠️ Inconsistent with `Product.barcode`, which is unique — see Known Gaps.      |
 | `quantity`          | `INT`                 | NOT NULL, DEFAULT `0`                                        | Stock count for this specific variant.                                        |
 | `stockStatus`       | `ENUM(StockStatus)`   | NOT NULL, DEFAULT `OUT_OF_STOCK`                              | Cached badge state.                                                            |
+| `lowStockThreshold` | `INT`                 | NOT NULL, DEFAULT `10`, `@map("low_stock_threshold")`         | Threshold `stockStatus` compares this variant's own `quantity` against to decide `LOW_STOCK`. |
 | `weight`            | `DECIMAL(10,3)`        | NULLABLE                                                    | Weight in kg (overrides parent for shipping calc, if set).                    |
 | `size`              | `VARCHAR(50)`          | NULLABLE                                                    | Free-text size label (e.g. `"500ml"`).                                        |
 | `costPrice`         | `DECIMAL(12,2)`        | NULLABLE                                                    | Cost basis for margin reporting.                                              |
-| `discountType`      | `ENUM(DiscountType)`   | NULLABLE                                                    | `FIXED` or `PERCENTAGE` tag for `discountValue`/`salePrice`.                   |
-| `discountValue`     | `DECIMAL(12,2)`        | NULLABLE                                                    | Raw configured discount, paired with `discountType`.                          |
+| `discountType`      | `ENUM(DiscountType)`   | NOT NULL, DEFAULT `PERCENTAGE`                               | `FIXED` or `PERCENTAGE` tag for `discountValue`/`salePrice`.                   |
+| `discountValue`     | `DECIMAL(12,2)`        | NULLABLE, `CHECK` (see below)                                | Raw configured discount, paired with `discountType`. `CHECK`: `NULL`, or `>= 0` and (`PERCENTAGE` → `<= 100`, `FIXED` → `<= basePrice`). |
 | `basePrice`         | `DECIMAL(12,2)`        | NOT NULL, DEFAULT `0`                                        | Variant-specific list price.                                                  |
-| `salePrice`         | `DECIMAL(12,2)`        | NULLABLE                                                    | Final discounted price for this variant.                                      |
+| `salePrice`         | `DECIMAL(12,2)`        | NOT NULL, `CHECK` (`0 <= salePrice <= basePrice`)            | Final discounted price for this variant.                                      |
 | `attributes`        | `JSONB`                 | NOT NULL, DEFAULT `{}`                                       | Free-form key/value pairs, e.g. `{"color": "Red", "size": "XL"}`.             |
 | `isDefault`         | `BOOLEAN`               | NOT NULL, DEFAULT `false`                                    | Marks the variant pre-selected on the PDP. **No DB constraint** prevents multiple defaults per product — see Known Gaps. |
 | `productId`         | `INT`                   | FK → `products.id`, NOT NULL, **ON DELETE CASCADE**            | Parent product. Deleting the parent deletes all variants.                     |
@@ -479,12 +484,12 @@ None currently defined for this domain. If reporting needs (e.g. "products with 
 ### 2. Financial Integrity & Pricing
 
 - `basePrice` (identical field name/shape on `Product` and `ProductVariant`) is always the pre-discount reference price. If `salePrice` is present, it is expected to be the final, already-resolved price — **not** a raw percentage. `discountValue` is the raw configured amount/percentage that produced it, paired with `discountType`.
-- There is **no DB `CHECK` constraint** enforcing `salePrice < basePrice` or non-negative prices/quantities. Validate this at the DTO/service boundary (e.g. `class-validator` custom validator) before writing.
+- DB `CHECK` constraints exist as defense-in-depth on both `products` and `product_variants` (see `prisma/migrations/20260714200001_backfill_stock_price_check_constraints` and `20260715140000_add_discount_value_check_constraints`): `basePrice`/`quantity`/`total_stock` non-negative, `0 <= salePrice <= basePrice`, and `discountValue` bound to `discountType` (`NULL`, or `>= 0` and — `PERCENTAGE` → `<= 100`, `FIXED` → `<= basePrice`). These mirror, not replace, the app-level validation in `ProductService.resolveSalePrice`/`resolvePricingUpdate` — still validate at the DTO/service boundary first for a clean `400` instead of a raw DB error.
 - Never do price arithmetic in plain JS floating point — use `Decimal` consistently end-to-end (Prisma already returns `Decimal.js`-backed values for these columns; don't coerce to `number` before doing math).
 
 ### 3. Inventory & Cache Sync Logic
 
-`hasVariants`, `totalStock`, and `stockStatus` on `Product` are all **denormalized caches with no automatic sync mechanism** (no DB trigger exists today). Any service method that creates/updates/deletes a `ProductVariant`, or writes an `Inventory` movement, must also recompute the parent `Product`'s cached fields — inside the same transaction (see the `withTransaction` pattern in `docs/concepts/prisma-concepts.md`). Concretely:
+`hasVariants`, `totalStock`, and `stockStatus` on `Product` are **denormalized caches**. `totalStock` and `stockStatus` (on both `Product` and `ProductVariant`) *are* kept in sync by DB triggers (`sync_variant_stock_status`, `sync_product_stock_fields`, `sync_product_total_stock_from_variants` — see `prisma/migrations/20260714200002_backfill_stock_sync_triggers` and `20260715130000_add_low_stock_threshold`) as a safety net, but service code should still set them explicitly rather than relying on the trigger alone. `hasVariants` has no trigger and must be set by application code. Any service method that creates/updates/deletes a `ProductVariant`, or writes an `Inventory` movement, should recompute the parent `Product`'s cached fields — inside the same transaction (see the `withTransaction` pattern in `docs/concepts/prisma-concepts.md`). Concretely:
 
 ```ts
 await this.productRepo.withTransaction(async (tx) => {

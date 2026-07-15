@@ -50,8 +50,7 @@ export type InventoryExchangeType = (typeof InventoryExchangeType)[keyof typeof 
 
 export const ProductType = {
   SIMPLE: 'SIMPLE',
-  VARIABLE: 'VARIABLE',
-  COMBO: 'COMBO'
+  VARIABLE: 'VARIABLE'
 } as const
 
 export type ProductType = (typeof ProductType)[keyof typeof ProductType]

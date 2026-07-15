@@ -7,6 +7,7 @@ import { PaginationModule } from '../../shared/pagination';
 import { StorageModule } from '../../shared/storage/storage.module';
 import { CategoryModule } from '../category/category.module';
 import { ProductModule } from '../product/product.module';
+import { ComboProductModule } from '../combo-product/combo-product.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ProductModule } from '../product/product.module';
     StorageModule,
     CategoryModule,
     ProductModule,
+    ComboProductModule,
   ],
   controllers: [HomeController],
   providers: [HomeService, HomeRepository],

@@ -130,7 +130,7 @@ export class ProductResponseDto {
   @ApiProperty({
     enum: ProductType,
     enumName: 'ProductType',
-    description: 'SIMPLE / VARIABLE / COMBO discriminator',
+    description: 'SIMPLE / VARIABLE discriminator',
     example: ProductType.SIMPLE,
   })
   type!: ProductType;
@@ -169,14 +169,14 @@ export class ProductResponseDto {
   basePrice!: number;
 
   @Expose()
-  @ApiPropertyOptional({
+  @ApiProperty({
     enum: DiscountType,
     enumName: 'DiscountType',
     description:
-      'How `discountValue`/`salePrice` was configured — FIXED or PERCENTAGE',
+      'How `discountValue` is applied to derive `salePrice` — FIXED or PERCENTAGE. Defaults to PERCENTAGE when no discount is configured.',
     example: DiscountType.FIXED,
   })
-  discountType?: DiscountType;
+  discountType!: DiscountType;
 
   @Expose()
   @ApiPropertyOptional({
@@ -230,6 +230,14 @@ export class ProductResponseDto {
     example: StockStatus.IN_STOCK,
   })
   stockStatus!: StockStatus;
+
+  @Expose()
+  @ApiProperty({
+    description:
+      'Stock count at/below which `stockStatus` becomes LOW_STOCK. Compared against `quantity` for SIMPLE products, `totalStock` for VARIABLE.',
+    example: 10,
+  })
+  lowStockThreshold!: number;
 
   @Expose()
   @ApiPropertyOptional({
@@ -434,13 +442,14 @@ export class ProductResponseDto {
     this.isFeatured = product.isFeatured!;
     this.hasVariants = product.hasVariants!;
     this.basePrice = Number(product.basePrice);
-    this.discountType = product.discountType ?? undefined;
+    this.discountType = product.discountType!;
     this.discountValue = toPrice(product.discountValue);
     this.salePrice = toPrice(product.salePrice);
     this.costPrice = toPrice(product.costPrice);
     this.quantity = product.quantity!;
     this.totalStock = product.totalStock!;
     this.stockStatus = product.stockStatus!;
+    this.lowStockThreshold = product.lowStockThreshold!;
     this.weight = toPrice(product.weight);
     this.dimensions = toDimensionsDto(product.dimensions);
     this.seoMetadata = toSeoMetadataDto(product.seoMetadata);
@@ -561,7 +570,7 @@ export class ProductResponsePublicDto {
   @ApiProperty({
     enum: ProductType,
     enumName: 'ProductType',
-    description: 'SIMPLE / VARIABLE / COMBO discriminator',
+    description: 'SIMPLE / VARIABLE discriminator',
     example: ProductType.SIMPLE,
   })
   type!: ProductType;

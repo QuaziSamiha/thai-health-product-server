@@ -22,6 +22,7 @@ import { HomeContentType } from '../../generated/prisma/enums';
 import { Prisma } from '../../generated/prisma/client';
 import { CategoryService } from '../category/category.service';
 import { ProductService } from '../product/product.service';
+import { ComboProductService } from '../combo-product/combo-product.service';
 
 const HOME_IMAGE_FOLDER = 'home/images';
 
@@ -36,6 +37,7 @@ export class HomeService {
     private readonly configService: ConfigService,
     private readonly categoryService: CategoryService,
     private readonly productService: ProductService,
+    private readonly comboProductService: ComboProductService,
   ) {}
 
   async createHome(
@@ -151,8 +153,8 @@ export class HomeService {
 
   /**
    * Everything the public storefront homepage needs in one call: the two
-   * "above the fold" slots, the root category list, and three product
-   * sections. Categories/products are fetched via CategoryService/
+   * "above the fold" slots, the root category list, the combo section, and
+   * two product sections. Fetched via CategoryService/ComboProductService/
    * ProductService, never queried directly here — this method only
    * composes what those modules already expose, in parallel since none of
    * the six lookups depend on another.
@@ -170,7 +172,7 @@ export class HomeService {
       this.homeRepository.findFeaturedByType(HomeContentType.HERO_SLIDER),
       this.homeRepository.findFeaturedByType(HomeContentType.PROMOTION_BANNER),
       this.categoryService.getActiveRootCategoriesForHome(),
-      this.productService.getComboProducts(),
+      this.comboProductService.getActiveCombosForHome(),
       this.productService.getFeaturedProducts(),
       this.productService.getNonFeaturedProducts(),
     ]);

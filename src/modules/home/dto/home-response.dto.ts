@@ -9,6 +9,7 @@ import { UserMinifiedResponseDto } from '../../user/dto/user-response.dto';
 import type { MinifiedUser } from '../../user/dto/user-response.dto';
 import { CategoryHomeResponseDto } from '../../category/dto/category-response.dto';
 import { ProductResponsePublicDto } from '../../product/dto/product-response.dto';
+import { ComboProductResponsePublicDto } from '../../combo-product/dto/combo-product-response.dto';
 
 export class HomeResponseDto {
   @Expose()
@@ -236,9 +237,9 @@ export class HomeResponsePublicDto {
 //* FEATURED RESPONSE — everything the public storefront homepage needs in
 //* one call: the two "above the fold" slots (lowest-displayOrder ACTIVE hero
 //* slider / promotion banner, either null if that type has no ACTIVE row),
-//* the root category list, and three product sections. Composed from
-//* CategoryService/ProductService — home.service.ts never queries their
-//* tables directly.
+//* the root category list, the combo section, and two product sections.
+//* Composed from CategoryService/ComboProductService/ProductService —
+//* home.service.ts never queries their tables directly.
 //* ═══════════════════════════════════════════════════════════════════════
 
 export class FeaturedHomeContentsResponseDto {
@@ -270,11 +271,11 @@ export class FeaturedHomeContentsResponseDto {
 
   @Expose()
   @ApiProperty({
-    type: () => [ProductResponsePublicDto],
-    description: 'Active products of type COMBO, for a "Combo Deals" section.',
+    type: () => [ComboProductResponsePublicDto],
+    description: 'Active combos, for a "Combo Deals" section.',
   })
-  @Type(() => ProductResponsePublicDto)
-  comboProducts!: ProductResponsePublicDto[];
+  @Type(() => ComboProductResponsePublicDto)
+  comboProducts!: ComboProductResponsePublicDto[];
 
   @Expose()
   @ApiProperty({
@@ -296,7 +297,7 @@ export class FeaturedHomeContentsResponseDto {
     heroSlider: HomeResponsePublicDto | null,
     promotionBanner: HomeResponsePublicDto | null,
     categories: CategoryHomeResponseDto[],
-    comboProducts: ProductResponsePublicDto[],
+    comboProducts: ComboProductResponsePublicDto[],
     featuredProducts: ProductResponsePublicDto[],
     products: ProductResponsePublicDto[],
   ) {

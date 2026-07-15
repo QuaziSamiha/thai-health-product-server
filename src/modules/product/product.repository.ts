@@ -201,15 +201,6 @@ export class ProductRepository extends BaseRepository {
     });
   }
 
-  /** Active COMBO products, newest first — for a "Combo Deals" home section. */
-  async findComboProducts(limit: number, tx?: Prisma.TransactionClient) {
-    return await this.findActiveProductsList(
-      { type: ProductType.COMBO },
-      limit,
-      tx,
-    );
-  }
-
   /** Active products flagged `isFeatured`, newest first. */
   async findFeaturedProducts(limit: number, tx?: Prisma.TransactionClient) {
     return await this.findActiveProductsList({ isFeatured: true }, limit, tx);
