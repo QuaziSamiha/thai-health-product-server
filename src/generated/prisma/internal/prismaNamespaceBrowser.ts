@@ -278,6 +278,7 @@ export const ProductScalarFieldEnum = {
   lowStockThreshold: 'lowStockThreshold',
   weight: 'weight',
   dimensions: 'dimensions',
+  size: 'size',
   seoMetadata: 'seoMetadata',
   tags: 'tags',
   dosage: 'dosage',

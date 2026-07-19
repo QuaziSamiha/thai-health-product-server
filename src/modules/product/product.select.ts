@@ -97,6 +97,7 @@ const PRODUCT_SELECT_COMMON = {
   salePrice: true,
   stockStatus: true,
   weight: true,
+  size: true,
   dimensions: true,
   seoMetadata: true,
   tags: true,

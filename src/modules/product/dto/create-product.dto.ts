@@ -343,6 +343,17 @@ export class CreateProductDto {
 
   @ApiPropertyOptional({
     description:
+      'Size/quantity label (e.g. "500ml", "30 tablets"). Only meaningful for a SIMPLE product — a VARIABLE product expresses size per variant instead.',
+    example: '500ml',
+    maxLength: 50,
+  })
+  @IsOptional()
+  @IsString({ message: 'Size must be a valid text string' })
+  @MaxLength(50, { message: 'Size cannot exceed 50 characters' })
+  size?: string;
+
+  @ApiPropertyOptional({
+    description:
       'Physical package dimensions. Send as a JSON object normally, or a JSON-encoded string when using multipart/form-data.',
     type: () => ProductDimensionsInputDto,
   })

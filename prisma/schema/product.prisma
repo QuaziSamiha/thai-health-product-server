@@ -58,6 +58,7 @@ model Product {
   // * PHYSICAL
   weight     Decimal? @db.Decimal(10, 3) //* WEIGHT IN KG
   dimensions Json?    @default("{}") //* STRUCTURED (LENGTH, WIDTH, HEIGHT)
+  size       String?  @db.VarChar(50) //* ONLY MEANINGFUL FOR type = SIMPLE — VARIABLE PRODUCTS EXPRESS SIZE PER VARIANT INSTEAD (SEE ProductVariant.size)
 
   //* SEO METADATA
   seoMetadata Json? @default("{}") @map("seo_metadata") //* Consolidating SEO fields for cleaner API: metaTitle,  metaDescription, metaTitleTh, metaDescriptionTh

@@ -84,6 +84,7 @@ export type ProductMinAggregateOutputType = {
   stockStatus: $Enums.StockStatus | null
   lowStockThreshold: number | null
   weight: runtime.Decimal | null
+  size: string | null
   dosage: string | null
   dosageTh: string | null
   ingredients: string | null
@@ -132,6 +133,7 @@ export type ProductMaxAggregateOutputType = {
   stockStatus: $Enums.StockStatus | null
   lowStockThreshold: number | null
   weight: runtime.Decimal | null
+  size: string | null
   dosage: string | null
   dosageTh: string | null
   ingredients: string | null
@@ -181,6 +183,7 @@ export type ProductCountAggregateOutputType = {
   lowStockThreshold: number
   weight: number
   dimensions: number
+  size: number
   seoMetadata: number
   tags: number
   dosage: number
@@ -265,6 +268,7 @@ export type ProductMinAggregateInputType = {
   stockStatus?: true
   lowStockThreshold?: true
   weight?: true
+  size?: true
   dosage?: true
   dosageTh?: true
   ingredients?: true
@@ -313,6 +317,7 @@ export type ProductMaxAggregateInputType = {
   stockStatus?: true
   lowStockThreshold?: true
   weight?: true
+  size?: true
   dosage?: true
   dosageTh?: true
   ingredients?: true
@@ -362,6 +367,7 @@ export type ProductCountAggregateInputType = {
   lowStockThreshold?: true
   weight?: true
   dimensions?: true
+  size?: true
   seoMetadata?: true
   tags?: true
   dosage?: true
@@ -500,6 +506,7 @@ export type ProductGroupByOutputType = {
   lowStockThreshold: number
   weight: runtime.Decimal | null
   dimensions: runtime.JsonValue | null
+  size: string | null
   seoMetadata: runtime.JsonValue | null
   tags: string[]
   dosage: string | null
@@ -574,6 +581,7 @@ export type ProductWhereInput = {
   lowStockThreshold?: Prisma.IntFilter<"Product"> | number
   weight?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.JsonNullableFilter<"Product">
+  size?: Prisma.StringNullableFilter<"Product"> | string | null
   seoMetadata?: Prisma.JsonNullableFilter<"Product">
   tags?: Prisma.StringNullableListFilter<"Product">
   dosage?: Prisma.StringNullableFilter<"Product"> | string | null
@@ -634,6 +642,7 @@ export type ProductOrderByWithRelationInput = {
   lowStockThreshold?: Prisma.SortOrder
   weight?: Prisma.SortOrderInput | Prisma.SortOrder
   dimensions?: Prisma.SortOrderInput | Prisma.SortOrder
+  size?: Prisma.SortOrderInput | Prisma.SortOrder
   seoMetadata?: Prisma.SortOrderInput | Prisma.SortOrder
   tags?: Prisma.SortOrder
   dosage?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -697,6 +706,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   lowStockThreshold?: Prisma.IntFilter<"Product"> | number
   weight?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.JsonNullableFilter<"Product">
+  size?: Prisma.StringNullableFilter<"Product"> | string | null
   seoMetadata?: Prisma.JsonNullableFilter<"Product">
   tags?: Prisma.StringNullableListFilter<"Product">
   dosage?: Prisma.StringNullableFilter<"Product"> | string | null
@@ -757,6 +767,7 @@ export type ProductOrderByWithAggregationInput = {
   lowStockThreshold?: Prisma.SortOrder
   weight?: Prisma.SortOrderInput | Prisma.SortOrder
   dimensions?: Prisma.SortOrderInput | Prisma.SortOrder
+  size?: Prisma.SortOrderInput | Prisma.SortOrder
   seoMetadata?: Prisma.SortOrderInput | Prisma.SortOrder
   tags?: Prisma.SortOrder
   dosage?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -816,6 +827,7 @@ export type ProductScalarWhereWithAggregatesInput = {
   lowStockThreshold?: Prisma.IntWithAggregatesFilter<"Product"> | number
   weight?: Prisma.DecimalNullableWithAggregatesFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.JsonNullableWithAggregatesFilter<"Product">
+  size?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   seoMetadata?: Prisma.JsonNullableWithAggregatesFilter<"Product">
   tags?: Prisma.StringNullableListFilter<"Product">
   dosage?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
@@ -866,6 +878,7 @@ export type ProductCreateInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -922,6 +935,7 @@ export type ProductUncheckedCreateInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -977,6 +991,7 @@ export type ProductUpdateInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1033,6 +1048,7 @@ export type ProductUncheckedUpdateInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1089,6 +1105,7 @@ export type ProductCreateManyInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -1139,6 +1156,7 @@ export type ProductUpdateManyMutationInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1186,6 +1204,7 @@ export type ProductUncheckedUpdateManyInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1265,6 +1284,7 @@ export type ProductCountOrderByAggregateInput = {
   lowStockThreshold?: Prisma.SortOrder
   weight?: Prisma.SortOrder
   dimensions?: Prisma.SortOrder
+  size?: Prisma.SortOrder
   seoMetadata?: Prisma.SortOrder
   tags?: Prisma.SortOrder
   dosage?: Prisma.SortOrder
@@ -1331,6 +1351,7 @@ export type ProductMaxOrderByAggregateInput = {
   stockStatus?: Prisma.SortOrder
   lowStockThreshold?: Prisma.SortOrder
   weight?: Prisma.SortOrder
+  size?: Prisma.SortOrder
   dosage?: Prisma.SortOrder
   dosageTh?: Prisma.SortOrder
   ingredients?: Prisma.SortOrder
@@ -1379,6 +1400,7 @@ export type ProductMinOrderByAggregateInput = {
   stockStatus?: Prisma.SortOrder
   lowStockThreshold?: Prisma.SortOrder
   weight?: Prisma.SortOrder
+  size?: Prisma.SortOrder
   dosage?: Prisma.SortOrder
   dosageTh?: Prisma.SortOrder
   ingredients?: Prisma.SortOrder
@@ -1706,6 +1728,7 @@ export type ProductCreateWithoutCategoryInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -1761,6 +1784,7 @@ export type ProductUncheckedCreateWithoutCategoryInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -1845,6 +1869,7 @@ export type ProductScalarWhereInput = {
   lowStockThreshold?: Prisma.IntFilter<"Product"> | number
   weight?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.JsonNullableFilter<"Product">
+  size?: Prisma.StringNullableFilter<"Product"> | string | null
   seoMetadata?: Prisma.JsonNullableFilter<"Product">
   tags?: Prisma.StringNullableListFilter<"Product">
   dosage?: Prisma.StringNullableFilter<"Product"> | string | null
@@ -1895,6 +1920,7 @@ export type ProductCreateWithoutComboItemsInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -1950,6 +1976,7 @@ export type ProductUncheckedCreateWithoutComboItemsInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -2020,6 +2047,7 @@ export type ProductUpdateWithoutComboItemsInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2075,6 +2103,7 @@ export type ProductUncheckedUpdateWithoutComboItemsInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2129,6 +2158,7 @@ export type ProductCreateWithoutBatchesInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -2184,6 +2214,7 @@ export type ProductUncheckedCreateWithoutBatchesInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -2254,6 +2285,7 @@ export type ProductUpdateWithoutBatchesInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2309,6 +2341,7 @@ export type ProductUncheckedUpdateWithoutBatchesInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2363,6 +2396,7 @@ export type ProductCreateWithoutInventoryLogsInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -2418,6 +2452,7 @@ export type ProductUncheckedCreateWithoutInventoryLogsInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -2488,6 +2523,7 @@ export type ProductUpdateWithoutInventoryLogsInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2543,6 +2579,7 @@ export type ProductUncheckedUpdateWithoutInventoryLogsInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2597,6 +2634,7 @@ export type ProductCreateWithoutVariantsInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -2652,6 +2690,7 @@ export type ProductUncheckedCreateWithoutVariantsInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -2722,6 +2761,7 @@ export type ProductUpdateWithoutVariantsInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2777,6 +2817,7 @@ export type ProductUncheckedUpdateWithoutVariantsInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2831,6 +2872,7 @@ export type ProductCreateWithoutImagesInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -2886,6 +2928,7 @@ export type ProductUncheckedCreateWithoutImagesInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -2956,6 +2999,7 @@ export type ProductUpdateWithoutImagesInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3011,6 +3055,7 @@ export type ProductUncheckedUpdateWithoutImagesInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3065,6 +3110,7 @@ export type ProductCreateWithoutCreatedByUserInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -3120,6 +3166,7 @@ export type ProductUncheckedCreateWithoutCreatedByUserInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -3184,6 +3231,7 @@ export type ProductCreateWithoutUpdatedByUserInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -3239,6 +3287,7 @@ export type ProductUncheckedCreateWithoutUpdatedByUserInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -3303,6 +3352,7 @@ export type ProductCreateWithoutDeletedByUserInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -3358,6 +3408,7 @@ export type ProductUncheckedCreateWithoutDeletedByUserInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -3471,6 +3522,7 @@ export type ProductCreateManyCategoryInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -3520,6 +3572,7 @@ export type ProductUpdateWithoutCategoryInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3575,6 +3628,7 @@ export type ProductUncheckedUpdateWithoutCategoryInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3630,6 +3684,7 @@ export type ProductUncheckedUpdateManyWithoutCategoryInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3680,6 +3735,7 @@ export type ProductCreateManyCreatedByUserInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -3730,6 +3786,7 @@ export type ProductCreateManyUpdatedByUserInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -3780,6 +3837,7 @@ export type ProductCreateManyDeletedByUserInput = {
   lowStockThreshold?: number
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductCreatetagsInput | string[]
   dosage?: string | null
@@ -3829,6 +3887,7 @@ export type ProductUpdateWithoutCreatedByUserInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3884,6 +3943,7 @@ export type ProductUncheckedUpdateWithoutCreatedByUserInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3939,6 +3999,7 @@ export type ProductUncheckedUpdateManyWithoutCreatedByUserInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3988,6 +4049,7 @@ export type ProductUpdateWithoutUpdatedByUserInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4043,6 +4105,7 @@ export type ProductUncheckedUpdateWithoutUpdatedByUserInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4098,6 +4161,7 @@ export type ProductUncheckedUpdateManyWithoutUpdatedByUserInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4147,6 +4211,7 @@ export type ProductUpdateWithoutDeletedByUserInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4202,6 +4267,7 @@ export type ProductUncheckedUpdateWithoutDeletedByUserInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4257,6 +4323,7 @@ export type ProductUncheckedUpdateManyWithoutDeletedByUserInput = {
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dimensions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tags?: Prisma.ProductUpdatetagsInput | string[]
   dosage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4374,6 +4441,7 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   lowStockThreshold?: boolean
   weight?: boolean
   dimensions?: boolean
+  size?: boolean
   seoMetadata?: boolean
   tags?: boolean
   dosage?: boolean
@@ -4435,6 +4503,7 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   lowStockThreshold?: boolean
   weight?: boolean
   dimensions?: boolean
+  size?: boolean
   seoMetadata?: boolean
   tags?: boolean
   dosage?: boolean
@@ -4490,6 +4559,7 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   lowStockThreshold?: boolean
   weight?: boolean
   dimensions?: boolean
+  size?: boolean
   seoMetadata?: boolean
   tags?: boolean
   dosage?: boolean
@@ -4545,6 +4615,7 @@ export type ProductSelectScalar = {
   lowStockThreshold?: boolean
   weight?: boolean
   dimensions?: boolean
+  size?: boolean
   seoMetadata?: boolean
   tags?: boolean
   dosage?: boolean
@@ -4569,7 +4640,7 @@ export type ProductSelectScalar = {
   deletedBy?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "name" | "slug" | "sku" | "barcode" | "description" | "shortDescription" | "nameTh" | "descriptionTh" | "shortDescTh" | "type" | "status" | "isFeatured" | "hasVariants" | "costPrice" | "discountType" | "discountValue" | "basePrice" | "salePrice" | "quantity" | "totalStock" | "stockStatus" | "lowStockThreshold" | "weight" | "dimensions" | "seoMetadata" | "tags" | "dosage" | "dosageTh" | "ingredients" | "ingredientsTh" | "healthBenefits" | "healthBenefitsTh" | "warning" | "warningTh" | "storageInstructions" | "storageInstructionsTh" | "origin" | "genericName" | "categoryId" | "createdAt" | "updatedAt" | "deletedAt" | "publishedAt" | "createdBy" | "updatedBy" | "deletedBy", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "name" | "slug" | "sku" | "barcode" | "description" | "shortDescription" | "nameTh" | "descriptionTh" | "shortDescTh" | "type" | "status" | "isFeatured" | "hasVariants" | "costPrice" | "discountType" | "discountValue" | "basePrice" | "salePrice" | "quantity" | "totalStock" | "stockStatus" | "lowStockThreshold" | "weight" | "dimensions" | "size" | "seoMetadata" | "tags" | "dosage" | "dosageTh" | "ingredients" | "ingredientsTh" | "healthBenefits" | "healthBenefitsTh" | "warning" | "warningTh" | "storageInstructions" | "storageInstructionsTh" | "origin" | "genericName" | "categoryId" | "createdAt" | "updatedAt" | "deletedAt" | "publishedAt" | "createdBy" | "updatedBy" | "deletedBy", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   images?: boolean | Prisma.Product$imagesArgs<ExtArgs>
@@ -4635,6 +4706,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     lowStockThreshold: number
     weight: runtime.Decimal | null
     dimensions: runtime.JsonValue | null
+    size: string | null
     seoMetadata: runtime.JsonValue | null
     tags: string[]
     dosage: string | null
@@ -5115,6 +5187,7 @@ export interface ProductFieldRefs {
   readonly lowStockThreshold: Prisma.FieldRef<"Product", 'Int'>
   readonly weight: Prisma.FieldRef<"Product", 'Decimal'>
   readonly dimensions: Prisma.FieldRef<"Product", 'Json'>
+  readonly size: Prisma.FieldRef<"Product", 'String'>
   readonly seoMetadata: Prisma.FieldRef<"Product", 'Json'>
   readonly tags: Prisma.FieldRef<"Product", 'String[]'>
   readonly dosage: Prisma.FieldRef<"Product", 'String'>

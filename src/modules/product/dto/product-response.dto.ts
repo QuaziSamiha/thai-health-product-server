@@ -258,6 +258,14 @@ export class ProductResponseDto {
   weight?: number;
 
   @Expose()
+  @ApiPropertyOptional({
+    description:
+      'Size/quantity label. Only meaningful for a SIMPLE product — a VARIABLE product expresses size per variant instead.',
+    example: '500ml',
+  })
+  size?: string;
+
+  @Expose()
   @ApiPropertyOptional({ type: () => ProductDimensionsDto })
   dimensions?: ProductDimensionsDto;
 
@@ -465,6 +473,7 @@ export class ProductResponseDto {
     this.stockStatus = product.stockStatus!;
     this.lowStockThreshold = product.lowStockThreshold!;
     this.weight = toPrice(product.weight);
+    this.size = product.size ?? undefined;
     this.dimensions = toDimensionsDto(product.dimensions);
     this.seoMetadata = toSeoMetadataDto(product.seoMetadata);
     this.tags = product.tags ?? [];
@@ -642,6 +651,14 @@ export class ProductResponsePublicDto {
   weight?: number;
 
   @Expose()
+  @ApiPropertyOptional({
+    description:
+      'Size/quantity label. Only meaningful for a SIMPLE product — a VARIABLE product expresses size per variant instead.',
+    example: '500ml',
+  })
+  size?: string;
+
+  @Expose()
   @ApiPropertyOptional({ type: () => ProductDimensionsDto })
   dimensions?: ProductDimensionsDto;
 
@@ -782,6 +799,7 @@ export class ProductResponsePublicDto {
     this.salePrice = toPrice(product.salePrice);
     this.stockStatus = product.stockStatus!;
     this.weight = toPrice(product.weight);
+    this.size = product.size ?? undefined;
     this.dimensions = toDimensionsDto(product.dimensions);
     this.seoMetadata = toSeoMetadataDto(product.seoMetadata);
     this.tags = product.tags ?? [];
