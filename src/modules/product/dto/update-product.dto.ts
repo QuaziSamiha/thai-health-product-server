@@ -420,6 +420,21 @@ export class UpdateProductDto {
 
   @ApiPropertyOptional({
     description:
+      "Final display order for the WHOLE gallery after this request (surviving existing images + newly uploaded ones) — position 0 becomes the primary image. Each entry is either an existing image's id (as a numeric string, e.g. `\"12\"`) or `new:<n>`, referencing the nth file (0-based) in `images`. Must contain every surviving existing image exactly once plus exactly one `new:<n>` per uploaded file. Omit to leave existing images' order/primary untouched and simply append new uploads after them. Send as a JSON array normally, or a JSON-encoded string when using multipart/form-data.",
+    type: [String],
+    example: ['new:0', '12', '15'],
+  })
+  @IsOptional()
+  @Transform(({ value }) => {
+    const parsed = tryParseJson(value);
+    return Array.isArray(parsed) ? parsed.map((v) => String(v)) : parsed;
+  })
+  @IsArray({ message: 'imageOrder must be an array' })
+  @IsString({ each: true, message: 'Each imageOrder entry must be a string' })
+  imageOrder?: string[];
+
+  @ApiPropertyOptional({
+    description:
       'IDs of existing gallery images to remove from this product (DB rows and stored files). Send as a JSON array normally, or a JSON-encoded string when using multipart/form-data.',
     type: [Number],
     example: [4, 7],

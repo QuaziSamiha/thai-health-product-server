@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import {
   ProductRepository,
   VariantReconcilePlan,
+  ImageReorderPlan,
   StorefrontListFilters,
 } from './product.repository';
 import { CategoryService } from '../category/category.service';
@@ -582,6 +583,61 @@ export class ProductService {
   }
 
   /**
+   * Resolves `dto.imageOrder`'s wire tokens (an existing image's id as a
+   * numeric string, or `new:<n>` for the nth uploaded file) into a plan the
+   * repository can apply — validated against the gallery as it will exist
+   * *after* this request's deletions. `undefined` in ⇒ `undefined` out: the
+   * caller falls back to the old append-only behavior when the client
+   * doesn't send an order (e.g. an older client, or a request that isn't
+   * touching images at all).
+   *
+   * Deliberately ignores the numeric suffix on `new:<n>` tokens beyond using
+   * it to recognize the token shape — new entries are matched to uploaded
+   * files positionally (the order they appear in `imageOrder`), which is
+   * simpler for the caller to construct correctly than requiring the
+   * indices to match exact upload order.
+   */
+  private resolveImageReorderPlan(
+    imageOrder: string[] | undefined,
+    remainingExistingIds: Set<number>,
+    newFilesCount: number,
+  ): ({ type: 'existing'; id: number } | { type: 'new' })[] | undefined {
+    if (imageOrder === undefined) return undefined;
+
+    const seenExisting = new Set<number>();
+    let newCount = 0;
+    const tokens = imageOrder.map((token) => {
+      if (token.startsWith('new:')) {
+        newCount++;
+        return { type: 'new' as const };
+      }
+      const id = Number(token);
+      if (
+        !Number.isInteger(id) ||
+        !remainingExistingIds.has(id) ||
+        seenExisting.has(id)
+      ) {
+        throw new BadRequestException(
+          "imageOrder references an image outside this product's surviving gallery, or references one more than once",
+        );
+      }
+      seenExisting.add(id);
+      return { type: 'existing' as const, id };
+    });
+
+    if (
+      newCount !== newFilesCount ||
+      seenExisting.size !== remainingExistingIds.size
+    ) {
+      throw new BadRequestException(
+        'imageOrder must include every surviving existing image exactly once, plus exactly one `new:<n>` entry per uploaded file',
+      );
+    }
+
+    return tokens;
+  }
+
+  /**
    * Partial update. Only fields actually present in `dto` are touched —
    * everything else on the row is left exactly as it was.
    *
@@ -657,6 +713,20 @@ export class ProductService {
       (img) => img.isPrimary && !deletedImageIds.has(img.id),
     );
 
+    //* VALIDATED AGAINST images.length (NOT uploadedPaths, WHICH DOESN'T
+    //* EXIST YET) — SAME COUNT, BUT THIS WAY A BAD imageOrder 400s BEFORE
+    //* ANY FILE IS ACTUALLY UPLOADED
+    const remainingExistingIds = new Set(
+      existing.images
+        .filter((img) => !deletedImageIds.has(img.id))
+        .map((img) => img.id),
+    );
+    const reorderTokens = this.resolveImageReorderPlan(
+      dto.imageOrder,
+      remainingExistingIds,
+      images.length,
+    );
+
     const uploadedPaths: string[] = [];
     try {
       for (const file of images) {
@@ -690,7 +760,17 @@ export class ProductService {
               tx,
             );
           }
-          if (uploadedPaths.length) {
+          if (reorderTokens) {
+            //* ATTACH THE NOW-KNOWN UPLOADED PATHS TO EACH `new` TOKEN, IN
+            //* THE ORDER THEY APPEAR WITHIN imageOrder (SEE resolveImageReorderPlan)
+            let newIndex = 0;
+            const plan: ImageReorderPlan = reorderTokens.map((token) =>
+              token.type === 'existing'
+                ? token
+                : { type: 'new' as const, path: uploadedPaths[newIndex++] },
+            );
+            await this.productRepository.reorderImages(id, plan, tx);
+          } else if (uploadedPaths.length) {
             const startOrder = existing.images.length;
             await this.productRepository.createImages(
               id,

@@ -376,6 +376,62 @@ export class ProductRepository extends BaseRepository {
     });
   }
 
+  /**
+   * Applies a full gallery reorder: `plan[i]` is the image that belongs at
+   * `displayOrder = i`, and `plan[0]` is the new primary. Existing rows are
+   * updated in place (by id) and new files are inserted at their planned
+   * position — the caller has already resolved uploaded file paths onto
+   * each `new` entry.
+   *
+   * Every current primary is cleared *before* any row is set primary again,
+   * sequentially (not in parallel — the transaction runs on one connection)
+   * so the `product_images_one_primary_per_product` partial unique index
+   * never sees two `is_primary = true` rows for the same product at once.
+   */
+  async reorderImages(
+    productId: number,
+    plan: ImageReorderPlan,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+
+    await client.productImage.updateMany({
+      where: { productId },
+      data: { isPrimary: false },
+    });
+
+    for (let index = 0; index < plan.length; index++) {
+      const entry = plan[index];
+      if (entry.type === 'existing') {
+        await client.productImage.update({
+          //* SCOPED BY productId SO A FOREIGN IMAGE ID CAN NEVER BE UPDATED
+          //* THROUGH ANOTHER PRODUCT'S PAYLOAD
+          where: { id: entry.id, productId },
+          data: { displayOrder: index, isPrimary: index === 0 },
+        });
+      }
+    }
+
+    const newImages = plan
+      .map((entry, index) => ({ entry, index }))
+      .filter(
+        (
+          x,
+        ): x is { entry: Extract<ImageReorderPlan[number], { type: 'new' }>; index: number } =>
+          x.entry.type === 'new',
+      );
+    if (newImages.length) {
+      await client.productImage.createMany({
+        data: newImages.map(({ entry, index }) => ({
+          productId,
+          url: entry.path,
+          displayOrder: index,
+          isPrimary: index === 0,
+        })),
+      });
+    }
+  }
+
   // ─── Mutations — Variants ────────────────────────────────────────────────────
 
   /**
@@ -422,3 +478,12 @@ export interface VariantReconcilePlan {
   updates: { id: number; data: Prisma.ProductVariantUncheckedUpdateInput }[];
   creates: Prisma.ProductVariantCreateManyProductInput[];
 }
+
+//* INDEX IN THIS ARRAY *IS* THE FINAL displayOrder — INDEX 0 IS THE NEW
+//* PRIMARY. THE SERVICE RESOLVES dto.imageOrder's `id` / `new:<n>` TOKENS
+//* INTO THIS SHAPE (ATTACHING THE ACTUAL UPLOADED PATH TO EACH `new` ENTRY)
+//* SO THE REPOSITORY NEVER HAS TO KNOW ABOUT THE WIRE FORMAT.
+export type ImageReorderPlan = (
+  | { type: 'existing'; id: number }
+  | { type: 'new'; path: string }
+)[];

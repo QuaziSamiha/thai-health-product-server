@@ -114,7 +114,11 @@ const PRODUCT_SELECT_COMMON = {
   origin: true,
   genericName: true,
   category: { select: CATEGORY_MINIFIED_SELECT },
-  images: { select: IMAGE_SELECT },
+  //* WITHOUT AN EXPLICIT orderBy, PRISMA/POSTGRES RETURN THE GALLERY IN
+  //* WHATEVER ORDER THE ENGINE FINDS THEM (TYPICALLY INSERTION ORDER) —
+  //* NOT displayOrder. THAT WOULD SILENTLY UNDO ANY GALLERY REORDER (SEE
+  //* ProductRepository.reorderImages) THE MOMENT THE PRODUCT IS RE-FETCHED.
+  images: { select: IMAGE_SELECT, orderBy: { displayOrder: 'asc' } },
   publishedAt: true,
 } as const;
 
