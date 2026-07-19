@@ -431,6 +431,7 @@ export type ProductVariantWhereUniqueInput = Prisma.AtLeast<{
   name?: string
   slug?: string
   sku?: string
+  barcode?: string
   AND?: Prisma.ProductVariantWhereInput | Prisma.ProductVariantWhereInput[]
   OR?: Prisma.ProductVariantWhereInput[]
   NOT?: Prisma.ProductVariantWhereInput | Prisma.ProductVariantWhereInput[]
@@ -439,7 +440,6 @@ export type ProductVariantWhereUniqueInput = Prisma.AtLeast<{
   nameTh?: Prisma.StringNullableFilter<"ProductVariant"> | string | null
   descriptionTh?: Prisma.StringNullableFilter<"ProductVariant"> | string | null
   shortDescTh?: Prisma.StringNullableFilter<"ProductVariant"> | string | null
-  barcode?: Prisma.StringNullableFilter<"ProductVariant"> | string | null
   quantity?: Prisma.IntFilter<"ProductVariant"> | number
   stockStatus?: Prisma.EnumStockStatusFilter<"ProductVariant"> | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFilter<"ProductVariant"> | number
@@ -458,7 +458,7 @@ export type ProductVariantWhereUniqueInput = Prisma.AtLeast<{
   inventoryLogs?: Prisma.InventoryListRelationFilter
   batches?: Prisma.BatchListRelationFilter
   comboItems?: Prisma.ComboItemListRelationFilter
-}, "id" | "name" | "slug" | "sku">
+}, "id" | "name" | "slug" | "sku" | "barcode">
 
 export type ProductVariantOrderByWithAggregationInput = {
   id?: Prisma.SortOrder

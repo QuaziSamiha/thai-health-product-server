@@ -43,7 +43,7 @@ const PRODUCT_IMAGE_FOLDER = 'products/gallery';
 //* DEFAULT SECTION SIZE FOR THE UNPAGINATED HOME-PAGE-STYLE LISTS
 //* (combo/featured/best) — CALLERS (E.G. A FUTURE home-content MODULE) MAY
 //* OVERRIDE PER SECTION.
-const DEFAULT_HOME_SECTION_LIMIT = 8;
+const DEFAULT_HOME_SECTION_LIMIT = 4;
 
 //* MIRRORS THE SCHEMA COLUMN DEFAULT (Product.lowStockThreshold /
 //* ProductVariant.lowStockThreshold) — USED WHEN A CREATE PAYLOAD OMITS IT,
@@ -56,6 +56,7 @@ const DEFAULT_LOW_STOCK_THRESHOLD = 10;
 interface ExistingVariantState {
   id: number;
   name: string;
+  size: string | null;
   quantity: number;
   lowStockThreshold: number;
   isDefault: boolean;
@@ -275,6 +276,7 @@ export class ProductService {
         lowStockThreshold,
         variants,
       } = this.buildStockAndVariants(
+        dto.name,
         slug,
         dto.variants,
         dto.quantity,
@@ -380,6 +382,7 @@ export class ProductService {
    * the first one is — the storefront always needs some variant pre-selected.
    */
   private buildStockAndVariants(
+    productName: string,
     productSlug: string,
     variantDto: CreateProductVariantDto[] | undefined,
     simpleQuantity: number | undefined,
@@ -409,7 +412,7 @@ export class ProductService {
     }
 
     const variants = variantDto!.map((variant, index) =>
-      this.buildVariantInput(productSlug, variant, index),
+      this.buildVariantInput(productName, productSlug, variant, index),
     );
     if (!variants.some((v) => v.isDefault)) {
       variants[0].isDefault = true;
@@ -430,6 +433,7 @@ export class ProductService {
   }
 
   private buildVariantInput(
+    productName: string,
     productSlug: string,
     variant: CreateProductVariantDto,
     index: number,
@@ -443,9 +447,13 @@ export class ProductService {
     return {
       // Variant name/slug are unique across ALL products in the current
       // schema (not scoped per-product) — prefixing with the parent's own
-      // unique slug keeps this collision-free in practice.
-      name: variant.name ?? `${productSlug} ${variant.size ?? ''}`.trim(),
-      slug: `${productSlug}-${generateSlug(slugSeed)}`,
+      // unique slug (plus the size-derived seed) keeps this collision-free
+      // in practice, since two variants of the same product always differ
+      // by size.
+      name:
+        variant.name ??
+        `${productName} variant ${variant.size ?? ''}`.trim(),
+      slug: `${productSlug}-variant-${generateSlug(slugSeed)}`,
       size: variant.size,
       basePrice,
       ...this.resolveSalePrice(
@@ -639,6 +647,15 @@ export class ProductService {
       );
     }
 
+    //* WHETHER A PRIMARY IMAGE SURVIVES THIS REQUEST — IF `deleteImageIds`
+    //* REMOVES THE CURRENT PRIMARY (OR THE GALLERY WAS ALREADY EMPTY), THE
+    //* FIRST NEWLY-UPLOADED IMAGE BELOW MUST TAKE OVER AS PRIMARY SO THE
+    //* PRODUCT ISN'T LEFT WITHOUT ONE.
+    const deletedImageIds = new Set(imagesToDelete.map((img) => img.id));
+    const hasSurvivingPrimaryImage = existing.images.some(
+      (img) => img.isPrimary && !deletedImageIds.has(img.id),
+    );
+
     const uploadedPaths: string[] = [];
     try {
       for (const file of images) {
@@ -655,6 +672,7 @@ export class ProductService {
       const { fields: stockFields, variantPlan } = this.resolveStockUpdate(
         existing,
         dto,
+        dto.name ?? existing.name,
         slug,
       );
 
@@ -678,7 +696,7 @@ export class ProductService {
               uploadedPaths.map((path, index) => ({
                 url: path,
                 displayOrder: startOrder + index,
-                isPrimary: false,
+                isPrimary: !hasSurvivingPrimaryImage && index === 0,
               })),
               tx,
             );
@@ -784,6 +802,7 @@ export class ProductService {
       variants: ExistingVariantState[];
     },
     dto: UpdateProductDto,
+    productName: string,
     productSlug: string,
   ): {
     fields: Partial<Prisma.ProductUncheckedUpdateInput>;
@@ -805,6 +824,7 @@ export class ProductService {
     if (effectiveType === ProductType.VARIABLE) {
       if (dto.variants !== undefined) {
         const { plan, totalStock } = this.buildVariantReconcilePlan(
+          productName,
           productSlug,
           current.variants,
           dto.variants,
@@ -883,6 +903,7 @@ export class ProductService {
    * refresh the product's cached stock fields.
    */
   private buildVariantReconcilePlan(
+    productName: string,
     productSlug: string,
     existingVariants: ExistingVariantState[],
     requested: UpdateProductVariantDto[],
@@ -935,17 +956,29 @@ export class ProductService {
       if (existing) {
         totalStock += entry.quantity ?? existing.quantity;
         const pricingFields = this.resolvePricingUpdate(existing, entry);
+        //* THE ADMIN FORM NEVER SENDS `entry.name` — NAME/SLUG ARE ALWAYS
+        //* SERVER-GENERATED FROM productName + SIZE, SO THEY MUST BE
+        //* REGENERATED WHENEVER THE SIZE CHANGES TOO, NOT ONLY WHEN AN
+        //* EXPLICIT NAME OVERRIDE ARRIVES — OTHERWISE A SIZE EDIT SILENTLY
+        //* FREEZES THE STALE NAME/SLUG FROM CREATE TIME.
+        const effectiveSize = entry.size ?? existing.size ?? undefined;
+        const shouldRegenerate =
+          entry.name !== undefined || entry.size !== undefined;
+        const slugSeed =
+          entry.name ?? effectiveSize ?? `variant-${existing.id}`;
         updates.push({
           id: existing.id,
           //* undefined FIELDS ARE SKIPPED BY PRISMA — ONLY WHAT THE PAYLOAD
           //* ACTUALLY PROVIDED (PLUS DERIVED slug/stockStatus/isDefault/
           //* PRICING) GETS WRITTEN.
           data: {
-            name: entry.name,
-            slug:
-              entry.name && entry.name !== existing.name
-                ? `${productSlug}-${generateSlug(entry.name)}`
-                : undefined,
+            name: shouldRegenerate
+              ? (entry.name ??
+                `${productName} variant ${effectiveSize ?? ''}`.trim())
+              : undefined,
+            slug: shouldRegenerate
+              ? `${productSlug}-variant-${generateSlug(slugSeed)}`
+              : undefined,
             size: entry.size,
             basePrice: entry.basePrice,
             ...pricingFields,
@@ -970,7 +1003,7 @@ export class ProductService {
       } else {
         totalStock += entry.quantity ?? 0;
         creates.push({
-          ...this.buildVariantInput(productSlug, entry, index),
+          ...this.buildVariantInput(productName, productSlug, entry, index),
           isDefault,
         });
       }

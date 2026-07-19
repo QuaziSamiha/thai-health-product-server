@@ -32,7 +32,7 @@ erDiagram
         string slug UK
         string sku UK "nullable"
         string barcode UK "nullable"
-        enum type "SIMPLE | VARIABLE | COMBO"
+        enum type "SIMPLE | VARIABLE"
         enum status
         decimal basePrice
         decimal salePrice "nullable"
@@ -52,7 +52,7 @@ erDiagram
         string name UK
         string slug UK
         string sku UK "nullable"
-        string barcode "nullable, NOT unique"
+        string barcode UK "nullable"
         int productId FK
         decimal costPrice "nullable"
         enum discountType "nullable"
@@ -118,7 +118,8 @@ erDiagram
 | :--------- | :-------------------------------------------------------------------------------------------------------------- |
 | `SIMPLE`   | Standalone product, no variants. Stock lives on `Product.quantity`.                                             |
 | `VARIABLE` | Parent product with one or more `ProductVariant` rows. Stock lives on each variant; `Product.totalStock` is a cached sum. |
-| `COMBO`    | **Not stored on this table.** Combos are modeled separately via `ComboProduct` / `ComboItem` (`combo-product.prisma`), which reference `Product`/`ProductVariant` by FK. Treat this enum value as reserved/legacy unless the combo tables are wired up. |
+
+> There is no `COMBO` value on this enum — it was removed via `prisma/migrations/20260714200004_remove_combo_product_type`. Combos are modeled separately via `ComboProduct` / `ComboItem` (`combo-product.prisma`), which reference `Product`/`ProductVariant` by FK; don't try to represent one by hijacking `ProductType`.
 
 ### `DiscountType`
 
@@ -156,7 +157,7 @@ erDiagram
 <details>
   <summary><b>Data Dictionary — Product</b></summary>
 
-**Table purpose:** `Product` is the top-level catalog entity — every sellable item (simple or variable) has exactly one row here. It owns identity (slug/SKU/barcode), pricing defaults, aggregate stock state, SEO metadata, and the full audit trail.
+**Table purpose:** `Product` is the top-level catalog entity — every sellable item (simple or variable) has exactly one row here. It owns identity (slug/SKU/barcode), pricing defaults, aggregate stock state, SEO metadata, bilingual health/compliance labeling (dosage, ingredients, warnings), and the full audit trail.
 
 | Field              | Type                    | Constraints                                                    | Description                                                                 |
 | :----------------- | :---------------------- | :--------------------------------------------------------------- | :---------------------------------------------------------------------------- |
@@ -181,13 +182,25 @@ erDiagram
 | `basePrice`         | `DECIMAL(12,2)`          | NOT NULL, DEFAULT `0`                                             | MSRP / list price. `Decimal` avoids floating-point rounding errors.           |
 | `salePrice`         | `DECIMAL(12,2)`          | NOT NULL, `CHECK` (`0 <= salePrice <= basePrice`)                 | Final discounted price shown on storefront.                                   |
 | `quantity`          | `INT`                    | NOT NULL, DEFAULT `0`                                             | Stock count — authoritative only when `type = SIMPLE`.                        |
-| `totalStock`        | `INT`                    | NOT NULL, DEFAULT `0`, `@map("total_stock")`                       | **Denormalized cache** — sum of all `ProductVariant.quantity` for `VARIABLE` products. Must be kept in sync by application logic or a DB trigger; nothing enforces it automatically today. |
+| `totalStock`        | `INT`                    | NOT NULL, DEFAULT `0`, `@map("total_stock")`                       | **Denormalized cache** — sum of all `ProductVariant.quantity` for `VARIABLE` products. Kept in sync by the `sync_product_total_stock_from_variants` DB trigger (see [Inventory & Cache Sync Logic](#3-inventory--cache-sync-logic)); service code should still set it explicitly rather than relying on the trigger alone. |
 | `stockStatus`       | `ENUM(StockStatus)`      | NOT NULL, DEFAULT `OUT_OF_STOCK`                                  | Cached badge state for listing pages.                                         |
 | `lowStockThreshold` | `INT`                    | NOT NULL, DEFAULT `10`, `@map("low_stock_threshold")`               | Threshold `stockStatus` compares the effective count against to decide `LOW_STOCK`. |
 | `weight`            | `DECIMAL(10,3)`          | NULLABLE                                                          | Weight in kilograms, used for shipping cost calculation.                      |
 | `dimensions`        | `JSONB`                  | DEFAULT `{}`                                                      | `{ length, width, height, unit }` — see [Detailed Field Examples](#detailed-field-examples-json-objects). |
 | `seoMetadata`       | `JSONB`                  | DEFAULT `{}`                                                      | Consolidated `metaTitle`/`metaDescription` (EN + TH) for a cleaner API shape.  |
 | `tags`               | `TEXT[]`                 | DEFAULT `[]`                                                      | Native Postgres array of free-form labels/keywords.                           |
+| `dosage`             | `TEXT`                   | NULLABLE                                                          | Recommended dosage/usage instructions (English), customer-visible.            |
+| `dosageTh`           | `TEXT`                   | NULLABLE, `@map("dosage_th")`                                     | Thai translation of `dosage`.                                                 |
+| `ingredients`        | `TEXT`                   | NULLABLE                                                          | Ingredient list (English), customer-visible.                                  |
+| `ingredientsTh`      | `TEXT`                   | NULLABLE, `@map("ingredients_th")`                                | Thai translation of `ingredients`.                                            |
+| `healthBenefits`     | `TEXT`                   | NULLABLE, `@map("health_benefits")`                               | Claimed health benefits (English), customer-visible.                          |
+| `healthBenefitsTh`   | `TEXT`                   | NULLABLE, `@map("health_benefits_th")`                            | Thai translation of `healthBenefits`.                                         |
+| `warning`            | `TEXT`                   | NULLABLE                                                          | Safety warnings/contraindications (English), customer-visible.                |
+| `warningTh`          | `TEXT`                   | NULLABLE, `@map("warning_th")`                                    | Thai translation of `warning`.                                                |
+| `storageInstructions`   | `TEXT`                | NULLABLE, `@map("storage_instructions")`                          | Storage guidance (English), e.g. "Store below 25°C, away from direct sunlight." |
+| `storageInstructionsTh` | `TEXT`                | NULLABLE, `@map("storage_instructions_th")`                       | Thai translation of `storageInstructions`.                                    |
+| `origin`             | `VARCHAR(255)`           | NULLABLE                                                          | Country/region of origin or manufacture.                                      |
+| `genericName`        | `VARCHAR(255)`           | NULLABLE, `@map("generic")`                                       | Generic/active-ingredient name, distinct from the marketing `name`.           |
 | `categoryId`        | `INT`                    | FK → `categories.id`, NOT NULL, **ON DELETE RESTRICT**             | Owning category. A category with products cannot be deleted.                  |
 | `createdAt`         | `TIMESTAMP`               | NOT NULL, DEFAULT `now()`                                          | Row creation time.                                                             |
 | `updatedAt`         | `TIMESTAMP`               | NOT NULL, auto-updated                                             | Last modification time.                                                       |
@@ -209,13 +222,13 @@ erDiagram
 | Field              | Type                | Constraints                                             | Description                                                                 |
 | :----------------- | :------------------- | :--------------------------------------------------------- | :---------------------------------------------------------------------------- |
 | `id`                | `INT`                | PK, AUTOINCREMENT                                            | Internal key.                                                                 |
-| `name`              | `VARCHAR(255)`        | UNIQUE (global), NOT NULL                                    | ⚠️ Currently unique across **all** variants, not scoped per product — see [Known Gaps](#known-gaps--recommended-hardening). |
-| `slug`              | `VARCHAR(255)`        | UNIQUE (global), NOT NULL                                    | Same caveat as `name`.                                                        |
+| `name`              | `VARCHAR(255)`        | UNIQUE (global), NOT NULL                                    | Unique across **all** variants, not scoped per product — an intentional design choice, not scoped to `productId`. |
+| `slug`              | `VARCHAR(255)`        | UNIQUE (global), NOT NULL                                    | Same as `name` — globally unique by design.                                   |
 | `description`       | `TEXT`                | NULLABLE                                                    | English long-form description.                                                |
 | `shortDescription`  | `TEXT`                | NULLABLE                                                    | English summary.                                                              |
 | `nameTh` / `descriptionTh` / `shortDescTh` | `VARCHAR/TEXT` | NULLABLE                                     | Thai counterparts.                                                            |
 | `sku`               | `VARCHAR(100)`        | UNIQUE, NULLABLE                                             | Variant-level SKU.                                                            |
-| `barcode`           | `VARCHAR(100)`        | NULLABLE, **no unique constraint**                            | ⚠️ Inconsistent with `Product.barcode`, which is unique — see Known Gaps.      |
+| `barcode`           | `VARCHAR(100)`        | UNIQUE, NULLABLE                                             | Variant-level barcode for POS/warehouse scanning.                             |
 | `quantity`          | `INT`                 | NOT NULL, DEFAULT `0`                                        | Stock count for this specific variant.                                        |
 | `stockStatus`       | `ENUM(StockStatus)`   | NOT NULL, DEFAULT `OUT_OF_STOCK`                              | Cached badge state.                                                            |
 | `lowStockThreshold` | `INT`                 | NOT NULL, DEFAULT `10`, `@map("low_stock_threshold")`         | Threshold `stockStatus` compares this variant's own `quantity` against to decide `LOW_STOCK`. |
@@ -248,7 +261,7 @@ erDiagram
 | `iconUrl`        | `VARCHAR(512)`      | NULLABLE                                                             | Pre-resized icon variant.                                                |
 | `altText`        | `TEXT`               | NULLABLE                                                             | Accessibility / SEO alt text.                                            |
 | `displayOrder`   | `INT`                | NOT NULL, DEFAULT `0`                                                | Sort order within the gallery.                                           |
-| `isPrimary`      | `BOOLEAN`             | NOT NULL, DEFAULT `false`                                            | Marks the hero/cover image. **No DB constraint** prevents multiple primaries per product — see Known Gaps. |
+| `isPrimary`      | `BOOLEAN`             | NOT NULL, DEFAULT `false`                                            | Marks the hero/cover image. Enforced to at most one `true` per `productId` by a partial unique index (`product_images_one_primary_per_product`, see `prisma/migrations/20260719170000_one_primary_image_per_product`). |
 | `isActive`       | `BOOLEAN`             | NOT NULL, DEFAULT `true`                                             | Soft-hide an image without deleting it.                                  |
 | `productId`      | `INT`                 | FK → `products.id`, NOT NULL, **ON DELETE CASCADE**                    | Owning product.                                                          |
 | `variantId`      | `INT`                 | FK → `product_variants.id`, NULLABLE, **ON DELETE CASCADE**            | Owning variant, if this image is variant-specific. Not constrained to belong to the same `productId` — see Known Gaps. |
@@ -446,20 +459,26 @@ erDiagram
 
 | Index                                             | Type            | Purpose                                                                    |
 | :--------------------------------------------------- | :---------------- | :------------------------------------------------------------------------------ |
-| `sid`, `name`, `slug`, `sku`, `barcode` (each `@unique`) | B-Tree (unique)   | Identity lookups; Prisma/Postgres creates one unique index per column automatically. |
-| `@@index([stockStatus])`                              | B-Tree            | Fast "in stock / out of stock" filtering.                                       |
+| `sid`, `name`, `slug`, `sku`, `barcode` on `Product`; `name`, `slug`, `sku`, `barcode` on `ProductVariant` (each `@unique`) | B-Tree (unique)   | Identity lookups; Prisma/Postgres creates one unique index per column automatically. |
+| `@@index([status, stockStatus])` (`Product`)          | B-Tree (composite) | Admin dashboard: active products that are low/out of stock. Replaced an earlier standalone `stockStatus` index — a 3-value enum is too low-cardinality for the planner to prefer a single-column B-Tree over a sequential scan. |
 | `@@index([status, type, publishedAt])`                | B-Tree (composite) | Storefront listing query: active + correct type + already-published.           |
 | `@@index([categoryId, status])`                       | B-Tree (composite) | Category browsing pages.                                                       |
 | `@@index([status, isFeatured])`                       | B-Tree (composite) | Homepage "Featured" sections.                                                  |
 | `@@index([createdAt])`                                | B-Tree            | "Newest" sort order.                                                            |
+| `@@index([tags], type: Gin)` (`Product`)              | GIN               | `tags @> ARRAY[...]` containment filtering.                                     |
+| `@@index([productId])` (`ProductVariant`)             | B-Tree            | FK lookup for `Product → variants` joins.                                      |
+| `@@index([productId, isDefault])` (`ProductVariant`)  | B-Tree (composite) | Fetching the default variant without scanning all of a product's variants.     |
+| `@@index([productId, stockStatus])` (`ProductVariant`) | B-Tree (composite) | Admin dashboard: this product's low/out-of-stock variants.                     |
 | `@@index([productId, isPrimary])` (`ProductImage`)    | B-Tree (composite) | Fetching a product's cover image without scanning the whole gallery.           |
-| FK columns (`categoryId`, `productId`, `variantId`, `createdBy`, `updatedBy`, `deletedBy`) | B-Tree (implicit)  | Prisma auto-creates an index on every relation scalar field.                    |
+| `@@index([variantId])` (`ProductImage`)               | B-Tree            | FK lookup for filtering images by variant.                                     |
+| `categoryId`, `createdBy`, `updatedBy`, `deletedBy`   | B-Tree (implicit via FK/unique constraint) | Standard Prisma-managed FK/audit-column indexes.               |
+
+> **Prisma does *not* auto-index every relation scalar field** — `productId` (`ProductVariant`) and `variantId` (`ProductImage`) needed the explicit `@@index` entries above; they were missing for a while and only added later (`prisma/migrations/20260719120000_add_product_variant_image_fk_indexes`). Add an explicit index any time a new FK column is introduced — don't assume Prisma covers it.
 
 ### Recommended future indexes (not yet implemented)
 
-- **`@@index([tags], type: Gin)`** on `Product.tags` — required once tag-based filtering ("show all `organic` products") is a real query path; a plain B-Tree can't do array-containment lookups efficiently.
-- **`@@index([attributes], type: Gin)`** on `ProductVariant.attributes` — same rationale for filtering by e.g. `{"color": "Red"}`.
-- **Partial unique index** `ON product_variants (product_id) WHERE is_default = true` and `ON product_images (product_id) WHERE is_primary = true` — Prisma's schema DSL can't express partial indexes; add via a raw SQL migration to actually enforce "exactly one default variant / primary image per product."
+- **`@@index([attributes], type: Gin)`** on `ProductVariant.attributes` — for filtering by e.g. `{"color": "Red"}`; a plain B-Tree can't do JSON-containment lookups efficiently.
+- **Partial unique index** `ON product_variants (product_id) WHERE is_default = true` — to enforce "exactly one default variant per product." The `ProductImage` equivalent (`product_images_one_primary_per_product`, `WHERE is_primary = true`) already exists (`prisma/migrations/20260719170000_one_primary_image_per_product`); this variant-side one doesn't yet.
 - **Partial unique indexes scoped to live rows** on `slug`/`sku`/`barcode`/`name` (`WHERE deleted_at IS NULL`) — today, soft-deleting a product permanently reserves its slug/SKU, which blocks re-launching under the same identifier.
 - **Full-text search (`tsvector` + GIN)** on `name`/`description` if the storefront needs free-text search beyond exact slug lookup — avoids `ILIKE '%term%'` sequential scans at catalog scale.
 
@@ -522,9 +541,8 @@ Periodic reconciliation (a scheduled job comparing `SUM(product_variants.quantit
 
 These are schema-level issues worth fixing before the `product` module goes to production — not blockers for reading/understanding the current design, but real bugs waiting to happen:
 
-- `ProductVariant.name`/`slug` are unique **globally**, not scoped per product — two different products cannot both have a variant named `"Small"`. Should be `@@unique([productId, name])` / `@@unique([productId, slug])`.
-- `ProductVariant.barcode` lacks `@unique`, inconsistent with `Product.barcode`.
-- No constraint enforces "exactly one `isDefault` variant" or "exactly one `isPrimary` image" per product — needs a partial unique index (raw migration).
+- `ProductVariant.name`/`slug` are unique **globally**, not scoped per product — two different products cannot both have a variant named `"Small"`. Flagged during schema review; kept as-is by deliberate product decision, not an open bug.
+- No constraint enforces "exactly one `isDefault` variant" per product — needs a partial unique index (raw migration), the same pattern already used for the `isPrimary` image constraint (see [Indexes](#performance-optimizations-indexes--views)).
 - No constraint ties a `ProductImage.variantId` to the variant's actual `productId` — a variant image could theoretically be attached to an unrelated product row.
 - Soft-deleted products permanently reserve their `slug`/`sku`/`barcode`/`name` due to global (not partial) unique indexes.
 - `Inventory.recordedBy` is `ON DELETE CASCADE`, inconsistent with every other audit FK in this domain (`SET NULL`) — deleting a user currently erases their inventory audit trail.

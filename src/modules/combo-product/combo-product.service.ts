@@ -22,7 +22,7 @@ import { Prisma } from '../../generated/prisma/client';
 import { CategoryProductStatus } from '../../generated/prisma/enums';
 
 const COMBO_IMAGE_FOLDER = 'combos/gallery';
-const DEFAULT_HOME_SECTION_LIMIT = 8;
+const DEFAULT_HOME_SECTION_LIMIT = 4;
 
 @Injectable()
 export class ComboProductService {

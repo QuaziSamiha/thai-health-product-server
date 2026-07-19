@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
+import { ProductType } from '../../../generated/prisma/browser';
 
 //* ═══════════════════════════════════════════════════════════════════════
 //* SHARED BUILDING BLOCKS — REUSED ACROSS EVERY PRODUCT RESPONSE VARIANT
@@ -123,6 +124,20 @@ export function toSeoMetadataDto(
 
 export function toPrice(value: unknown): number | undefined {
   return value !== null && value !== undefined ? Number(value) : undefined;
+}
+
+//* SINGLE PLACE THAT BRANCHES ON `type` TO PICK THE AUTHORITATIVE STOCK
+//* COUNT — `quantity` FOR SIMPLE, `totalStock` FOR VARIABLE. CALLERS
+//* (RESPONSE DTOS, FUTURE CART/ORDER/INVENTORY MODULES) SHOULD READ
+//* `effectiveStock` OFF THE RESPONSE RATHER THAN RE-DERIVING THIS BRANCH.
+export function getEffectiveStock(product: {
+  type: ProductType;
+  quantity: number;
+  totalStock: number;
+}): number {
+  return product.type === ProductType.VARIABLE
+    ? product.totalStock
+    : product.quantity;
 }
 
 export function toAttributes(

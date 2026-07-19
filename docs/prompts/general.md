@@ -1,7 +1,12 @@
-- is this suitable for a industry standard, scalable and well architecture codebase for all kind of future project domain for a senior software engineer 
-  
+- is this suitable for a industry standard, scalable and well architecture codebase for all kind of future project domain for a senior software engineer
 - Always write every comment strictly in the following format: `//* COMMENT` — where the prefix is always `//*` followed by a single space, and every letter in the comment text must be fully uppercased with no exceptions across all files.
 
 - Always use `yarn` instead of `npm` for installing any packages or libraries — use `yarn add <package>` for dependencies and `yarn add -D <package>` for dev dependencies throughout all instructions and code.
 
-- in this file, you have to check for the endpoint  product-by-slug/:slug, the function and the functions call from it for service and repository layer, is optimized, secure, mainting our convention such as service funtion for business logic, repository function for db logic, the end point name, function name, swagger info, response, request, etc everything, review like a senior backend nest js engineer
+- in this file, you have to check for the endpoint product-by-slug/:slug, the function and the functions call from it for service and repository layer, is optimized, secure, maintaining our convention such as service function for business logic, repository function for db logic, the end point name, function name, swagger info, response, request, etc everything, review like a senior backend nest js engineer
+
+<!--  19 July, 2026 -->
+
+- remind that ask me to change every important thing, give me file name, and after completing your task give me a list of file names with line where you made changes
+
+- review this db schema like a senior db designer and backend engineer, this schema should be well architecture, industry standard, scalable, and convention followed,

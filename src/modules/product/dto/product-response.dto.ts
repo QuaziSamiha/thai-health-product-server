@@ -24,6 +24,7 @@ import {
   toSeoMetadataDto,
   toPrice,
   toAbsoluteUrl,
+  getEffectiveStock,
 } from './product-shared.dto';
 import { ProductImageDto } from './product-image-response.dto';
 import {
@@ -221,6 +222,14 @@ export class ProductResponseDto {
     example: 0,
   })
   totalStock!: number;
+
+  @Expose()
+  @ApiProperty({
+    description:
+      'Resolved stock count regardless of `type` — `quantity` for SIMPLE, `totalStock` for VARIABLE. Prefer this over reading `quantity`/`totalStock` directly so callers don\'t have to branch on `type` themselves.',
+    example: 150,
+  })
+  effectiveStock!: number;
 
   @Expose()
   @ApiProperty({
@@ -448,6 +457,11 @@ export class ProductResponseDto {
     this.costPrice = toPrice(product.costPrice);
     this.quantity = product.quantity!;
     this.totalStock = product.totalStock!;
+    this.effectiveStock = getEffectiveStock({
+      type: product.type!,
+      quantity: product.quantity!,
+      totalStock: product.totalStock!,
+    });
     this.stockStatus = product.stockStatus!;
     this.lowStockThreshold = product.lowStockThreshold!;
     this.weight = toPrice(product.weight);
