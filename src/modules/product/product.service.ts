@@ -286,13 +286,24 @@ export class ProductService {
 
       //* A VARIABLE PRODUCT MAY OMIT ITS OWN BASE PRICE — FALL BACK TO THE
       //* DEFAULT VARIANT'S SO LISTINGS SHOW A REAL PRICE INSTEAD OF THE
-      //* COLUMN DEFAULT 0.
+      //* COLUMN DEFAULT 0. SAME FOR THE DISCOUNT: THE ADMIN FORM NEVER SENDS
+      //* dto.discountType/dto.discountValue FOR A VARIABLE PRODUCT (THE
+      //* DISCOUNT LIVES ON THE VARIANT), SO Product.salePrice MUST FALL BACK
+      //* TO THE DEFAULT VARIANT'S OWN CONFIGURED DISCOUNT TOO — OTHERWISE IT
+      //* SILENTLY ENDS UP "0% OFF" REGARDLESS OF WHAT THE VARIANT ACTUALLY
+      //* HAS CONFIGURED, WHICH IS WRONG FOR ANY LISTING/SORT THAT READS THE
+      //* PRODUCT ROW DIRECTLY INSTEAD OF THE VARIANT.
       const defaultVariant = variants.find((v) => v.isDefault) ?? variants[0];
       const basePrice = dto.basePrice ?? Number(defaultVariant?.basePrice ?? 0);
+      const defaultVariantDiscountValue =
+        defaultVariant?.discountValue === null ||
+        defaultVariant?.discountValue === undefined
+          ? undefined
+          : Number(defaultVariant.discountValue);
       const { discountType, discountValue, salePrice } = this.resolveSalePrice(
         basePrice,
-        dto.discountType,
-        dto.discountValue,
+        defaultVariant?.discountType ?? dto.discountType,
+        defaultVariantDiscountValue ?? dto.discountValue,
       );
 
       const created = await this.productRepository.createProduct({
@@ -828,8 +839,17 @@ export class ProductService {
               genericName: dto.genericName,
               categoryId: dto.categoryId,
               updatedBy: userId,
-              ...stockFields,
+              //* stockFields SPREADS LAST — WHEN dto.variants IS PROVIDED FOR A
+              //* VARIABLE PRODUCT, IT CARRIES basePrice/discountType/
+              //* discountValue/salePrice ALREADY RESOLVED FROM THE DEFAULT
+              //* VARIANT (SEE resolveStockUpdate), WHICH MUST WIN OVER
+              //* pricingFields' GENERIC dto.basePrice/discountType/discountValue
+              //* READ — OTHERWISE A CLIENT THAT SENDS A REDUNDANT TOP-LEVEL
+              //* basePrice ALONGSIDE `variants` (AS THE ADMIN FORM DOES) WOULD
+              //* SILENTLY OVERWRITE THE CORRECT VARIANT-DERIVED DISCOUNT WITH
+              //* THE PRODUCT ROW'S OWN, POSSIBLY STALE, discountType/discountValue.
               ...pricingFields,
+              ...stockFields,
             },
             tx,
           );
@@ -905,12 +925,26 @@ export class ProductService {
 
     if (effectiveType === ProductType.VARIABLE) {
       if (dto.variants !== undefined) {
-        const { plan, totalStock } = this.buildVariantReconcilePlan(
-          productName,
-          productSlug,
-          current.variants,
-          dto.variants,
-        );
+        const { plan, totalStock, defaultPricing } =
+          this.buildVariantReconcilePlan(
+            productName,
+            productSlug,
+            current.variants,
+            dto.variants,
+          );
+        //* MIRROR THE DEFAULT VARIANT'S OWN PRICING ONTO Product — SAME
+        //* RATIONALE AS createProduct: dto.basePrice CAN STILL OVERRIDE (RARE/
+        //* MANUAL), BUT discountType/discountValue ALWAYS COME FROM THE
+        //* VARIANT (THE ADMIN FORM NEVER SENDS THEM AT THE TOP LEVEL FOR A
+        //* VARIABLE PRODUCT) — RE-RESOLVED AGAINST WHATEVER basePrice WINS SO
+        //* salePrice NEVER PAIRS A NEW basePrice WITH A STALE salePrice.
+        const basePrice = dto.basePrice ?? defaultPricing.basePrice;
+        const { discountType, discountValue, salePrice } =
+          this.resolveSalePrice(
+            basePrice,
+            defaultPricing.discountType,
+            defaultPricing.discountValue,
+          );
         return {
           fields: {
             hasVariants: true,
@@ -918,6 +952,10 @@ export class ProductService {
             totalStock,
             lowStockThreshold,
             stockStatus: this.computeStockStatus(totalStock, lowStockThreshold),
+            basePrice,
+            discountType,
+            discountValue,
+            salePrice,
           },
           variantPlan: plan,
         };
@@ -982,14 +1020,28 @@ export class ProductService {
    *
    * Also returns `totalStock` for the final set (payload quantity when
    * given, the variant's current quantity otherwise) so the caller can
-   * refresh the product's cached stock fields.
+   * refresh the product's cached stock fields. `defaultPricing` is the
+   * default variant's own basePrice/discountType/discountValue *as they end
+   * up after this plan applies* (not the partial update patch stored in
+   * `updates`/`creates`, which leaves untouched fields `undefined`) — the
+   * caller mirrors this onto the `Product` row itself so `Product.basePrice`/
+   * `salePrice` always match what the storefront actually shows for this
+   * product (the default variant), instead of a stale creation-time snapshot.
    */
   private buildVariantReconcilePlan(
     productName: string,
     productSlug: string,
     existingVariants: ExistingVariantState[],
     requested: UpdateProductVariantDto[],
-  ): { plan: VariantReconcilePlan; totalStock: number } {
+  ): {
+    plan: VariantReconcilePlan;
+    totalStock: number;
+    defaultPricing: {
+      basePrice: number;
+      discountType: DiscountType | undefined;
+      discountValue: number | undefined;
+    };
+  } {
     const existingById = new Map(existingVariants.map((v) => [v.id, v]));
 
     const seenIds = new Set<number>();
@@ -1091,7 +1143,28 @@ export class ProductService {
       }
     });
 
-    return { plan: { deleteIds, updates, creates }, totalStock };
+    const defaultEntry = requested[defaultIndex];
+    const defaultExisting =
+      defaultEntry.id !== undefined
+        ? existingById.get(defaultEntry.id)
+        : undefined;
+    const defaultPricing = {
+      basePrice: Number(
+        defaultEntry.basePrice ?? defaultExisting?.basePrice ?? 0,
+      ),
+      discountType: defaultEntry.discountType ?? defaultExisting?.discountType,
+      discountValue:
+        defaultEntry.discountValue ??
+        (defaultExisting?.discountValue != null
+          ? Number(defaultExisting.discountValue)
+          : undefined),
+    };
+
+    return {
+      plan: { deleteIds, updates, creates },
+      totalStock,
+      defaultPricing,
+    };
   }
 
   /**
