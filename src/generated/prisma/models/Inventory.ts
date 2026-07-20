@@ -298,7 +298,7 @@ export type InventoryWhereInput = {
   recordedBy?: Prisma.IntNullableFilter<"Inventory"> | number | null
   product?: Prisma.XOR<Prisma.ProductNullableScalarRelationFilter, Prisma.ProductWhereInput> | null
   variant?: Prisma.XOR<Prisma.ProductVariantNullableScalarRelationFilter, Prisma.ProductVariantWhereInput> | null
-  recordedByUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  InventoryRecordedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
 export type InventoryOrderByWithRelationInput = {
@@ -316,7 +316,7 @@ export type InventoryOrderByWithRelationInput = {
   recordedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   product?: Prisma.ProductOrderByWithRelationInput
   variant?: Prisma.ProductVariantOrderByWithRelationInput
-  recordedByUser?: Prisma.UserOrderByWithRelationInput
+  InventoryRecordedBy?: Prisma.UserOrderByWithRelationInput
 }
 
 export type InventoryWhereUniqueInput = Prisma.AtLeast<{
@@ -337,7 +337,7 @@ export type InventoryWhereUniqueInput = Prisma.AtLeast<{
   recordedBy?: Prisma.IntNullableFilter<"Inventory"> | number | null
   product?: Prisma.XOR<Prisma.ProductNullableScalarRelationFilter, Prisma.ProductWhereInput> | null
   variant?: Prisma.XOR<Prisma.ProductVariantNullableScalarRelationFilter, Prisma.ProductVariantWhereInput> | null
-  recordedByUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  InventoryRecordedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id" | "sid">
 
 export type InventoryOrderByWithAggregationInput = {
@@ -389,7 +389,7 @@ export type InventoryCreateInput = {
   recordedAt?: Date | string
   product?: Prisma.ProductCreateNestedOneWithoutInventoryLogsInput
   variant?: Prisma.ProductVariantCreateNestedOneWithoutInventoryLogsInput
-  recordedByUser?: Prisma.UserCreateNestedOneWithoutInventoriesInput
+  InventoryRecordedBy?: Prisma.UserCreateNestedOneWithoutInventoriesInput
 }
 
 export type InventoryUncheckedCreateInput = {
@@ -418,7 +418,7 @@ export type InventoryUpdateInput = {
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   product?: Prisma.ProductUpdateOneWithoutInventoryLogsNestedInput
   variant?: Prisma.ProductVariantUpdateOneWithoutInventoryLogsNestedInput
-  recordedByUser?: Prisma.UserUpdateOneWithoutInventoriesNestedInput
+  InventoryRecordedBy?: Prisma.UserUpdateOneWithoutInventoriesNestedInput
 }
 
 export type InventoryUncheckedUpdateInput = {
@@ -640,45 +640,45 @@ export type InventoryUncheckedUpdateManyWithoutVariantNestedInput = {
   deleteMany?: Prisma.InventoryScalarWhereInput | Prisma.InventoryScalarWhereInput[]
 }
 
-export type InventoryCreateNestedManyWithoutRecordedByUserInput = {
-  create?: Prisma.XOR<Prisma.InventoryCreateWithoutRecordedByUserInput, Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput> | Prisma.InventoryCreateWithoutRecordedByUserInput[] | Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput[]
-  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput | Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput[]
-  createMany?: Prisma.InventoryCreateManyRecordedByUserInputEnvelope
+export type InventoryCreateNestedManyWithoutInventoryRecordedByInput = {
+  create?: Prisma.XOR<Prisma.InventoryCreateWithoutInventoryRecordedByInput, Prisma.InventoryUncheckedCreateWithoutInventoryRecordedByInput> | Prisma.InventoryCreateWithoutInventoryRecordedByInput[] | Prisma.InventoryUncheckedCreateWithoutInventoryRecordedByInput[]
+  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutInventoryRecordedByInput | Prisma.InventoryCreateOrConnectWithoutInventoryRecordedByInput[]
+  createMany?: Prisma.InventoryCreateManyInventoryRecordedByInputEnvelope
   connect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
 }
 
-export type InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput = {
-  create?: Prisma.XOR<Prisma.InventoryCreateWithoutRecordedByUserInput, Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput> | Prisma.InventoryCreateWithoutRecordedByUserInput[] | Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput[]
-  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput | Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput[]
-  createMany?: Prisma.InventoryCreateManyRecordedByUserInputEnvelope
+export type InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput = {
+  create?: Prisma.XOR<Prisma.InventoryCreateWithoutInventoryRecordedByInput, Prisma.InventoryUncheckedCreateWithoutInventoryRecordedByInput> | Prisma.InventoryCreateWithoutInventoryRecordedByInput[] | Prisma.InventoryUncheckedCreateWithoutInventoryRecordedByInput[]
+  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutInventoryRecordedByInput | Prisma.InventoryCreateOrConnectWithoutInventoryRecordedByInput[]
+  createMany?: Prisma.InventoryCreateManyInventoryRecordedByInputEnvelope
   connect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
 }
 
-export type InventoryUpdateManyWithoutRecordedByUserNestedInput = {
-  create?: Prisma.XOR<Prisma.InventoryCreateWithoutRecordedByUserInput, Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput> | Prisma.InventoryCreateWithoutRecordedByUserInput[] | Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput[]
-  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput | Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput[]
-  upsert?: Prisma.InventoryUpsertWithWhereUniqueWithoutRecordedByUserInput | Prisma.InventoryUpsertWithWhereUniqueWithoutRecordedByUserInput[]
-  createMany?: Prisma.InventoryCreateManyRecordedByUserInputEnvelope
+export type InventoryUpdateManyWithoutInventoryRecordedByNestedInput = {
+  create?: Prisma.XOR<Prisma.InventoryCreateWithoutInventoryRecordedByInput, Prisma.InventoryUncheckedCreateWithoutInventoryRecordedByInput> | Prisma.InventoryCreateWithoutInventoryRecordedByInput[] | Prisma.InventoryUncheckedCreateWithoutInventoryRecordedByInput[]
+  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutInventoryRecordedByInput | Prisma.InventoryCreateOrConnectWithoutInventoryRecordedByInput[]
+  upsert?: Prisma.InventoryUpsertWithWhereUniqueWithoutInventoryRecordedByInput | Prisma.InventoryUpsertWithWhereUniqueWithoutInventoryRecordedByInput[]
+  createMany?: Prisma.InventoryCreateManyInventoryRecordedByInputEnvelope
   set?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
   disconnect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
   delete?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
   connect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
-  update?: Prisma.InventoryUpdateWithWhereUniqueWithoutRecordedByUserInput | Prisma.InventoryUpdateWithWhereUniqueWithoutRecordedByUserInput[]
-  updateMany?: Prisma.InventoryUpdateManyWithWhereWithoutRecordedByUserInput | Prisma.InventoryUpdateManyWithWhereWithoutRecordedByUserInput[]
+  update?: Prisma.InventoryUpdateWithWhereUniqueWithoutInventoryRecordedByInput | Prisma.InventoryUpdateWithWhereUniqueWithoutInventoryRecordedByInput[]
+  updateMany?: Prisma.InventoryUpdateManyWithWhereWithoutInventoryRecordedByInput | Prisma.InventoryUpdateManyWithWhereWithoutInventoryRecordedByInput[]
   deleteMany?: Prisma.InventoryScalarWhereInput | Prisma.InventoryScalarWhereInput[]
 }
 
-export type InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput = {
-  create?: Prisma.XOR<Prisma.InventoryCreateWithoutRecordedByUserInput, Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput> | Prisma.InventoryCreateWithoutRecordedByUserInput[] | Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput[]
-  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput | Prisma.InventoryCreateOrConnectWithoutRecordedByUserInput[]
-  upsert?: Prisma.InventoryUpsertWithWhereUniqueWithoutRecordedByUserInput | Prisma.InventoryUpsertWithWhereUniqueWithoutRecordedByUserInput[]
-  createMany?: Prisma.InventoryCreateManyRecordedByUserInputEnvelope
+export type InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput = {
+  create?: Prisma.XOR<Prisma.InventoryCreateWithoutInventoryRecordedByInput, Prisma.InventoryUncheckedCreateWithoutInventoryRecordedByInput> | Prisma.InventoryCreateWithoutInventoryRecordedByInput[] | Prisma.InventoryUncheckedCreateWithoutInventoryRecordedByInput[]
+  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutInventoryRecordedByInput | Prisma.InventoryCreateOrConnectWithoutInventoryRecordedByInput[]
+  upsert?: Prisma.InventoryUpsertWithWhereUniqueWithoutInventoryRecordedByInput | Prisma.InventoryUpsertWithWhereUniqueWithoutInventoryRecordedByInput[]
+  createMany?: Prisma.InventoryCreateManyInventoryRecordedByInputEnvelope
   set?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
   disconnect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
   delete?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
   connect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
-  update?: Prisma.InventoryUpdateWithWhereUniqueWithoutRecordedByUserInput | Prisma.InventoryUpdateWithWhereUniqueWithoutRecordedByUserInput[]
-  updateMany?: Prisma.InventoryUpdateManyWithWhereWithoutRecordedByUserInput | Prisma.InventoryUpdateManyWithWhereWithoutRecordedByUserInput[]
+  update?: Prisma.InventoryUpdateWithWhereUniqueWithoutInventoryRecordedByInput | Prisma.InventoryUpdateWithWhereUniqueWithoutInventoryRecordedByInput[]
+  updateMany?: Prisma.InventoryUpdateManyWithWhereWithoutInventoryRecordedByInput | Prisma.InventoryUpdateManyWithWhereWithoutInventoryRecordedByInput[]
   deleteMany?: Prisma.InventoryScalarWhereInput | Prisma.InventoryScalarWhereInput[]
 }
 
@@ -692,7 +692,7 @@ export type InventoryCreateWithoutProductInput = {
   sellingPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   recordedAt?: Date | string
   variant?: Prisma.ProductVariantCreateNestedOneWithoutInventoryLogsInput
-  recordedByUser?: Prisma.UserCreateNestedOneWithoutInventoriesInput
+  InventoryRecordedBy?: Prisma.UserCreateNestedOneWithoutInventoriesInput
 }
 
 export type InventoryUncheckedCreateWithoutProductInput = {
@@ -763,7 +763,7 @@ export type InventoryCreateWithoutVariantInput = {
   sellingPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   recordedAt?: Date | string
   product?: Prisma.ProductCreateNestedOneWithoutInventoryLogsInput
-  recordedByUser?: Prisma.UserCreateNestedOneWithoutInventoriesInput
+  InventoryRecordedBy?: Prisma.UserCreateNestedOneWithoutInventoriesInput
 }
 
 export type InventoryUncheckedCreateWithoutVariantInput = {
@@ -806,7 +806,7 @@ export type InventoryUpdateManyWithWhereWithoutVariantInput = {
   data: Prisma.XOR<Prisma.InventoryUpdateManyMutationInput, Prisma.InventoryUncheckedUpdateManyWithoutVariantInput>
 }
 
-export type InventoryCreateWithoutRecordedByUserInput = {
+export type InventoryCreateWithoutInventoryRecordedByInput = {
   sid?: string
   quantity?: number
   changeType?: $Enums.InventoryExchangeType
@@ -819,7 +819,7 @@ export type InventoryCreateWithoutRecordedByUserInput = {
   variant?: Prisma.ProductVariantCreateNestedOneWithoutInventoryLogsInput
 }
 
-export type InventoryUncheckedCreateWithoutRecordedByUserInput = {
+export type InventoryUncheckedCreateWithoutInventoryRecordedByInput = {
   id?: number
   sid?: string
   quantity?: number
@@ -833,30 +833,30 @@ export type InventoryUncheckedCreateWithoutRecordedByUserInput = {
   variantId?: number | null
 }
 
-export type InventoryCreateOrConnectWithoutRecordedByUserInput = {
+export type InventoryCreateOrConnectWithoutInventoryRecordedByInput = {
   where: Prisma.InventoryWhereUniqueInput
-  create: Prisma.XOR<Prisma.InventoryCreateWithoutRecordedByUserInput, Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput>
+  create: Prisma.XOR<Prisma.InventoryCreateWithoutInventoryRecordedByInput, Prisma.InventoryUncheckedCreateWithoutInventoryRecordedByInput>
 }
 
-export type InventoryCreateManyRecordedByUserInputEnvelope = {
-  data: Prisma.InventoryCreateManyRecordedByUserInput | Prisma.InventoryCreateManyRecordedByUserInput[]
+export type InventoryCreateManyInventoryRecordedByInputEnvelope = {
+  data: Prisma.InventoryCreateManyInventoryRecordedByInput | Prisma.InventoryCreateManyInventoryRecordedByInput[]
   skipDuplicates?: boolean
 }
 
-export type InventoryUpsertWithWhereUniqueWithoutRecordedByUserInput = {
+export type InventoryUpsertWithWhereUniqueWithoutInventoryRecordedByInput = {
   where: Prisma.InventoryWhereUniqueInput
-  update: Prisma.XOR<Prisma.InventoryUpdateWithoutRecordedByUserInput, Prisma.InventoryUncheckedUpdateWithoutRecordedByUserInput>
-  create: Prisma.XOR<Prisma.InventoryCreateWithoutRecordedByUserInput, Prisma.InventoryUncheckedCreateWithoutRecordedByUserInput>
+  update: Prisma.XOR<Prisma.InventoryUpdateWithoutInventoryRecordedByInput, Prisma.InventoryUncheckedUpdateWithoutInventoryRecordedByInput>
+  create: Prisma.XOR<Prisma.InventoryCreateWithoutInventoryRecordedByInput, Prisma.InventoryUncheckedCreateWithoutInventoryRecordedByInput>
 }
 
-export type InventoryUpdateWithWhereUniqueWithoutRecordedByUserInput = {
+export type InventoryUpdateWithWhereUniqueWithoutInventoryRecordedByInput = {
   where: Prisma.InventoryWhereUniqueInput
-  data: Prisma.XOR<Prisma.InventoryUpdateWithoutRecordedByUserInput, Prisma.InventoryUncheckedUpdateWithoutRecordedByUserInput>
+  data: Prisma.XOR<Prisma.InventoryUpdateWithoutInventoryRecordedByInput, Prisma.InventoryUncheckedUpdateWithoutInventoryRecordedByInput>
 }
 
-export type InventoryUpdateManyWithWhereWithoutRecordedByUserInput = {
+export type InventoryUpdateManyWithWhereWithoutInventoryRecordedByInput = {
   where: Prisma.InventoryScalarWhereInput
-  data: Prisma.XOR<Prisma.InventoryUpdateManyMutationInput, Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserInput>
+  data: Prisma.XOR<Prisma.InventoryUpdateManyMutationInput, Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByInput>
 }
 
 export type InventoryCreateManyProductInput = {
@@ -883,7 +883,7 @@ export type InventoryUpdateWithoutProductInput = {
   sellingPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   variant?: Prisma.ProductVariantUpdateOneWithoutInventoryLogsNestedInput
-  recordedByUser?: Prisma.UserUpdateOneWithoutInventoriesNestedInput
+  InventoryRecordedBy?: Prisma.UserUpdateOneWithoutInventoriesNestedInput
 }
 
 export type InventoryUncheckedUpdateWithoutProductInput = {
@@ -938,7 +938,7 @@ export type InventoryUpdateWithoutVariantInput = {
   sellingPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   product?: Prisma.ProductUpdateOneWithoutInventoryLogsNestedInput
-  recordedByUser?: Prisma.UserUpdateOneWithoutInventoriesNestedInput
+  InventoryRecordedBy?: Prisma.UserUpdateOneWithoutInventoriesNestedInput
 }
 
 export type InventoryUncheckedUpdateWithoutVariantInput = {
@@ -969,7 +969,7 @@ export type InventoryUncheckedUpdateManyWithoutVariantInput = {
   recordedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
-export type InventoryCreateManyRecordedByUserInput = {
+export type InventoryCreateManyInventoryRecordedByInput = {
   id?: number
   sid?: string
   quantity?: number
@@ -983,7 +983,7 @@ export type InventoryCreateManyRecordedByUserInput = {
   variantId?: number | null
 }
 
-export type InventoryUpdateWithoutRecordedByUserInput = {
+export type InventoryUpdateWithoutInventoryRecordedByInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   changeType?: Prisma.EnumInventoryExchangeTypeFieldUpdateOperationsInput | $Enums.InventoryExchangeType
@@ -996,7 +996,7 @@ export type InventoryUpdateWithoutRecordedByUserInput = {
   variant?: Prisma.ProductVariantUpdateOneWithoutInventoryLogsNestedInput
 }
 
-export type InventoryUncheckedUpdateWithoutRecordedByUserInput = {
+export type InventoryUncheckedUpdateWithoutInventoryRecordedByInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1010,7 +1010,7 @@ export type InventoryUncheckedUpdateWithoutRecordedByUserInput = {
   variantId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
-export type InventoryUncheckedUpdateManyWithoutRecordedByUserInput = {
+export type InventoryUncheckedUpdateManyWithoutInventoryRecordedByInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1041,7 +1041,7 @@ export type InventorySelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   recordedBy?: boolean
   product?: boolean | Prisma.Inventory$productArgs<ExtArgs>
   variant?: boolean | Prisma.Inventory$variantArgs<ExtArgs>
-  recordedByUser?: boolean | Prisma.Inventory$recordedByUserArgs<ExtArgs>
+  InventoryRecordedBy?: boolean | Prisma.Inventory$InventoryRecordedByArgs<ExtArgs>
 }, ExtArgs["result"]["inventory"]>
 
 export type InventorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1059,7 +1059,7 @@ export type InventorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   recordedBy?: boolean
   product?: boolean | Prisma.Inventory$productArgs<ExtArgs>
   variant?: boolean | Prisma.Inventory$variantArgs<ExtArgs>
-  recordedByUser?: boolean | Prisma.Inventory$recordedByUserArgs<ExtArgs>
+  InventoryRecordedBy?: boolean | Prisma.Inventory$InventoryRecordedByArgs<ExtArgs>
 }, ExtArgs["result"]["inventory"]>
 
 export type InventorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1077,7 +1077,7 @@ export type InventorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   recordedBy?: boolean
   product?: boolean | Prisma.Inventory$productArgs<ExtArgs>
   variant?: boolean | Prisma.Inventory$variantArgs<ExtArgs>
-  recordedByUser?: boolean | Prisma.Inventory$recordedByUserArgs<ExtArgs>
+  InventoryRecordedBy?: boolean | Prisma.Inventory$InventoryRecordedByArgs<ExtArgs>
 }, ExtArgs["result"]["inventory"]>
 
 export type InventorySelectScalar = {
@@ -1099,17 +1099,17 @@ export type InventoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type InventoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product?: boolean | Prisma.Inventory$productArgs<ExtArgs>
   variant?: boolean | Prisma.Inventory$variantArgs<ExtArgs>
-  recordedByUser?: boolean | Prisma.Inventory$recordedByUserArgs<ExtArgs>
+  InventoryRecordedBy?: boolean | Prisma.Inventory$InventoryRecordedByArgs<ExtArgs>
 }
 export type InventoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product?: boolean | Prisma.Inventory$productArgs<ExtArgs>
   variant?: boolean | Prisma.Inventory$variantArgs<ExtArgs>
-  recordedByUser?: boolean | Prisma.Inventory$recordedByUserArgs<ExtArgs>
+  InventoryRecordedBy?: boolean | Prisma.Inventory$InventoryRecordedByArgs<ExtArgs>
 }
 export type InventoryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product?: boolean | Prisma.Inventory$productArgs<ExtArgs>
   variant?: boolean | Prisma.Inventory$variantArgs<ExtArgs>
-  recordedByUser?: boolean | Prisma.Inventory$recordedByUserArgs<ExtArgs>
+  InventoryRecordedBy?: boolean | Prisma.Inventory$InventoryRecordedByArgs<ExtArgs>
 }
 
 export type $InventoryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1117,7 +1117,7 @@ export type $InventoryPayload<ExtArgs extends runtime.Types.Extensions.InternalA
   objects: {
     product: Prisma.$ProductPayload<ExtArgs> | null
     variant: Prisma.$ProductVariantPayload<ExtArgs> | null
-    recordedByUser: Prisma.$UserPayload<ExtArgs> | null
+    InventoryRecordedBy: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1528,7 +1528,7 @@ export interface Prisma__InventoryClient<T, Null = never, ExtArgs extends runtim
   readonly [Symbol.toStringTag]: "PrismaPromise"
   product<T extends Prisma.Inventory$productArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Inventory$productArgs<ExtArgs>>): Prisma.Prisma__ProductClient<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   variant<T extends Prisma.Inventory$variantArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Inventory$variantArgs<ExtArgs>>): Prisma.Prisma__ProductVariantClient<runtime.Types.Result.GetResult<Prisma.$ProductVariantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  recordedByUser<T extends Prisma.Inventory$recordedByUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Inventory$recordedByUserArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  InventoryRecordedBy<T extends Prisma.Inventory$InventoryRecordedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Inventory$InventoryRecordedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2009,9 +2009,9 @@ export type Inventory$variantArgs<ExtArgs extends runtime.Types.Extensions.Inter
 }
 
 /**
- * Inventory.recordedByUser
+ * Inventory.InventoryRecordedBy
  */
-export type Inventory$recordedByUserArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Inventory$InventoryRecordedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the User
    */

@@ -417,7 +417,7 @@ export type UserCreateInput = {
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
@@ -449,7 +449,7 @@ export type UserUncheckedCreateInput = {
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
@@ -480,7 +480,7 @@ export type UserUpdateInput = {
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
@@ -512,7 +512,7 @@ export type UserUncheckedUpdateInput = {
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
@@ -928,7 +928,7 @@ export type UserCreateWithoutBlogsInput = {
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
@@ -959,7 +959,7 @@ export type UserUncheckedCreateWithoutBlogsInput = {
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -1005,7 +1005,7 @@ export type UserUpdateWithoutBlogsInput = {
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
@@ -1036,7 +1036,7 @@ export type UserUncheckedUpdateWithoutBlogsInput = {
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -1065,7 +1065,7 @@ export type UserCreateWithoutCreatedCategoriesInput = {
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
@@ -1096,7 +1096,7 @@ export type UserUncheckedCreateWithoutCreatedCategoriesInput = {
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
@@ -1131,7 +1131,7 @@ export type UserCreateWithoutUpdatedCategoriesInput = {
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
@@ -1162,7 +1162,7 @@ export type UserUncheckedCreateWithoutUpdatedCategoriesInput = {
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
@@ -1208,7 +1208,7 @@ export type UserUpdateWithoutCreatedCategoriesInput = {
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
@@ -1239,7 +1239,7 @@ export type UserUncheckedUpdateWithoutCreatedCategoriesInput = {
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1280,7 +1280,7 @@ export type UserUpdateWithoutUpdatedCategoriesInput = {
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
@@ -1311,7 +1311,7 @@ export type UserUncheckedUpdateWithoutUpdatedCategoriesInput = {
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1342,7 +1342,7 @@ export type UserCreateWithoutCreatedCombosInput = {
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
   createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
@@ -1373,7 +1373,7 @@ export type UserUncheckedCreateWithoutCreatedCombosInput = {
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
   createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -1408,7 +1408,7 @@ export type UserCreateWithoutUpdatedCombosInput = {
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
   createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
@@ -1439,7 +1439,7 @@ export type UserUncheckedCreateWithoutUpdatedCombosInput = {
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
   createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -1485,7 +1485,7 @@ export type UserUpdateWithoutCreatedCombosInput = {
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
   createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
@@ -1516,7 +1516,7 @@ export type UserUncheckedUpdateWithoutCreatedCombosInput = {
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
   createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -1557,7 +1557,7 @@ export type UserUpdateWithoutUpdatedCombosInput = {
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
   createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
@@ -1588,7 +1588,7 @@ export type UserUncheckedUpdateWithoutUpdatedCombosInput = {
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
   createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -1618,7 +1618,7 @@ export type UserCreateWithoutCreatedHomeContentsInput = {
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
@@ -1649,7 +1649,7 @@ export type UserUncheckedCreateWithoutCreatedHomeContentsInput = {
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
@@ -1684,7 +1684,7 @@ export type UserCreateWithoutUpdatedHomeContentsInput = {
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
@@ -1715,7 +1715,7 @@ export type UserUncheckedCreateWithoutUpdatedHomeContentsInput = {
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
@@ -1761,7 +1761,7 @@ export type UserUpdateWithoutCreatedHomeContentsInput = {
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
@@ -1792,7 +1792,7 @@ export type UserUncheckedUpdateWithoutCreatedHomeContentsInput = {
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1833,7 +1833,7 @@ export type UserUpdateWithoutUpdatedHomeContentsInput = {
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
@@ -1864,7 +1864,7 @@ export type UserUncheckedUpdateWithoutUpdatedHomeContentsInput = {
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2031,7 +2031,7 @@ export type UserCreateWithoutCreatedProductsInput = {
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
   updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
@@ -2062,7 +2062,7 @@ export type UserUncheckedCreateWithoutCreatedProductsInput = {
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
   updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
@@ -2097,7 +2097,7 @@ export type UserCreateWithoutUpdatedProductsInput = {
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
   deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
@@ -2128,7 +2128,7 @@ export type UserUncheckedCreateWithoutUpdatedProductsInput = {
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
@@ -2163,7 +2163,7 @@ export type UserCreateWithoutDeletedProductsInput = {
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
@@ -2194,7 +2194,7 @@ export type UserUncheckedCreateWithoutDeletedProductsInput = {
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
@@ -2240,7 +2240,7 @@ export type UserUpdateWithoutCreatedProductsInput = {
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
   updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
@@ -2271,7 +2271,7 @@ export type UserUncheckedUpdateWithoutCreatedProductsInput = {
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2312,7 +2312,7 @@ export type UserUpdateWithoutUpdatedProductsInput = {
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
   deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
@@ -2343,7 +2343,7 @@ export type UserUncheckedUpdateWithoutUpdatedProductsInput = {
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2384,7 +2384,7 @@ export type UserUpdateWithoutDeletedProductsInput = {
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
@@ -2415,7 +2415,7 @@ export type UserUncheckedUpdateWithoutDeletedProductsInput = {
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2446,7 +2446,7 @@ export type UserCreateWithoutCreatedSupportsInput = {
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
@@ -2477,7 +2477,7 @@ export type UserUncheckedCreateWithoutCreatedSupportsInput = {
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
@@ -2512,7 +2512,7 @@ export type UserCreateWithoutUpdatedSupportsInput = {
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
@@ -2543,7 +2543,7 @@ export type UserUncheckedCreateWithoutUpdatedSupportsInput = {
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
@@ -2589,7 +2589,7 @@ export type UserUpdateWithoutCreatedSupportsInput = {
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
@@ -2620,7 +2620,7 @@ export type UserUncheckedUpdateWithoutCreatedSupportsInput = {
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2661,7 +2661,7 @@ export type UserUpdateWithoutUpdatedSupportsInput = {
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
@@ -2692,7 +2692,7 @@ export type UserUncheckedUpdateWithoutUpdatedSupportsInput = {
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2721,7 +2721,7 @@ export type UserCreateWithoutProfileInput = {
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
@@ -2752,7 +2752,7 @@ export type UserUncheckedCreateWithoutProfileInput = {
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
@@ -2798,7 +2798,7 @@ export type UserUpdateWithoutProfileInput = {
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
@@ -2829,7 +2829,7 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2859,7 +2859,7 @@ export type UserCreateWithoutSecurityInput = {
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
@@ -2890,7 +2890,7 @@ export type UserUncheckedCreateWithoutSecurityInput = {
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
@@ -2936,7 +2936,7 @@ export type UserUpdateWithoutSecurityInput = {
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
@@ -2967,7 +2967,7 @@ export type UserUncheckedUpdateWithoutSecurityInput = {
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2997,7 +2997,7 @@ export type UserCreateWithoutSessionsInput = {
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
@@ -3028,7 +3028,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
@@ -3074,7 +3074,7 @@ export type UserUpdateWithoutSessionsInput = {
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
@@ -3105,7 +3105,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
@@ -3135,7 +3135,7 @@ export type UserCreateWithoutOtpsInput = {
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
@@ -3166,7 +3166,7 @@ export type UserUncheckedCreateWithoutOtpsInput = {
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutRecordedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
   createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
   blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
@@ -3212,7 +3212,7 @@ export type UserUpdateWithoutOtpsInput = {
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
@@ -3243,7 +3243,7 @@ export type UserUncheckedUpdateWithoutOtpsInput = {
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutRecordedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
   createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput

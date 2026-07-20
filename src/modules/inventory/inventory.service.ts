@@ -81,7 +81,7 @@ export class InventoryService {
       ...restData,
       ...(productId && { product: { connect: { id: productId } } }),
       ...(variantId && { variant: { connect: { id: variantId } } }),
-      ...(userId && { recordedByUser: { connect: { id: userId } } }),
+      ...(userId && { InventoryRecordedBy: { connect: { id: userId } } }),
     });
 
     return new InventoryResponseDto(movement);

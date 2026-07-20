@@ -128,7 +128,7 @@ erDiagram
 | `recordedAt`         | `TIMESTAMP`           | NOT NULL, DEFAULT `now()`                                                | When this movement was recorded. There is no `updatedAt` — rows are treated as immutable log entries, never edited after the fact. |
 | `productId`          | `INT`                 | FK → `products.id`, NULLABLE, **ON DELETE CASCADE**                        | Product this movement applies to, if not variant-specific.                    |
 | `variantId`          | `INT`                 | FK → `product_variants.id`, NULLABLE, **ON DELETE CASCADE**                | Variant this movement applies to, if variant-specific.                        |
-| `recordedBy`         | `INT`                 | FK → `users.id`, NULLABLE, **ON DELETE CASCADE**                           | Actor who recorded the movement. ⚠️ `CASCADE`, not `SET NULL` — see [Known Gaps](#known-gaps--recommended-hardening). |
+| `recordedBy`         | `INT`                 | FK → `users.id`, NULLABLE, **ON DELETE SET NULL**                          | Actor who recorded the movement. Deleting the user preserves the ledger row and nulls out the actor. |
 
 </details>
 
@@ -217,12 +217,11 @@ erDiagram
 | `ProductVariant` → `Batch`                  | `Batch.variantId`             | **CASCADE**          | Same, at variant granularity.                                               |
 | `Product` → `Inventory`                     | `Inventory.productId`         | **CASCADE**          | Deleting a product wipes its stock-movement history.                        |
 | `ProductVariant` → `Inventory`              | `Inventory.variantId`         | **CASCADE**          | Same, at variant granularity.                                               |
-| `User` → `Inventory` (`recordedByUser`)     | `Inventory.recordedBy`        | **CASCADE**          | ⚠️ Deleting a user **deletes every inventory row they ever recorded** — this is the audit-history loss already flagged as inconsistent in `product-db-schema.md`. Every other audit FK in this schema (`createdBy`/`updatedBy`/`deletedBy` on `Product`, `ComboProduct`, `Home`, etc.) uses `SET NULL` instead. |
+| `User` → `Inventory` (`InventoryRecordedBy`) | `Inventory.recordedBy`        | **SET NULL**          | Deleting a user preserves the inventory rows they recorded, nulling out the actor — consistent with every other audit FK in this schema (`createdBy`/`updatedBy`/`deletedBy` on `Product`, `ComboProduct`, `Home`, etc.). |
 
 **Practical implications:**
 
 - Because `Product → Batch` and `Product → Inventory` are both `CASCADE`, a hard-deleted product silently destroys its entire lot/expiry and stock-movement history — regulatory/compliance record for a pharmaceutical retailer. Always prefer `Product.deletedAt` (soft delete) over a hard `DELETE` once a product has ever had stock movement.
-- `Inventory.recordedBy`'s `CASCADE` means offboarding/deleting a staff or admin user (e.g. a former warehouse employee) **erases the stock-movement rows they recorded**, not just their name off of them. This is very likely unintentional and should be `SET NULL` to match the rest of the codebase's audit-FK convention — see [Known Gaps](#known-gaps--recommended-hardening).
 
 </details>
 
@@ -273,7 +272,6 @@ erDiagram
 
 These are schema-level issues worth fixing before the `inventory` module goes to production — not blockers for reading/understanding the current design, but real bugs waiting to happen:
 
-- **`Inventory.recordedBy` is `ON DELETE CASCADE`**, not `SET NULL` — deleting a user permanently erases every stock-movement row they ever recorded, inconsistent with every other audit FK in this codebase. This is also flagged from `Product`'s side in `product-db-schema.md`. Highest-priority fix in this domain.
 - No `CHECK` constraint keeps `0 <= Batch.remaining <= Batch.quantity` — a buggy decrement could drive `remaining` negative or above the original lot size with nothing rejecting the write.
 - Both `Batch.productId`/`variantId` and `Inventory.productId`/`variantId` are independently nullable with **no `CHECK` requiring at least one to be set** — a row scoped to neither a product nor a variant is representable and meaningless.
 - No constraint ties `variantId` to actually belong to the referenced `productId` when both are set — same class of gap as `ProductImage.variantId` in `product-db-schema.md`.

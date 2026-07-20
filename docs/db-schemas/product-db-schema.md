@@ -440,7 +440,7 @@ erDiagram
 | `Product` → `ComboItem`                       | `ComboItem.productId`        | **RESTRICT**        | A product bundled into any combo cannot be deleted.                         |
 | `ProductVariant` → `ComboItem`                | `ComboItem.variantId`        | **SET NULL**        | Deleting the pinned variant loosens the combo item back to product-level.   |
 | `User` → `Product` (`createdBy`/`updatedBy`/`deletedBy`) | `Product.*By`     | **SET NULL**        | Deleting a user preserves the product row; the audit pointer just goes null. |
-| `User` → `Inventory` (`recordedBy`)           | `Inventory.recordedBy`       | **CASCADE**         | ⚠️ Inconsistent with the `Product` audit FKs above — deleting a user currently deletes their inventory audit history. Recommend `SET NULL` to match. |
+| `User` → `Inventory` (`InventoryRecordedBy`)  | `Inventory.recordedBy`       | **SET NULL**        | Consistent with the `Product` audit FKs above — deleting a user preserves inventory audit history. |
 
 **Practical implications:**
 
@@ -545,6 +545,5 @@ These are schema-level issues worth fixing before the `product` module goes to p
 - No constraint enforces "exactly one `isDefault` variant" per product — needs a partial unique index (raw migration), the same pattern already used for the `isPrimary` image constraint (see [Indexes](#performance-optimizations-indexes--views)).
 - No constraint ties a `ProductImage.variantId` to the variant's actual `productId` — a variant image could theoretically be attached to an unrelated product row.
 - Soft-deleted products permanently reserve their `slug`/`sku`/`barcode`/`name` due to global (not partial) unique indexes.
-- `Inventory.recordedBy` is `ON DELETE CASCADE`, inconsistent with every other audit FK in this domain (`SET NULL`) — deleting a user currently erases their inventory audit trail.
 
 </details>
