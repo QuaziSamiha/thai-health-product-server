@@ -33,9 +33,12 @@ This document maps every **currently exposed** `product` HTTP endpoint (`Product
    - `hasVariants` — `true` if `dto.variants` is a non-empty array, otherwise `false`. Never taken from the request directly (the DTO doesn't even expose this field).
    - `quantity` / `totalStock` — enforces the same invariant documented for the model: **SIMPLE** → `dto.quantity` (default `0`) is authoritative, `totalStock` mirrors it. **VARIABLE** → `quantity` is forced to `0` and `totalStock` is the sum of every variant's `quantity`, even if the client also sent a top-level `quantity` (it's discarded).
    - `stockStatus` — three-state, derived from the effective stock count (`totalStock` for VARIABLE, `quantity` for SIMPLE) against `lowStockThreshold` (`dto.lowStockThreshold`, default `10`): `OUT_OF_STOCK` at `0`, `LOW_STOCK` from `1` up to and including the threshold, `IN_STOCK` above it.
+
+   > **Product-level `size`** (e.g. `"500ml"`, `"30 tablets"`): a plain scalar column on `Product` itself, passed straight through from `dto.size` with no derivation — same treatment as `weight`. Only meaningful when `type = SIMPLE`; a `VARIABLE` product expresses size per **variant** instead (`ProductVariant.size`, see point 6 below).
+
 6. **Per-variant computation** (`buildVariantInput`), for each entry in `dto.variants`:
-   - `name` — the client's value, or `"${productName} ${size}"` if omitted.
-   - `slug` — `${productSlug}-${generateSlug(name ?? size ?? 'variant-N')}`. `ProductVariant.slug` is unique **globally**, not scoped per product (a known schema characteristic, not something this endpoint changes) — prefixing with the parent's own already-unique slug keeps this collision-free in practice without altering the schema.
+   - `name` — the client's value, or `"${productName} variant ${size}"` if omitted (e.g. `"Organic Arabica Coffee variant 500ml"`) — built from the product's actual display name, not its slug.
+   - `slug` — `${productSlug}-variant-${generateSlug(name ?? size ?? 'variant-N')}`. `ProductVariant.slug` is unique **globally**, not scoped per product (a known schema characteristic, not something this endpoint changes) — prefixing with the parent's own already-unique slug (plus the size-derived seed) keeps this collision-free in practice, since two variants of the same product always differ by size.
    - `stockStatus` — same three-state rule as above, computed from that variant's own `quantity` and its own `lowStockThreshold` (`entry.lowStockThreshold`, default `10`), independently of the aggregate.
    - `attributes` — defaults to `{}` if omitted; passed through `toPlainJson()` to strip it down to a plain serializable value.
    - Everything else (`basePrice`, `discountType`, `discountValue`, `salePrice`, `costPrice`, `sku`, `barcode`, `weight`, `size`, `isDefault`) passes through as given.
@@ -66,7 +69,7 @@ This document maps every **currently exposed** `product` HTTP endpoint (`Product
 | :--- | :--- |
 | Controller | `ProductController.updateProduct(id, dto, images, req)` — reads the acting admin's id off `req.user.id` (`UnauthorizedException` if missing); no other logic. |
 | Service | `ProductService.updateProduct(id, userId, dto, images)` — existence check, conditional category eligibility check, conditional name/slug re-check, uploads new images, resolves which stock fields (if any) need recomputing, runs the DB writes in one transaction, rolls back uploaded files if anything downstream fails. |
-| Repository | `findByIdAdmin` (existence + current state) → `findByName` / `findBySlugAdmin` (conflict re-check) → `withTransaction(async tx => { replaceVariants?; createImages?; updateProduct })`. |
+| Repository | `findByIdAdmin` (existence + current state) → `findByName` / `findBySlugAdmin` (conflict re-check) → `withTransaction(async tx => { reconcileVariants?; createImages?; updateProduct })`. |
 
 **Business logic — in order:**
 
@@ -74,6 +77,9 @@ This document maps every **currently exposed** `product` HTTP endpoint (`Product
 2. **Conditional category eligibility check** — only runs if `dto.categoryId` is present in the request. Same rule as create: `CategoryService.assertCategoryAssignableToProduct(dto.categoryId)` must find the category, confirm it's `ACTIVE`, and confirm it's not a root category (`404`/`400`/`400` respectively). Omitting `categoryId` entirely leaves the product filed under its existing category untouched, no re-check performed.
 3. **Conditional name/slug conflict check** — only runs if `dto.name` is present **and** differs from the current name. `findByName(dto.name)` and `findBySlugAdmin(newSlug)` are both re-checked, but a match only counts as a conflict if it belongs to a *different* row (`match.id !== id`) — otherwise a product would conflict with itself on every update that includes its own unchanged name.
 4. **New images are uploaded to disk before the transaction**, same rollback-on-failure behavior as create. Unlike create, there's no "attach to the create call" step — they're inserted via `createImages` inside the transaction below, with `displayOrder` continuing from `existing.images.length` (never `0`), and `isPrimary: false` (existing primary image is never silently displaced by an update).
+
+   > `size`, if present in the request, updates the `Product` row's own scalar column exactly like `weight` — no derivation, no conditional logic. Only meaningful for a `SIMPLE` product.
+
 5. **`resolveStockUpdate(existing, dto, slug)`** decides whether `hasVariants`/`quantity`/`totalStock`/`stockStatus`/`lowStockThreshold` need recomputing at all:
    - **Not touched** unless the request includes `type`, `quantity`, `variants`, **or** `lowStockThreshold` — otherwise these fields are omitted from the update payload entirely (Prisma ignores `undefined` keys, so whatever was already stored stays exactly as it was). A request that *only* changes `lowStockThreshold` still triggers this block, since `stockStatus` may flip even though nothing about the stock count itself changed.
    - **Effective type** = `dto.type ?? existing.type`. **Effective threshold** = `dto.lowStockThreshold ?? existing.lowStockThreshold`.
@@ -81,12 +87,13 @@ This document maps every **currently exposed** `product` HTTP endpoint (`Product
    - If effective type is `VARIABLE` but `variants` is *not* provided (e.g. only `lowStockThreshold` or `isFeatured` changed): `hasVariants: true, quantity: 0` are set, and `stockStatus` is recomputed against `existing.totalStock` (unchanged) and the effective threshold — existing variants and `totalStock` itself are left alone.
    - If effective type is `SIMPLE`: `quantity = dto.quantity ?? existing.quantity`, `totalStock` mirrors it, `stockStatus` recomputed against the effective threshold.
    - Per-variant updates (`buildVariantReconcilePlan`) recompute that variant's own `stockStatus` whenever the entry's `quantity` **or** `lowStockThreshold` is present, against whichever of the two wasn't sent (falling back to the variant's current value).
+   - Per-variant `name`/`slug` are **regenerated whenever `entry.name` or `entry.size` is present** in the payload — not only on an explicit `name` override. This matters because the admin UI never sends `name` at all (it's always server-derived); without keying off `size` too, editing just a variant's size would silently leave it wearing the stale name/slug from creation time. When regenerated: `name = entry.name ?? "${productName} variant ${effectiveSize}"`, `slug = "${productSlug}-variant-${generateSlug(entry.name ?? effectiveSize ?? 'variant-<id>')}"`.
    - **Known limitation, by design**: flipping `type` between `SIMPLE` and `VARIABLE` without also sending `variants` does **not** itself create or delete variant rows — that's treated as a separate, more destructive operation this endpoint won't trigger implicitly.
-6. **`variants`, if provided, is a full replacement** — `replaceVariants` wipes the existing set and inserts the new one (the same repository method already built for this exact purpose). Omitting `variants` entirely leaves the current variants completely untouched.
-7. **One transaction** wraps `replaceVariants` (if applicable) → `createImages` (if applicable) → the scalar `updateProduct` call, via `productRepository.withTransaction(...)` called from the service layer (per the documented `withTransaction` convention — see `docs/concepts/prisma-concepts.md`). A failure partway never leaves new variants committed alongside stale scalar fields, or new images attached to a row whose other fields never actually updated.
+6. **`variants`, if provided, is reconciled by id — not wiped and replaced.** `buildVariantReconcilePlan` computes the diff (entries with an `id` → update in place; entries without one → create; existing variants missing from the list → delete), and `reconcileVariants` executes that plan as `deleteMany` + per-row `update` + `createMany`. IDs — and anything referencing them (order history, cart lines) — survive for every variant that's just being edited, not recreated. Omitting `variants` entirely leaves the current variants completely untouched.
+7. **One transaction** wraps `reconcileVariants` (if applicable) → `createImages` (if applicable) → the scalar `updateProduct` call, via `productRepository.withTransaction(...)` called from the service layer (per the documented `withTransaction` convention — see `docs/concepts/prisma-concepts.md`). A failure partway never leaves new variants committed alongside stale scalar fields, or new images attached to a row whose other fields never actually updated.
 8. **Rollback on transaction failure**: if any step inside the transaction throws, every file uploaded in step 4 is deleted before the error propagates — same reasoning as create.
 
-**Response shape**: `ProductResponseDto` (full admin detail), reflecting the row *after* all of the above — including newly appended images and/or the replaced variant set.
+**Response shape**: `ProductResponseDto` (full admin detail), reflecting the row *after* all of the above — including newly appended images and/or the reconciled variant set.
 
 | Status | Cause |
 | :--- | :--- |
@@ -113,7 +120,7 @@ This document maps every **currently exposed** `product` HTTP endpoint (`Product
 
 **Business logic:**
 
-1. **No visibility filtering, by design.** Unlike `published-products`, this endpoint applies none of `publicVisibilityWhere()`'s three conditions — `DRAFT`, `ARCHIVED`, `HIDDEN`, `INACTIVE`, scheduled-future, and even soft-deleted (`deletedAt IS NOT NULL`) rows are all included. A management dashboard needs to see and act on everything, not just what the storefront shows customers.
+1. **No visibility filtering, by design.** Unlike `active-products`, this endpoint applies none of `activeVisibilityWhere()`'s conditions — `DRAFT`, `ARCHIVED`, `HIDDEN`, `INACTIVE`, and even soft-deleted (`deletedAt IS NOT NULL`) rows are all included. A management dashboard needs to see and act on everything, not just what the storefront shows customers.
 2. **Search** — `search` matches `name`/`slug`/`sku`/`nameTh` (identical `searchableFields` to the public list), handled inside `PaginationService.paginate()`.
 3. **Sorting/pagination** — standard `page`/`limit` or `cursor`-based, default sort field `createdAt`, direction from `sortOrder` (default `desc`).
 4. **Response mapping** — every row is wrapped in `new ProductResponseDto(product)`, the full admin shape (includes `costPrice`, `discountValue`, raw `categoryId`, exact `quantity`/`totalStock`, and the complete audit trail with `createdByUser`/`updatedByUser`/`deletedByUser` snapshots).
@@ -128,25 +135,28 @@ This document maps every **currently exposed** `product` HTTP endpoint (`Product
 
 ---
 
-## `GET /api/v1/product/published-products`
+## `GET /api/v1/product/active-products`
 
-**Purpose**: Paginated, filterable storefront product listing (search/category/type), for category pages, search results, and browse grids.
+**Purpose**: Paginated, filterable storefront product listing (search/category/type/sort), for category pages, search results, and browse grids.
 
 **Access**: Public — no auth guard, no role restriction.
 
 | Layer | What happens |
 | :--- | :--- |
-| Controller | `ProductController.getPublishedProducts(query)` — binds `PublishedProductsQueryDto` off the query string; no other logic. |
-| Service | `ProductService.getPublishedProducts(query)` — the only work done here is parsing the CSV `categoryIds` string into `number[]`; everything else passes straight through to the repository, then each row is wrapped in `ProductResponsePublicDto`. |
-| Repository | `ProductRepository.findAllProductsPublic(paginationParams, { categoryIds, type })` — already-existing method; builds the `where` from `publicVisibilityWhere()` plus the optional `categoryId: { in }` / `type` filters, and calls the shared `PaginationService.paginate()`. |
+| Controller | `ProductController.getActiveProducts(query)` — binds `ActiveProductsQueryDto` off the query string; no other logic. |
+| Service | `ProductService.getActiveProducts(query)` — delegates CSV/filter parsing to `parseStorefrontQuery(query)`, calls the repository, then wraps each row in `ProductResponsePublicDto` via `toPublicList`. |
+| Repository | `ProductRepository.findAllProductsActive(paginationParams, { categoryIds, type, sortBy })` — builds the `where` from `activeVisibilityWhere()` plus the optional `categoryId: { in }` / `type` filters, applies `sortBy` (or `createdAt`) as the `orderBy` column, and calls the shared `PaginationService.paginate()`. |
 
 **Business logic — in order:**
 
-1. **Query binding.** `PublishedProductsQueryDto` extends the shared `PaginationQueryDto` (`page`, `limit`, `sortOrder`, `search`, `cursor`) with two storefront-only filters: `categoryIds` (a comma-separated string of positive integers, validated with a regex — e.g. `"1,2,3"`) and `productType` (`SIMPLE` / `VARIABLE` / `COMBO`, validated with `@IsEnum`).
-2. **CSV parsing happens in the service, not the repository** — `findAllProductsPublic`'s own contract explicitly expects already-parsed `number[]` filters, so this is the one place request-shape parsing belongs. `categoryIds` is split on `,`, each piece `Number()`-coerced and trimmed, and any non-integer result is filtered out defensively.
-3. **Visibility gate** — identical to `product-by-slug`: `deletedAt IS NULL`, `status = ACTIVE`, `publishedAt <= now()`. Applied unconditionally; the extra filters only ever narrow this further, never bypass it.
+1. **Query binding.** `ActiveProductsQueryDto` extends the shared `PaginationQueryDto` (`page`, `limit`, `sortOrder`, `search`, `cursor`) with three storefront-only filters:
+   - `categoryIds` — a comma-separated string of positive integers, validated with a regex (e.g. `"1,2,3"`).
+   - `productType` — `SIMPLE` or `VARIABLE`, validated with `@IsEnum` (the `ProductType` enum no longer has a `COMBO` value — combo products are a separate model, `ComboProduct`, merged into listings only at the response-DTO/search layer, not filterable through this param).
+   - `sortBy` — whitelisted against `PRODUCT_SORT_FIELDS = ['createdAt', 'basePrice', 'name']` via `@IsIn`. This whitelist is a hard boundary, not just documentation: the value is interpolated directly into a Prisma `orderBy` key downstream, so only columns validated here may ever reach it.
+2. **CSV/filter parsing happens in the service** (`parseStorefrontQuery`), **not the repository** — `findAllProductsActive`'s own contract explicitly expects an already-parsed `StorefrontListFilters` (`categoryIds: number[]`, `type`, `sortBy`), so this is the one place request-shape parsing belongs. `categoryIds` is split on `,`, each piece `Number()`-coerced and trimmed, and any non-integer result is filtered out defensively.
+3. **Visibility gate** — `activeVisibilityWhere()`: `deletedAt IS NULL` and `status = ACTIVE`. Applied unconditionally; the extra filters only ever narrow this further, never bypass it. **`publishedAt` is deliberately NOT part of this gate** — the column is still recorded on create/update (see the create endpoint's step 4), but the storefront list shows every `ACTIVE` product regardless of its scheduled launch date. (Contrast this with `product-by-slug` below, historically documented as also checking `publishedAt` — that condition has since been dropped from `activeVisibilityWhere()`, so both endpoints now share the exact same two-condition gate.)
 4. **Search** — `search` matches against `name`, `slug`, `sku`, `nameTh` (the same `searchableFields` used by the admin list), handled entirely inside `PaginationService.paginate()`.
-5. **Sorting/pagination** — standard offset pagination (`page`/`limit`) or cursor-based (`cursor`, which takes precedence over `page` when present), default sort field `createdAt`, direction from `sortOrder` (default `desc`, so newest products lead).
+5. **Sorting/pagination** — standard offset pagination (`page`/`limit`) or cursor-based (`cursor`, which takes precedence over `page` when present), sort column from `sortBy` (default `createdAt`), direction from `sortOrder` (default `desc`, so newest products lead by default).
 6. **Response mapping** — every row in `paginated.data` is wrapped in `new ProductResponsePublicDto(product)` (same shape as `product-by-slug`), while `meta` (`totalItems`/`itemCount`/`itemsPerPage`/`totalPages`/`currentPage`/`nextCursor`) passes through unchanged from the repository.
 
 **Response shape**: `{ data: ProductResponsePublicDto[], meta: IPaginationMeta }` — see `ApiPaginatedResponse` for the exact Swagger schema.
@@ -154,7 +164,7 @@ This document maps every **currently exposed** `product` HTTP endpoint (`Product
 | Status | Cause |
 | :--- | :--- |
 | `200` | Always — an empty `data` array (with accurate `meta.totalItems: 0`) is a valid, successful response, not a `404`. |
-| `400` | Query validation failed (e.g. `categoryIds` not a comma-separated list of integers, `productType` not one of the enum values, `limit` over the max). |
+| `400` | Query validation failed (e.g. `categoryIds` not a comma-separated list of integers, `productType` not one of the enum values, `sortBy` not one of the whitelisted columns, `limit` over the max). |
 
 ---
 
@@ -168,21 +178,22 @@ This document maps every **currently exposed** `product` HTTP endpoint (`Product
 | :--- | :--- |
 | Controller | `ProductController.getProductBySlug(slug)` — takes the raw `:slug` path param, no validation pipe beyond the implicit string type. |
 | Service | `ProductService.getProductBySlug(slug)` — calls the repository, throws `NotFoundException('Product not found')` if nothing comes back, otherwise wraps the row in `ProductResponsePublicDto`. |
-| Repository | `ProductRepository.findBySlugPublic(slug)` — `product.findFirst()` using `PRODUCT_SELECT_PUBLIC`, filtered by `publicVisibilityWhere()`. |
+| Repository | `ProductRepository.findBySlugPublic(slug)` — `product.findFirst()` using `PRODUCT_SELECT_PUBLIC`, filtered by `activeVisibilityWhere()`. |
 
-**Business logic — the visibility gate.** A product is only returned if **all three** hold:
+**Business logic — the visibility gate.** A product is only returned if **both** hold:
 - `deletedAt IS NULL` (not soft-deleted)
 - `status = ACTIVE`
-- `publishedAt <= now()` — a `NULL` `publishedAt` never satisfies this, so a product with no publish date set stays hidden until an admin explicitly schedules/publishes it.
 
-A product that's `DRAFT`, `ARCHIVED`, `HIDDEN`, `INACTIVE`, soft-deleted, or scheduled for a future date returns **404**, identical to a genuinely nonexistent slug — this is intentional: the response never reveals *why* a product isn't visible, only that it isn't.
+`publishedAt` is recorded on the row (see the create endpoint's step 4 — it's stamped automatically on create/update) but is **deliberately not part of this gate**. An `ACTIVE` product is publicly visible immediately regardless of its `publishedAt` value — there is currently no "scheduled launch" enforcement at read time, only the timestamp being tracked for potential future use.
+
+A product that's `DRAFT`, `ARCHIVED`, `HIDDEN`, `INACTIVE`, or soft-deleted returns **404**, identical to a genuinely nonexistent slug — this is intentional: the response never reveals *why* a product isn't visible, only that it isn't.
 
 **Response shape**: `ProductResponsePublicDto` — includes `id`/`sid`; excludes `barcode`, `status`, `costPrice`, `discountType`, `discountValue`, exact `quantity`/`totalStock` (only the `stockStatus` badge), the raw `categoryId`, and the entire audit trail (`createdBy`/`updatedBy`/`deletedBy` + user snapshots). Includes nested `images` (`ProductImageDto[]`) and `variants` (`ProductVariantPublicDto[]`, itself excluding `barcode`/`discountType`/`discountValue`/`costPrice`/raw `quantity`).
 
 | Status | Cause |
 | :--- | :--- |
 | `200` | Product exists and passes the visibility gate. |
-| `404` | Slug doesn't exist, or exists but fails the visibility gate (deleted/draft/archived/hidden/inactive/not-yet-published). |
+| `404` | Slug doesn't exist, or exists but fails the visibility gate (deleted/draft/archived/hidden/inactive). |
 
 ---
 
@@ -201,7 +212,7 @@ A product that's `DRAFT`, `ARCHIVED`, `HIDDEN`, `INACTIVE`, soft-deleted, or sch
 **Business logic — what "soft delete" actually touches:**
 - **Product**: `deletedAt` set to now, `deletedBy` set to the acting admin, `status` forced to `ARCHIVED` regardless of its previous value.
 - **Images**: every image belonging to the product — both product-level and variant-level, since both are scoped by the same `productId` — gets `isActive: false`. This is a single `updateMany`, not per-image calls.
-- **Variants**: **deliberately untouched**. `ProductVariant` has no soft-delete-capable column (no `deletedAt`, no `isActive`). This isn't a gap: nothing in the codebase queries a variant independently of its parent product, so once the parent fails `publicVisibilityWhere()`, its variants become unreachable through the public API regardless of their own row state.
+- **Variants**: **deliberately untouched**. `ProductVariant` has no soft-delete-capable column (no `deletedAt`, no `isActive`). This isn't a gap: nothing in the codebase queries a variant independently of its parent product, so once the parent fails `activeVisibilityWhere()`, its variants become unreachable through the public API regardless of their own row state.
 - Both DB writes run in one transaction — a failure partway never leaves the product archived with its images still visible, or vice versa.
 
 **Idempotency**: calling this twice on the same product returns `409 Conflict` the second time, not a silent no-op or a 500.
@@ -250,10 +261,11 @@ These exist in `ProductRepository`/`ProductService` (or a matching DTO already e
 
 | Capability | Repository method | Notes |
 | :--- | :--- | :--- |
-| Admin single lookups | `findByIdAdmin`, `findBySlugAdmin` | No route restricts these to admin yet. |
+| Admin lookup by slug | `findBySlugAdmin` | Only used internally today, for the create/update slug-conflict check — no dedicated "get by slug as admin" route. (`findByIdAdmin` is *not* in this list anymore — it now powers `GET /product-by-id/:id`, already restricted to `ADMIN`.) |
 | Dropdown/autocomplete list | `findProductDropdownOptions` | |
 | Minified lookups (cart/order/wishlist embedding) | `findByIdMinified`, `findByIdPublic` | |
 | Standalone image management | `findImagesByIds`, `deleteImages` | `createImages` is now used internally by both create and update. |
+| Home-section listings | `ProductService.getFeaturedProducts`, `getNonFeaturedProducts`, `getBestProducts` | Not dead code — reachable indirectly via `GET /home/featured-home-contents` (`HomeService`, see the home module's own docs), just never through a `ProductController` route. `getBestProducts` itself is built but currently unused even by `HomeService` — see its own doc comment; there's no sales/order-volume ranking yet, so it's the same active-product pool as everything else, newest first. |
 
 ---
 
