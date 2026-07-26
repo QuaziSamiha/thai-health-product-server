@@ -18,6 +18,7 @@ import {
   ProductResponseDto,
   ProductResponsePublicDto,
 } from './dto/product-response.dto';
+import { ProductDropdownOptionDto } from './dto/product-dropdown-response.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { CreateProductVariantDto } from './dto/create-product-variant.dto';
 import { UpdateProductVariantDto } from './dto/update-product-variant.dto';
@@ -218,6 +219,24 @@ export class ProductService {
   ): Promise<ProductResponsePublicDto[]> {
     return this.toPublicDtoList(
       await this.productRepository.findBestProducts(limit),
+    );
+  }
+
+  /**
+   * Flattened admin dropdown list — one option per *selectable* thing, not
+   * per product row: a SIMPLE product (no variants) contributes itself,
+   * while a product with variants contributes one option per variant
+   * instead of its own row, since a variant is what the caller (e.g. an
+   * order line or discount rule picker) actually needs to reference.
+   */
+  async getProductDropdownOptions(): Promise<ProductDropdownOptionDto[]> {
+    const products = await this.productRepository.findProductDropdownOptions();
+    return products.flatMap((product) =>
+      product.variants.length
+        ? product.variants.map(
+            (variant) => new ProductDropdownOptionDto({ product, variant }),
+          )
+        : [new ProductDropdownOptionDto({ product })],
     );
   }
 

@@ -15,24 +15,27 @@ model Batch {
   id  Int    @id @default(autoincrement())
   sid String @unique @default(uuid()) @db.Uuid
 
-  batchNo String @unique @db.VarChar(100) // HUMAN READABLE BATCH NUMBER (E.G., 14-BEAUTY-001)
+  batchNo String @unique @map("batch_no") @db.VarChar(100) // HUMAN READABLE BATCH NUMBER (E.G., 14-BEAUTY-001)
 
   // QUANTITIES
   quantity  Int @default(0) // INITIAL QUANTITY ADDED IN THIS BATCH
   remaining Int @default(0) // QUANTITY REMAINING (DECREMENTS ON REMOVAL)
 
+  //* PRICING
+  costPrice Decimal @default(0) @map("cost_price") @db.Decimal(12, 2) //* COST PRICE PAID PER UNIT TO ACQUIRE THIS BATCH — SNAPSHOT AT RECEIPT TIME, USED FOR COGS/FIFO VALUATION. DISTINCT FROM Inventory.costPrice, WHICH IS A PER-MOVEMENT SNAPSHOT, NOT PER-BATCH.
+
   // METADATA FOR THE BATCH
-  manufacturingDate DateTime?
-  expiryDate        DateTime?
+  manufacturingDate DateTime? @map("manufacturing_date")
+  expiryDate        DateTime? @map("expiry_date")
 
   // TIME STAMPS
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // RELATIONS
-  productId Int?
+  productId Int?            @map("product_id")
   product   Product?        @relation(fields: [productId], references: [id], onDelete: Cascade)
-  variantId Int?
+  variantId Int?            @map("variant_id")
   variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Cascade)
 
   @@index([productId])
@@ -44,19 +47,19 @@ model Inventory {
   id                  Int                   @id @default(autoincrement())
   sid                 String                @unique @default(uuid()) @db.Uuid
   quantity            Int                   @default(0)
-  changeType          InventoryExchangeType @default(ADD)
+  changeType          InventoryExchangeType @default(ADD) @map("change_type")
   reason              String?               @db.Text
-  referenceId         String? // Reference to order, purchase, etc.
-  costPrice           Decimal? // Cost at time of stock change
-  sellingPrice        Decimal? // Selling price at time of stock change
+  referenceId         String?               @map("reference_id") // Reference to order, purchase, etc.
+  costPrice           Decimal?              @map("cost_price") // Cost at time of stock change
+  sellingPrice        Decimal?              @map("selling_price") // Selling price at time of stock change
   // * TIME STAMPS
-  recordedAt          DateTime              @default(now())
+  recordedAt          DateTime              @default(now()) @map("recorded_at")
   // * RELATIONS
-  productId           Int?
+  productId           Int?                  @map("product_id")
   product             Product?              @relation(fields: [productId], references: [id], onDelete: Cascade)
-  variantId           Int?
+  variantId           Int?                  @map("variant_id")
   variant             ProductVariant?       @relation(fields: [variantId], references: [id], onDelete: Cascade)
-  recordedBy          Int?
+  recordedBy          Int?                  @map("recorded_by")
   InventoryRecordedBy User?                 @relation(fields: [recordedBy], references: [id], onDelete: SetNull)
 
   @@index([productId])

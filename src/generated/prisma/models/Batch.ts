@@ -30,6 +30,7 @@ export type BatchAvgAggregateOutputType = {
   id: number | null
   quantity: number | null
   remaining: number | null
+  costPrice: runtime.Decimal | null
   productId: number | null
   variantId: number | null
 }
@@ -38,6 +39,7 @@ export type BatchSumAggregateOutputType = {
   id: number | null
   quantity: number | null
   remaining: number | null
+  costPrice: runtime.Decimal | null
   productId: number | null
   variantId: number | null
 }
@@ -48,6 +50,7 @@ export type BatchMinAggregateOutputType = {
   batchNo: string | null
   quantity: number | null
   remaining: number | null
+  costPrice: runtime.Decimal | null
   manufacturingDate: Date | null
   expiryDate: Date | null
   createdAt: Date | null
@@ -62,6 +65,7 @@ export type BatchMaxAggregateOutputType = {
   batchNo: string | null
   quantity: number | null
   remaining: number | null
+  costPrice: runtime.Decimal | null
   manufacturingDate: Date | null
   expiryDate: Date | null
   createdAt: Date | null
@@ -76,6 +80,7 @@ export type BatchCountAggregateOutputType = {
   batchNo: number
   quantity: number
   remaining: number
+  costPrice: number
   manufacturingDate: number
   expiryDate: number
   createdAt: number
@@ -90,6 +95,7 @@ export type BatchAvgAggregateInputType = {
   id?: true
   quantity?: true
   remaining?: true
+  costPrice?: true
   productId?: true
   variantId?: true
 }
@@ -98,6 +104,7 @@ export type BatchSumAggregateInputType = {
   id?: true
   quantity?: true
   remaining?: true
+  costPrice?: true
   productId?: true
   variantId?: true
 }
@@ -108,6 +115,7 @@ export type BatchMinAggregateInputType = {
   batchNo?: true
   quantity?: true
   remaining?: true
+  costPrice?: true
   manufacturingDate?: true
   expiryDate?: true
   createdAt?: true
@@ -122,6 +130,7 @@ export type BatchMaxAggregateInputType = {
   batchNo?: true
   quantity?: true
   remaining?: true
+  costPrice?: true
   manufacturingDate?: true
   expiryDate?: true
   createdAt?: true
@@ -136,6 +145,7 @@ export type BatchCountAggregateInputType = {
   batchNo?: true
   quantity?: true
   remaining?: true
+  costPrice?: true
   manufacturingDate?: true
   expiryDate?: true
   createdAt?: true
@@ -237,6 +247,7 @@ export type BatchGroupByOutputType = {
   batchNo: string
   quantity: number
   remaining: number
+  costPrice: runtime.Decimal
   manufacturingDate: Date | null
   expiryDate: Date | null
   createdAt: Date
@@ -274,6 +285,7 @@ export type BatchWhereInput = {
   batchNo?: Prisma.StringFilter<"Batch"> | string
   quantity?: Prisma.IntFilter<"Batch"> | number
   remaining?: Prisma.IntFilter<"Batch"> | number
+  costPrice?: Prisma.DecimalFilter<"Batch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Prisma.DateTimeNullableFilter<"Batch"> | Date | string | null
   expiryDate?: Prisma.DateTimeNullableFilter<"Batch"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Batch"> | Date | string
@@ -290,6 +302,7 @@ export type BatchOrderByWithRelationInput = {
   batchNo?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   remaining?: Prisma.SortOrder
+  costPrice?: Prisma.SortOrder
   manufacturingDate?: Prisma.SortOrderInput | Prisma.SortOrder
   expiryDate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -309,6 +322,7 @@ export type BatchWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.BatchWhereInput | Prisma.BatchWhereInput[]
   quantity?: Prisma.IntFilter<"Batch"> | number
   remaining?: Prisma.IntFilter<"Batch"> | number
+  costPrice?: Prisma.DecimalFilter<"Batch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Prisma.DateTimeNullableFilter<"Batch"> | Date | string | null
   expiryDate?: Prisma.DateTimeNullableFilter<"Batch"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Batch"> | Date | string
@@ -325,6 +339,7 @@ export type BatchOrderByWithAggregationInput = {
   batchNo?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   remaining?: Prisma.SortOrder
+  costPrice?: Prisma.SortOrder
   manufacturingDate?: Prisma.SortOrderInput | Prisma.SortOrder
   expiryDate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -347,6 +362,7 @@ export type BatchScalarWhereWithAggregatesInput = {
   batchNo?: Prisma.StringWithAggregatesFilter<"Batch"> | string
   quantity?: Prisma.IntWithAggregatesFilter<"Batch"> | number
   remaining?: Prisma.IntWithAggregatesFilter<"Batch"> | number
+  costPrice?: Prisma.DecimalWithAggregatesFilter<"Batch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Batch"> | Date | string | null
   expiryDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Batch"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Batch"> | Date | string
@@ -360,6 +376,7 @@ export type BatchCreateInput = {
   batchNo: string
   quantity?: number
   remaining?: number
+  costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Date | string | null
   expiryDate?: Date | string | null
   createdAt?: Date | string
@@ -374,6 +391,7 @@ export type BatchUncheckedCreateInput = {
   batchNo: string
   quantity?: number
   remaining?: number
+  costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Date | string | null
   expiryDate?: Date | string | null
   createdAt?: Date | string
@@ -387,6 +405,7 @@ export type BatchUpdateInput = {
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -401,6 +420,7 @@ export type BatchUncheckedUpdateInput = {
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -415,6 +435,7 @@ export type BatchCreateManyInput = {
   batchNo: string
   quantity?: number
   remaining?: number
+  costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Date | string | null
   expiryDate?: Date | string | null
   createdAt?: Date | string
@@ -428,6 +449,7 @@ export type BatchUpdateManyMutationInput = {
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -440,6 +462,7 @@ export type BatchUncheckedUpdateManyInput = {
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -454,6 +477,7 @@ export type BatchCountOrderByAggregateInput = {
   batchNo?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   remaining?: Prisma.SortOrder
+  costPrice?: Prisma.SortOrder
   manufacturingDate?: Prisma.SortOrder
   expiryDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -466,6 +490,7 @@ export type BatchAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   remaining?: Prisma.SortOrder
+  costPrice?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   variantId?: Prisma.SortOrder
 }
@@ -476,6 +501,7 @@ export type BatchMaxOrderByAggregateInput = {
   batchNo?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   remaining?: Prisma.SortOrder
+  costPrice?: Prisma.SortOrder
   manufacturingDate?: Prisma.SortOrder
   expiryDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -490,6 +516,7 @@ export type BatchMinOrderByAggregateInput = {
   batchNo?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   remaining?: Prisma.SortOrder
+  costPrice?: Prisma.SortOrder
   manufacturingDate?: Prisma.SortOrder
   expiryDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -502,6 +529,7 @@ export type BatchSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   remaining?: Prisma.SortOrder
+  costPrice?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   variantId?: Prisma.SortOrder
 }
@@ -605,6 +633,7 @@ export type BatchCreateWithoutProductInput = {
   batchNo: string
   quantity?: number
   remaining?: number
+  costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Date | string | null
   expiryDate?: Date | string | null
   createdAt?: Date | string
@@ -618,6 +647,7 @@ export type BatchUncheckedCreateWithoutProductInput = {
   batchNo: string
   quantity?: number
   remaining?: number
+  costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Date | string | null
   expiryDate?: Date | string | null
   createdAt?: Date | string
@@ -660,6 +690,7 @@ export type BatchScalarWhereInput = {
   batchNo?: Prisma.StringFilter<"Batch"> | string
   quantity?: Prisma.IntFilter<"Batch"> | number
   remaining?: Prisma.IntFilter<"Batch"> | number
+  costPrice?: Prisma.DecimalFilter<"Batch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Prisma.DateTimeNullableFilter<"Batch"> | Date | string | null
   expiryDate?: Prisma.DateTimeNullableFilter<"Batch"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Batch"> | Date | string
@@ -673,6 +704,7 @@ export type BatchCreateWithoutVariantInput = {
   batchNo: string
   quantity?: number
   remaining?: number
+  costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Date | string | null
   expiryDate?: Date | string | null
   createdAt?: Date | string
@@ -686,6 +718,7 @@ export type BatchUncheckedCreateWithoutVariantInput = {
   batchNo: string
   quantity?: number
   remaining?: number
+  costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Date | string | null
   expiryDate?: Date | string | null
   createdAt?: Date | string
@@ -725,6 +758,7 @@ export type BatchCreateManyProductInput = {
   batchNo: string
   quantity?: number
   remaining?: number
+  costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Date | string | null
   expiryDate?: Date | string | null
   createdAt?: Date | string
@@ -737,6 +771,7 @@ export type BatchUpdateWithoutProductInput = {
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -750,6 +785,7 @@ export type BatchUncheckedUpdateWithoutProductInput = {
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -763,6 +799,7 @@ export type BatchUncheckedUpdateManyWithoutProductInput = {
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -776,6 +813,7 @@ export type BatchCreateManyVariantInput = {
   batchNo: string
   quantity?: number
   remaining?: number
+  costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Date | string | null
   expiryDate?: Date | string | null
   createdAt?: Date | string
@@ -788,6 +826,7 @@ export type BatchUpdateWithoutVariantInput = {
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -801,6 +840,7 @@ export type BatchUncheckedUpdateWithoutVariantInput = {
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -814,6 +854,7 @@ export type BatchUncheckedUpdateManyWithoutVariantInput = {
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   manufacturingDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -829,6 +870,7 @@ export type BatchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   batchNo?: boolean
   quantity?: boolean
   remaining?: boolean
+  costPrice?: boolean
   manufacturingDate?: boolean
   expiryDate?: boolean
   createdAt?: boolean
@@ -845,6 +887,7 @@ export type BatchSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   batchNo?: boolean
   quantity?: boolean
   remaining?: boolean
+  costPrice?: boolean
   manufacturingDate?: boolean
   expiryDate?: boolean
   createdAt?: boolean
@@ -861,6 +904,7 @@ export type BatchSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   batchNo?: boolean
   quantity?: boolean
   remaining?: boolean
+  costPrice?: boolean
   manufacturingDate?: boolean
   expiryDate?: boolean
   createdAt?: boolean
@@ -877,6 +921,7 @@ export type BatchSelectScalar = {
   batchNo?: boolean
   quantity?: boolean
   remaining?: boolean
+  costPrice?: boolean
   manufacturingDate?: boolean
   expiryDate?: boolean
   createdAt?: boolean
@@ -885,7 +930,7 @@ export type BatchSelectScalar = {
   variantId?: boolean
 }
 
-export type BatchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "batchNo" | "quantity" | "remaining" | "manufacturingDate" | "expiryDate" | "createdAt" | "updatedAt" | "productId" | "variantId", ExtArgs["result"]["batch"]>
+export type BatchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "batchNo" | "quantity" | "remaining" | "costPrice" | "manufacturingDate" | "expiryDate" | "createdAt" | "updatedAt" | "productId" | "variantId", ExtArgs["result"]["batch"]>
 export type BatchInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product?: boolean | Prisma.Batch$productArgs<ExtArgs>
   variant?: boolean | Prisma.Batch$variantArgs<ExtArgs>
@@ -911,6 +956,7 @@ export type $BatchPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     batchNo: string
     quantity: number
     remaining: number
+    costPrice: runtime.Decimal
     manufacturingDate: Date | null
     expiryDate: Date | null
     createdAt: Date
@@ -1347,6 +1393,7 @@ export interface BatchFieldRefs {
   readonly batchNo: Prisma.FieldRef<"Batch", 'String'>
   readonly quantity: Prisma.FieldRef<"Batch", 'Int'>
   readonly remaining: Prisma.FieldRef<"Batch", 'Int'>
+  readonly costPrice: Prisma.FieldRef<"Batch", 'Decimal'>
   readonly manufacturingDate: Prisma.FieldRef<"Batch", 'DateTime'>
   readonly expiryDate: Prisma.FieldRef<"Batch", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Batch", 'DateTime'>

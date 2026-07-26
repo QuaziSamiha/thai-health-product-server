@@ -222,17 +222,44 @@ export class ProductRepository extends BaseRepository {
     return await this.findActiveProductsList({}, limit, tx);
   }
 
-  /** Lightweight id/name/variant list for select-input / dropdown UIs. */
+  /**
+   * Lightweight source rows for the admin dropdown list: id/slug/name/sku/
+   * quantity/costPrice/barcode/basePrice/salePrice for the product itself
+   * plus the same for each of its variants, plus the product's own
+   * type/status (variants have neither — both are product-level concepts).
+   * The service flattens this into one option per variant (falling back to
+   * the product row itself when it has none) — this query only fetches
+   * what that flattening needs.
+   */
   async findProductDropdownOptions(tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return await client.product.findMany({
-      where: { status: CategoryProductStatus.ACTIVE },
+      where: { deletedAt: null, status: CategoryProductStatus.ACTIVE },
       orderBy: { name: 'asc' },
       select: {
         id: true,
         name: true,
+        slug: true,
+        sku: true,
+        barcode: true,
+        type: true,
+        status: true,
+        quantity: true,
+        costPrice: true,
+        basePrice: true,
+        salePrice: true,
         variants: {
-          select: { id: true, name: true, size: true },
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            sku: true,
+            barcode: true,
+            quantity: true,
+            costPrice: true,
+            basePrice: true,
+            salePrice: true,
+          },
           orderBy: { id: 'asc' },
         },
       },

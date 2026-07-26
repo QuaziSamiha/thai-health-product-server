@@ -1853,6 +1853,7 @@ export const BatchScalarFieldEnum = {
   batchNo: 'batchNo',
   quantity: 'quantity',
   remaining: 'remaining',
+  costPrice: 'costPrice',
   manufacturingDate: 'manufacturingDate',
   expiryDate: 'expiryDate',
   createdAt: 'createdAt',
