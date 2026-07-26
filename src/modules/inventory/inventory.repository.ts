@@ -132,4 +132,70 @@ export class InventoryRepository extends BaseRepository {
       defaultSortField: 'recordedAt',
     });
   }
+
+  // ─── Stock targets (Product / ProductVariant) ───────────────────────────────
+  //* addStock TOUCHES products/product_variants DIRECTLY (RATHER THAN GOING
+  //* THROUGH ProductModule) SINCE THE INCREMENT MUST RUN INSIDE THIS SAME
+  //* TRANSACTION AS THE BATCH/INVENTORY WRITES BELOW.
+
+  /** Lean lookup used to validate an add-stock item's productId and its type/variant consistency. */
+  async findProductStockInfo(id: number, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.product.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        sku: true,
+        hasVariants: true,
+        deletedAt: true,
+      },
+    });
+  }
+
+  /** Lean lookup used to validate an add-stock item's variantId and confirm it belongs to the given product. */
+  async findVariantStockInfo(id: number, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.productVariant.findUnique({
+      where: { id },
+      select: { id: true, productId: true },
+    });
+  }
+
+  /**
+   * Increments a SIMPLE product's own stock count. The `sync_product_stock_fields`
+   * DB trigger recomputes totalStock/stockStatus from the new quantity —
+   * nothing else needs to be written for that here.
+   */
+  async incrementProductQuantity(
+    id: number,
+    amount: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return await client.product.update({
+      where: { id },
+      data: { quantity: { increment: amount } },
+      select: { id: true, quantity: true },
+    });
+  }
+
+  /**
+   * Increments one variant's own stock count. The `sync_variant_stock_status`
+   * trigger recomputes that variant's stockStatus, which in turn fires
+   * `sync_product_total_stock_from_variants` to refresh the parent product's
+   * totalStock/stockStatus — nothing else needs to be written for that here.
+   */
+  async incrementVariantQuantity(
+    id: number,
+    amount: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return await client.productVariant.update({
+      where: { id },
+      data: { quantity: { increment: amount } },
+      select: { id: true, quantity: true },
+    });
+  }
 }

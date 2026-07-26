@@ -1,41 +1,56 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsString,
-  IsNotEmpty,
   MaxLength,
   IsOptional,
   IsInt,
+  IsNumber,
   Min,
   IsDateString,
+  IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { InventoryExchangeType } from '../../../generated/prisma/enums';
 
+//* THIS DTO BACKS BOTH THE GENERIC MANUAL BATCH-CRUD PATH (InventoryService.createBatch)
+//* AND EACH ITEM OF THE add-stock BULK WORKFLOW (InventoryService.addStock) — RATHER THAN
+//* MAINTAINING A SEPARATE, NEARLY-IDENTICAL "AddStockItemDto". changeType/reason/sellingPrice
+//* FEED THE Inventory LOG ENTRY THAT add-stock ALSO WRITES ALONGSIDE THE Batch ROW ITSELF.
 export class CreateBatchDto {
   @ApiProperty({
-    description: 'Human-readable batch/lot number, e.g. "14-BEAUTY-001".',
-    example: '14-BEAUTY-001',
-    maxLength: 100,
+    description: 'Quantity received in this batch.',
+    example: 100,
+    minimum: 1,
   })
-  @IsNotEmpty({ message: 'Batch number is required' })
-  @IsString({ message: 'Batch number must be a valid text string' })
-  @MaxLength(100, { message: 'Batch number cannot exceed 100 characters' })
-  batchNo!: string;
+  @Type(() => Number)
+  @IsInt({ message: 'Quantity must be a whole number' })
+  @Min(1, { message: 'Quantity must be at least 1' })
+  quantity!: number;
+
+  @ApiProperty({
+    description: 'Cost price paid per unit for this batch.',
+    example: 250.0,
+    minimum: 0,
+  })
+  @Type(() => Number)
+  @IsNumber({}, { message: 'Cost price must be a valid number' })
+  @Min(0, { message: 'Cost price cannot be negative' })
+  costPrice!: number;
 
   @ApiPropertyOptional({
-    description: 'Quantity added when this batch was received. Defaults to 0.',
-    example: 500,
-    default: 0,
+    description: 'Selling price snapshot at the time this batch was recorded.',
+    example: 450.0,
     minimum: 0,
   })
   @IsOptional()
   @Type(() => Number)
-  @IsInt({ message: 'Quantity must be a whole number' })
-  @Min(0, { message: 'Quantity cannot be negative' })
-  quantity?: number;
+  @IsNumber({}, { message: 'Selling price must be a valid number' })
+  @Min(0, { message: 'Selling price cannot be negative' })
+  sellingPrice?: number;
 
   @ApiPropertyOptional({
     description: 'Date the batch was manufactured.',
-    example: '2026-01-15T00:00:00Z',
+    example: '2026-01-15',
   })
   @IsOptional()
   @IsDateString({}, { message: 'Manufacturing date must be a valid date' })
@@ -43,11 +58,36 @@ export class CreateBatchDto {
 
   @ApiPropertyOptional({
     description: 'Date the batch expires.',
-    example: '2027-01-15T00:00:00Z',
+    example: '2027-01-15',
   })
   @IsOptional()
   @IsDateString({}, { message: 'Expiry date must be a valid date' })
   expiryDate?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Reason this stock movement happened, for the accompanying inventory log entry. Defaults to ADD.',
+    enum: InventoryExchangeType,
+    enumName: 'InventoryExchangeType',
+    default: InventoryExchangeType.ADD,
+    example: InventoryExchangeType.ADD,
+  })
+  @IsOptional()
+  @IsEnum(InventoryExchangeType, {
+    message: 'Please select a valid change type',
+  })
+  changeType?: InventoryExchangeType;
+
+  @ApiPropertyOptional({
+    description:
+      'Free-text note for this stock movement. Defaults to a generated note referencing the batch number when omitted.',
+    example: 'Received from Supplier ABC, PO#1029',
+    maxLength: 500,
+  })
+  @IsOptional()
+  @IsString({ message: 'Reason must be a valid text string' })
+  @MaxLength(500, { message: 'Reason cannot exceed 500 characters' })
+  reason?: string;
 
   @ApiPropertyOptional({
     description: 'Owning product ID, if this batch is for a SIMPLE product.',
