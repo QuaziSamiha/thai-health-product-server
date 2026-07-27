@@ -20,6 +20,7 @@ export class InventoryRepository extends BaseRepository {
     batchNo: true,
     quantity: true,
     remaining: true,
+    costPrice: true,
     manufacturingDate: true,
     expiryDate: true,
     productId: true,

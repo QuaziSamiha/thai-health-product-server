@@ -36,6 +36,13 @@ export class BatchResponseDto {
   remaining!: number;
 
   @Expose()
+  @ApiProperty({
+    description: 'Cost price paid per unit to acquire this batch',
+    example: 250.0,
+  })
+  costPrice!: unknown;
+
+  @Expose()
   @ApiPropertyOptional({ description: 'Date the batch was manufactured' })
   manufacturingDate?: Date | null;
 
@@ -65,6 +72,7 @@ export class BatchResponseDto {
     this.batchNo = batch.batchNo!;
     this.quantity = batch.quantity!;
     this.remaining = batch.remaining!;
+    this.costPrice = batch.costPrice;
     this.manufacturingDate = batch.manufacturingDate ?? undefined;
     this.expiryDate = batch.expiryDate ?? undefined;
     this.productId = batch.productId ?? undefined;
