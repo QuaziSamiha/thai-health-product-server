@@ -41,6 +41,15 @@ export class InventoryRepository extends BaseRepository {
     productId: true,
     variantId: true,
     recordedBy: true,
+    //* ADMIN INVENTORY LIST/DETAIL VIEWS NEED THE PRODUCT/VARIANT NAME —
+    //* NOT JUST THE BARE productId/variantId ABOVE — SO THEY DON'T HAVE TO
+    //* ROUND-TRIP TO THE PRODUCT MODULE PER ROW. quantity IS THE ACTUAL
+    //* CURRENT STOCK FOR THAT PRODUCT/VARIANT — DELIBERATELY *NOT* THIS ROW'S
+    //* OWN `quantity` ABOVE, WHICH IS ONLY THE MAGNITUDE OF THIS ONE MOVEMENT.
+    product: {
+      select: { id: true, name: true, slug: true, quantity: true, type: true },
+    },
+    variant: { select: { id: true, name: true, size: true, quantity: true } },
   } as const;
 
   // ─── Batch ───────────────────────────────────────────────────────────────
@@ -53,6 +62,23 @@ export class InventoryRepository extends BaseRepository {
     return await client.batch.create({
       data,
       select: this.BATCH_SELECT,
+    });
+  }
+
+  /** Every batch for one product, optionally narrowed to a single variant — oldest first (FEFO-ish ordering for the removal-picker dropdown). */
+  async findBatchesForProduct(
+    productId: number,
+    variantId?: number | null,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return await client.batch.findMany({
+      where: {
+        productId,
+        ...(variantId !== undefined && variantId !== null && { variantId }),
+      },
+      select: this.BATCH_SELECT,
+      orderBy: { createdAt: 'asc' },
     });
   }
 
@@ -163,38 +189,52 @@ export class InventoryRepository extends BaseRepository {
   }
 
   /**
-   * Increments a SIMPLE product's own stock count. The `sync_product_stock_fields`
-   * DB trigger recomputes totalStock/stockStatus from the new quantity —
-   * nothing else needs to be written for that here.
+   * Increments a SIMPLE product's own stock count and, when a batch cost
+   * price was supplied, overwrites the product's own `costPrice` with it —
+   * the product's cost basis always reflects its most recently received
+   * batch. The `sync_product_stock_fields` DB trigger recomputes
+   * totalStock/stockStatus from the new quantity — nothing else needs to be
+   * written for that here.
    */
   async incrementProductQuantity(
     id: number,
     amount: number,
+    costPrice?: number,
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx || this.prisma;
     return await client.product.update({
       where: { id },
-      data: { quantity: { increment: amount } },
+      data: {
+        quantity: { increment: amount },
+        ...(costPrice !== undefined && { costPrice }),
+      },
       select: { id: true, quantity: true },
     });
   }
 
   /**
-   * Increments one variant's own stock count. The `sync_variant_stock_status`
-   * trigger recomputes that variant's stockStatus, which in turn fires
-   * `sync_product_total_stock_from_variants` to refresh the parent product's
-   * totalStock/stockStatus — nothing else needs to be written for that here.
+   * Increments one variant's own stock count and, when a batch cost price
+   * was supplied, overwrites the variant's own `costPrice` with it — same
+   * "most recent batch wins" semantics as `incrementProductQuantity`. The
+   * `sync_variant_stock_status` trigger recomputes that variant's
+   * stockStatus, which in turn fires `sync_product_total_stock_from_variants`
+   * to refresh the parent product's totalStock/stockStatus — nothing else
+   * needs to be written for that here.
    */
   async incrementVariantQuantity(
     id: number,
     amount: number,
+    costPrice?: number,
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx || this.prisma;
     return await client.productVariant.update({
       where: { id },
-      data: { quantity: { increment: amount } },
+      data: {
+        quantity: { increment: amount },
+        ...(costPrice !== undefined && { costPrice }),
+      },
       select: { id: true, quantity: true },
     });
   }

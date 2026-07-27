@@ -1,7 +1,60 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import { InventoryModel } from '../../../generated/prisma/models';
-import { InventoryExchangeType } from '../../../generated/prisma/enums';
+import { InventoryExchangeType, ProductType } from '../../../generated/prisma/enums';
+import { BatchResponseDto } from './batch-response.dto';
+
+class InventoryProductRefDto {
+  @Expose()
+  @ApiProperty({ example: 14 })
+  id!: number;
+
+  @Expose()
+  @ApiProperty({ example: 'Colette Collins 343' })
+  name!: string;
+
+  @Expose()
+  @ApiProperty({ example: 'colette-collins-343' })
+  slug!: string;
+
+  @Expose()
+  @ApiProperty({
+    description:
+      "The product's actual current stock — not this movement's own magnitude",
+    example: 170,
+  })
+  quantity!: number;
+
+  @Expose()
+  @ApiProperty({
+    enum: ProductType,
+    description: 'SIMPLE (no variants) or VARIABLE (sold via variants)',
+    example: ProductType.SIMPLE,
+  })
+  type!: ProductType;
+}
+
+class InventoryVariantRefDto {
+  @Expose()
+  @ApiProperty({ example: 104 })
+  id!: number;
+
+  @Expose()
+  @ApiProperty({ example: '200 ml' })
+  name!: string;
+
+  @Expose()
+  @ApiPropertyOptional({ example: '200 ml' })
+  size?: string | null;
+
+  @Expose()
+  @ApiProperty({
+    description:
+      "The variant's actual current stock — not this movement's own magnitude",
+    example: 170,
+  })
+  quantity!: number;
+}
 
 export class InventoryResponseDto {
   @Expose()
@@ -77,7 +130,49 @@ export class InventoryResponseDto {
   })
   recordedBy?: number | null;
 
-  constructor(inventory: Partial<InventoryModel>) {
+  @Expose()
+  @Type(() => InventoryProductRefDto)
+  @ApiPropertyOptional({
+    description: 'The product this movement applies to, name/slug included',
+    type: InventoryProductRefDto,
+  })
+  product?: InventoryProductRefDto | null;
+
+  @Expose()
+  @Type(() => InventoryVariantRefDto)
+  @ApiPropertyOptional({
+    description: 'The variant this movement applies to, name/size included',
+    type: InventoryVariantRefDto,
+  })
+  variant?: InventoryVariantRefDto | null;
+
+  @Expose()
+  @Type(() => BatchResponseDto)
+  @ApiPropertyOptional({
+    description:
+      "This movement's product/variant batches — populated only on the single-record detail endpoint, omitted on list views",
+    type: () => [BatchResponseDto],
+  })
+  batches?: BatchResponseDto[];
+
+  constructor(
+    inventory: Partial<InventoryModel> & {
+      product?: {
+        id: number;
+        name: string;
+        slug: string;
+        quantity: number;
+        type: ProductType;
+      } | null;
+      variant?: {
+        id: number;
+        name: string;
+        size?: string | null;
+        quantity: number;
+      } | null;
+    },
+    batches?: BatchResponseDto[],
+  ) {
     this.id = inventory.id!;
     this.sid = inventory.sid!;
     this.quantity = inventory.quantity!;
@@ -90,5 +185,8 @@ export class InventoryResponseDto {
     this.productId = inventory.productId ?? undefined;
     this.variantId = inventory.variantId ?? undefined;
     this.recordedBy = inventory.recordedBy ?? undefined;
+    this.product = inventory.product ?? undefined;
+    this.variant = inventory.variant ?? undefined;
+    this.batches = batches;
   }
 }

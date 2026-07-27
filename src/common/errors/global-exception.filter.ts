@@ -11,7 +11,7 @@ import { Response } from 'express';
 import { ValidationError } from 'class-validator';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import { Prisma } from '../../generated/prisma/client';
-import { constraintRecordFromUnknown } from '../utils/validation.util';
+import { formatValidationErrors } from '../utils/validation.util';
 
 //* MAPS THE MOST COMMON PRISMA ERROR CODES TO A SAFE, ACTIONABLE CLIENT
 //* RESPONSE. CODES NOT LISTED HERE (E.G. P2021 "TABLE/COLUMN DOES NOT
@@ -75,15 +75,25 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
     let message: string | string[] = 'Internal server error';
     let error = 'Internal Server Error';
+    //* OPTIONAL STABLE IDENTIFIER THE CLIENT CAN BRANCH ON (E.G. REFRESH THE TOKEN ON
+    //* AUTH_TOKEN_EXPIRED VS. HARD LOGOUT ON AUTH_TOKEN_INVALID). ONLY EMITTED WHEN THE
+    //* THROWER SUPPLIED ONE, SO EXISTING RESPONSES KEEP THEIR CURRENT SHAPE.
+    let errorCode: string | undefined;
 
-    if (exception instanceof JsonWebTokenError) {
-      statusCode = HttpStatus.UNAUTHORIZED;
-      message = 'Invalid token';
-      error = (exception as Error).message;
-    } else if (exception instanceof TokenExpiredError) {
+    //* ORDER IS LOAD-BEARING: TokenExpiredError EXTENDS JsonWebTokenError, SO THE
+    //* SUBCLASS MUST BE TESTED FIRST OR EXPIRY IS SWALLOWED BY THE PARENT BRANCH
+    //* AND REPORTED AS "INVALID TOKEN" — WHICH WOULD TELL THE CLIENT TO HARD-LOGOUT
+    //* INSTEAD OF REFRESHING.
+    if (exception instanceof TokenExpiredError) {
       statusCode = HttpStatus.UNAUTHORIZED;
       message = 'Token expired';
       error = (exception as Error).message;
+      errorCode = 'AUTH_TOKEN_EXPIRED';
+    } else if (exception instanceof JsonWebTokenError) {
+      statusCode = HttpStatus.UNAUTHORIZED;
+      message = 'Invalid token';
+      error = (exception as Error).message;
+      errorCode = 'AUTH_TOKEN_INVALID';
     } else if (exception instanceof BadRequestException) {
       const validationErrors = exception.getResponse() as {
         message?: string | ValidationError[];
@@ -93,11 +103,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         validationErrors.message[0] instanceof ValidationError
       ) {
         statusCode = HttpStatus.BAD_REQUEST;
-        message = validationErrors.message
-          .map((item) =>
-            Object.values(constraintRecordFromUnknown(item)).join(', '),
-          )
-          .join(', ');
+        message = formatValidationErrors(
+          validationErrors.message as ValidationError[],
+        );
         error = 'Validation Error';
       } else {
         statusCode = HttpStatus.BAD_REQUEST;
@@ -113,6 +121,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         const responseObj = exceptionResponse as Record<string, unknown>;
         message = (responseObj['message'] as string) || exception.message;
         error = (responseObj['error'] as string) || exception.message;
+        if (typeof responseObj['errorCode'] === 'string') {
+          errorCode = responseObj['errorCode'];
+        }
       } else {
         message = exceptionResponse;
         error = exceptionResponse;
@@ -146,6 +157,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       success: false,
       message,
       error,
+      ...(errorCode ? { errorCode } : {}),
       timestamp: new Date().toISOString(),
     });
   }

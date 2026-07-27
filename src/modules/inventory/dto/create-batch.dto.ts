@@ -11,6 +11,8 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { InventoryExchangeType } from '../../../generated/prisma/enums';
+import { IsGteProperty } from '../../../common/decorators/validation/is-gte-property.decorator';
+import { IsAfter } from '../../../common/decorators/validation/is-after.decorator';
 
 //* THIS DTO BACKS BOTH THE GENERIC MANUAL BATCH-CRUD PATH (InventoryService.createBatch)
 //* AND EACH ITEM OF THE add-stock BULK WORKFLOW (InventoryService.addStock) — RATHER THAN
@@ -46,6 +48,9 @@ export class CreateBatchDto {
   @Type(() => Number)
   @IsNumber({}, { message: 'Selling price must be a valid number' })
   @Min(0, { message: 'Selling price cannot be negative' })
+  @IsGteProperty('costPrice', {
+    message: 'Selling price cannot be less than cost price',
+  })
   sellingPrice?: number;
 
   @ApiPropertyOptional({
@@ -62,6 +67,9 @@ export class CreateBatchDto {
   })
   @IsOptional()
   @IsDateString({}, { message: 'Expiry date must be a valid date' })
+  @IsAfter('manufacturingDate', {
+    message: 'Expiry date must be after manufacturing date',
+  })
   expiryDate?: string;
 
   @ApiPropertyOptional({

@@ -10,6 +10,7 @@ import { CreateBatchDto } from './dto/create-batch.dto';
 import { UpdateBatchDto } from './dto/update-batch.dto';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { AddStockDto } from './dto/add-stock.dto';
+import { RemoveStockDto } from './dto/remove-stock.dto';
 import { BatchResponseDto } from './dto/batch-response.dto';
 import { InventoryResponseDto } from './dto/inventory-response.dto';
 import { InventoryExchangeType } from '../../generated/prisma/enums';
@@ -25,19 +26,16 @@ function buildProductCode(product: {
   return (product.sku ?? product.name).toUpperCase().replace(/[^A-Z0-9]/g, '');
 }
 
-//* yyyyMMddHHmmss IN SERVER LOCAL TIME — PURELY FOR HUMAN TRACEABILITY ON THE
+//* yyyyMMdd IN SERVER LOCAL TIME — PURELY FOR HUMAN TRACEABILITY ON THE
 //* PRINTED BATCH LABEL. UNIQUENESS ITSELF IS GUARANTEED BY THE TRAILING
-//* batch.id (POSTGRES' OWN ATOMIC AUTO-INCREMENT), NOT BY THIS TIMESTAMP, SO
-//* TWO BATCHES CREATED WITHIN THE SAME SECOND NEVER COLLIDE.
-function formatBatchTimestamp(date: Date): string {
+//* batch.id (POSTGRES' OWN ATOMIC AUTO-INCREMENT), NOT BY THIS DATE, SO
+//* MULTIPLE BATCHES CREATED ON THE SAME DAY NEVER COLLIDE.
+function formatBatchDate(date: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0');
-  return (
-    `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}` +
-    `${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`
-  );
+  return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}`;
 }
 
-//* {CODE}-{yyyyMMddHHmmss}-P{productId}[V{variantId}]-{batch.id} — DEPENDS ON
+//* {CODE}-{yyyyMMdd}-P{productId}[V{variantId}]-{batch.id} — DEPENDS ON
 //* THE BATCH ROW'S OWN id, SO THIS CAN ONLY BE COMPUTED *AFTER* THE ROW
 //* EXISTS (SEE THE PLACEHOLDER-THEN-UPDATE TWO-STEP IN
 //* createBatchWithGeneratedNumber BELOW). target.productId IS OPTIONAL SINCE
@@ -47,7 +45,7 @@ function buildBatchNo(
   product: { name: string; sku: string | null },
   target: { productId?: number; variantId?: number },
   batchId: number,
-  timestamp: string,
+  dateTag: string,
 ): string {
   const code = buildProductCode(product);
   const targetTag = target.productId
@@ -55,9 +53,7 @@ function buildBatchNo(
       ? `P${target.productId}V${target.variantId}`
       : `P${target.productId}`
     : undefined;
-  return [code, timestamp, targetTag, String(batchId)]
-    .filter(Boolean)
-    .join('-');
+  return [code, dateTag, targetTag, String(batchId)].filter(Boolean).join('-');
 }
 
 @Injectable()
@@ -131,7 +127,7 @@ export class InventoryService {
       productForCode,
       { productId: input.productId, variantId: input.variantId },
       created.id,
-      formatBatchTimestamp(new Date()),
+      formatBatchDate(new Date()),
     );
 
     const batch = await this.inventoryRepository.updateBatch(
@@ -208,12 +204,28 @@ export class InventoryService {
     return new InventoryResponseDto(movement);
   }
 
+  /**
+   * Single-record detail view — unlike the list endpoint, this also attaches
+   * every batch for the movement's own product/variant (the admin "view"
+   * modal shows batch history alongside the movement itself). Omitted on
+   * `getAllMovements` since fetching batches per row there would be an
+   * N+1 query for no benefit — nothing in the list view renders them.
+   */
   async getMovementById(id: number): Promise<InventoryResponseDto> {
     const movement = await this.inventoryRepository.findMovementById(id);
     if (!movement) {
       throw new NotFoundException(`Inventory movement with ID ${id} not found`);
     }
-    return new InventoryResponseDto(movement);
+    const batches = movement.productId
+      ? await this.inventoryRepository.findBatchesForProduct(
+          movement.productId,
+          movement.variantId,
+        )
+      : [];
+    return new InventoryResponseDto(
+      movement,
+      batches.map((batch) => new BatchResponseDto(batch)),
+    );
   }
 
   async getAllMovements(
@@ -230,6 +242,94 @@ export class InventoryService {
     };
   }
 
+  /** Every batch for one product (optionally narrowed to one variant) — feeds the "remove stock" batch picker. */
+  async getBatchesForProduct(
+    productId: number,
+    variantId?: number,
+  ): Promise<BatchResponseDto[]> {
+    const batches = await this.inventoryRepository.findBatchesForProduct(
+      productId,
+      variantId,
+    );
+    return batches.map((batch) => new BatchResponseDto(batch));
+  }
+
+  /**
+   * Removes stock from one specific batch — the counterpart to `addStock`.
+   * Validates the batch belongs to the given product/variant and has enough
+   * `remaining`, then atomically: decrements the batch's `remaining`,
+   * decrements the product's or variant's own `quantity`, and appends the
+   * corresponding `Inventory` log entry. Cost price is deliberately left
+   * untouched here — that's an intake-time concept (see `addStock`), not a
+   * removal-time one.
+   */
+  async removeStock(
+    userId: number,
+    dto: RemoveStockDto,
+  ): Promise<BatchResponseDto> {
+    return this.inventoryRepository.withTransaction(async (tx) => {
+      const batch = await this.inventoryRepository.findBatchById(
+        dto.batchId,
+        tx,
+      );
+      if (!batch) {
+        throw new NotFoundException(`Batch with ID ${dto.batchId} not found`);
+      }
+      if (batch.productId !== dto.productId) {
+        throw new BadRequestException(
+          `Batch ${dto.batchId} does not belong to product ${dto.productId}`,
+        );
+      }
+      if ((batch.variantId ?? undefined) !== dto.variantId) {
+        throw new BadRequestException(
+          `Batch ${dto.batchId} does not belong to variant ${dto.variantId ?? 'none'}`,
+        );
+      }
+      if (dto.quantity > batch.remaining) {
+        throw new BadRequestException(
+          `Only ${batch.remaining} unit(s) remaining in batch ${batch.batchNo}`,
+        );
+      }
+
+      const updatedBatch = await this.inventoryRepository.updateBatch(
+        dto.batchId,
+        { remaining: batch.remaining - dto.quantity },
+        tx,
+      );
+
+      if (dto.variantId) {
+        await this.inventoryRepository.incrementVariantQuantity(
+          dto.variantId,
+          -dto.quantity,
+          undefined,
+          tx,
+        );
+      } else {
+        await this.inventoryRepository.incrementProductQuantity(
+          dto.productId,
+          -dto.quantity,
+          undefined,
+          tx,
+        );
+      }
+
+      await this.inventoryRepository.createMovement(
+        {
+          quantity: dto.quantity,
+          changeType: dto.changeType ?? InventoryExchangeType.ADJUSTMENT,
+          reason: dto.reason ?? `Stock removed from batch ${batch.batchNo}`,
+          referenceId: String(batch.id),
+          product: { connect: { id: dto.productId } },
+          ...(dto.variantId && { variant: { connect: { id: dto.variantId } } }),
+          InventoryRecordedBy: { connect: { id: userId } },
+        },
+        tx,
+      );
+
+      return new BatchResponseDto(updatedBatch);
+    });
+  }
+
   // ─── Add stock (batch intake) ────────────────────────────────────────────────
 
   /**
@@ -244,9 +344,12 @@ export class InventoryService {
    *     number (see `buildBatchNo`). The number depends on the row's own
    *     id, so the batch is created with a throwaway placeholder first and
    *     immediately updated to its real number.
-   *  3. Increments the product's or variant's own `quantity` column. The
-   *     DB's stock-sync triggers recompute stockStatus/totalStock from
-   *     that increment — nothing else is written for that here.
+   *  3. Increments the product's or variant's own `quantity` column and
+   *     overwrites its `costPrice` with this item's cost — the product/
+   *     variant's cost basis always reflects its most recently received
+   *     batch (see `incrementProductQuantity`/`incrementVariantQuantity`).
+   *     The DB's stock-sync triggers recompute stockStatus/totalStock from
+   *     the quantity change — nothing else is written for that here.
    *  4. Appends a new `Inventory` row. Inventory is an append-only product
    *     log/history, never an upsert — every intake gets its own immutable
    *     entry rather than updating a running total.
@@ -312,15 +415,11 @@ export class InventoryService {
           );
         }
 
-        if (
-          item.manufacturingDate &&
-          item.expiryDate &&
-          item.expiryDate < item.manufacturingDate
-        ) {
-          throw new BadRequestException(
-            `${itemLabel}: expiry date cannot be before manufacturing date`,
-          );
-        }
+        //* MANUFACTURING/EXPIRY DATE ORDERING (EXPIRY MUST BE STRICTLY AFTER
+        //* MANUFACTURING — EQUAL DATES ARE REJECTED TOO) IS NOW ENFORCED BY
+        //* @IsAfter ON CreateBatchDto.expiryDate ITSELF, SO IT'S ALREADY
+        //* GUARANTEED BY THE TIME THIS SERVICE METHOD RUNS — NO NEED TO
+        //* RE-CHECK IT PER ITEM HERE.
 
         const batch = await this.createBatchWithGeneratedNumber(
           {
@@ -341,12 +440,14 @@ export class InventoryService {
           await this.inventoryRepository.incrementVariantQuantity(
             variant.id,
             item.quantity,
+            item.costPrice,
             tx,
           );
         } else {
           await this.inventoryRepository.incrementProductQuantity(
             productId,
             item.quantity,
+            item.costPrice,
             tx,
           );
         }

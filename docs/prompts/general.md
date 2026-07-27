@@ -10,3 +10,9 @@
 - remind that ask me to change every important thing, give me file name, and after completing your task give me a list of file names with line where you made changes
 
 - review this db schema like a senior db designer and backend engineer, this schema should be well architecture, industry standard, scalable, and convention followed,
+
+- don't make change any existing logic or file without asking me.
+
+- give a proper summary of your tasks after each work.
+
+- give a file list which you have modified after completing a task.

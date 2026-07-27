@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
 import { GlobalExceptionFilter } from './common/errors/global-exception.filter';
 import { Request, Response } from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -37,6 +37,11 @@ async function bootstrap() {
       whitelist: true, // Strips away fields that aren't in the DTO
       forbidNonWhitelisted: true, // Throws an error if unknown fields are sent
       transform: true, // Automatically transforms payloads to DTO instances
+      // * Skip Nest's own dot-path flattening (e.g. "items.0.Quantity must be
+      // * at least 1") — pass the raw ValidationError[] through so
+      // * GlobalExceptionFilter's formatValidationErrors can turn nested
+      // * array errors into readable "Item N: ..." messages instead.
+      exceptionFactory: (errors) => new BadRequestException(errors),
     }),
   );
   app.useGlobalFilters(new GlobalExceptionFilter());
