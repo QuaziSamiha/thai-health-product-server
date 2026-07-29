@@ -231,12 +231,14 @@ export class ProductService {
    */
   async getProductDropdownOptions(): Promise<ProductDropdownOptionDto[]> {
     const products = await this.productRepository.findProductDropdownOptions();
+    const baseUrl = this.configService.get<string>('app.baseUrl');
     return products.flatMap((product) =>
       product.variants.length
         ? product.variants.map(
-            (variant) => new ProductDropdownOptionDto({ product, variant }),
+            (variant) =>
+              new ProductDropdownOptionDto({ product, variant }, baseUrl),
           )
-        : [new ProductDropdownOptionDto({ product })],
+        : [new ProductDropdownOptionDto({ product }, baseUrl)],
     );
   }
 

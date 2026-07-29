@@ -3,7 +3,9 @@ import { Expose } from 'class-transformer';
 import {
   CategoryProductStatus,
   ProductType,
+  StockStatus,
 } from '../../../generated/prisma/browser';
+import { toAbsoluteUrl } from './product-shared.dto';
 
 //* ═══════════════════════════════════════════════════════════════════════
 //* ADMIN DROPDOWN OPTION — ONE ENTRY PER *SELECTABLE* THING, NOT PER
@@ -85,6 +87,32 @@ export class ProductDropdownOptionDto {
   quantity!: number;
 
   @Expose()
+  @ApiProperty({
+    enum: StockStatus,
+    enumName: 'StockStatus',
+    description:
+      "Stock badge — the variant's own stockStatus for a variant option, otherwise the product's",
+    example: StockStatus.IN_STOCK,
+  })
+  stockStatus!: StockStatus;
+
+  @Expose()
+  @ApiPropertyOptional({
+    description:
+      "Absolute URL of the product's primary gallery image, falling back to the first image if none is flagged primary. Always the parent product's own image — not per-variant.",
+    example: 'http://localhost:8000/uploads/products/gallery/abc.webp',
+  })
+  image?: string;
+
+  @Expose()
+  @ApiProperty({
+    description:
+      "Last modified timestamp — always the parent product's own updatedAt (ProductVariant has no timestamp column of its own).",
+    example: '2026-07-26T10:15:00.000Z',
+  })
+  updatedAt!: Date;
+
+  @Expose()
   @ApiPropertyOptional({
     description:
       "Cost basis for margin reporting — the variant's own costPrice for a variant option, otherwise the product's. Admin/management only.",
@@ -114,32 +142,39 @@ export class ProductDropdownOptionDto {
   })
   salePrice!: number;
 
-  constructor(input: {
-    product: {
-      id: number;
-      slug: string;
-      name: string;
-      sku: string | null;
-      barcode: string | null;
-      type: ProductType;
-      status: CategoryProductStatus;
-      quantity: number;
-      costPrice: unknown;
-      basePrice: unknown;
-      salePrice: unknown;
-    };
-    variant?: {
-      id: number;
-      slug: string;
-      name: string;
-      sku: string | null;
-      barcode: string | null;
-      quantity: number;
-      costPrice: unknown;
-      basePrice: unknown;
-      salePrice: unknown;
-    };
-  }) {
+  constructor(
+    input: {
+      product: {
+        id: number;
+        slug: string;
+        name: string;
+        sku: string | null;
+        barcode: string | null;
+        type: ProductType;
+        status: CategoryProductStatus;
+        quantity: number;
+        costPrice: unknown;
+        basePrice: unknown;
+        salePrice: unknown;
+        stockStatus: StockStatus;
+        images?: { url: string }[];
+        updatedAt: Date;
+      };
+      variant?: {
+        id: number;
+        slug: string;
+        name: string;
+        sku: string | null;
+        barcode: string | null;
+        quantity: number;
+        costPrice: unknown;
+        basePrice: unknown;
+        salePrice: unknown;
+        stockStatus: StockStatus;
+      };
+    },
+    baseUrl?: string,
+  ) {
     this.productId = input.product.id;
     this.variantId = input.variant?.id;
     this.slug = input.variant?.slug ?? input.product.slug;
@@ -149,6 +184,9 @@ export class ProductDropdownOptionDto {
     this.type = input.product.type;
     this.status = input.product.status;
     this.quantity = input.variant?.quantity ?? input.product.quantity;
+    this.stockStatus = input.variant?.stockStatus ?? input.product.stockStatus;
+    this.image = toAbsoluteUrl(input.product.images?.[0]?.url, baseUrl);
+    this.updatedAt = input.product.updatedAt;
     const costPrice = input.variant?.costPrice ?? input.product.costPrice;
     this.costPrice =
       costPrice !== null && costPrice !== undefined

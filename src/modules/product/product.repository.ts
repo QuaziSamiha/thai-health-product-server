@@ -248,6 +248,24 @@ export class ProductRepository extends BaseRepository {
         costPrice: true,
         basePrice: true,
         salePrice: true,
+        stockStatus: true,
+        //* ProductVariant HAS NO updatedAt COLUMN OF ITS OWN (SEE SCHEMA) — SO
+        //* THIS IS ALWAYS THE PARENT PRODUCT'S OWN TIMESTAMP, SAME RULE AS
+        //* type/status/image BELOW.
+        updatedAt: true,
+        //* PRODUCT-LEVEL GALLERY ONLY (variantId: null) — SAME IMAGE IS SHOWN
+        //* FOR EVERY OPTION THIS PRODUCT CONTRIBUTES, MIRRORING type/status
+        //* BELOW, WHICH ARE ALSO ALWAYS THE PRODUCT'S OWN VALUE REGARDLESS OF
+        //* WHICH OPTION THIS IS. `isPrimary: 'desc'` THEN `displayOrder: 'asc'`
+        //* PICKS THE PRIMARY IMAGE IF ONE IS FLAGGED, OTHERWISE FALLS BACK TO
+        //* THE FIRST (DEFAULT) IMAGE IN GALLERY ORDER — take: 1 KEEPS THIS A
+        //* SINGLE-ROW READ, NOT A FULL GALLERY FETCH.
+        images: {
+          where: { variantId: null },
+          select: { url: true },
+          orderBy: [{ isPrimary: 'desc' }, { displayOrder: 'asc' }],
+          take: 1,
+        },
         variants: {
           select: {
             id: true,
@@ -259,6 +277,7 @@ export class ProductRepository extends BaseRepository {
             costPrice: true,
             basePrice: true,
             salePrice: true,
+            stockStatus: true,
           },
           orderBy: { id: 'asc' },
         },

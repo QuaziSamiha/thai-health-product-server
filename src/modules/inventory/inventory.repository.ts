@@ -160,6 +160,32 @@ export class InventoryRepository extends BaseRepository {
     });
   }
 
+  /**
+   * Paginated ledger for one product, optionally narrowed to one variant —
+   * feeds the Inventory admin page's per-row "Inventory" (history) button.
+   * `variantId: variantId ?? null` is explicit rather than omitted: an
+   * undefined variantId means "this option is a SIMPLE product", so only
+   * its own product-level (variantId IS NULL) movements should match — not
+   * every movement across all of the product's variants too.
+   */
+  async findMovementsForProduct(
+    productId: number,
+    variantId: number | undefined,
+    params: PaginationQueryDto,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return await this.paginationService.paginate<
+      Prisma.InventoryGetPayload<{ select: typeof this.INVENTORY_SELECT }>,
+      typeof client.inventory
+    >(client.inventory, params, {
+      where: { productId, variantId: variantId ?? null },
+      select: this.INVENTORY_SELECT,
+      searchableFields: ['referenceId'],
+      defaultSortField: 'recordedAt',
+    });
+  }
+
   // ─── Stock targets (Product / ProductVariant) ───────────────────────────────
   //* addStock TOUCHES products/product_variants DIRECTLY (RATHER THAN GOING
   //* THROUGH ProductModule) SINCE THE INCREMENT MUST RUN INSIDE THIS SAME
@@ -190,12 +216,38 @@ export class InventoryRepository extends BaseRepository {
   }
 
   /**
+   * Weighted-average cost: (existingQuantity × existingCost + addedQuantity ×
+   * addedCost) ÷ (existingQuantity + addedQuantity), rounded to 2 decimal
+   * places (matches the column's own `Decimal(12, 2)` precision). A brand
+   * new product/variant (quantity 0, costPrice null) collapses this to just
+   * `addedCost`, so no special-casing is needed for "first stock ever
+   * added". Shared by `incrementProductQuantity`/`incrementVariantQuantity`.
+   */
+  private weightedAverageCost(
+    existingQuantity: number,
+    existingCost: Prisma.Decimal | null,
+    addedQuantity: number,
+    addedCost: number,
+  ): number {
+    const totalQuantity = existingQuantity + addedQuantity;
+    if (totalQuantity <= 0) return addedCost;
+
+    const existingValue = existingQuantity * Number(existingCost ?? 0);
+    const addedValue = addedQuantity * addedCost;
+    return (
+      Math.round(((existingValue + addedValue) / totalQuantity) * 100) / 100
+    );
+  }
+
+  /**
    * Increments a SIMPLE product's own stock count and, when a batch cost
-   * price was supplied, overwrites the product's own `costPrice` with it —
-   * the product's cost basis always reflects its most recently received
-   * batch. The `sync_product_stock_fields` DB trigger recomputes
-   * totalStock/stockStatus from the new quantity — nothing else needs to be
-   * written for that here.
+   * price was supplied, recomputes the product's own `costPrice` as the
+   * weighted average of its existing stock and this newly received batch —
+   * NOT an overwrite, so an earlier, cheaper (or pricier) batch still pulls
+   * weight on the blended cost basis rather than being discarded the
+   * moment a new batch arrives. The `sync_product_stock_fields` DB trigger
+   * recomputes totalStock/stockStatus from the new quantity — nothing else
+   * needs to be written for that here.
    */
   async incrementProductQuantity(
     id: number,
@@ -204,11 +256,26 @@ export class InventoryRepository extends BaseRepository {
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx || this.prisma;
+
+    let newCostPrice: number | undefined;
+    if (costPrice !== undefined) {
+      const current = await client.product.findUniqueOrThrow({
+        where: { id },
+        select: { quantity: true, costPrice: true },
+      });
+      newCostPrice = this.weightedAverageCost(
+        current.quantity,
+        current.costPrice,
+        amount,
+        costPrice,
+      );
+    }
+
     return await client.product.update({
       where: { id },
       data: {
         quantity: { increment: amount },
-        ...(costPrice !== undefined && { costPrice }),
+        ...(newCostPrice !== undefined && { costPrice: newCostPrice }),
       },
       select: { id: true, quantity: true },
     });
@@ -216,8 +283,9 @@ export class InventoryRepository extends BaseRepository {
 
   /**
    * Increments one variant's own stock count and, when a batch cost price
-   * was supplied, overwrites the variant's own `costPrice` with it — same
-   * "most recent batch wins" semantics as `incrementProductQuantity`. The
+   * was supplied, recomputes the variant's own `costPrice` as the weighted
+   * average of its existing stock and this newly received batch — same
+   * blended-cost semantics as `incrementProductQuantity`. The
    * `sync_variant_stock_status` trigger recomputes that variant's
    * stockStatus, which in turn fires `sync_product_total_stock_from_variants`
    * to refresh the parent product's totalStock/stockStatus — nothing else
@@ -230,11 +298,26 @@ export class InventoryRepository extends BaseRepository {
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx || this.prisma;
+
+    let newCostPrice: number | undefined;
+    if (costPrice !== undefined) {
+      const current = await client.productVariant.findUniqueOrThrow({
+        where: { id },
+        select: { quantity: true, costPrice: true },
+      });
+      newCostPrice = this.weightedAverageCost(
+        current.quantity,
+        current.costPrice,
+        amount,
+        costPrice,
+      );
+    }
+
     return await client.productVariant.update({
       where: { id },
       data: {
         quantity: { increment: amount },
-        ...(costPrice !== undefined && { costPrice }),
+        ...(newCostPrice !== undefined && { costPrice: newCostPrice }),
       },
       select: { id: true, quantity: true },
     });

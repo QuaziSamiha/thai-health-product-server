@@ -126,14 +126,14 @@ export class ProductController {
     return await this.productService.getActiveProducts(query);
   }
 
-  @Get('inventory-options')
+  @Get('product-inventory')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Get flattened product/variant options for admin dropdowns',
     description:
-      'Returns one option per selectable thing rather than one per product row: a product with no variants appears as itself, while a product with variants contributes one option per variant instead of its own row (e.g. "Colette Collins 23 July variant 200 ml", "Colette Collins 23 July variant 30 Capsules"). Only ACTIVE, non-deleted products are included. Admin only.',
+      'Returns one option per selectable thing rather than one per product row: a product with no variants appears as itself, while a product with variants contributes one option per variant instead of its own row (e.g. "Colette Collins 23 July variant 200 ml", "Colette Collins 23 July variant 30 Capsules"). Each option includes stockStatus (variant\'s own for a variant option, otherwise the product\'s), the product\'s primary/default gallery image if any, and updatedAt (always the parent product\'s own timestamp — ProductVariant has none of its own). Only ACTIVE, non-deleted products are included. Admin only.',
   })
   @ApiOkResponse({
     description: 'Dropdown options retrieved successfully.',

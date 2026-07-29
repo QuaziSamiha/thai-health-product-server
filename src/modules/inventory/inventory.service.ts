@@ -10,7 +10,7 @@ import { CreateBatchDto } from './dto/create-batch.dto';
 import { UpdateBatchDto } from './dto/update-batch.dto';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { AddStockDto } from './dto/add-stock.dto';
-import { RemoveStockDto } from './dto/remove-stock.dto';
+import { RemoveStockDto, RemoveStockItemDto } from './dto/remove-stock.dto';
 import { BatchResponseDto } from './dto/batch-response.dto';
 import { InventoryResponseDto } from './dto/inventory-response.dto';
 import { InventoryExchangeType } from '../../generated/prisma/enums';
@@ -242,6 +242,27 @@ export class InventoryService {
     };
   }
 
+  /** Paginated inventory history for one product, optionally narrowed to one variant. */
+  async getMovementsForProduct(
+    productId: number,
+    variantId: number | undefined,
+    params: PaginationQueryDto,
+  ): Promise<IPaginatedResult<InventoryResponseDto>> {
+    const paginatedMovements =
+      await this.inventoryRepository.findMovementsForProduct(
+        productId,
+        variantId,
+        params,
+      );
+
+    return {
+      ...paginatedMovements,
+      data: paginatedMovements.data.map(
+        (movement) => new InventoryResponseDto(movement),
+      ),
+    };
+  }
+
   /** Every batch for one product (optionally narrowed to one variant) — feeds the "remove stock" batch picker. */
   async getBatchesForProduct(
     productId: number,
@@ -255,85 +276,305 @@ export class InventoryService {
   }
 
   /**
-   * Removes stock from one specific batch — the counterpart to `addStock`.
-   * Validates the batch belongs to the given product/variant and has enough
-   * `remaining`, then atomically: decrements the batch's `remaining`,
-   * decrements the product's or variant's own `quantity`, and appends the
-   * corresponding `Inventory` log entry. Cost price is deliberately left
-   * untouched here — that's an intake-time concept (see `addStock`), not a
-   * removal-time one.
+   * Removes stock for one or more items in a single, atomic call — the
+   * counterpart to `addStock`. For each item:
+   *
+   *  - **Specific batch** (`item.batchId` given): validates the batch belongs
+   *    to the given product/variant and has enough `remaining`, then
+   *    decrements just that one batch.
+   *  - **FIFO** (`item.batchId` omitted): validates the product/variant
+   *    pairing itself (same invariants as `addStock` — a VARIABLE product
+   *    requires a `variantId` that belongs to it, a SIMPLE product must not
+   *    receive one), then walks every batch for that product/variant
+   *    oldest-first (`findBatchesForProduct`'s own ordering), consuming each
+   *    batch's `remaining` in turn until `item.quantity` is fully accounted
+   *    for. Rejects outright if the combined remaining across every batch
+   *    falls short — no partial removal is ever applied.
+   *
+   * Cost price is deliberately left untouched — that's an intake-time
+   * concept (see `addStock`), not a removal-time one. Each item's own
+   * product/variant `quantity` is decremented exactly once by that item's
+   * full `quantity` (not once per batch touched within it), but one
+   * `Inventory` movement is written **per batch actually touched**, each
+   * carrying only that batch's own share and its own `referenceId`, so the
+   * ledger still attributes exactly how much came from which batch instead
+   * of collapsing a multi-batch FIFO draw into one misleading entry.
+   *
+   * `validateItems` rejects the whole request up front (before the
+   * transaction even opens) if the same product/variant appears in more than
+   * one item without every one of those items pinning a distinct `batchId` —
+   * two FIFO draws (or two draws from the same batch) against the same
+   * product/variant in one request would double-count against the same
+   * pool, which no ordering of independent per-item processing can resolve
+   * correctly on its own.
    */
   async removeStock(
     userId: number,
     dto: RemoveStockDto,
-  ): Promise<BatchResponseDto> {
+  ): Promise<BatchResponseDto[]> {
+    this.validateRemoveStockItems(dto.items);
+
     return this.inventoryRepository.withTransaction(async (tx) => {
-      const batch = await this.inventoryRepository.findBatchById(
-        dto.batchId,
-        tx,
-      );
-      if (!batch) {
-        throw new NotFoundException(`Batch with ID ${dto.batchId} not found`);
-      }
-      if (batch.productId !== dto.productId) {
-        throw new BadRequestException(
-          `Batch ${dto.batchId} does not belong to product ${dto.productId}`,
-        );
-      }
-      if ((batch.variantId ?? undefined) !== dto.variantId) {
-        throw new BadRequestException(
-          `Batch ${dto.batchId} does not belong to variant ${dto.variantId ?? 'none'}`,
-        );
-      }
-      if (dto.quantity > batch.remaining) {
-        throw new BadRequestException(
-          `Only ${batch.remaining} unit(s) remaining in batch ${batch.batchNo}`,
-        );
+      const updated: BatchResponseDto[] = [];
+
+      for (const item of dto.items) {
+        const touchedBatches =
+          item.batchId !== undefined
+            ? [await this.resolveSpecificBatch(item, tx)]
+            : await this.resolveFifoBatches(item, tx);
+
+        for (const { batch, drawn, reasonFallback } of touchedBatches) {
+          const updatedBatch = await this.inventoryRepository.updateBatch(
+            batch.id,
+            { remaining: batch.remaining - drawn },
+            tx,
+          );
+          updated.push(new BatchResponseDto(updatedBatch));
+
+          await this.inventoryRepository.createMovement(
+            {
+              quantity: drawn,
+              changeType: item.changeType ?? InventoryExchangeType.ADJUSTMENT,
+              reason: item.reason ?? reasonFallback,
+              referenceId: String(batch.id),
+              product: { connect: { id: item.productId } },
+              ...(item.variantId && {
+                variant: { connect: { id: item.variantId } },
+              }),
+              InventoryRecordedBy: { connect: { id: userId } },
+            },
+            tx,
+          );
+        }
+
+        if (item.variantId) {
+          await this.inventoryRepository.incrementVariantQuantity(
+            item.variantId,
+            -item.quantity,
+            undefined,
+            tx,
+          );
+        } else {
+          await this.inventoryRepository.incrementProductQuantity(
+            item.productId,
+            -item.quantity,
+            undefined,
+            tx,
+          );
+        }
       }
 
-      const updatedBatch = await this.inventoryRepository.updateBatch(
-        dto.batchId,
-        { remaining: batch.remaining - dto.quantity },
-        tx,
-      );
-
-      if (dto.variantId) {
-        await this.inventoryRepository.incrementVariantQuantity(
-          dto.variantId,
-          -dto.quantity,
-          undefined,
-          tx,
-        );
-      } else {
-        await this.inventoryRepository.incrementProductQuantity(
-          dto.productId,
-          -dto.quantity,
-          undefined,
-          tx,
-        );
-      }
-
-      await this.inventoryRepository.createMovement(
-        {
-          quantity: dto.quantity,
-          changeType: dto.changeType ?? InventoryExchangeType.ADJUSTMENT,
-          reason: dto.reason ?? `Stock removed from batch ${batch.batchNo}`,
-          referenceId: String(batch.id),
-          product: { connect: { id: dto.productId } },
-          ...(dto.variantId && { variant: { connect: { id: dto.variantId } } }),
-          InventoryRecordedBy: { connect: { id: userId } },
-        },
-        tx,
-      );
-
-      return new BatchResponseDto(updatedBatch);
+      return updated;
     });
+  }
+
+  /**
+   * Cross-item guard `resolveSpecificBatch`/`resolveFifoBatches` can't see on
+   * their own, since each only looks at its own item: groups the request's
+   * items by (productId, variantId) and, for any group with more than one
+   * item, requires every item in it to name a `batchId` and every one of
+   * those `batchId`s to be distinct. A single-item group is unrestricted
+   * (FIFO is fine when there's only one draw against that product/variant in
+   * this request).
+   */
+  private validateRemoveStockItems(items: RemoveStockItemDto[]): void {
+    const groups = new Map<string, RemoveStockItemDto[]>();
+    for (const item of items) {
+      const key = `${item.productId}:${item.variantId ?? ''}`;
+      const group = groups.get(key);
+      if (group) {
+        group.push(item);
+      } else {
+        groups.set(key, [item]);
+      }
+    }
+
+    for (const group of groups.values()) {
+      if (group.length <= 1) continue;
+
+      const { productId, variantId } = group[0];
+      const label = variantId
+        ? `product ${productId} variant ${variantId}`
+        : `product ${productId}`;
+
+      if (group.some((item) => item.batchId === undefined)) {
+        throw new BadRequestException(
+          `${label} appears more than once in this request — each occurrence must specify a distinct batchId`,
+        );
+      }
+
+      const batchIds = group.map((item) => item.batchId);
+      if (new Set(batchIds).size !== batchIds.length) {
+        throw new BadRequestException(
+          `${label} appears more than once in this request with the same batchId — each occurrence must draw from a different batch`,
+        );
+      }
+    }
+  }
+
+  /** Single-batch removal path — validates ownership and capacity against exactly the batch the caller picked. */
+  private async resolveSpecificBatch(
+    item: RemoveStockItemDto,
+    tx: Prisma.TransactionClient,
+  ): Promise<{
+    batch: { id: number; batchNo: string; remaining: number };
+    drawn: number;
+    reasonFallback: string;
+  }> {
+    const batch = await this.inventoryRepository.findBatchById(
+      item.batchId!,
+      tx,
+    );
+    if (!batch) {
+      throw new NotFoundException(`Batch with ID ${item.batchId} not found`);
+    }
+    if (batch.productId !== item.productId) {
+      throw new BadRequestException(
+        `Batch ${item.batchId} does not belong to product ${item.productId}`,
+      );
+    }
+    if ((batch.variantId ?? undefined) !== item.variantId) {
+      throw new BadRequestException(
+        `Batch ${item.batchId} does not belong to variant ${item.variantId ?? 'none'}`,
+      );
+    }
+    if (item.quantity > batch.remaining) {
+      throw new BadRequestException(
+        `Only ${batch.remaining} unit(s) remaining in batch ${batch.batchNo}`,
+      );
+    }
+
+    return {
+      batch,
+      drawn: item.quantity,
+      reasonFallback: `Stock removed from batch ${batch.batchNo}`,
+    };
+  }
+
+  /**
+   * FIFO removal path — validates the product/variant pairing itself (no
+   * chosen batch to anchor that check against, unlike `resolveSpecificBatch`),
+   * then greedily draws from the oldest non-empty batch first, spilling into
+   * the next one as each is exhausted, until `item.quantity` is fully spoken
+   * for. Throws rather than applying a partial removal if every batch
+   * combined can't cover the requested quantity.
+   */
+  private async resolveFifoBatches(
+    item: RemoveStockItemDto,
+    tx: Prisma.TransactionClient,
+  ): Promise<
+    {
+      batch: { id: number; batchNo: string; remaining: number };
+      drawn: number;
+      reasonFallback: string;
+    }[]
+  > {
+    const product = await this.inventoryRepository.findProductStockInfo(
+      item.productId,
+      tx,
+    );
+    if (!product || product.deletedAt) {
+      throw new NotFoundException(`Product ${item.productId} not found`);
+    }
+    if (item.variantId !== undefined) {
+      const variant = await this.inventoryRepository.findVariantStockInfo(
+        item.variantId,
+        tx,
+      );
+      if (!variant) {
+        throw new NotFoundException(`Variant ${item.variantId} not found`);
+      }
+      if (variant.productId !== item.productId) {
+        throw new BadRequestException(
+          `Variant ${item.variantId} does not belong to product ${item.productId}`,
+        );
+      }
+    }
+    if (product.hasVariants && item.variantId === undefined) {
+      throw new BadRequestException(
+        `Product ${item.productId} has variants — a variantId is required`,
+      );
+    }
+    if (!product.hasVariants && item.variantId !== undefined) {
+      throw new BadRequestException(
+        `Product ${item.productId} does not use variants`,
+      );
+    }
+
+    const batches = await this.inventoryRepository.findBatchesForProduct(
+      item.productId,
+      item.variantId,
+      tx,
+    );
+
+    let remainingToDraw = item.quantity;
+    const touched: {
+      batch: { id: number; batchNo: string; remaining: number };
+      drawn: number;
+      reasonFallback: string;
+    }[] = [];
+
+    for (const batch of batches) {
+      if (remainingToDraw <= 0) break;
+      if (batch.remaining <= 0) continue;
+
+      const drawn = Math.min(batch.remaining, remainingToDraw);
+      touched.push({
+        batch,
+        drawn,
+        reasonFallback: `Stock removed via FIFO from batch ${batch.batchNo}`,
+      });
+      remainingToDraw -= drawn;
+    }
+
+    if (remainingToDraw > 0) {
+      const totalAvailable = item.quantity - remainingToDraw;
+      throw new BadRequestException(
+        `Only ${totalAvailable} unit(s) available across all batches for this ${item.variantId ? 'variant' : 'product'} — cannot remove ${item.quantity}`,
+      );
+    }
+
+    return touched;
   }
 
   // ─── Add stock (batch intake) ────────────────────────────────────────────────
 
   /**
-   * Records one or more stock intakes in a single, atomic call. For each item:
+   * Consolidates items that represent the same physical intake — same
+   * product/variant AND the same `costPrice` — into a single item with their
+   * `quantity`s summed, rather than creating a redundant extra batch at an
+   * identical cost. A different `costPrice` for the same product/variant is
+   * treated as a genuinely different intake (e.g. a new supplier price) and
+   * is left alone, becoming its own batch. Grouping key deliberately omits
+   * `sellingPrice`/dates/etc — only product/variant/costPrice determine
+   * whether two items are "the same" batch; a merged group keeps the first
+   * item's own `sellingPrice`/`manufacturingDate`/`expiryDate`/`changeType`/
+   * `reason`, only `quantity` is combined. Order-preserving (first
+   * occurrence of each key wins its position) so batch/item numbering stays
+   * predictable.
+   */
+  private mergeAddStockItems(items: CreateBatchDto[]): CreateBatchDto[] {
+    const merged = new Map<string, CreateBatchDto>();
+    const order: string[] = [];
+
+    for (const item of items) {
+      const key = `${item.productId ?? ''}:${item.variantId ?? ''}:${item.costPrice}`;
+      const existing = merged.get(key);
+      if (existing) {
+        existing.quantity += item.quantity;
+      } else {
+        merged.set(key, { ...item });
+        order.push(key);
+      }
+    }
+
+    return order.map((key) => merged.get(key)!);
+  }
+
+  /**
+   * Records one or more stock intakes in a single, atomic call. Items are
+   * first consolidated by `mergeAddStockItems` (see there), then for each
+   * merged item:
    *
    *  1. Validates the product/variant pairing — a VARIABLE product (has
    *     variants) requires a `variantId` that actually belongs to it; a
@@ -361,11 +602,13 @@ export class InventoryService {
     userId: number,
     dto: AddStockDto,
   ): Promise<BatchResponseDto[]> {
+    const items = this.mergeAddStockItems(dto.items);
+
     return this.inventoryRepository.withTransaction(async (tx) => {
       const results: BatchResponseDto[] = [];
 
-      for (let index = 0; index < dto.items.length; index++) {
-        const item = dto.items[index];
+      for (let index = 0; index < items.length; index++) {
+        const item = items[index];
         const itemLabel = `Item ${index + 1}`;
 
         //* productId IS OPTIONAL ON THE SHARED CreateBatchDto (A GENERIC

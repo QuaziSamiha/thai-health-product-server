@@ -29,10 +29,14 @@ import { InventoryService } from './inventory.service';
 import { AddStockDto } from './dto/add-stock.dto';
 import { RemoveStockDto } from './dto/remove-stock.dto';
 import { GetBatchesQueryDto } from './dto/get-batches-query.dto';
+import { GetMovementsQueryDto } from './dto/get-movements-query.dto';
 import { BatchResponseDto } from './dto/batch-response.dto';
 import { InventoryResponseDto } from './dto/inventory-response.dto';
 import { ResponseMessage } from '../../common/decorators/response/response-message.decorator';
-import { ApiPaginatedResponse, PaginationQueryDto } from '../../shared/pagination';
+import {
+  ApiPaginatedResponse,
+  PaginationQueryDto,
+} from '../../shared/pagination';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/auth/roles.decorator';
@@ -51,12 +55,12 @@ export class InventoryController {
   @ApiOperation({
     summary: 'Add stock as one or more batches (Admin Only).',
     description:
-      "Records one or more stock intakes in a single, atomic call. Each item creates a permanent Batch record (with a server-generated batch number), increments the target product's or variant's own stock count, and appends an immutable entry to the product's inventory log. Admin only.",
+      "Records one or more stock intakes in a single, atomic call. Items for the same product/variant at the same costPrice are merged into one batch with their quantities summed — a different costPrice for the same product/variant is treated as a genuinely different intake and keeps its own batch. Each resulting item creates a permanent Batch record (with a server-generated batch number), increments the target product's or variant's own stock count, and appends an immutable entry to the product's inventory log. Admin only.",
   })
   @ApiBody({ type: AddStockDto })
   @ApiCreatedResponse({
     description:
-      'Stock added successfully — one batch per submitted item, in submission order.',
+      'Stock added successfully — one batch per merged item, in first-occurrence order (see description).',
     type: [BatchResponseDto],
   })
   @ApiBadRequestResponse({
@@ -84,22 +88,26 @@ export class InventoryController {
   @ApiBearerAuth()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
-    summary: 'Remove stock from one specific batch (Admin Only).',
+    summary:
+      'Remove stock as one or more items, per-item batch-specific or FIFO (Admin Only).',
     description:
-      "Draws down one batch's `remaining` count and the owning product's/variant's own stock, and appends an immutable Inventory log entry. The counterpart to add-stock. Admin only.",
+      "Removes stock for one or more items in a single, atomic call — the counterpart to add-stock. Each item draws down its owning product's/variant's own stock and appends an immutable Inventory log entry per batch touched. Per item: when `batchId` is given, only that batch is drawn down; when it's omitted, the oldest batch(es) with remaining stock are consumed in order until that item's `quantity` is satisfied (FIFO). If the same product/variant appears in more than one item, every one of those items must specify a distinct `batchId` — two FIFO (or same-batch) draws against the same product/variant in one request are rejected. Admin only.",
   })
   @ApiBody({ type: RemoveStockDto })
   @ApiCreatedResponse({
-    description: 'Stock removed successfully — the updated batch.',
-    type: BatchResponseDto,
+    description:
+      'Stock removed successfully — every batch touched across all items, in processing order (one entry per item for a specific-batch removal, one per batch drawn from for a FIFO removal).',
+    type: [BatchResponseDto],
   })
   @ApiBadRequestResponse({
     description:
-      'Invalid input, a product/variant/batch mismatch, or the requested quantity exceeds the batch\'s remaining count.',
+      "Invalid input, a product/variant/batch mismatch, a repeated product/variant without distinct batchIds, or a requested quantity that exceeds what's available (the chosen batch's own remaining, or the combined remaining across all batches for a FIFO removal).",
   })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
   @ApiForbiddenResponse({ description: 'Admin role required.' })
-  @ApiNotFoundResponse({ description: 'The referenced batch does not exist.' })
+  @ApiNotFoundResponse({
+    description: 'The referenced batch, product, or variant does not exist.',
+  })
   @ResponseMessage('Stock removed successfully')
   async removeStock(
     @Body() dto: RemoveStockDto,
@@ -157,6 +165,34 @@ export class InventoryController {
     return this.inventoryService.getBatchesForProduct(
       productId,
       query.variantId,
+    );
+  }
+
+  @Get('product/:productId/movements')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Get one product's inventory history (paginated, Admin Only).",
+    description:
+      'Paginated ledger of stock movements for one specific product, optionally narrowed to one variant via `?variantId=`. Feeds the Inventory admin page\'s per-row "Inventory" button — a SIMPLE product option (no variantId) only sees its own product-level movements, a variant option only sees that variant\'s own movements. Admin only.',
+  })
+  @ApiPaginatedResponse(
+    InventoryResponseDto,
+    'Inventory history retrieved successfully.',
+  )
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
+  @ApiForbiddenResponse({ description: 'Admin role required.' })
+  @ResponseMessage('Inventory history retrieved successfully')
+  async getMovementsForProduct(
+    @Param('productId', ParseIntPipe) productId: number,
+    @Query() query: GetMovementsQueryDto,
+  ) {
+    const { variantId, ...pagination } = query;
+    return this.inventoryService.getMovementsForProduct(
+      productId,
+      variantId,
+      pagination,
     );
   }
 
