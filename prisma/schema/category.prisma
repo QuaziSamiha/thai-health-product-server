@@ -37,8 +37,8 @@ model Category {
   metaDescriptionTh String? @db.Text
 
   //* AUDIT TRAIL & TIMESTAMPS
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
 
   //* RELATINOS
   createdBy     Int?
@@ -48,7 +48,8 @@ model Category {
   products      Product[]
 
   //* INDEXING STRATEGY
-  @@index([slug]) //* PRIMARY INDEX FOR URL LOOKUPS
+  //* NO @@index([slug]) — `slug @unique` ABOVE ALREADY CREATES A BTREE INDEX
+  //* THAT SERVES EVERY URL LOOKUP. A SECOND ONE IS PURE WRITE AMPLIFICATION.
   @@index([parentId, status]) //* FAST FETCHING OF ACTIVE SUB-CATEGORIES
   @@index([status, isFeatured]) //* FAST FETCHING FOR "FEATURED" HOMEPAGE SECTIONS
   @@index([displayOrder]) //* OPTIMIZED SORTING FOR MENUS/LISTS

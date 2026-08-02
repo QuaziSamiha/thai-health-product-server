@@ -74,6 +74,9 @@ const COMBO_PRODUCT_SELECT_COMMON = {
   title: true,
   titleTh: true,
   slug: true,
+  //* sku IS PUBLIC (SAME TIER AS PRODUCT_SELECT_COMMON) — CUSTOMERS QUOTE IT IN
+  //* SUPPORT TICKETS. barcode/costPrice ARE ADMIN-ONLY, SEE BELOW.
+  sku: true,
   shortDescription: true,
   shortDescTh: true,
   description: true,
@@ -83,6 +86,11 @@ const COMBO_PRODUCT_SELECT_COMMON = {
   startsAt: true,
   endsAt: true,
   isFeatured: true,
+  //* DERIVED AVAILABILITY — ONE COLUMN INSTEAD OF JOINING items →
+  //* products/variants AND AGGREGATING PER CARD. `quantity` IS ADMIN-ONLY,
+  //* MATCHING PRODUCT_SELECT_PUBLIC, WHICH EXPOSES stockStatus BUT NOT THE
+  //* RAW COUNT.
+  stockStatus: true,
   seoMetadata: true,
   images: { select: COMBO_IMAGE_SELECT, orderBy: { displayOrder: 'asc' } },
   items: { select: COMBO_ITEM_SELECT, orderBy: { displayOrder: 'asc' } },
@@ -95,6 +103,10 @@ const COMBO_PRODUCT_SELECT_COMMON = {
 export const COMBO_PRODUCT_SELECT_ADMIN = {
   ...COMBO_PRODUCT_SELECT_COMMON,
   status: true,
+  barcode: true,
+  costPrice: true,
+  quantity: true,
+  lowStockThreshold: true,
   createdAt: true,
   updatedAt: true,
   deletedAt: true,
@@ -102,6 +114,8 @@ export const COMBO_PRODUCT_SELECT_ADMIN = {
   createdByUser: { select: COMBO_USER_MINIFIED_SELECT },
   updatedBy: true,
   updatedByUser: { select: COMBO_USER_MINIFIED_SELECT },
+  deletedBy: true,
+  deletedByUser: { select: COMBO_USER_MINIFIED_SELECT },
 } as const;
 
 //* PUBLIC — feeds ComboProductResponsePublicDto. Storefront view: no

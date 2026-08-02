@@ -53,6 +53,7 @@ export type ComboItemMinAggregateOutputType = {
   variantId: number | null
   quantity: number | null
   unitPrice: runtime.Decimal | null
+  pricedAt: Date | null
   displayOrder: number | null
 }
 
@@ -63,6 +64,7 @@ export type ComboItemMaxAggregateOutputType = {
   variantId: number | null
   quantity: number | null
   unitPrice: runtime.Decimal | null
+  pricedAt: Date | null
   displayOrder: number | null
 }
 
@@ -73,6 +75,7 @@ export type ComboItemCountAggregateOutputType = {
   variantId: number
   quantity: number
   unitPrice: number
+  pricedAt: number
   displayOrder: number
   _all: number
 }
@@ -105,6 +108,7 @@ export type ComboItemMinAggregateInputType = {
   variantId?: true
   quantity?: true
   unitPrice?: true
+  pricedAt?: true
   displayOrder?: true
 }
 
@@ -115,6 +119,7 @@ export type ComboItemMaxAggregateInputType = {
   variantId?: true
   quantity?: true
   unitPrice?: true
+  pricedAt?: true
   displayOrder?: true
 }
 
@@ -125,6 +130,7 @@ export type ComboItemCountAggregateInputType = {
   variantId?: true
   quantity?: true
   unitPrice?: true
+  pricedAt?: true
   displayOrder?: true
   _all?: true
 }
@@ -222,6 +228,7 @@ export type ComboItemGroupByOutputType = {
   variantId: number | null
   quantity: number
   unitPrice: runtime.Decimal | null
+  pricedAt: Date | null
   displayOrder: number
   _count: ComboItemCountAggregateOutputType | null
   _avg: ComboItemAvgAggregateOutputType | null
@@ -255,6 +262,7 @@ export type ComboItemWhereInput = {
   variantId?: Prisma.IntNullableFilter<"ComboItem"> | number | null
   quantity?: Prisma.IntFilter<"ComboItem"> | number
   unitPrice?: Prisma.DecimalNullableFilter<"ComboItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Prisma.DateTimeNullableFilter<"ComboItem"> | Date | string | null
   displayOrder?: Prisma.IntFilter<"ComboItem"> | number
   combo?: Prisma.XOR<Prisma.ComboProductScalarRelationFilter, Prisma.ComboProductWhereInput>
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
@@ -268,6 +276,7 @@ export type ComboItemOrderByWithRelationInput = {
   variantId?: Prisma.SortOrderInput | Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrderInput | Prisma.SortOrder
+  pricedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   displayOrder?: Prisma.SortOrder
   combo?: Prisma.ComboProductOrderByWithRelationInput
   product?: Prisma.ProductOrderByWithRelationInput
@@ -285,6 +294,7 @@ export type ComboItemWhereUniqueInput = Prisma.AtLeast<{
   variantId?: Prisma.IntNullableFilter<"ComboItem"> | number | null
   quantity?: Prisma.IntFilter<"ComboItem"> | number
   unitPrice?: Prisma.DecimalNullableFilter<"ComboItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Prisma.DateTimeNullableFilter<"ComboItem"> | Date | string | null
   displayOrder?: Prisma.IntFilter<"ComboItem"> | number
   combo?: Prisma.XOR<Prisma.ComboProductScalarRelationFilter, Prisma.ComboProductWhereInput>
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
@@ -298,6 +308,7 @@ export type ComboItemOrderByWithAggregationInput = {
   variantId?: Prisma.SortOrderInput | Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrderInput | Prisma.SortOrder
+  pricedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   displayOrder?: Prisma.SortOrder
   _count?: Prisma.ComboItemCountOrderByAggregateInput
   _avg?: Prisma.ComboItemAvgOrderByAggregateInput
@@ -316,12 +327,14 @@ export type ComboItemScalarWhereWithAggregatesInput = {
   variantId?: Prisma.IntNullableWithAggregatesFilter<"ComboItem"> | number | null
   quantity?: Prisma.IntWithAggregatesFilter<"ComboItem"> | number
   unitPrice?: Prisma.DecimalNullableWithAggregatesFilter<"ComboItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ComboItem"> | Date | string | null
   displayOrder?: Prisma.IntWithAggregatesFilter<"ComboItem"> | number
 }
 
 export type ComboItemCreateInput = {
   quantity?: number
   unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Date | string | null
   displayOrder?: number
   combo: Prisma.ComboProductCreateNestedOneWithoutItemsInput
   product: Prisma.ProductCreateNestedOneWithoutComboItemsInput
@@ -335,12 +348,14 @@ export type ComboItemUncheckedCreateInput = {
   variantId?: number | null
   quantity?: number
   unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Date | string | null
   displayOrder?: number
 }
 
 export type ComboItemUpdateInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   combo?: Prisma.ComboProductUpdateOneRequiredWithoutItemsNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutComboItemsNestedInput
@@ -354,6 +369,7 @@ export type ComboItemUncheckedUpdateInput = {
   variantId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -364,12 +380,14 @@ export type ComboItemCreateManyInput = {
   variantId?: number | null
   quantity?: number
   unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Date | string | null
   displayOrder?: number
 }
 
 export type ComboItemUpdateManyMutationInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -380,6 +398,7 @@ export type ComboItemUncheckedUpdateManyInput = {
   variantId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -406,6 +425,7 @@ export type ComboItemCountOrderByAggregateInput = {
   variantId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
+  pricedAt?: Prisma.SortOrder
   displayOrder?: Prisma.SortOrder
 }
 
@@ -426,6 +446,7 @@ export type ComboItemMaxOrderByAggregateInput = {
   variantId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
+  pricedAt?: Prisma.SortOrder
   displayOrder?: Prisma.SortOrder
 }
 
@@ -436,6 +457,7 @@ export type ComboItemMinOrderByAggregateInput = {
   variantId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
+  pricedAt?: Prisma.SortOrder
   displayOrder?: Prisma.SortOrder
 }
 
@@ -489,14 +511,6 @@ export type ComboItemUncheckedUpdateManyWithoutComboNestedInput = {
   update?: Prisma.ComboItemUpdateWithWhereUniqueWithoutComboInput | Prisma.ComboItemUpdateWithWhereUniqueWithoutComboInput[]
   updateMany?: Prisma.ComboItemUpdateManyWithWhereWithoutComboInput | Prisma.ComboItemUpdateManyWithWhereWithoutComboInput[]
   deleteMany?: Prisma.ComboItemScalarWhereInput | Prisma.ComboItemScalarWhereInput[]
-}
-
-export type NullableDecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type ComboItemCreateNestedManyWithoutProductInput = {
@@ -586,6 +600,7 @@ export type ComboItemUncheckedUpdateManyWithoutVariantNestedInput = {
 export type ComboItemCreateWithoutComboInput = {
   quantity?: number
   unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Date | string | null
   displayOrder?: number
   product: Prisma.ProductCreateNestedOneWithoutComboItemsInput
   variant?: Prisma.ProductVariantCreateNestedOneWithoutComboItemsInput
@@ -597,6 +612,7 @@ export type ComboItemUncheckedCreateWithoutComboInput = {
   variantId?: number | null
   quantity?: number
   unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Date | string | null
   displayOrder?: number
 }
 
@@ -636,12 +652,14 @@ export type ComboItemScalarWhereInput = {
   variantId?: Prisma.IntNullableFilter<"ComboItem"> | number | null
   quantity?: Prisma.IntFilter<"ComboItem"> | number
   unitPrice?: Prisma.DecimalNullableFilter<"ComboItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Prisma.DateTimeNullableFilter<"ComboItem"> | Date | string | null
   displayOrder?: Prisma.IntFilter<"ComboItem"> | number
 }
 
 export type ComboItemCreateWithoutProductInput = {
   quantity?: number
   unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Date | string | null
   displayOrder?: number
   combo: Prisma.ComboProductCreateNestedOneWithoutItemsInput
   variant?: Prisma.ProductVariantCreateNestedOneWithoutComboItemsInput
@@ -653,6 +671,7 @@ export type ComboItemUncheckedCreateWithoutProductInput = {
   variantId?: number | null
   quantity?: number
   unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Date | string | null
   displayOrder?: number
 }
 
@@ -685,6 +704,7 @@ export type ComboItemUpdateManyWithWhereWithoutProductInput = {
 export type ComboItemCreateWithoutVariantInput = {
   quantity?: number
   unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Date | string | null
   displayOrder?: number
   combo: Prisma.ComboProductCreateNestedOneWithoutItemsInput
   product: Prisma.ProductCreateNestedOneWithoutComboItemsInput
@@ -696,6 +716,7 @@ export type ComboItemUncheckedCreateWithoutVariantInput = {
   productId: number
   quantity?: number
   unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Date | string | null
   displayOrder?: number
 }
 
@@ -731,12 +752,14 @@ export type ComboItemCreateManyComboInput = {
   variantId?: number | null
   quantity?: number
   unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Date | string | null
   displayOrder?: number
 }
 
 export type ComboItemUpdateWithoutComboInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   product?: Prisma.ProductUpdateOneRequiredWithoutComboItemsNestedInput
   variant?: Prisma.ProductVariantUpdateOneWithoutComboItemsNestedInput
@@ -748,6 +771,7 @@ export type ComboItemUncheckedUpdateWithoutComboInput = {
   variantId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -757,6 +781,7 @@ export type ComboItemUncheckedUpdateManyWithoutComboInput = {
   variantId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -766,12 +791,14 @@ export type ComboItemCreateManyProductInput = {
   variantId?: number | null
   quantity?: number
   unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Date | string | null
   displayOrder?: number
 }
 
 export type ComboItemUpdateWithoutProductInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   combo?: Prisma.ComboProductUpdateOneRequiredWithoutItemsNestedInput
   variant?: Prisma.ProductVariantUpdateOneWithoutComboItemsNestedInput
@@ -783,6 +810,7 @@ export type ComboItemUncheckedUpdateWithoutProductInput = {
   variantId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -792,6 +820,7 @@ export type ComboItemUncheckedUpdateManyWithoutProductInput = {
   variantId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -801,12 +830,14 @@ export type ComboItemCreateManyVariantInput = {
   productId: number
   quantity?: number
   unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Date | string | null
   displayOrder?: number
 }
 
 export type ComboItemUpdateWithoutVariantInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   combo?: Prisma.ComboProductUpdateOneRequiredWithoutItemsNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutComboItemsNestedInput
@@ -818,6 +849,7 @@ export type ComboItemUncheckedUpdateWithoutVariantInput = {
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -827,6 +859,7 @@ export type ComboItemUncheckedUpdateManyWithoutVariantInput = {
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  pricedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -839,6 +872,7 @@ export type ComboItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   variantId?: boolean
   quantity?: boolean
   unitPrice?: boolean
+  pricedAt?: boolean
   displayOrder?: boolean
   combo?: boolean | Prisma.ComboProductDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -852,6 +886,7 @@ export type ComboItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   variantId?: boolean
   quantity?: boolean
   unitPrice?: boolean
+  pricedAt?: boolean
   displayOrder?: boolean
   combo?: boolean | Prisma.ComboProductDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -865,6 +900,7 @@ export type ComboItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   variantId?: boolean
   quantity?: boolean
   unitPrice?: boolean
+  pricedAt?: boolean
   displayOrder?: boolean
   combo?: boolean | Prisma.ComboProductDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -878,10 +914,11 @@ export type ComboItemSelectScalar = {
   variantId?: boolean
   quantity?: boolean
   unitPrice?: boolean
+  pricedAt?: boolean
   displayOrder?: boolean
 }
 
-export type ComboItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "comboId" | "productId" | "variantId" | "quantity" | "unitPrice" | "displayOrder", ExtArgs["result"]["comboItem"]>
+export type ComboItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "comboId" | "productId" | "variantId" | "quantity" | "unitPrice" | "pricedAt" | "displayOrder", ExtArgs["result"]["comboItem"]>
 export type ComboItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   combo?: boolean | Prisma.ComboProductDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -912,6 +949,7 @@ export type $ComboItemPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     variantId: number | null
     quantity: number
     unitPrice: runtime.Decimal | null
+    pricedAt: Date | null
     displayOrder: number
   }, ExtArgs["result"]["comboItem"]>
   composites: {}
@@ -1345,6 +1383,7 @@ export interface ComboItemFieldRefs {
   readonly variantId: Prisma.FieldRef<"ComboItem", 'Int'>
   readonly quantity: Prisma.FieldRef<"ComboItem", 'Int'>
   readonly unitPrice: Prisma.FieldRef<"ComboItem", 'Decimal'>
+  readonly pricedAt: Prisma.FieldRef<"ComboItem", 'DateTime'>
   readonly displayOrder: Prisma.FieldRef<"ComboItem", 'Int'>
 }
     

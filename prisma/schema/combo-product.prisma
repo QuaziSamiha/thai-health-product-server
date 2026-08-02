@@ -8,47 +8,74 @@ model ComboProduct {
 
   title            String  @unique @db.VarChar(255)
   slug             String  @unique @db.VarChar(255)
+  sku              String? @unique @db.VarChar(100)
+  barcode          String? @unique @db.VarChar(100)
   description      String? @db.Text
-  shortDescription String? @db.VarChar(500)
+  shortDescription String? @map("short_description") @db.VarChar(500)
 
   //* CONTENT (TH)
-  titleTh       String? @db.VarChar(255)
-  shortDescTh   String? @db.VarChar(500)
-  descriptionTh String? @db.Text
+  titleTh       String? @map("title_th") @db.VarChar(255)
+  shortDescTh   String? @map("short_desc_th") @db.VarChar(500)
+  descriptionTh String? @map("description_th") @db.Text
 
   //* PRICING (DECIMAL FOR FINANCIAL ACCURACY)
-  totalPrice Decimal @default(0) @db.Decimal(12, 2) //* SUM-OF-PARTS DISPLAY PRICE (CAN BE CACHED OR ENTERED MANUALLY)
-  comboPrice Decimal @default(0) @db.Decimal(12, 2) //* THE BUNDLE OFFER PRICE CUSTOMER PAYS
+  totalPrice Decimal  @default(0) @map("total_price") @db.Decimal(12, 2) //* SUM-OF-PARTS DISPLAY PRICE
+  comboPrice Decimal  @default(0) @map("combo_price") @db.Decimal(12, 2) //* THE BUNDLE OFFER PRICE CUSTOMER PAYS
+  costPrice  Decimal? @map("cost_price") @db.Decimal(12, 2) //* LANDED COST OF THE BUNDLE FOR MARGIN REPORTING AGAINST comboPrice — ENTERED, NOT SUMMED FROM ITEMS, SINCE A BUNDLE CARRIES ITS OWN PACKAGING/ASSEMBLY COST
 
   //* PROMOTION WINDOW (THE "COMBO LIMIT" / DURATION RANGE)
-  startsAt DateTime? @map("starts_at")
-  endsAt   DateTime? @map("ends_at")
+  startsAt DateTime? @map("starts_at") @db.Timestamptz(3)
+  endsAt   DateTime? @map("ends_at") @db.Timestamptz(3)
 
   //* STATE
   status     CategoryProductStatus @default(DRAFT)
-  isFeatured Boolean               @default(false)
+  isFeatured Boolean               @default(false) @map("is_featured")
+
+  //* AVAILABILITY (FULLY DERIVED — NEVER CLIENT INPUT, NEVER HAND-EDITED)
+  //* A COMBO IS SELLABLE ONLY IF *EVERY* ITEM HAS ENOUGH STOCK, SO THE BUNDLE
+  //* IS LIMITED BY ITS SCARCEST PART: quantity IS A MIN OVER ITEMS, NOT A SUM
+  //* (UNLIKE Product.totalStock). DENORMALIZED SO A STOREFRONT LISTING READS
+  //* ONE COLUMN INSTEAD OF JOINING combo_items → products/variants AND
+  //* AGGREGATING PER CARD. MAINTAINED BY THE TRIGGER FAMILY IN MIGRATION
+  //* 20260802140000_add_combo_stock_availability AND MIRRORED IN APP CODE AT
+  //* CREATE TIME (ComboProductService.resolveComboAvailability) — THE TWO
+  //* RULES MUST BE KEPT IN SYNC, SAME CONTRACT AS Product.stockStatus.
+  quantity          Int         @default(0) //* HOW MANY COMPLETE BUNDLES CAN BE ASSEMBLED RIGHT NOW = MIN OVER ITEMS OF floor(ITEM STOCK / ITEM QUANTITY)
+  stockStatus       StockStatus @default(OUT_OF_STOCK) @map("stock_status")
+  lowStockThreshold Int         @default(10) @map("low_stock_threshold") //* stockStatus BECOMES LOW_STOCK ONCE quantity DROPS TO/BELOW THIS, DOWN TO 1
 
   //* SEO METADATA
-  seoMetadata Json? @default("{}") //* metaTitle, metaDescription, metaTitleTh, metaDescriptionTh
+  seoMetadata Json? @default("{}") @map("seo_metadata") //* metaTitle, metaDescription, metaTitleTh, metaDescriptionTh
 
   //* RELATIONS
   images ComboImage[]
   items  ComboItem[]
 
   //* AUDIT & TIMESTAMPS
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  deletedAt   DateTime? @map("deleted_at") //* SOFT DELETE
-  publishedAt DateTime? @map("published_at")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3) //* SOFT DELETE
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
 
   createdBy     Int?  @map("created_by")
   createdByUser User? @relation("ComboCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
   updatedBy     Int?  @map("updated_by")
   updatedByUser User? @relation("ComboUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  deletedBy     Int?  @map("deleted_by")
+  deletedByUser User? @relation("ComboDeletedBy", fields: [deletedBy], references: [id], onDelete: SetNull)
 
-  @@index([slug])
-  @@index([status, isFeatured]) //* Fast featured/active listings on storefront
-  @@index([startsAt, endsAt]) //* Window queries for active promotions
+  //* INDEXING STRATEGY — THIS MODEL DECLARES NO @@index ON PURPOSE:
+  //*  1. slug/title/sku/barcode ARE @unique, WHICH ALREADY CREATES A BTREE
+  //*     INDEX EACH. A SEPARATE @@index([slug]) WAS DROPPED IN MIGRATION
+  //*     20260802190000 AS PURE WRITE AMPLIFICATION.
+  //*  2. THE STOREFRONT LISTING IS SERVED BY THE PARTIAL INDEX
+  //*     combo_products_live_idx ON (status, is_featured, starts_at, ends_at)
+  //*     WHERE deleted_at IS NULL — PRISMA'S DSL CANNOT EXPRESS A FILTERED
+  //*     INDEX, SO IT LIVES IN MIGRATION 20260802200000. IT REPLACED
+  //*     @@index([status, isFeatured]) + @@index([startsAt, endsAt]): THE
+  //*     FIRST IGNORED deleted_at, THE SECOND COULD ONLY RANGE-SCAN starts_at
+  //*     BEFORE RECHECKING ends_at OFF THE HEAP. EQUALITY COLUMNS LEAD,
+  //*     RANGES TRAIL — THAT ORDER MATTERS FOR A TWO-SIDED WINDOW.
   @@map("combo_products")
 }
 
@@ -64,12 +91,23 @@ model ComboItem {
   product   Product @relation(fields: [productId], references: [id], onDelete: Restrict) //* PREVENT DELETING A PRODUCT THAT'S STILL BUNDLED
 
   variantId Int?            @map("variant_id") //* OPTIONAL: pin to a specific size/variant
-  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Restrict) //* SAME RULE AS product
 
-  quantity     Int      @default(1)
-  unitPrice    Decimal? @db.Decimal(12, 2) //* SNAPSHOT PRICE AT TIME OF BUNDLING (PROTECTS HISTORICAL COMBO PRICING)
-  displayOrder Int      @default(0)
+  quantity     Int       @default(1)
+  unitPrice    Decimal?  @map("unit_price") @db.Decimal(12, 2) //* SNAPSHOT PRICE AT TIME OF BUNDLING (PROTECTS HISTORICAL COMBO PRICING)
+  //* WHEN unitPrice WAS CAPTURED — WITHOUT IT, A PRICE DISPUTE CANNOT TELL A
+  //* TWO-DAY-OLD SNAPSHOT FROM A TWO-YEAR-OLD ONE. FULLY DERIVED, NEVER CLIENT
+  //* INPUT: THE TRIGGER trg_sync_combo_item_priced_at (MIGRATION
+  //* 20260803000000_combo_item_priced_at) STAMPS IT ON INSERT AND ON EVERY
+  //* UPDATE WHERE unitPrice ACTUALLY CHANGES VALUE — AND ONLY THEN, WHICH IS
+  //* WHY THIS IS NOT updatedAt. NULL EXACTLY WHEN unitPrice IS NULL.
+  pricedAt     DateTime? @map("priced_at") @db.Timestamptz(3)
+  displayOrder Int       @default(0) @map("display_order")
 
+  //* COVERS PINNED ROWS ONLY — POSTGRES TREATS NULLS AS DISTINCT, SO ROWS WITH
+  //* variantId = null ARE GUARDED BY THE PARTIAL UNIQUE INDEX
+  //* combo_items_unique_without_variant (MIGRATION
+  //* 20260802120000_combo_items_variant_integrity), NOT BY THIS.
   @@unique([comboId, productId, variantId]) //* PREVENT DUPLICATE ROWS PER (COMBO, PRODUCT, VARIANT)
   @@index([productId])
   @@index([variantId])
@@ -81,14 +119,14 @@ model ComboItem {
 model ComboImage {
   id           Int     @id @default(autoincrement())
   url          String  @db.VarChar(512)
-  thumbnailUrl String? @db.VarChar(512)
-  bannerUrl    String? @db.VarChar(512)
-  iconUrl      String? @db.VarChar(512)
+  thumbnailUrl String? @map("thumbnail_url") @db.VarChar(512)
+  bannerUrl    String? @map("banner_url") @db.VarChar(512)
+  iconUrl      String? @map("icon_url") @db.VarChar(512)
 
-  altText      String?
-  displayOrder Int     @default(0)
-  isPrimary    Boolean @default(false)
-  isActive     Boolean @default(true)
+  altText      String? @map("alt_text")
+  displayOrder Int     @default(0) @map("display_order")
+  isPrimary    Boolean @default(false) @map("is_primary") //* AT MOST ONE PER comboId ENFORCED BY A PARTIAL UNIQUE INDEX (combo_images_one_primary_per_combo) — NOT EXPRESSIBLE IN THIS SCHEMA DSL, SEE prisma/migrations/20260802230000_one_primary_image_per_combo
+  isActive     Boolean @default(true) @map("is_active")
 
   comboId Int          @map("combo_id")
   combo   ComboProduct @relation(fields: [comboId], references: [id], onDelete: Cascade)

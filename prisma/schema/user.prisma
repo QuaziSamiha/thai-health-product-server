@@ -53,9 +53,9 @@ model User {
   providerId   String? // OAuth ID
 
   // Timestamps
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  lastLoginAt DateTime? @map("last_login_at")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  lastLoginAt DateTime? @map("last_login_at") @db.Timestamptz(3)
 
   // Relations
   profile             Profile?
@@ -70,6 +70,7 @@ model User {
   inventories         Inventory[]
   createdCombos       ComboProduct[] @relation("ComboCreatedBy")
   updatedCombos       ComboProduct[] @relation("ComboUpdatedBy")
+  deletedCombos       ComboProduct[] @relation("ComboDeletedBy")
   blogs               Blog[]
   createdHomeContents Home[]         @relation("HomeCreatedBy")
   updatedHomeContents Home[]         @relation("HomeUpdatedBy")
@@ -87,6 +88,10 @@ model Profile {
   name        String?   @db.VarChar(200)
   avatarUrl   String? // One source of truth for the image
   bio         String?   @db.Text
+  //* DELIBERATELY *NOT* @db.Timestamptz(3), UNLIKE EVERY OTHER DateTime IN THIS
+  //* SCHEMA (SEE MIGRATION 20260802160000_timestamptz_repo_wide): A BIRTH DATE
+  //* IS A CALENDAR DATE, NOT AN INSTANT — MAKING IT TZ-AWARE WOULD RENDER IT AS
+  //* A DIFFERENT DAY DEPENDING ON THE READER'S ZONE. SHOULD BECOME @db.Date.
   dateOfBirth DateTime?
   gender      String?   @db.VarChar(20)
 
@@ -102,13 +107,13 @@ model Profile {
 model UserSecurity {
   id              Int       @id @default(autoincrement())
   isEmailVerified Boolean   @default(false)
-  emailVerifiedAt DateTime?
+  emailVerifiedAt DateTime? @db.Timestamptz(3)
 
   // Multi-step Auth logic
   verificationToken        String?
-  verificationTokenExpires DateTime?
+  verificationTokenExpires DateTime? @db.Timestamptz(3)
   resetToken               String?
-  resetTokenExpires        DateTime?
+  resetTokenExpires        DateTime? @db.Timestamptz(3)
 
   // Security Logs
   loginAttempts Int     @default(0)
@@ -124,8 +129,8 @@ model UserSecurity {
 model Session {
   id                    Int      @id @default(autoincrement())
   refreshToken          String   @unique @db.Text
-  refreshTokenExpiresAt DateTime
-  createdAt             DateTime @default(now())
+  refreshTokenExpiresAt DateTime @db.Timestamptz(3)
+  createdAt             DateTime @default(now()) @db.Timestamptz(3)
   userAgent             String?
   ipAddress             String?
 
@@ -139,7 +144,7 @@ model OTP {
   id        Int      @id @default(autoincrement())
   code      String // Hashed code for security
   type      OTPType
-  expiresAt DateTime @map("expires_at")
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(3)
   isUsed    Boolean  @default(false) @map("is_used")
 
   // To identify the target
@@ -148,7 +153,7 @@ model OTP {
   userId Int?  @map("user_id") // Optional for guest checkouts
   user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
 
   @@index([identifier])
   @@map("otps")

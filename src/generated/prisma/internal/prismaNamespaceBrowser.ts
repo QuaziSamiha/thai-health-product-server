@@ -142,6 +142,8 @@ export const ComboProductScalarFieldEnum = {
   sid: 'sid',
   title: 'title',
   slug: 'slug',
+  sku: 'sku',
+  barcode: 'barcode',
   description: 'description',
   shortDescription: 'shortDescription',
   titleTh: 'titleTh',
@@ -149,17 +151,22 @@ export const ComboProductScalarFieldEnum = {
   descriptionTh: 'descriptionTh',
   totalPrice: 'totalPrice',
   comboPrice: 'comboPrice',
+  costPrice: 'costPrice',
   startsAt: 'startsAt',
   endsAt: 'endsAt',
   status: 'status',
   isFeatured: 'isFeatured',
+  quantity: 'quantity',
+  stockStatus: 'stockStatus',
+  lowStockThreshold: 'lowStockThreshold',
   seoMetadata: 'seoMetadata',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt',
   publishedAt: 'publishedAt',
   createdBy: 'createdBy',
-  updatedBy: 'updatedBy'
+  updatedBy: 'updatedBy',
+  deletedBy: 'deletedBy'
 } as const
 
 export type ComboProductScalarFieldEnum = (typeof ComboProductScalarFieldEnum)[keyof typeof ComboProductScalarFieldEnum]
@@ -172,6 +179,7 @@ export const ComboItemScalarFieldEnum = {
   variantId: 'variantId',
   quantity: 'quantity',
   unitPrice: 'unitPrice',
+  pricedAt: 'pricedAt',
   displayOrder: 'displayOrder'
 } as const
 

@@ -25,12 +25,12 @@ model Batch {
   costPrice Decimal @default(0) @map("cost_price") @db.Decimal(12, 2) //* COST PRICE PAID PER UNIT TO ACQUIRE THIS BATCH — SNAPSHOT AT RECEIPT TIME, USED FOR COGS/FIFO VALUATION. DISTINCT FROM Inventory.costPrice, WHICH IS A PER-MOVEMENT SNAPSHOT, NOT PER-BATCH.
 
   // METADATA FOR THE BATCH
-  manufacturingDate DateTime? @map("manufacturing_date")
-  expiryDate        DateTime? @map("expiry_date")
+  manufacturingDate DateTime? @map("manufacturing_date") @db.Timestamptz(3)
+  expiryDate        DateTime? @map("expiry_date") @db.Timestamptz(3)
 
   // TIME STAMPS
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   // RELATIONS
   productId Int?            @map("product_id")
@@ -53,7 +53,7 @@ model Inventory {
   costPrice           Decimal?              @map("cost_price") // Cost at time of stock change
   sellingPrice        Decimal?              @map("selling_price") // Selling price at time of stock change
   // * TIME STAMPS
-  recordedAt          DateTime              @default(now()) @map("recorded_at")
+  recordedAt          DateTime              @default(now()) @map("recorded_at") @db.Timestamptz(3)
   // * RELATIONS
   productId           Int?                  @map("product_id")
   product             Product?              @relation(fields: [productId], references: [id], onDelete: Cascade)

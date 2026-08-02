@@ -44,6 +44,23 @@ export class ComboProductRepository extends BaseRepository {
     });
   }
 
+  /** Uniqueness checks — `sku`/`barcode` are unique columns on the model. */
+  async findBySku(sku: string, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.comboProduct.findUnique({
+      where: { sku },
+      select: { id: true, sku: true },
+    });
+  }
+
+  async findByBarcode(barcode: string, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.comboProduct.findUnique({
+      where: { barcode },
+      select: { id: true, barcode: true },
+    });
+  }
+
   async findBySlugPublic(slug: string, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return await client.comboProduct.findUnique({
@@ -53,10 +70,7 @@ export class ComboProductRepository extends BaseRepository {
   }
 
   /** Active combos, newest first — for a "Combo Deals" home section. */
-  async findActiveCombosForHome(
-    limit: number,
-    tx?: Prisma.TransactionClient,
-  ) {
+  async findActiveCombosForHome(limit: number, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return await client.comboProduct.findMany({
       where: { deletedAt: null, status: CategoryProductStatus.ACTIVE },
@@ -76,7 +90,18 @@ export class ComboProductRepository extends BaseRepository {
     if (ids.length === 0) return [];
     return await client.product.findMany({
       where: { id: { in: ids } },
-      select: { id: true, basePrice: true, salePrice: true },
+      //* type/name ARE FOR THE SIMPLE-vs-VARIABLE BUNDLING RULE AND ITS ERROR
+      //* MESSAGE (SEE ComboProductService.resolveComboItems), NOT FOR PRICING.
+      //* quantity FEEDS resolveComboAvailability — FOR AN UNPINNED ITEM THE
+      //* PRODUCT IS ALWAYS SIMPLE, SO ITS OWN quantity IS THE BUNDLE LIMIT.
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        quantity: true,
+        basePrice: true,
+        salePrice: true,
+      },
     });
   }
 
@@ -85,7 +110,14 @@ export class ComboProductRepository extends BaseRepository {
     if (ids.length === 0) return [];
     return await client.productVariant.findMany({
       where: { id: { in: ids } },
-      select: { id: true, productId: true, basePrice: true, salePrice: true },
+      //* quantity FEEDS resolveComboAvailability — SEE findProductsByIds
+      select: {
+        id: true,
+        productId: true,
+        quantity: true,
+        basePrice: true,
+        salePrice: true,
+      },
     });
   }
 

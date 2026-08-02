@@ -37,10 +37,11 @@ model Product {
   shortDescTh   String? @map("short_desc_th") @db.VarChar(500)
 
   //* CONFIGURATIONS
-  type        ProductType           @default(SIMPLE)
-  status      CategoryProductStatus @default(ACTIVE)
-  isFeatured  Boolean               @default(false) @map("is_featured")
-  hasVariants Boolean               @default(false) @map("has_variants") //* DERIVED FIELD TO READ FASTER (variants.length)
+  type          ProductType           @default(SIMPLE)
+  status        CategoryProductStatus @default(ACTIVE)
+  isFeatured    Boolean               @default(false) @map("is_featured")
+  hasVariants   Boolean               @default(false) @map("has_variants") //* DERIVED FIELD TO READ FASTER (variants.length)
+  comboQuantity Int                   @default(1) @map("combo_quantity") //* HOW MANY UNITS OF THIS PRODUCT GO INTO A COMBO. USED TO PREFILL ComboItem.quantity WHEN THIS PRODUCT IS BUNDLED — ComboItem.quantity STAYS AUTHORITATIVE PER COMBO AND MAY OVERRIDE IT. MUST BE > 0 (products_combo_quantity_positive).
 
   //* PRICING (USE DECIMAL FOR FINANCIAL ACCURACY)
   costPrice     Decimal?     @map("cost_price") @db.Decimal(12, 2) //* FOR PROFIT CALCULATION
@@ -89,10 +90,10 @@ model Product {
   comboItems    ComboItem[]
 
   //* AUDIT & TIMESTAMPS
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  deletedAt   DateTime? @map("deleted_at") //* FOR SOFT DELETE
-  publishedAt DateTime? @map("published_at") //* This allows for scheduled launches draft vs live
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3) //* FOR SOFT DELETE
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3) //* This allows for scheduled launches draft vs live
 
   createdBy     Int?  @map("created_by")
   createdByUser User? @relation("ProductCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
@@ -139,8 +140,9 @@ model ProductVariant {
   basePrice     Decimal      @default(0) @map("base_price") @db.Decimal(12, 2)
   salePrice     Decimal      @default(0) @map("sale_price") @db.Decimal(12, 2) //* SERVER-DERIVED FROM basePrice + discountType/discountValue — NEVER CLIENT INPUT
 
-  attributes Json    @default("{}") // The JSON structure for attributes (e.g., {"color": "Red", "size": "XL"})  //* E.G. { "size": "500ml", "flavor": "Honey" }
-  isDefault  Boolean @default(false) @map("is_default")
+  attributes    Json    @default("{}") // The JSON structure for attributes (e.g., {"color": "Red", "size": "XL"})  //* E.G. { "size": "500ml", "flavor": "Honey" }
+  isDefault     Boolean @default(false) @map("is_default")
+  comboQuantity Int     @default(1) @map("combo_quantity") //* SAME SEMANTICS AS Product.comboQuantity, SCOPED TO THIS VARIANT — WINS OVER THE PARENT PRODUCT'S VALUE WHEN A ComboItem PINS A VARIANT. MUST BE > 0 (product_variants_combo_quantity_positive).
 
   // * RELATIONS
   productId     Int            @map("product_id")

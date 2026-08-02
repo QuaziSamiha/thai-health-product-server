@@ -16,6 +16,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { CategoryProductStatus } from '../../../generated/prisma/enums';
+import { emptyStringToUndefined } from '../../../common/utils/json-transform.util';
 import { IsAfter } from '../../../common/decorators/validation/is-after.decorator';
 import { ComboItemDto } from './combo-item.dto';
 import { IsUniqueComboItems } from './unique-combo-items.validator';
@@ -99,6 +100,31 @@ export class CreateComboProductDto {
   @MaxLength(255, { message: 'Thai title cannot exceed 255 characters' })
   titleTh?: string;
 
+  @ApiPropertyOptional({
+    description:
+      "Stock Keeping Unit for the bundle as its own sellable unit — not derived from its items' SKUs. Must be unique across combos.",
+    example: 'CMB-WELL-01',
+    maxLength: 100,
+  })
+  //* sku/barcode ARE UNIQUE COLUMNS — "" FROM A FORM MUST BECOME undefined
+  //* OR THE SECOND COMBO EVER SAVED WITH AN EMPTY VALUE 409s (P2002)
+  @Transform(({ value }) => emptyStringToUndefined(value))
+  @IsOptional()
+  @IsString({ message: 'SKU must be a valid text string' })
+  @MaxLength(100, { message: 'SKU cannot exceed 100 characters' })
+  sku?: string;
+
+  @ApiPropertyOptional({
+    description: 'EAN/UPC barcode for POS/warehouse scanning. Must be unique.',
+    example: '8850001234567',
+    maxLength: 100,
+  })
+  @Transform(({ value }) => emptyStringToUndefined(value))
+  @IsOptional()
+  @IsString({ message: 'Barcode must be a valid text string' })
+  @MaxLength(100, { message: 'Barcode cannot exceed 100 characters' })
+  barcode?: string;
+
   // ─── Content ─────────────────────────────────────────────────────────────────
 
   @ApiPropertyOptional({
@@ -145,6 +171,18 @@ export class CreateComboProductDto {
   @IsNumber({}, { message: 'Combo price must be a valid number' })
   @Min(0, { message: 'Combo price cannot be negative' })
   comboPrice!: number;
+
+  @ApiPropertyOptional({
+    description:
+      'Landed cost of the bundle, for margin reporting against `comboPrice`. Entered rather than summed from the items, since a bundle carries its own packaging/assembly cost. Admin-only — never returned on public routes.',
+    example: 900.0,
+    minimum: 0,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber({}, { message: 'Cost price must be a valid number' })
+  @Min(0, { message: 'Cost price cannot be negative' })
+  costPrice?: number;
 
   // ─── Promotion Window ────────────────────────────────────────────────────────
 

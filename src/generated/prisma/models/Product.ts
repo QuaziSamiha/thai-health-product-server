@@ -1539,10 +1539,6 @@ export type EnumDiscountTypeFieldUpdateOperationsInput = {
   set?: $Enums.DiscountType
 }
 
-export type EnumStockStatusFieldUpdateOperationsInput = {
-  set?: $Enums.StockStatus
-}
-
 export type ProductUpdatetagsInput = {
   set?: string[]
   push?: string | string[]

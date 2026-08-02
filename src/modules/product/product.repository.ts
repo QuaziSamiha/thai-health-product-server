@@ -463,8 +463,10 @@ export class ProductRepository extends BaseRepository {
       .filter(
         (
           x,
-        ): x is { entry: Extract<ImageReorderPlan[number], { type: 'new' }>; index: number } =>
-          x.entry.type === 'new',
+        ): x is {
+          entry: Extract<ImageReorderPlan[number], { type: 'new' }>;
+          index: number;
+        } => x.entry.type === 'new',
       );
     if (newImages.length) {
       await client.productImage.createMany({
@@ -476,6 +478,30 @@ export class ProductRepository extends BaseRepository {
         })),
       });
     }
+  }
+
+  // ─── Reads — Combo References ────────────────────────────────────────────────
+
+  /**
+   * Which of the given variants are still bundled into a combo, and by which
+   * combo. `combo_items_variant_id_fkey` is ON DELETE RESTRICT, so deleting
+   * any of these would fail with a raw Prisma P2003 — the service calls this
+   * first to reject the request with a message that names the blocking combos.
+   */
+  async findCombosUsingVariants(
+    variantIds: number[],
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    if (variantIds.length === 0) return [];
+    return await client.comboItem.findMany({
+      where: { variantId: { in: variantIds } },
+      select: {
+        variantId: true,
+        variant: { select: { name: true } },
+        combo: { select: { id: true, title: true } },
+      },
+    });
   }
 
   // ─── Mutations — Variants ────────────────────────────────────────────────────

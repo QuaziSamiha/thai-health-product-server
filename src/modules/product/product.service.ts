@@ -485,8 +485,7 @@ export class ProductService {
       // in practice, since two variants of the same product always differ
       // by size.
       name:
-        variant.name ??
-        `${productName} variant ${variant.size ?? ''}`.trim(),
+        variant.name ?? `${productName} variant ${variant.size ?? ''}`.trim(),
       slug: `${productSlug}-variant-${generateSlug(slugSeed)}`,
       size: variant.size,
       basePrice,
@@ -781,6 +780,13 @@ export class ProductService {
 
       const pricingFields = this.resolvePricingUpdate(existing, dto);
 
+      //* combo_items_variant_id_fkey IS ON DELETE RESTRICT, SO DROPPING A
+      //* VARIANT THAT A COMBO STILL BUNDLES WOULD BLOW UP THE TRANSACTION
+      //* BELOW WITH A RAW P2003. CHECK FIRST AND NAME THE BLOCKING COMBOS.
+      if (variantPlan?.deleteIds.length) {
+        await this.assertVariantsNotBundled(variantPlan.deleteIds);
+      }
+
       const updated = await this.productRepository.withTransaction(
         async (tx) => {
           if (variantPlan) {
@@ -898,6 +904,30 @@ export class ProductService {
       );
       throw updateError;
     }
+  }
+
+  /**
+   * Rejects a variant reconcile that would delete a variant still referenced
+   * by a ComboItem. The DB already refuses it (ON DELETE RESTRICT, matching
+   * the product FK) — this turns that into a 409 that tells the admin which
+   * combo to edit first, instead of an opaque foreign-key failure.
+   */
+  private async assertVariantsNotBundled(variantIds: number[]): Promise<void> {
+    const bundled =
+      await this.productRepository.findCombosUsingVariants(variantIds);
+    if (bundled.length === 0) return;
+
+    const blockers = [
+      ...new Set(
+        bundled.map(
+          (item) =>
+            `"${item.variant?.name ?? `Variant ${item.variantId}`}" in combo "${item.combo.title}"`,
+        ),
+      ),
+    ];
+    throw new ConflictException(
+      `Cannot remove a variant that is still bundled in a combo: ${blockers.join('; ')}. Remove it from the combo first.`,
+    );
   }
 
   /**

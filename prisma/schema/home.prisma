@@ -42,8 +42,8 @@ model Home {
   displayOrder Int @default(0)
 
   //* AUDIT TRAIL & TIMESTAMPS
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
 
   //* RELATIONS
   createdBy     Int?

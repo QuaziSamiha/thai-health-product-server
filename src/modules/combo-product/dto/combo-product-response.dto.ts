@@ -1,6 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { CategoryProductStatus } from '../../../generated/prisma/browser';
+import {
+  CategoryProductStatus,
+  StockStatus,
+} from '../../../generated/prisma/browser';
 import {
   ComboProductModel,
   ComboImageModel,
@@ -90,6 +93,20 @@ export class ComboProductResponseDto {
   slug!: string;
 
   @Expose()
+  @ApiPropertyOptional({
+    description: "SKU of the bundle itself — not derived from its items' SKUs",
+    example: 'CMB-WELL-01',
+  })
+  sku?: string;
+
+  @Expose()
+  @ApiPropertyOptional({
+    description: 'EAN/UPC barcode for POS/warehouse scanning',
+    example: '8850001234567',
+  })
+  barcode?: string;
+
+  @Expose()
   @ApiPropertyOptional({ description: 'Short summary for cards/listings' })
   shortDescription?: string;
 
@@ -124,6 +141,16 @@ export class ComboProductResponseDto {
   comboPrice!: number;
 
   @Expose()
+  @ApiPropertyOptional({
+    description:
+      'Landed cost of the bundle, for margin reporting against `comboPrice`. Admin-only.',
+    example: 900.0,
+    type: 'number',
+    format: 'float',
+  })
+  costPrice?: number;
+
+  @Expose()
   @ApiPropertyOptional({ description: 'Promotion window start' })
   startsAt?: Date;
 
@@ -137,6 +164,32 @@ export class ComboProductResponseDto {
     example: false,
   })
   isFeatured!: boolean;
+
+  @Expose()
+  @ApiProperty({
+    description:
+      'How many complete bundles the current stock can assemble — the MIN across items of floor(item stock / item quantity), NOT a sum. Fully derived: never accepted from the client.',
+    example: 7,
+  })
+  quantity!: number;
+
+  @Expose()
+  @ApiProperty({
+    enum: StockStatus,
+    enumName: 'StockStatus',
+    description:
+      'Derived from `quantity`: OUT_OF_STOCK at 0, LOW_STOCK from 1 up to `lowStockThreshold`, IN_STOCK above it',
+    example: StockStatus.IN_STOCK,
+  })
+  stockStatus!: StockStatus;
+
+  @Expose()
+  @ApiProperty({
+    description:
+      'Bundle count at or below which the combo reports LOW_STOCK, down to 1',
+    example: 10,
+  })
+  lowStockThreshold!: number;
 
   @Expose()
   @ApiPropertyOptional({ type: () => ComboSeoMetadataDto })
@@ -185,10 +238,18 @@ export class ComboProductResponseDto {
   @ApiPropertyOptional({ type: () => UserMinifiedResponseDto })
   updatedByUser?: UserMinifiedResponseDto;
 
+  @Expose()
+  @ApiPropertyOptional({
+    type: () => UserMinifiedResponseDto,
+    description: 'Who soft-deleted this combo — paired with `deletedAt`',
+  })
+  deletedByUser?: UserMinifiedResponseDto;
+
   constructor(
     combo: ComboProductResponseInput & {
       createdByUser?: MinifiedUser | null;
       updatedByUser?: MinifiedUser | null;
+      deletedByUser?: MinifiedUser | null;
     },
     baseUrl?: string,
   ) {
@@ -198,15 +259,21 @@ export class ComboProductResponseDto {
     this.title = combo.title!;
     this.titleTh = combo.titleTh ?? undefined;
     this.slug = combo.slug!;
+    this.sku = combo.sku ?? undefined;
+    this.barcode = combo.barcode ?? undefined;
     this.shortDescription = combo.shortDescription ?? undefined;
     this.shortDescTh = combo.shortDescTh ?? undefined;
     this.description = combo.description ?? undefined;
     this.descriptionTh = combo.descriptionTh ?? undefined;
     this.totalPrice = Number(combo.totalPrice ?? 0);
     this.comboPrice = Number(combo.comboPrice ?? 0);
+    this.costPrice = toPrice(combo.costPrice);
     this.startsAt = combo.startsAt ?? undefined;
     this.endsAt = combo.endsAt ?? undefined;
     this.isFeatured = combo.isFeatured!;
+    this.quantity = combo.quantity ?? 0;
+    this.stockStatus = combo.stockStatus!;
+    this.lowStockThreshold = combo.lowStockThreshold!;
     this.seoMetadata = toSeoMetadataDto(combo.seoMetadata);
     this.images = (combo.images ?? []).map(
       (img) => new ComboImageResponseDto(img, baseUrl),
@@ -223,6 +290,9 @@ export class ComboProductResponseDto {
       : undefined;
     this.updatedByUser = combo.updatedByUser
       ? new UserMinifiedResponseDto(combo.updatedByUser)
+      : undefined;
+    this.deletedByUser = combo.deletedByUser
+      ? new UserMinifiedResponseDto(combo.deletedByUser)
       : undefined;
   }
 }
@@ -266,6 +336,13 @@ export class ComboProductResponsePublicDto {
     example: 'wellness-starter-bundle',
   })
   slug!: string;
+
+  @Expose()
+  @ApiPropertyOptional({
+    description: 'SKU of the bundle — safe to quote in support requests',
+    example: 'CMB-WELL-01',
+  })
+  sku?: string;
 
   @Expose()
   @ApiPropertyOptional({ description: 'Short summary for cards/listings' })
@@ -318,6 +395,16 @@ export class ComboProductResponsePublicDto {
   isFeatured!: boolean;
 
   @Expose()
+  @ApiProperty({
+    enum: StockStatus,
+    enumName: 'StockStatus',
+    description:
+      'Whether the bundle can currently be assembled from its items — drives the "Add to cart" / "Sold out" state. The raw bundle count is admin-only, same as Product.',
+    example: StockStatus.IN_STOCK,
+  })
+  stockStatus!: StockStatus;
+
+  @Expose()
   @ApiPropertyOptional({ type: () => ComboSeoMetadataDto })
   seoMetadata?: ComboSeoMetadataDto;
 
@@ -348,6 +435,7 @@ export class ComboProductResponsePublicDto {
     this.title = combo.title!;
     this.titleTh = combo.titleTh ?? undefined;
     this.slug = combo.slug!;
+    this.sku = combo.sku ?? undefined;
     this.shortDescription = combo.shortDescription ?? undefined;
     this.shortDescTh = combo.shortDescTh ?? undefined;
     this.description = combo.description ?? undefined;
@@ -357,6 +445,7 @@ export class ComboProductResponsePublicDto {
     this.startsAt = combo.startsAt ?? undefined;
     this.endsAt = combo.endsAt ?? undefined;
     this.isFeatured = combo.isFeatured!;
+    this.stockStatus = combo.stockStatus!;
     this.seoMetadata = toSeoMetadataDto(combo.seoMetadata);
     this.images = (combo.images ?? []).map(
       (img) => new ComboImageResponseDto(img, baseUrl),

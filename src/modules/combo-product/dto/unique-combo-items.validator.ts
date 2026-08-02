@@ -5,7 +5,10 @@ import { ComboItemDto } from './combo-item.dto';
 //* `items`. THE DB'S @@unique([comboId, productId, variantId]) CANNOT CATCH
 //* A DUPLICATE PRODUCT-LEVEL ROW (variantId = null) BECAUSE POSTGRES TREATS
 //* EVERY NULL AS DISTINCT FROM EVERY OTHER NULL IN A UNIQUE INDEX — SEE
-//* "Bundling Rules" IN combo-product-db-schema.md. VALIDATED HERE INSTEAD.
+//* "Bundling Rules" IN combo-product-db-schema.md. THE PARTIAL UNIQUE INDEX
+//* combo_items_unique_without_variant NOW BACKSTOPS THAT AT THE DB LEVEL;
+//* THIS STAYS AS THE FIRST LINE OF DEFENCE SO A BAD PAYLOAD 400s WITH A
+//* READABLE MESSAGE INSTEAD OF SURFACING AS A P2002 MID-INSERT.
 export function IsUniqueComboItems(validationOptions?: ValidationOptions) {
   return function (target: object, propertyName: string) {
     registerDecorator({
