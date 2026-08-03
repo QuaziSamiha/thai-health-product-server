@@ -113,7 +113,7 @@ erDiagram
 <details>
   <summary><b>Data Dictionary — Inventory</b></summary>
 
-**Table purpose:** `Inventory` is the append-only stock-movement ledger — one row per quantity change, with the reason (`changeType`), the actor who recorded it, and a price snapshot at the time of the change. This is the audit trail behind `Product.totalStock`/`ProductVariant.quantity` (see `product-db-schema.md`'s [Inventory & Cache Sync Logic](../db-schemas/product-db-schema.md#3-inventory--cache-sync-logic)) — those columns are the cached *current* total; this table is the *history* that explains how the total got there. Maps to table `inventory`.
+**Table purpose:** `Inventory` is the append-only stock-movement ledger — one row per quantity change, with the reason (`changeType`), the actor who recorded it, and a price snapshot at the time of the change. This is the audit trail behind `Product.totalStock`/`ProductVariant.quantity` (see `product.md`'s [Inventory & Cache Sync Logic](../product.md#inventory--cache-sync-logic)) — those columns are the cached *current* total; this table is the *history* that explains how the total got there. Maps to table `inventory`.
 
 | Field             | Type              | Constraints                                                       | Description                                                                 |
 | :------------------ | :------------------ | :--------------------------------------------------------------------- | :---------------------------------------------------------------------------- |
@@ -213,7 +213,7 @@ erDiagram
 
 | Parent → Child                          | FK Column                | On Delete       | Effect                                                                     |
 | :----------------------------------------- | :--------------------------- | :----------------- | :-------------------------------------------------------------------------- |
-| `Product` → `Batch`                         | `Batch.productId`             | **CASCADE**          | Deleting a product wipes its lot/expiry batches — same rule documented from `Product`'s side in `product-db-schema.md`. |
+| `Product` → `Batch`                         | `Batch.productId`             | **CASCADE**          | Deleting a product wipes its lot/expiry batches — same rule documented from `Product`'s side in [product.md](../product.md#relationships-and-cascading-rules). |
 | `ProductVariant` → `Batch`                  | `Batch.variantId`             | **CASCADE**          | Same, at variant granularity.                                               |
 | `Product` → `Inventory`                     | `Inventory.productId`         | **CASCADE**          | Deleting a product wipes its stock-movement history.                        |
 | `ProductVariant` → `Inventory`              | `Inventory.variantId`         | **CASCADE**          | Same, at variant granularity.                                               |
@@ -261,7 +261,7 @@ erDiagram
 ### 2. Batch vs. Inventory — Two Different Jobs
 
 - `Batch` answers "what lots of stock do we have, and when do they expire" (FEFO picking, expiry write-offs). `Inventory` answers "what happened to the stock, when, and why" (the audit ledger). They are related in practice (an `EXPIRED` `Inventory` row should correspond to a `Batch.remaining` write-down) but there is **no FK between them** — nothing in the schema ties a specific `Inventory` row to the `Batch` it drew from. If per-batch movement tracking becomes a requirement, add a nullable `batchId` FK to `Inventory` rather than trying to infer it after the fact from timestamps.
-- `Batch.remaining` and `Product.totalStock`/`ProductVariant.quantity` are three separate denormalized numbers that must all move together inside the same transaction whenever stock changes — see the `withTransaction` pattern documented in `product-db-schema.md`'s [Inventory & Cache Sync Logic](product-db-schema.md#3-inventory--cache-sync-logic). Nothing in this schema enforces that sync automatically.
+- `Batch.remaining` and `Product.totalStock`/`ProductVariant.quantity` are three separate denormalized numbers that must all move together inside the same transaction whenever stock changes — see the `withTransaction` pattern documented in `product.md`'s [Inventory & Cache Sync Logic](../product.md#inventory--cache-sync-logic). Nothing in this schema enforces that sync automatically.
 
 ### 3. Compliance & Retention
 
@@ -274,7 +274,7 @@ These are schema-level issues worth fixing before the `inventory` module goes to
 
 - No `CHECK` constraint keeps `0 <= Batch.remaining <= Batch.quantity` — a buggy decrement could drive `remaining` negative or above the original lot size with nothing rejecting the write.
 - Both `Batch.productId`/`variantId` and `Inventory.productId`/`variantId` are independently nullable with **no `CHECK` requiring at least one to be set** — a row scoped to neither a product nor a variant is representable and meaningless.
-- No constraint ties `variantId` to actually belong to the referenced `productId` when both are set — same class of gap as `ProductImage.variantId` in `product-db-schema.md`.
+- No constraint ties `variantId` to actually belong to the referenced `productId` when both are set — same class of gap as `ProductImage.variantId` in [product.md](../product.md#known-gaps--recommended-hardening).
 - `Inventory.costPrice`/`sellingPrice` are declared as plain `Decimal` with **no `@db.Decimal(precision, scale)`**, unlike every priced column elsewhere in the schema (`Product.basePrice`, `ComboProduct.totalPrice`, etc., all `Decimal(12,2)`). Without an explicit native type, Postgres/Prisma falls back to a much wider default precision — align these two columns to `@db.Decimal(12, 2)` for consistency and predictable storage.
 - `Inventory.referenceId` has no companion `referenceType` column and no FK — it's an untyped, unvalidated pointer to "an order, purchase, etc." with no way to enforce or even reliably determine which table it refers to.
 - No index on `Batch.expiryDate` — expiry-alert queries ("what's expiring in the next 30 days") currently require a full scan.

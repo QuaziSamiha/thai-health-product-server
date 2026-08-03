@@ -189,7 +189,7 @@ erDiagram
 
 ##### Publishing Workflow
 
-- **The intended convention** (shared with `Product`, see `product-db-schema.md`) is that a post is publicly "live" only when **both** `status == PUBLISHED` **and** `publishedAt <= NOW()` — `publishedAt` acting as a scheduling gate.
+- **The intended convention** (shared with `Product`, see [product.md](./product.md#search--discovery-optimization)) is that a post is publicly "live" only when **both** `status == PUBLISHED` **and** `publishedAt <= NOW()` — `publishedAt` acting as a scheduling gate.
 - **The blog module does not implement that gate today.** `findAllPublishedBlogs` filters on `status` alone, and `findBySlugPublic` filters on nothing at all. Any new public read path should apply both conditions rather than copying the existing queries — see [List Published Blogs (Public)](#list-published-blogs-public) and [Get Blog by Slug (Public)](#get-blog-by-slug-public).
 - `DRAFT` posts must never be returned by a public list **or** detail endpoint, regardless of `publishedAt`. The slug lookup currently violates this.
 

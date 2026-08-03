@@ -45,6 +45,34 @@ yarn start:prod      # .env.production
 ### Auth
 ### Category
 ### Product
+- [db schema](./docs/product.md#db-schema)
+  - [Entity-Relationship Diagram (ERD)](./docs/product.md#entity-relationship-diagram-erd)
+  - [Enum Definitions](./docs/product.md#enum-definitions)
+  - [Data Dictionary — Product](./docs/product.md#data-dictionary--product)
+  - [Data Dictionary — ProductVariant](./docs/product.md#data-dictionary--productvariant)
+  - [Data Dictionary — ProductImage](./docs/product.md#data-dictionary--productimage)
+  - [Detailed Field Examples (JSON Objects)](./docs/product.md#detailed-field-examples-json-objects)
+  - [Relationships and Cascading Rules](./docs/product.md#relationships-and-cascading-rules)
+  - [Performance Optimizations (Indexes & Views)](./docs/product.md#performance-optimizations-indexes--views)
+  - [Conventions](./docs/product.md#conventions)
+  - [Example Data](./docs/product.md#example-data)
+  - [Example Usage (JSON Response)](./docs/product.md#example-usage-json-response)
+  - [Implementation & Best Practices](./docs/product.md#implementation--best-practices)
+  - [Known Gaps / Recommended Hardening](./docs/product.md#known-gaps--recommended-hardening)
+- [api end point and business logic](./docs/product.md#api-end-point--business-logic)
+  - [Endpoint Overview](./docs/product.md#endpoint-overview)
+  - [Response Shapes & Select Projections](./docs/product.md#response-shapes--select-projections)
+  - [Create a Product — `POST /product/create-product`](./docs/product.md#create-a-product)
+  - [List All Products (Admin) — `GET /product/all-product`](./docs/product.md#list-all-products-admin)
+  - [List Active Products (Public) — `GET /product/active-products`](./docs/product.md#list-active-products-public)
+  - [Get Product Dropdown Options (Admin) — `GET /product/product-inventory`](./docs/product.md#get-product-dropdown-options-admin)
+  - [Get Product by ID (Admin) — `GET /product/product-by-id/:id`](./docs/product.md#get-product-by-id-admin)
+  - [Get Product by Slug (Public) — `GET /product/product-by-slug/:slug`](./docs/product.md#get-product-by-slug-public)
+  - [Update a Product — `PATCH /product/update-product/:id`](./docs/product.md#update-a-product)
+  - [Soft Delete a Product — `DELETE /product/soft-delete-product/:id`](./docs/product.md#soft-delete-a-product)
+  - [Permanently Delete a Product — `DELETE /product/permanently-delete-product/:id`](./docs/product.md#permanently-delete-a-product)
+  - [Built but Not Yet Exposed](./docs/product.md#built-but-not-yet-exposed)
+  - [Repository Organization](./docs/product.md#repository-organization)
 ### Inventory & Batch
 ### Home
 ### Combo Product
