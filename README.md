@@ -39,3 +39,29 @@ yarn start:local     # .env.development.local (your personal DB)
 yarn start:office    # .env.office
 yarn start:prod      # .env.production
 ```
+
+
+### User
+### Auth
+### Category
+### Product
+### Inventory & Batch
+### Home
+### Combo Product
+- [db schema](./docs/combo-product.md#db-schema)
+  - [Entity-Relationship Diagram (ERD)](./docs/combo-product.md#entity-relationship-diagram-erd)
+  - [Enum Definitions](./docs/combo-product.md#enum-definitions)
+  - [Data Dictionary — ComboProduct](./docs/combo-product.md#data-dictionary--comboproduct)
+  - [Data Dictionary — ComboItem](./docs/combo-product.md#data-dictionary--comboitem)
+  - [Data Dictionary — ComboImage](./docs/combo-product.md#data-dictionary--comboimage)
+  - [Availability Model (The Bottleneck Rule)](./docs/combo-product.md#availability-model-the-bottleneck-rule)
+  - [Bundling Rules](./docs/combo-product.md#bundling-rules)
+  - [Price Snapshot Dating](./docs/combo-product.md#price-snapshot-dating)
+  - [Relationships and Cascading Rules](./docs/combo-product.md#relationships-and-cascading-rules)
+  - [Indexes & Constraints](./docs/combo-product.md#indexes--constraints)
+  - [Conventions](./docs/combo-product.md#conventions)
+  - [Example Data](./docs/combo-product.md#example-data)
+  - [Known Gaps / Recommended Hardening](./docs/combo-product.md#known-gaps--recommended-hardening)
+- api end point and business logic
+### Blog
+### Support

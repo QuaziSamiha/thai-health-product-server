@@ -1,6 +1,3 @@
-// =========== COMBO PRODUCT MODEL ============
-//* A combo bundles existing products/variants together at a special price for a limited time window.
-//* Kept separate from the Product model because the lifecycle, pricing, and content fields differ.
 model ComboProduct {
   //* SEARCH & IDENTITY
   id  Int    @id @default(autoincrement())
@@ -65,9 +62,7 @@ model ComboProduct {
   deletedByUser User? @relation("ComboDeletedBy", fields: [deletedBy], references: [id], onDelete: SetNull)
 
   //* INDEXING STRATEGY — THIS MODEL DECLARES NO @@index ON PURPOSE:
-  //*  1. slug/title/sku/barcode ARE @unique, WHICH ALREADY CREATES A BTREE
-  //*     INDEX EACH. A SEPARATE @@index([slug]) WAS DROPPED IN MIGRATION
-  //*     20260802190000 AS PURE WRITE AMPLIFICATION.
+  //*  1. slug/title/sku/barcode ARE @unique, WHICH ALREADY CREATES A B-TREE INDEX EACH.
   //*  2. THE STOREFRONT LISTING IS SERVED BY THE PARTIAL INDEX
   //*     combo_products_live_idx ON (status, is_featured, starts_at, ends_at)
   //*     WHERE deleted_at IS NULL — PRISMA'S DSL CANNOT EXPRESS A FILTERED
@@ -79,7 +74,6 @@ model ComboProduct {
   @@map("combo_products")
 }
 
-// =========== COMBO ITEM MODEL ============
 //* One product (and optional variant) that belongs to a combo, with a quantity.
 model ComboItem {
   id Int @id @default(autoincrement())
@@ -106,15 +100,13 @@ model ComboItem {
 
   //* COVERS PINNED ROWS ONLY — POSTGRES TREATS NULLS AS DISTINCT, SO ROWS WITH
   //* variantId = null ARE GUARDED BY THE PARTIAL UNIQUE INDEX
-  //* combo_items_unique_without_variant (MIGRATION
-  //* 20260802120000_combo_items_variant_integrity), NOT BY THIS.
+  //* combo_items_unique_without_variant, NOT BY THIS.
   @@unique([comboId, productId, variantId]) //* PREVENT DUPLICATE ROWS PER (COMBO, PRODUCT, VARIANT)
   @@index([productId])
   @@index([variantId])
   @@map("combo_items")
 }
 
-// =========== COMBO IMAGE MODEL ============
 //* Combo-specific imagery, mirrors the structure of ProductImage but scoped to a combo.
 model ComboImage {
   id           Int     @id @default(autoincrement())
