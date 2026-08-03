@@ -29,6 +29,7 @@ import { IsOffsetDateString } from '../../../common/decorators/validation/is-off
 import { ComboItemDto } from './combo-item.dto';
 import { ComboSeoMetadataInputDto } from './create-combo-product.dto';
 import { IsUniqueComboItems } from './unique-combo-items.validator';
+import { IsSingleItemQuantitySufficient } from './single-item-quantity.validator';
 
 //* PATCH SEMANTICS: EVERY FIELD IS OPTIONAL AND ONLY WHAT IS SENT IS WRITTEN,
 //* SO AN ADMIN EDITING ONE FIELD CANNOT BLANK THE REST. THIS ROUTE IS ALSO
@@ -262,6 +263,7 @@ export class UpdateComboProductDto {
     message:
       'Each product/variant combination can only be bundled once per combo',
   })
+  @IsSingleItemQuantitySufficient()
   @ValidateNested({ each: true })
   items?: ComboItemDto[];
 

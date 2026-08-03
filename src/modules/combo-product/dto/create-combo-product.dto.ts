@@ -28,6 +28,7 @@ import { IsAfter } from '../../../common/decorators/validation/is-after.decorato
 import { IsOffsetDateString } from '../../../common/decorators/validation/is-offset-date-string.decorator';
 import { ComboItemDto } from './combo-item.dto';
 import { IsUniqueComboItems } from './unique-combo-items.validator';
+import { IsSingleItemQuantitySufficient } from './single-item-quantity.validator';
 
 //* SHAPE OF ComboProduct.seoMetadata (A SINGLE JSON COLUMN — SEE combo-product.prisma).
 //* VALIDATED AS A NESTED DTO SO A MALFORMED/OVERSIZED BLOB IS REJECTED AT THE
@@ -338,6 +339,7 @@ export class CreateComboProductDto {
     message:
       'Each product/variant combination can only be bundled once per combo',
   })
+  @IsSingleItemQuantitySufficient()
   @ValidateNested({ each: true })
   items!: ComboItemDto[];
 
