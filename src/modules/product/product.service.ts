@@ -19,6 +19,7 @@ import {
   ProductResponsePublicDto,
 } from './dto/product-response.dto';
 import { ProductDropdownOptionDto } from './dto/product-dropdown-response.dto';
+import { ProductComboInventoryOptionDto } from './dto/product-combo-inventory-response.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { CreateProductVariantDto } from './dto/create-product-variant.dto';
 import { UpdateProductVariantDto } from './dto/update-product-variant.dto';
@@ -240,6 +241,39 @@ export class ProductService {
           )
         : [new ProductDropdownOptionDto({ product }, baseUrl)],
     );
+  }
+
+  /**
+   * Same flattening rule as `getProductDropdownOptions`, plus
+   * `comboQuantity`/`availableForCombo` (quantity - comboQuantity) per
+   * option — how much of this product/variant's current stock is still
+   * free to allocate to a combo, given the amount already earmarked as its
+   * own per-bundle prefill. An option that can't cover even one more combo
+   * (`availableForCombo < 1` — including zero/negative stock) is dropped
+   * entirely rather than returned with a non-positive number: the filter
+   * runs here, after each DTO's `availableForCombo` is computed, because it
+   * compares two columns (`quantity` vs. `comboQuantity`) — not something a
+   * single-column Prisma `where` filter can express.
+   */
+  async getProductComboInventoryOptions(): Promise<
+    ProductComboInventoryOptionDto[]
+  > {
+    const products =
+      await this.productRepository.findProductComboInventoryOptions();
+    const baseUrl = this.configService.get<string>('app.baseUrl');
+    return products
+      .flatMap((product) =>
+        product.variants.length
+          ? product.variants.map(
+              (variant) =>
+                new ProductComboInventoryOptionDto(
+                  { product, variant },
+                  baseUrl,
+                ),
+            )
+          : [new ProductComboInventoryOptionDto({ product }, baseUrl)],
+      )
+      .filter((option) => option.availableForCombo >= 1);
   }
 
   /**

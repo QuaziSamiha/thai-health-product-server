@@ -107,6 +107,7 @@ export const COMBO_PRODUCT_SELECT_ADMIN = {
   costPrice: true,
   quantity: true,
   lowStockThreshold: true,
+  offeredQuantity: true,
   createdAt: true,
   updatedAt: true,
   deletedAt: true,

@@ -41,6 +41,17 @@ model ComboProduct {
   stockStatus       StockStatus @default(OUT_OF_STOCK) @map("stock_status")
   lowStockThreshold Int         @default(10) @map("low_stock_threshold") //* stockStatus BECOMES LOW_STOCK ONCE quantity DROPS TO/BELOW THIS, DOWN TO 1
 
+  //* HOW MANY BUNDLES THE ADMIN CHOSE TO PUT ON SALE — *ADMIN INTENT*, THE ONE
+  //* AVAILABILITY FIELD THAT IS NOT DERIVED. IT IS A CAP UNDERNEATH THE
+  //* DERIVED CEILING ABOVE: EFFECTIVE SELLABLE BUNDLES = MIN(quantity,
+  //* offeredQuantity). KEPT AS ITS OWN COLUMN PRECISELY BECAUSE THE TRIGGERS
+  //* OVERWRITE quantity ON EVERY STOCK/ITEM CHANGE AND WOULD ERASE THE
+  //* ADMIN'S NUMBER. null = NO CAP, SELL EVERYTHING STOCK ALLOWS.
+  //* VALIDATED AT THE API BOUNDARY TO BE <= quantity AT CREATE/UPDATE TIME;
+  //* IT MAY LEGITIMATELY EXCEED quantity LATER IF STOCK DROPS, WHICH IS WHY
+  //* THERE IS NO CROSS-COLUMN CHECK CONSTRAINT.
+  offeredQuantity Int? @map("offered_quantity")
+
   //* SEO METADATA
   seoMetadata Json? @default("{}") @map("seo_metadata") //* metaTitle, metaDescription, metaTitleTh, metaDescriptionTh
 

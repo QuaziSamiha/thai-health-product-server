@@ -35,6 +35,7 @@ export type ProductVariantAvgAggregateOutputType = {
   discountValue: runtime.Decimal | null
   basePrice: runtime.Decimal | null
   salePrice: runtime.Decimal | null
+  comboQuantity: number | null
   productId: number | null
 }
 
@@ -47,6 +48,7 @@ export type ProductVariantSumAggregateOutputType = {
   discountValue: runtime.Decimal | null
   basePrice: runtime.Decimal | null
   salePrice: runtime.Decimal | null
+  comboQuantity: number | null
   productId: number | null
 }
 
@@ -72,6 +74,7 @@ export type ProductVariantMinAggregateOutputType = {
   basePrice: runtime.Decimal | null
   salePrice: runtime.Decimal | null
   isDefault: boolean | null
+  comboQuantity: number | null
   productId: number | null
 }
 
@@ -97,6 +100,7 @@ export type ProductVariantMaxAggregateOutputType = {
   basePrice: runtime.Decimal | null
   salePrice: runtime.Decimal | null
   isDefault: boolean | null
+  comboQuantity: number | null
   productId: number | null
 }
 
@@ -123,6 +127,7 @@ export type ProductVariantCountAggregateOutputType = {
   salePrice: number
   attributes: number
   isDefault: number
+  comboQuantity: number
   productId: number
   _all: number
 }
@@ -137,6 +142,7 @@ export type ProductVariantAvgAggregateInputType = {
   discountValue?: true
   basePrice?: true
   salePrice?: true
+  comboQuantity?: true
   productId?: true
 }
 
@@ -149,6 +155,7 @@ export type ProductVariantSumAggregateInputType = {
   discountValue?: true
   basePrice?: true
   salePrice?: true
+  comboQuantity?: true
   productId?: true
 }
 
@@ -174,6 +181,7 @@ export type ProductVariantMinAggregateInputType = {
   basePrice?: true
   salePrice?: true
   isDefault?: true
+  comboQuantity?: true
   productId?: true
 }
 
@@ -199,6 +207,7 @@ export type ProductVariantMaxAggregateInputType = {
   basePrice?: true
   salePrice?: true
   isDefault?: true
+  comboQuantity?: true
   productId?: true
 }
 
@@ -225,6 +234,7 @@ export type ProductVariantCountAggregateInputType = {
   salePrice?: true
   attributes?: true
   isDefault?: true
+  comboQuantity?: true
   productId?: true
   _all?: true
 }
@@ -338,6 +348,7 @@ export type ProductVariantGroupByOutputType = {
   salePrice: runtime.Decimal
   attributes: runtime.JsonValue
   isDefault: boolean
+  comboQuantity: number
   productId: number
   _count: ProductVariantCountAggregateOutputType | null
   _avg: ProductVariantAvgAggregateOutputType | null
@@ -387,6 +398,7 @@ export type ProductVariantWhereInput = {
   salePrice?: Prisma.DecimalFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonFilter<"ProductVariant">
   isDefault?: Prisma.BoolFilter<"ProductVariant"> | boolean
+  comboQuantity?: Prisma.IntFilter<"ProductVariant"> | number
   productId?: Prisma.IntFilter<"ProductVariant"> | number
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
   images?: Prisma.ProductImageListRelationFilter
@@ -418,6 +430,7 @@ export type ProductVariantOrderByWithRelationInput = {
   salePrice?: Prisma.SortOrder
   attributes?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
+  comboQuantity?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   product?: Prisma.ProductOrderByWithRelationInput
   images?: Prisma.ProductImageOrderByRelationAggregateInput
@@ -452,6 +465,7 @@ export type ProductVariantWhereUniqueInput = Prisma.AtLeast<{
   salePrice?: Prisma.DecimalFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonFilter<"ProductVariant">
   isDefault?: Prisma.BoolFilter<"ProductVariant"> | boolean
+  comboQuantity?: Prisma.IntFilter<"ProductVariant"> | number
   productId?: Prisma.IntFilter<"ProductVariant"> | number
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
   images?: Prisma.ProductImageListRelationFilter
@@ -483,6 +497,7 @@ export type ProductVariantOrderByWithAggregationInput = {
   salePrice?: Prisma.SortOrder
   attributes?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
+  comboQuantity?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   _count?: Prisma.ProductVariantCountOrderByAggregateInput
   _avg?: Prisma.ProductVariantAvgOrderByAggregateInput
@@ -517,6 +532,7 @@ export type ProductVariantScalarWhereWithAggregatesInput = {
   salePrice?: Prisma.DecimalWithAggregatesFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonWithAggregatesFilter<"ProductVariant">
   isDefault?: Prisma.BoolWithAggregatesFilter<"ProductVariant"> | boolean
+  comboQuantity?: Prisma.IntWithAggregatesFilter<"ProductVariant"> | number
   productId?: Prisma.IntWithAggregatesFilter<"ProductVariant"> | number
 }
 
@@ -542,6 +558,7 @@ export type ProductVariantCreateInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  comboQuantity?: number
   product: Prisma.ProductCreateNestedOneWithoutVariantsInput
   images?: Prisma.ProductImageCreateNestedManyWithoutVariantInput
   inventoryLogs?: Prisma.InventoryCreateNestedManyWithoutVariantInput
@@ -572,6 +589,7 @@ export type ProductVariantUncheckedCreateInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  comboQuantity?: number
   productId: number
   images?: Prisma.ProductImageUncheckedCreateNestedManyWithoutVariantInput
   inventoryLogs?: Prisma.InventoryUncheckedCreateNestedManyWithoutVariantInput
@@ -601,6 +619,7 @@ export type ProductVariantUpdateInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  comboQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   product?: Prisma.ProductUpdateOneRequiredWithoutVariantsNestedInput
   images?: Prisma.ProductImageUpdateManyWithoutVariantNestedInput
   inventoryLogs?: Prisma.InventoryUpdateManyWithoutVariantNestedInput
@@ -631,6 +650,7 @@ export type ProductVariantUncheckedUpdateInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  comboQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ProductImageUncheckedUpdateManyWithoutVariantNestedInput
   inventoryLogs?: Prisma.InventoryUncheckedUpdateManyWithoutVariantNestedInput
@@ -661,6 +681,7 @@ export type ProductVariantCreateManyInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  comboQuantity?: number
   productId: number
 }
 
@@ -686,6 +707,7 @@ export type ProductVariantUpdateManyMutationInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  comboQuantity?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ProductVariantUncheckedUpdateManyInput = {
@@ -711,6 +733,7 @@ export type ProductVariantUncheckedUpdateManyInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  comboQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -752,6 +775,7 @@ export type ProductVariantCountOrderByAggregateInput = {
   salePrice?: Prisma.SortOrder
   attributes?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
+  comboQuantity?: Prisma.SortOrder
   productId?: Prisma.SortOrder
 }
 
@@ -764,6 +788,7 @@ export type ProductVariantAvgOrderByAggregateInput = {
   discountValue?: Prisma.SortOrder
   basePrice?: Prisma.SortOrder
   salePrice?: Prisma.SortOrder
+  comboQuantity?: Prisma.SortOrder
   productId?: Prisma.SortOrder
 }
 
@@ -789,6 +814,7 @@ export type ProductVariantMaxOrderByAggregateInput = {
   basePrice?: Prisma.SortOrder
   salePrice?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
+  comboQuantity?: Prisma.SortOrder
   productId?: Prisma.SortOrder
 }
 
@@ -814,6 +840,7 @@ export type ProductVariantMinOrderByAggregateInput = {
   basePrice?: Prisma.SortOrder
   salePrice?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
+  comboQuantity?: Prisma.SortOrder
   productId?: Prisma.SortOrder
 }
 
@@ -826,6 +853,7 @@ export type ProductVariantSumOrderByAggregateInput = {
   discountValue?: Prisma.SortOrder
   basePrice?: Prisma.SortOrder
   salePrice?: Prisma.SortOrder
+  comboQuantity?: Prisma.SortOrder
   productId?: Prisma.SortOrder
 }
 
@@ -957,6 +985,7 @@ export type ProductVariantCreateWithoutComboItemsInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  comboQuantity?: number
   product: Prisma.ProductCreateNestedOneWithoutVariantsInput
   images?: Prisma.ProductImageCreateNestedManyWithoutVariantInput
   inventoryLogs?: Prisma.InventoryCreateNestedManyWithoutVariantInput
@@ -986,6 +1015,7 @@ export type ProductVariantUncheckedCreateWithoutComboItemsInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  comboQuantity?: number
   productId: number
   images?: Prisma.ProductImageUncheckedCreateNestedManyWithoutVariantInput
   inventoryLogs?: Prisma.InventoryUncheckedCreateNestedManyWithoutVariantInput
@@ -1030,6 +1060,7 @@ export type ProductVariantUpdateWithoutComboItemsInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  comboQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   product?: Prisma.ProductUpdateOneRequiredWithoutVariantsNestedInput
   images?: Prisma.ProductImageUpdateManyWithoutVariantNestedInput
   inventoryLogs?: Prisma.InventoryUpdateManyWithoutVariantNestedInput
@@ -1059,6 +1090,7 @@ export type ProductVariantUncheckedUpdateWithoutComboItemsInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  comboQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ProductImageUncheckedUpdateManyWithoutVariantNestedInput
   inventoryLogs?: Prisma.InventoryUncheckedUpdateManyWithoutVariantNestedInput
@@ -1087,6 +1119,7 @@ export type ProductVariantCreateWithoutBatchesInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  comboQuantity?: number
   product: Prisma.ProductCreateNestedOneWithoutVariantsInput
   images?: Prisma.ProductImageCreateNestedManyWithoutVariantInput
   inventoryLogs?: Prisma.InventoryCreateNestedManyWithoutVariantInput
@@ -1116,6 +1149,7 @@ export type ProductVariantUncheckedCreateWithoutBatchesInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  comboQuantity?: number
   productId: number
   images?: Prisma.ProductImageUncheckedCreateNestedManyWithoutVariantInput
   inventoryLogs?: Prisma.InventoryUncheckedCreateNestedManyWithoutVariantInput
@@ -1160,6 +1194,7 @@ export type ProductVariantUpdateWithoutBatchesInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  comboQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   product?: Prisma.ProductUpdateOneRequiredWithoutVariantsNestedInput
   images?: Prisma.ProductImageUpdateManyWithoutVariantNestedInput
   inventoryLogs?: Prisma.InventoryUpdateManyWithoutVariantNestedInput
@@ -1189,6 +1224,7 @@ export type ProductVariantUncheckedUpdateWithoutBatchesInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  comboQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ProductImageUncheckedUpdateManyWithoutVariantNestedInput
   inventoryLogs?: Prisma.InventoryUncheckedUpdateManyWithoutVariantNestedInput
@@ -1217,6 +1253,7 @@ export type ProductVariantCreateWithoutInventoryLogsInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  comboQuantity?: number
   product: Prisma.ProductCreateNestedOneWithoutVariantsInput
   images?: Prisma.ProductImageCreateNestedManyWithoutVariantInput
   batches?: Prisma.BatchCreateNestedManyWithoutVariantInput
@@ -1246,6 +1283,7 @@ export type ProductVariantUncheckedCreateWithoutInventoryLogsInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  comboQuantity?: number
   productId: number
   images?: Prisma.ProductImageUncheckedCreateNestedManyWithoutVariantInput
   batches?: Prisma.BatchUncheckedCreateNestedManyWithoutVariantInput
@@ -1290,6 +1328,7 @@ export type ProductVariantUpdateWithoutInventoryLogsInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  comboQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   product?: Prisma.ProductUpdateOneRequiredWithoutVariantsNestedInput
   images?: Prisma.ProductImageUpdateManyWithoutVariantNestedInput
   batches?: Prisma.BatchUpdateManyWithoutVariantNestedInput
@@ -1319,6 +1358,7 @@ export type ProductVariantUncheckedUpdateWithoutInventoryLogsInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  comboQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ProductImageUncheckedUpdateManyWithoutVariantNestedInput
   batches?: Prisma.BatchUncheckedUpdateManyWithoutVariantNestedInput
@@ -1347,6 +1387,7 @@ export type ProductVariantCreateWithoutProductInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  comboQuantity?: number
   images?: Prisma.ProductImageCreateNestedManyWithoutVariantInput
   inventoryLogs?: Prisma.InventoryCreateNestedManyWithoutVariantInput
   batches?: Prisma.BatchCreateNestedManyWithoutVariantInput
@@ -1376,6 +1417,7 @@ export type ProductVariantUncheckedCreateWithoutProductInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  comboQuantity?: number
   images?: Prisma.ProductImageUncheckedCreateNestedManyWithoutVariantInput
   inventoryLogs?: Prisma.InventoryUncheckedCreateNestedManyWithoutVariantInput
   batches?: Prisma.BatchUncheckedCreateNestedManyWithoutVariantInput
@@ -1434,6 +1476,7 @@ export type ProductVariantScalarWhereInput = {
   salePrice?: Prisma.DecimalFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonFilter<"ProductVariant">
   isDefault?: Prisma.BoolFilter<"ProductVariant"> | boolean
+  comboQuantity?: Prisma.IntFilter<"ProductVariant"> | number
   productId?: Prisma.IntFilter<"ProductVariant"> | number
 }
 
@@ -1459,6 +1502,7 @@ export type ProductVariantCreateWithoutImagesInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  comboQuantity?: number
   product: Prisma.ProductCreateNestedOneWithoutVariantsInput
   inventoryLogs?: Prisma.InventoryCreateNestedManyWithoutVariantInput
   batches?: Prisma.BatchCreateNestedManyWithoutVariantInput
@@ -1488,6 +1532,7 @@ export type ProductVariantUncheckedCreateWithoutImagesInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  comboQuantity?: number
   productId: number
   inventoryLogs?: Prisma.InventoryUncheckedCreateNestedManyWithoutVariantInput
   batches?: Prisma.BatchUncheckedCreateNestedManyWithoutVariantInput
@@ -1532,6 +1577,7 @@ export type ProductVariantUpdateWithoutImagesInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  comboQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   product?: Prisma.ProductUpdateOneRequiredWithoutVariantsNestedInput
   inventoryLogs?: Prisma.InventoryUpdateManyWithoutVariantNestedInput
   batches?: Prisma.BatchUpdateManyWithoutVariantNestedInput
@@ -1561,6 +1607,7 @@ export type ProductVariantUncheckedUpdateWithoutImagesInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  comboQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   inventoryLogs?: Prisma.InventoryUncheckedUpdateManyWithoutVariantNestedInput
   batches?: Prisma.BatchUncheckedUpdateManyWithoutVariantNestedInput
@@ -1590,6 +1637,7 @@ export type ProductVariantCreateManyProductInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  comboQuantity?: number
 }
 
 export type ProductVariantUpdateWithoutProductInput = {
@@ -1614,6 +1662,7 @@ export type ProductVariantUpdateWithoutProductInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  comboQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ProductImageUpdateManyWithoutVariantNestedInput
   inventoryLogs?: Prisma.InventoryUpdateManyWithoutVariantNestedInput
   batches?: Prisma.BatchUpdateManyWithoutVariantNestedInput
@@ -1643,6 +1692,7 @@ export type ProductVariantUncheckedUpdateWithoutProductInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  comboQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ProductImageUncheckedUpdateManyWithoutVariantNestedInput
   inventoryLogs?: Prisma.InventoryUncheckedUpdateManyWithoutVariantNestedInput
   batches?: Prisma.BatchUncheckedUpdateManyWithoutVariantNestedInput
@@ -1672,6 +1722,7 @@ export type ProductVariantUncheckedUpdateManyWithoutProductInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  comboQuantity?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 
@@ -1755,6 +1806,7 @@ export type ProductVariantSelect<ExtArgs extends runtime.Types.Extensions.Intern
   salePrice?: boolean
   attributes?: boolean
   isDefault?: boolean
+  comboQuantity?: boolean
   productId?: boolean
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   images?: boolean | Prisma.ProductVariant$imagesArgs<ExtArgs>
@@ -1787,6 +1839,7 @@ export type ProductVariantSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   salePrice?: boolean
   attributes?: boolean
   isDefault?: boolean
+  comboQuantity?: boolean
   productId?: boolean
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["productVariant"]>
@@ -1814,6 +1867,7 @@ export type ProductVariantSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   salePrice?: boolean
   attributes?: boolean
   isDefault?: boolean
+  comboQuantity?: boolean
   productId?: boolean
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["productVariant"]>
@@ -1841,10 +1895,11 @@ export type ProductVariantSelectScalar = {
   salePrice?: boolean
   attributes?: boolean
   isDefault?: boolean
+  comboQuantity?: boolean
   productId?: boolean
 }
 
-export type ProductVariantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "description" | "shortDescription" | "nameTh" | "descriptionTh" | "shortDescTh" | "sku" | "barcode" | "quantity" | "stockStatus" | "lowStockThreshold" | "weight" | "size" | "costPrice" | "discountType" | "discountValue" | "basePrice" | "salePrice" | "attributes" | "isDefault" | "productId", ExtArgs["result"]["productVariant"]>
+export type ProductVariantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "description" | "shortDescription" | "nameTh" | "descriptionTh" | "shortDescTh" | "sku" | "barcode" | "quantity" | "stockStatus" | "lowStockThreshold" | "weight" | "size" | "costPrice" | "discountType" | "discountValue" | "basePrice" | "salePrice" | "attributes" | "isDefault" | "comboQuantity" | "productId", ExtArgs["result"]["productVariant"]>
 export type ProductVariantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   images?: boolean | Prisma.ProductVariant$imagesArgs<ExtArgs>
@@ -1892,6 +1947,7 @@ export type $ProductVariantPayload<ExtArgs extends runtime.Types.Extensions.Inte
     salePrice: runtime.Decimal
     attributes: runtime.JsonValue
     isDefault: boolean
+    comboQuantity: number
     productId: number
   }, ExtArgs["result"]["productVariant"]>
   composites: {}
@@ -2343,6 +2399,7 @@ export interface ProductVariantFieldRefs {
   readonly salePrice: Prisma.FieldRef<"ProductVariant", 'Decimal'>
   readonly attributes: Prisma.FieldRef<"ProductVariant", 'Json'>
   readonly isDefault: Prisma.FieldRef<"ProductVariant", 'Boolean'>
+  readonly comboQuantity: Prisma.FieldRef<"ProductVariant", 'Int'>
   readonly productId: Prisma.FieldRef<"ProductVariant", 'Int'>
 }
     

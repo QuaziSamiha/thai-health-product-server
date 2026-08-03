@@ -2,12 +2,27 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { BaseRepository } from '../../prisma/base.repository';
 import { Prisma } from '../../generated/prisma/client';
-import { CategoryProductStatus } from '../../generated/prisma/enums';
-import { PaginationService } from '../../shared/pagination';
+import {
+  CategoryProductStatus,
+  StockStatus,
+} from '../../generated/prisma/enums';
+import { PaginationService, PaginationQueryDto } from '../../shared/pagination';
 import {
   COMBO_PRODUCT_SELECT_ADMIN,
   COMBO_PRODUCT_SELECT_PUBLIC,
 } from './combo-product.select';
+import type { ComboSortField } from './dto/all-combos-query.dto';
+
+//* ALREADY-VALIDATED ADMIN LIST FILTERS — PULLING THEM OFF THE QUERY DTO IS
+//* THE SERVICE'S JOB, SO THIS ONLY BUILDS THE PRISMA FILTER. sortBy IS SAFE TO
+//* INTERPOLATE INTO orderBy BECAUSE AllCombosQueryDto WHITELISTS ITS VALUES.
+//* MIRRORS StorefrontListFilters IN product.repository.ts.
+export interface AdminComboListFilters {
+  status?: CategoryProductStatus;
+  stockStatus?: StockStatus;
+  isFeatured?: boolean;
+  sortBy?: ComboSortField;
+}
 
 @Injectable()
 export class ComboProductRepository extends BaseRepository {
@@ -80,6 +95,57 @@ export class ComboProductRepository extends BaseRepository {
     });
   }
 
+  // ─── Reads — Lists ───────────────────────────────────────────────────────────
+
+  /**
+   * Admin listing — every combo except soft-deleted ones, narrowed by the
+   * optional status / stockStatus / isFeatured filters and sorted by a
+   * whitelisted column.
+   *
+   * Soft-deleted rows stay out for the same reason they do in
+   * `ProductRepository.findAllProductsAdmin`: leaving them in shows a delete
+   * button that can only 409. Drafts, archived, and hidden combos still
+   * appear — a management dashboard needs to see everything a customer
+   * cannot.
+   */
+  async findAllCombosAdmin(
+    params: PaginationQueryDto,
+    filters: AdminComboListFilters = {},
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+
+    //* AND-COMPOSED, NEVER SPREAD-MERGED WITH THE BASE `deletedAt` GATE — A
+    //* LATER KEY CANNOT THEN SILENTLY OVERWRITE IT AND RESURRECT DELETED ROWS.
+    //* SAME REASONING AS product.repository.ts's paginateStorefrontList.
+    const where: Prisma.ComboProductWhereInput = {
+      AND: [
+        { deletedAt: null },
+        ...(filters.status ? [{ status: filters.status }] : []),
+        ...(filters.stockStatus ? [{ stockStatus: filters.stockStatus }] : []),
+        //* EXPLICIT undefined CHECK, NOT TRUTHINESS — `isFeatured=false` IS A
+        //* REAL FILTER ("SHOW ME THE NON-FEATURED ONES"), NOT AN ABSENT ONE.
+        ...(filters.isFeatured !== undefined
+          ? [{ isFeatured: filters.isFeatured }]
+          : []),
+      ],
+    };
+
+    return await this.paginationService.paginate<
+      Prisma.ComboProductGetPayload<{
+        select: typeof COMBO_PRODUCT_SELECT_ADMIN;
+      }>,
+      typeof client.comboProduct
+    >(client.comboProduct, params, {
+      select: COMBO_PRODUCT_SELECT_ADMIN,
+      where,
+      //* sku/barcode ARE SEARCHABLE HERE BUT NOT ON THE PUBLIC SIDE — AN ADMIN
+      //* PASTES THEM STRAIGHT OFF A SUPPORT TICKET OR A PACKING SLIP.
+      searchableFields: ['title', 'titleTh', 'slug', 'sku', 'barcode'],
+      defaultSortField: filters.sortBy ?? 'createdAt',
+    });
+  }
+
   // ─── Reads — Item Bundling Validation ────────────────────────────────────────
   //* USED BY THE SERVICE TO CONFIRM EVERY BUNDLED product/variantId ACTUALLY
   //* EXISTS AND TO RESOLVE THE FALLBACK unitPrice SNAPSHOT WHEN THE CLIENT
@@ -140,6 +206,99 @@ export class ComboProductRepository extends BaseRepository {
         items: items?.length ? { createMany: { data: items } } : undefined,
       },
       select: COMBO_PRODUCT_SELECT_ADMIN,
+    });
+  }
+
+  async updateComboProduct(
+    id: number,
+    data: Prisma.ComboProductUncheckedUpdateInput,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return await client.comboProduct.update({
+      where: { id },
+      data,
+      select: COMBO_PRODUCT_SELECT_ADMIN,
+    });
+  }
+
+  /**
+   * Swaps a combo's entire item list. Delete-then-insert rather than a
+   * per-row merge because `combo_items` carries two unique indexes plus a
+   * price-snapshot trigger — reconciling in place would have to sequence
+   * updates to avoid transient collisions for no benefit, since the admin UI
+   * submits the bundle as one unit. MUST run inside the caller's transaction.
+   */
+  async replaceComboItems(
+    comboId: number,
+    items: Prisma.ComboItemCreateManyComboInput[],
+    tx: Prisma.TransactionClient,
+  ) {
+    await tx.comboItem.deleteMany({ where: { comboId } });
+    if (items.length) {
+      await tx.comboItem.createMany({
+        data: items.map((item) => ({ ...item, comboId })),
+      });
+    }
+  }
+
+  /** The rows behind `deleteImageIds`, scoped to the combo so a foreign image ID can never be deleted through another combo's payload. */
+  async findComboImagesByIds(
+    comboId: number,
+    imageIds: number[],
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    if (imageIds.length === 0) return [];
+    return await client.comboImage.findMany({
+      where: { comboId, id: { in: imageIds } },
+      select: {
+        id: true,
+        url: true,
+        thumbnailUrl: true,
+        bannerUrl: true,
+        iconUrl: true,
+        isPrimary: true,
+      },
+    });
+  }
+
+  async deleteComboImages(imageIds: number[], tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    if (imageIds.length === 0) return;
+    await client.comboImage.deleteMany({ where: { id: { in: imageIds } } });
+  }
+
+  async createComboImages(
+    comboId: number,
+    images: Prisma.ComboImageCreateManyComboInput[],
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    if (images.length === 0) return;
+    await client.comboImage.createMany({
+      data: images.map((image) => ({ ...image, comboId })),
+    });
+  }
+
+  /** Highest `displayOrder` currently in a combo's gallery — new uploads append after it. */
+  async findMaxImageDisplayOrder(
+    comboId: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    const result = await client.comboImage.aggregate({
+      where: { comboId },
+      _max: { displayOrder: true },
+    });
+    return result._max.displayOrder ?? -1;
+  }
+
+  /** Whether any image survives this edit as the cover — drives promoting a newly uploaded one. */
+  async countPrimaryImages(comboId: number, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.comboImage.count({
+      where: { comboId, isPrimary: true },
     });
   }
 

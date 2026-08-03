@@ -1790,6 +1790,7 @@ export const ComboProductScalarFieldEnum = {
   quantity: 'quantity',
   stockStatus: 'stockStatus',
   lowStockThreshold: 'lowStockThreshold',
+  offeredQuantity: 'offeredQuantity',
   seoMetadata: 'seoMetadata',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -1907,6 +1908,7 @@ export const ProductScalarFieldEnum = {
   status: 'status',
   isFeatured: 'isFeatured',
   hasVariants: 'hasVariants',
+  comboQuantity: 'comboQuantity',
   costPrice: 'costPrice',
   discountType: 'discountType',
   discountValue: 'discountValue',
@@ -1969,6 +1971,7 @@ export const ProductVariantScalarFieldEnum = {
   salePrice: 'salePrice',
   attributes: 'attributes',
   isDefault: 'isDefault',
+  comboQuantity: 'comboQuantity',
   productId: 'productId'
 } as const
 

@@ -192,6 +192,14 @@ export class ComboProductResponseDto {
   lowStockThreshold!: number;
 
   @Expose()
+  @ApiPropertyOptional({
+    description:
+      'How many bundles the admin put on sale. The one availability field that is NOT derived — `quantity` above is the ceiling stock allows, this is the cap underneath it. Effective sellable = min(quantity, offeredQuantity). Null means no cap.',
+    example: 2,
+  })
+  offeredQuantity?: number;
+
+  @Expose()
   @ApiPropertyOptional({ type: () => ComboSeoMetadataDto })
   seoMetadata?: ComboSeoMetadataDto;
 
@@ -274,6 +282,7 @@ export class ComboProductResponseDto {
     this.quantity = combo.quantity ?? 0;
     this.stockStatus = combo.stockStatus!;
     this.lowStockThreshold = combo.lowStockThreshold!;
+    this.offeredQuantity = combo.offeredQuantity ?? undefined;
     this.seoMetadata = toSeoMetadataDto(combo.seoMetadata);
     this.images = (combo.images ?? []).map(
       (img) => new ComboImageResponseDto(img, baseUrl),

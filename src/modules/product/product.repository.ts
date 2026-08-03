@@ -285,6 +285,63 @@ export class ProductRepository extends BaseRepository {
     });
   }
 
+  /**
+   * Same flattening source as `findProductDropdownOptions`, plus
+   * `comboQuantity` on the product and each variant — needed by the
+   * combo-inventory endpoint to compute `availableForCombo`
+   * (quantity - comboQuantity) per option. No stock filter here: the
+   * "usable for a combo" condition compares two columns
+   * (`quantity > comboQuantity`), which the query API can't express as a
+   * `where` filter (Prisma has no field-to-field comparison operator here),
+   * so it's applied by `ProductService.getProductComboInventoryOptions`
+   * after the DTO — and its computed `availableForCombo` — is built.
+   */
+  async findProductComboInventoryOptions(tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.product.findMany({
+      where: { deletedAt: null, status: CategoryProductStatus.ACTIVE },
+      orderBy: { name: 'asc' },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        sku: true,
+        barcode: true,
+        type: true,
+        status: true,
+        quantity: true,
+        comboQuantity: true,
+        costPrice: true,
+        basePrice: true,
+        salePrice: true,
+        stockStatus: true,
+        updatedAt: true,
+        images: {
+          where: { variantId: null },
+          select: { url: true },
+          orderBy: [{ isPrimary: 'desc' }, { displayOrder: 'asc' }],
+          take: 1,
+        },
+        variants: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            sku: true,
+            barcode: true,
+            quantity: true,
+            comboQuantity: true,
+            costPrice: true,
+            basePrice: true,
+            salePrice: true,
+            stockStatus: true,
+          },
+          orderBy: { id: 'asc' },
+        },
+      },
+    });
+  }
+
   // ─── Mutations ───────────────────────────────────────────────────────────────
 
   async createProduct(

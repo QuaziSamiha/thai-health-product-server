@@ -41,6 +41,7 @@ import {
   ProductResponsePublicDto,
 } from './dto/product-response.dto';
 import { ProductDropdownOptionDto } from './dto/product-dropdown-response.dto';
+import { ProductComboInventoryOptionDto } from './dto/product-combo-inventory-response.dto';
 import { ResponseMessage } from '../../common/decorators/response/response-message.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -144,6 +145,27 @@ export class ProductController {
   @ResponseMessage('Dropdown options retrieved successfully')
   async getProductDropdownOptions() {
     return this.productService.getProductDropdownOptions();
+  }
+
+  @Get('combo-inventory')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      'Get flattened product/variant options with combo availability for admin dropdowns',
+    description:
+      'Same flattening rule as `product-inventory` — a product with no variants appears as itself, while a product with variants contributes one option per variant instead of its own row. Each option additionally carries `comboQuantity` (units per bundle prefill) and `availableForCombo` (quantity - comboQuantity), so a combo builder can see how much stock is still free to bundle. Only ACTIVE, non-deleted products are included. Admin only.',
+  })
+  @ApiOkResponse({
+    description: 'Combo inventory options retrieved successfully.',
+    type: [ProductComboInventoryOptionDto],
+  })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
+  @ApiForbiddenResponse({ description: 'Admin role required.' })
+  @ResponseMessage('Combo inventory options retrieved successfully')
+  async getProductComboInventoryOptions() {
+    return this.productService.getProductComboInventoryOptions();
   }
 
   @Get('product-by-id/:id')

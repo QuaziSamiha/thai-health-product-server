@@ -74,6 +74,19 @@ yarn start:prod      # .env.production
   - [Built but Not Yet Exposed](./docs/product.md#built-but-not-yet-exposed)
   - [Repository Organization](./docs/product.md#repository-organization)
 ### Inventory & Batch
+- [db schema](./docs/inventory.md#db-schema)
+  - [Entity-Relationship Diagram (ERD)](./docs/inventory.md#entity-relationship-diagram-erd)
+  - [Enum Definitions](./docs/inventory.md#enum-definitions)
+  - [Data Dictionary — Batch](./docs/inventory.md#data-dictionary--batch)
+  - [Data Dictionary — Inventory](./docs/inventory.md#data-dictionary--inventory)
+  - [Relationships and Cascading Rules](./docs/inventory.md#relationships-and-cascading-rules)
+  - [Performance Optimizations (Indexes)](./docs/inventory.md#performance-optimizations-indexes)
+  - [Conventions](./docs/inventory.md#conventions)
+  - [Example Data](./docs/inventory.md#example-data)
+  - [Example Usage (JSON Response)](./docs/inventory.md#example-usage-json-response)
+  - [Implementation & Best Practices](./docs/inventory.md#implementation--best-practices)
+  - [Known Gaps / Recommended Hardening](./docs/inventory.md#known-gaps--recommended-hardening)
+- [api end point and business logic](./docs/inventory.md#api-end-point--business-logic)
 ### Home
 ### Combo Product
 - [db schema](./docs/combo-product.md#db-schema)

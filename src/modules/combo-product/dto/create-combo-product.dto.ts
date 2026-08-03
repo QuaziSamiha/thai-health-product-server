@@ -7,6 +7,7 @@ import {
   IsBoolean,
   IsDateString,
   IsEnum,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -16,22 +17,17 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { CategoryProductStatus } from '../../../generated/prisma/enums';
-import { emptyStringToUndefined } from '../../../common/utils/json-transform.util';
+import {
+  blankNumberToUndefined,
+  emptyStringToUndefined,
+  parseBooleanInput,
+  trimString,
+  tryParseJson,
+} from '../../../common/utils/json-transform.util';
 import { IsAfter } from '../../../common/decorators/validation/is-after.decorator';
+import { IsOffsetDateString } from '../../../common/decorators/validation/is-offset-date-string.decorator';
 import { ComboItemDto } from './combo-item.dto';
 import { IsUniqueComboItems } from './unique-combo-items.validator';
-
-//* multipart/form-data (REQUIRED SO IMAGES CAN BE UPLOADED ALONGSIDE THE
-//* COMBO) FLATTENS EVERY FIELD TO A STRING — ARRAYS/OBJECTS ARRIVE AS JSON
-//* TEXT AND MUST BE PARSED BACK BEFORE VALIDATION RUNS.
-function tryParseJson(value: unknown): unknown {
-  if (typeof value !== 'string') return value;
-  try {
-    return JSON.parse(value) as unknown;
-  } catch {
-    return value;
-  }
-}
 
 //* SHAPE OF ComboProduct.seoMetadata (A SINGLE JSON COLUMN — SEE combo-product.prisma).
 //* VALIDATED AS A NESTED DTO SO A MALFORMED/OVERSIZED BLOB IS REJECTED AT THE
@@ -85,6 +81,9 @@ export class CreateComboProductDto {
     example: 'Wellness Starter Bundle',
     maxLength: 255,
   })
+  //* TRIMMED BEFORE VALIDATION SO @IsNotEmpty REJECTS "   " — WITHOUT THIS A
+  //* WHITESPACE-ONLY TITLE PASSES AND generateSlug() PRODUCES AN EMPTY SLUG.
+  @Transform(({ value }) => trimString(value))
   @IsNotEmpty({ message: 'Combo title is required' })
   @IsString({ message: 'Combo title must be a valid text string' })
   @MaxLength(255, { message: 'Combo title cannot exceed 255 characters' })
@@ -95,6 +94,7 @@ export class CreateComboProductDto {
     example: 'ชุดเริ่มต้นสุขภาพดี',
     maxLength: 255,
   })
+  @Transform(({ value }) => trimString(value))
   @IsOptional()
   @IsString({ message: 'Thai title must be a valid text string' })
   @MaxLength(255, { message: 'Thai title cannot exceed 255 characters' })
@@ -107,8 +107,10 @@ export class CreateComboProductDto {
     maxLength: 100,
   })
   //* sku/barcode ARE UNIQUE COLUMNS — "" FROM A FORM MUST BECOME undefined
-  //* OR THE SECOND COMBO EVER SAVED WITH AN EMPTY VALUE 409s (P2002)
-  @Transform(({ value }) => emptyStringToUndefined(value))
+  //* OR THE SECOND COMBO EVER SAVED WITH AN EMPTY VALUE 409s (P2002).
+  //* TRIMMED FIRST, SO "CMB-01 " AND "CMB-01" CANNOT BECOME TWO ROWS AND SO
+  //* A WHITESPACE-ONLY ENTRY COLLAPSES TO undefined RATHER THAN "   ".
+  @Transform(({ value }) => emptyStringToUndefined(trimString(value)))
   @IsOptional()
   @IsString({ message: 'SKU must be a valid text string' })
   @MaxLength(100, { message: 'SKU cannot exceed 100 characters' })
@@ -119,7 +121,7 @@ export class CreateComboProductDto {
     example: '8850001234567',
     maxLength: 100,
   })
-  @Transform(({ value }) => emptyStringToUndefined(value))
+  @Transform(({ value }) => emptyStringToUndefined(trimString(value)))
   @IsOptional()
   @IsString({ message: 'Barcode must be a valid text string' })
   @MaxLength(100, { message: 'Barcode cannot exceed 100 characters' })
@@ -131,6 +133,7 @@ export class CreateComboProductDto {
     description: 'Short summary for cards/listings.',
     maxLength: 500,
   })
+  @Transform(({ value }) => trimString(value))
   @IsOptional()
   @IsString({ message: 'Short description must be a valid text string' })
   @MaxLength(500, { message: 'Short description cannot exceed 500 characters' })
@@ -140,6 +143,7 @@ export class CreateComboProductDto {
     description: 'Short summary in Thai.',
     maxLength: 500,
   })
+  @Transform(({ value }) => trimString(value))
   @IsOptional()
   @IsString({ message: 'Thai short description must be a valid text string' })
   @MaxLength(500, {
@@ -148,11 +152,13 @@ export class CreateComboProductDto {
   shortDescTh?: string;
 
   @ApiPropertyOptional({ description: 'Long-form description in English.' })
+  @Transform(({ value }) => trimString(value))
   @IsOptional()
   @IsString({ message: 'Description must be a valid text string' })
   description?: string;
 
   @ApiPropertyOptional({ description: 'Long-form description in Thai.' })
+  @Transform(({ value }) => trimString(value))
   @IsOptional()
   @IsString({ message: 'Thai description must be a valid text string' })
   descriptionTh?: string;
@@ -163,13 +169,22 @@ export class CreateComboProductDto {
   //* CAN NEVER DRIFT FROM WHAT'S ACTUALLY IN THE COMBO.
 
   @ApiProperty({
-    description: 'The bundle offer price the customer pays.',
+    description:
+      'The bundle offer price the customer pays. Must be greater than 0 and strictly less than the sum of the bundled items (the latter is checked in ComboProductService, since totalPrice is derived from `items`).',
     example: 1499.0,
-    minimum: 0,
+    minimum: 0.01,
   })
+  //* A multipart FORM SENDS "" FOR AN UNTOUCHED NUMBER INPUT, AND @Type RUNS
+  //* BEFORE @Transform — SO WITHOUT THIS GUARD THE FIELD ARRIVES AS
+  //* Number("") === 0 AND A COMBO IS SILENTLY CREATED FOR FREE. TURNING IT
+  //* INTO undefined MAKES @IsNumber REPORT THE MISSING PRICE INSTEAD.
+  @Transform(blankNumberToUndefined)
   @Type(() => Number)
   @IsNumber({}, { message: 'Combo price must be a valid number' })
-  @Min(0, { message: 'Combo price cannot be negative' })
+  //* 0.01 RATHER THAN @IsPositive — comboPrice IS Decimal(12,2), SO ANYTHING
+  //* BELOW ONE SATANG ROUNDS TO 0.00 ON THE WAY INTO THE COLUMN AND WOULD
+  //* SNEAK A FREE COMBO PAST A BARE "> 0" CHECK.
+  @Min(0.01, { message: 'Combo price must be greater than 0' })
   comboPrice!: number;
 
   @ApiPropertyOptional({
@@ -178,6 +193,9 @@ export class CreateComboProductDto {
     example: 900.0,
     minimum: 0,
   })
+  //* SAME BLANK-INPUT GUARD AS comboPrice — HERE THE CONSEQUENCE IS A STORED
+  //* COST OF 0 (I.E. A REPORTED 100% MARGIN) INSTEAD OF AN HONEST NULL.
+  @Transform(blankNumberToUndefined)
   @IsOptional()
   @Type(() => Number)
   @IsNumber({}, { message: 'Cost price must be a valid number' })
@@ -186,22 +204,41 @@ export class CreateComboProductDto {
 
   // ─── Promotion Window ────────────────────────────────────────────────────────
 
+  //* THE OFFSET IS MANDATORY ON BOTH ENDS: THE COLUMNS ARE @db.Timestamptz(3)
+  //* AND THE SERVICE CALLS new Date(...), WHICH READS A ZONE-LESS STRING AS
+  //* *SERVER LOCAL TIME* — SO "MIDNIGHT" WOULD MEAN A DIFFERENT INSTANT
+  //* DEPENDING ON WHERE THE API RUNS. @IsAfter THEN ORDERS THE PAIR, MIRRORING
+  //* THE combo_products_window_valid CHECK CONSTRAINT.
   @ApiPropertyOptional({
-    description: 'Promotion window start.',
+    description:
+      'Promotion window start. Must include a UTC offset (`Z` or `+07:00`).',
     example: '2026-07-01T00:00:00Z',
   })
   @IsOptional()
   @IsDateString({}, { message: 'Starts at must be a valid ISO date string' })
+  @IsOffsetDateString()
   startsAt?: string;
 
   @ApiPropertyOptional({
-    description: 'Promotion window end.',
+    description:
+      'Promotion window end. Must include a UTC offset (`Z` or `+07:00`).',
     example: '2026-07-31T23:59:59Z',
   })
   @IsOptional()
   @IsDateString({}, { message: 'Ends at must be a valid ISO date string' })
+  @IsOffsetDateString()
   @IsAfter('startsAt', { message: 'Ends at must be after starts at' })
   endsAt?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Scheduled-publish gate. Omit to publish immediately when `status` is ACTIVE; set a future timestamp to schedule the launch. Must include a UTC offset.',
+    example: '2026-07-01T00:00:00Z',
+  })
+  @IsOptional()
+  @IsDateString({}, { message: 'Published at must be a valid ISO date string' })
+  @IsOffsetDateString()
+  publishedAt?: string;
 
   // ─── State ───────────────────────────────────────────────────────────────────
 
@@ -218,14 +255,48 @@ export class CreateComboProductDto {
     description: 'Whether to highlight this combo in featured sections.',
     default: false,
   })
+  //* multipart HAS NO BOOLEAN TYPE. THE SHARED HELPER ACCEPTS true/1/on/yes
+  //* AND THEIR NEGATIVES, AND DELIBERATELY PASSES ANYTHING ELSE THROUGH SO
+  //* @IsBoolean CAN REJECT IT — THE PREVIOUS INLINE VERSION COERCED EVERY
+  //* UNRECOGNISED VALUE TO false, WHICH MADE @IsBoolean UNREACHABLE AND TURNED
+  //* AN HTML CHECKBOX ("on") INTO A SILENT "not featured".
   @IsOptional()
-  @Transform(({ value }) => {
-    if (typeof value === 'boolean') return value;
-    if (typeof value === 'string') return value === 'true' || value === '1';
-    return Boolean(value);
-  })
+  @Transform(({ value }) => parseBooleanInput(value))
   @IsBoolean({ message: 'isFeatured must be true or false' })
   isFeatured?: boolean;
+
+  @ApiPropertyOptional({
+    description:
+      'Bundle count at or below which the combo reports LOW_STOCK, down to 1. Defaults to 10.',
+    example: 10,
+    minimum: 1,
+    default: 10,
+  })
+  //* NOT A STOCK COUNT — THE COMBO'S OWN `quantity` IS DERIVED BY DB TRIGGERS
+  //* AND IS NEVER CLIENT INPUT. THIS ONLY TUNES WHERE LOW_STOCK BEGINS.
+  @Transform(blankNumberToUndefined)
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt({ message: 'Low stock threshold must be a whole number' })
+  @Min(1, { message: 'Low stock threshold must be at least 1' })
+  lowStockThreshold?: number;
+
+  @ApiPropertyOptional({
+    description:
+      'How many bundles to put on sale. Must not exceed what current stock can assemble — the scarcest bundled item sets that ceiling. Omit to sell everything stock allows.',
+    example: 2,
+    minimum: 1,
+  })
+  //* THE ONLY ADMIN-SET AVAILABILITY FIELD. THE COMBO'S `quantity` IS DERIVED
+  //* BY DB TRIGGERS AND IS THE *CEILING*; THIS IS THE ADMIN'S CAP UNDERNEATH
+  //* IT. THE <= CHECK LIVES IN ComboProductService BECAUSE IT COMPARES AGAINST
+  //* LIVE STOCK, WHICH A DTO CANNOT SEE.
+  @Transform(blankNumberToUndefined)
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt({ message: 'Combo quantity must be a whole number' })
+  @Min(1, { message: 'Combo quantity must be at least 1' })
+  offeredQuantity?: number;
 
   // ─── SEO ─────────────────────────────────────────────────────────────────────
   //* STORED AS ONE JSON COLUMN (seoMetadata) ON ComboProduct — UNLIKE Category,
@@ -272,10 +343,14 @@ export class CreateComboProductDto {
 
   // ─── Images ──────────────────────────────────────────────────────────────────
 
+  //* SWAGGER DOCUMENTATION ONLY — FILES NEVER REACH THIS DTO. THEY ARE PULLED
+  //* OFF THE REQUEST BY @UploadedFiles() IN THE CONTROLLER, AND THE 10-FILE CAP
+  //* IS ENFORCED THERE BY FilesInterceptor('images', 10), NOT BY ANY VALIDATOR
+  //* HERE. DON'T ADD @IsArray/@ArrayMaxSize — THEY WOULD NEVER RUN.
   @ApiPropertyOptional({
     type: 'array',
     items: { type: 'string', format: 'binary' },
-    description: 'Combo gallery image files (up to 10).',
+    description: 'Combo gallery image files (up to 10, enforced by the route).',
   })
   @IsOptional()
   images?: Express.Multer.File[];
