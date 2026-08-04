@@ -362,4 +362,168 @@ A combo may legitimately contain:
 
 ### API End Point & Business Logic
 
-_Not documented yet._
+Every endpoint below is served by `ComboProductController` → `ComboProductService` → `ComboProductRepository`. All routes are prefixed `/api/v1/combo` — **not** `/combo-product`; the route prefix matches the admin client's `COMBO_API` constants and the public-facing vocabulary, while the module/file names keep the `combo-product` prefix to mirror the Prisma model (`ComboProduct`), a different naming axis. For the DTO/Swagger contract see `src/modules/combo-product/dto/`; for the Prisma `select` shapes behind each read see `src/modules/combo-product/combo-product.select.ts`.
+
+> **Scope note:** these three routes are the module's *entire* HTTP surface today — `ComboProductController` declares no others. The service/repository layer has more capability than is wired to a route (a public slug lookup, a home-section listing). See [Built but Not Yet Exposed](#built-but-not-yet-exposed).
+
+#### Endpoint Overview
+
+| Method  | Path            | Access  | Purpose                                             |
+| :------ | :-------------- | :------ | :--------------------------------------------------- |
+| `GET`   | `/all-combo`    | `ADMIN` | [Paginated admin table, all statuses](#get-all-combos-admin) |
+| `POST`  | `/create-combo` | `ADMIN` | [Bundle products/variants into a new combo](#create-a-combo-product) |
+| `PATCH` | `/update/:id`   | `ADMIN` | [Partial update; `items` replaces the whole bundle](#update-a-combo-product) |
+
+Every route uses `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.ADMIN)` — this module has no public-facing route at all today (see the scope note above).
+
+---
+
+#### Response Shapes & Select Projections
+
+| Select                      | Fed to                        | Contains                                                                                                                                                                                    |
+| :--------------------------- | :----------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `COMBO_PRODUCT_SELECT_ADMIN`  | `ComboProductResponseDto`     | Everything: raw workflow `status`, `barcode`, `costPrice`, exact `quantity`/`offeredQuantity`, soft-delete state, and the full `createdByUser`/`updatedByUser`/`deletedByUser` audit trail. **Never reuse on an unauthenticated route.** All three endpoints on this page use this select. |
+| `COMBO_PRODUCT_SELECT_PUBLIC` | `ComboProductResponsePublicDto` | No `status`, no `barcode`/`costPrice`, no raw `quantity` (`stockStatus` only), no audit trail. Not fed by any endpoint on this page — see [Built but Not Yet Exposed](#built-but-not-yet-exposed). |
+| `COMBO_ITEM_SELECT`           | `ComboItemResponseDto`        | Same shape for every role — no sensitive fields. Nests `COMBO_ITEM_PRODUCT_SELECT`/`COMBO_ITEM_VARIANT_SELECT` (name/slug/price, not cost/quantity internals).                             |
+| `COMBO_IMAGE_SELECT`          | `ComboImageResponseDto`       | Same shape for every role — no sensitive fields.                                                                                                                                            |
+
+**Image URLs**, same convention as `product`: `ComboImage.url`/`thumbnailUrl`/`bannerUrl`/`iconUrl` are stored as relative paths and prefixed with `ConfigService.get('app.baseUrl')` at response time. A value already starting with `http` is left untouched.
+
+---
+
+#### Get All Combos (Admin)
+
+**`GET /api/v1/combo/all-combo`**
+
+**Purpose**: Management-dashboard combo table — paginated, searchable, filterable, sortable.
+
+**Access**: `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.ADMIN)`.
+
+| Layer      | What happens                                                                                                                                            |
+| :--------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Controller | `getAllCombos(query)` — binds `AllCombosQueryDto`; no other logic.                                                                                       |
+| Service    | `getAllCombos(query)` — splits `status`/`stockStatus`/`isFeatured`/`sortBy` off the shared pagination params (so `PaginationService` never sees filter keys), calls the repository, wraps each row in `ComboProductResponseDto`. |
+| Repository | `findAllCombosAdmin(params, filters)` — `AND`-composed `where` (`deletedAt: null` plus any of the three optional filters), `PaginationService.paginate()` with `searchableFields: ['title', 'titleTh', 'slug', 'sku', 'barcode']`. |
+
+**Business logic:**
+
+1. **`AllCombosQueryDto` extends the shared `PaginationQueryDto`** (`page`, `limit`, `sortOrder`, `search`, `cursor`) with three admin-only filters — `status`, `stockStatus`, `isFeatured` — plus `sortBy`, whitelisted against `COMBO_SORT_FIELDS` (`createdAt`, `updatedAt`, `title`, `comboPrice`, `totalPrice`, `quantity`, `startsAt`, `endsAt`) via `@IsIn`. **This whitelist is a hard security boundary, not documentation**: the value is interpolated directly into a Prisma `orderBy` key, so only columns validated here may ever reach it. Note `quantity` here sorts by the *derived* assemblable-bundle count, not `offeredQuantity` — sorting by what is actually sellable is what an admin scanning for problems wants.
+2. **No visibility filtering beyond soft-delete.** Unlike the (unexposed) public list, none of `DRAFT`/`ACTIVE`/`INACTIVE`/`ARCHIVED`/`HIDDEN` are excluded — a management dashboard needs to see everything a customer cannot. Only `deletedAt IS NOT NULL` rows are always excluded, same rationale as `ProductRepository.findAllProductsAdmin`.
+3. **Filters are additive and all optional.** `status`/`stockStatus` are plain equality when present. `isFeatured` uses an explicit `!== undefined` check, not truthiness — `isFeatured=false` is a real filter ("show me the non-featured ones"), not an absent one. All three are `AND`-composed with the base `deletedAt: null` gate (never spread-merged), so a filter key can only narrow the result, never accidentally resurrect a deleted row.
+4. **Search** — matches `title`, `titleTh`, `slug`, `sku`, `barcode`. Unlike the product module, `sku`/`barcode` are searchable here even though this is the admin-only list (an admin pastes them straight off a support ticket or packing slip).
+5. **Sorting/pagination** — offset (`page`/`limit`) or cursor-based; sort column from `sortBy` (default `createdAt`), direction from `sortOrder` (default `desc`).
+6. **Response mapping** — every row wrapped in `new ComboProductResponseDto(combo, baseUrl)`: full admin shape, including `costPrice`, exact `quantity`/`offeredQuantity`, and the complete audit trail.
+
+**Response shape**: `{ data: ComboProductResponseDto[], meta: IPaginationMeta }`.
+
+| Status | Cause                                                             |
+| :----- | :------------------------------------------------------------------ |
+| `200`  | Always — an empty `data` array is a valid response, not a `404`. |
+| `400`  | Invalid pagination, filter, or `sortBy` value.                    |
+| `401`  | Missing/invalid JWT.                                              |
+| `403`  | Authenticated but not `ADMIN`.                                    |
+
+---
+
+#### Create a Combo Product
+
+**`POST /api/v1/combo/create-combo`**
+
+**Purpose**: Bundle existing products/variants into a new, time-boxed combo offer at a special price, with an optional gallery of up to 10 images.
+
+**Access**: `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.ADMIN)`, `multipart/form-data` (images via the `images` field, up to 10, handled by `FilesInterceptor`).
+
+| Layer      | What happens                                                                                                                                                     |
+| :--------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Controller | `createCombo(dto, images, req)` — reads the acting admin's id off `req.user.id` (`UnauthorizedException` if missing); no other logic.                            |
+| Service    | `createComboProduct(userId, dto, images)` — uniqueness checks, `resolveComboItems`, price/quantity assertions, uploads images, builds the row, rolls back files on failure. |
+| Repository | `findByTitle` / `findBySlugAdmin` / `findBySku` / `findByBarcode` (uniqueness) → `findProductsByIds` / `findVariantsByIds` (bundling validation) → `createComboProduct(data)` — one `comboProduct.create()` with nested `images`/`items`. |
+
+**Business logic — in order:**
+
+1. **Title uniqueness** — `findByTitle(dto.title)` → `409` if taken.
+2. **Slug uniqueness** — `generateSlug(dto.title)`, then `findBySlugAdmin(slug)` → `409` (only reachable when two different titles happen to sanitize to the same slug, since `title` itself is already unique).
+3. **SKU/barcode uniqueness**, only when supplied — `findBySku`/`findByBarcode` → `409` each. Checked up front so a clash returns a named `409` instead of a raw Prisma `P2002` from the insert, matching how `title`/`slug` are already handled.
+4. **`resolveComboItems(dto.items)`** — the core bundling logic, shared verbatim with update. For each item:
+   - The product must exist (`404` otherwise).
+   - **Bundling Rule 1–2 enforced here**: a `VARIABLE` product requires `variantId` (`400`, names the product); a `SIMPLE` product must not receive one (`400`, names the product). See [Bundling Rules](#bundling-rules) for why this is pinned to the product's `type` rather than expressed as a unique index.
+   - If `variantId` is given, the variant must exist (`404`) and must belong to the given `productId` (`400`).
+   - **`unitPrice` price-snapshot resolution**: the client-supplied value wins; otherwise it falls back to the variant's (or product's, if unpinned) current `salePrice ?? basePrice` at bundling time — see [Price Snapshot Dating](#price-snapshot-dating).
+   - **`sourceStock` for the availability calc**: an unpinned row is always a `SIMPLE` product (enforced above), so its own `quantity` is the limiting stock — *not* `totalStock`, which is the variant roll-up and is `0` for a `SIMPLE` product's parts. A pinned row reads the variant's own `quantity`.
+   - The combo's `quantity` (how many bundles current stock can assemble) is then computed by `resolveComboAvailability` — `MIN` over items of `floor(sourceStock / max(item.quantity, 1))`, `0` for an empty set. See [Availability Model](#availability-model-the-bottleneck-rule) — **this app-side computation and the DB's `recompute_combo_quantity` function must stay in sync**; this one exists only because the DB trigger fires *after* the `combo_items` rows land, which is after this create's own response is built.
+   - The item whose own `floor(stock/qty)` equals that overall minimum is recorded as `limitingItemName`, for use in the `offeredQuantity` error message below (falls back to the first item for a degenerate set).
+5. **`assertOfferedQuantityFits(dto.offeredQuantity, quantity, limitingItemName)`** — if `offeredQuantity` is supplied and exceeds what stock can actually assemble, `400`, naming the scarce item (a distinct message when the ceiling is `0`: *"cannot be assembled at all right now"*). Skipped entirely when `offeredQuantity` is omitted.
+6. **`totalPrice`** = `Σ (item.unitPrice × item.quantity)` over the resolved items — never client input.
+7. **`assertComboPriceBelowParts(dto.comboPrice, totalPrice)`** — `comboPrice` must sit *strictly below* `totalPrice`; equality is rejected too (paying exactly the sum-of-parts is not an offer). A distinct message when `totalPrice <= 0` (*"bundled items have no value to discount"*). This is the strict authority; the DB's `combo_products_price_valid` check constraint is the looser `<=` backstop.
+8. **Images are uploaded to disk *before* the DB write** (same reasoning as `product`) — the nested `images` create needs each file's final path. A failed upload rolls back whatever succeeded so far.
+9. **One atomic `comboProduct.create()`** with nested `images: { createMany }` and `items: { createMany }`. `quantity`/`stockStatus`/`totalPrice` are written directly from the app-side computation above (not left to the DB trigger) so the create's own response is already correct.
+10. **`status` defaults to `DRAFT`, unlike `Product` (defaults `ACTIVE`)** — a combo must be *explicitly* published. `publishedAt`: an explicit `dto.publishedAt` always wins (scheduled launch); otherwise stamped `now()` only when `dto.status === ACTIVE`; otherwise left unset.
+11. **Rollback on DB failure**: if the create throws (e.g. a uniqueness race that slipped past the pre-checks in steps 1–3), every file uploaded in step 8 is deleted before the error propagates.
+
+**Response shape**: `ComboProductResponseDto` (full admin detail, including `costPrice`, exact `quantity`/`offeredQuantity`, and the new `images`/`items` nested in).
+
+| Status | Cause                                                                                                                                                                                          |
+| :----- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `201`  | Combo created successfully.                                                                                                                                                                    |
+| `400`  | DTO validation failed (see `CreateComboProductDto`/`ComboItemDto` — e.g. `items` empty, over 50 entries, or a duplicate product/variant pair via `@IsUniqueComboItems`; a single-item combo at `quantity: 1` via `@IsSingleItemQuantitySufficient`); **or** a `SIMPLE`/`VARIABLE` variant-pin mismatch; **or** a variant that doesn't belong to its product; **or** `comboPrice` not strictly below `totalPrice`; **or** `offeredQuantity` exceeds what stock can assemble. |
+| `401`  | Missing/invalid JWT.                                                                                                                                                                            |
+| `403`  | Authenticated but not `ADMIN`.                                                                                                                                                                  |
+| `404`  | A bundled `productId` or `variantId` does not exist.                                                                                                                                            |
+| `409`  | A combo with this title (or the derived slug), SKU, or barcode already exists.                                                                                                                 |
+
+---
+
+#### Update a Combo Product
+
+**`PATCH /api/v1/combo/update/:id`**
+
+**Purpose**: Partial update — only the fields present in the payload are written. Sending `items` **replaces the entire bundle** (recomputing `totalPrice`/`quantity`/`stockStatus`); omitting it leaves the bundle untouched.
+
+**Access**: `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.ADMIN)`, `multipart/form-data` (new images via `images`, up to 10; `deleteImageIds` removes existing ones first).
+
+| Layer      | What happens                                                                                                                                                                          |
+| :--------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Controller | `updateCombo(id, dto, images, req)` — reads the acting admin's id off `req.user.id`; no other logic.                                                                                 |
+| Service    | `updateComboProduct(id, userId, dto, images)` — existence check, conditional uniqueness re-checks, conditional `resolveComboItems`, image-id validation, uploads, one transaction, best-effort file cleanup. |
+| Repository | `findByIdAdmin` → conditional `findByTitle`/`findBySlugAdmin`/`findBySku`/`findByBarcode` → `findComboImagesByIds` → (inside one transaction) `replaceComboItems` / `deleteComboImages` / `countPrimaryImages` / `findMaxImageDisplayOrder` / `createComboImages` / `updateComboProduct`. |
+
+**Business logic — in order:**
+
+1. **Existence check** — `findByIdAdmin(id)` → `404` if missing **or already soft-deleted** (`existing.deletedAt` set is treated the same as not found).
+2. **Title change** (`dto.title !== existing.title`) regenerates the slug and re-checks **both** for conflicts, excluding the combo's own row (`conflict.id !== id`) — same two-step as create.
+3. **SKU/barcode change** (only when the payload's value differs from the stored one) is independently re-checked for conflict, same self-exclusion.
+4. **Items — conditional recompute.** `dto.items` omitted ⇒ the bundle is untouched: `totalPrice` and the assemblable ceiling are read from the *existing* row. `dto.items` present ⇒ `resolveComboItems` runs again (identical validation/pricing/availability logic as create, see steps 4–4's sub-bullets above), and its result supersedes the stored values for every check that follows.
+5. **Price rule re-checked against whichever side actually moved**: `effectiveComboPrice = dto.comboPrice ?? existing.comboPrice`, compared against the (possibly just-recomputed) `totalPrice` via the same `assertComboPriceBelowParts`. A patch that only lowers `comboPrice` still compares against the *stored* `totalPrice`; a patch that only swaps `items` re-checks the *stored* `comboPrice`.
+6. **`offeredQuantity` re-validated on every patch**, not only at create — `assertOfferedQuantityFits` runs against the (possibly new) ceiling, since the ceiling itself moves as stock and items change over the combo's lifetime.
+7. **`deleteImageIds` scoped to this combo** — `findComboImagesByIds(id, ids)`; any id that doesn't actually belong to this combo fails the **whole** request with `400`, before any file is uploaded (a foreign image ID can't be deleted through another combo's payload).
+8. **`lowStockThreshold`** falls back to the *existing stored* value when omitted (not the create-time default constant).
+9. **Images uploaded to disk before the transaction** — same rollback discipline as create (delete whatever succeeded if the upload loop itself fails partway).
+10. **Everything else runs inside one transaction** (`withTransaction`), so a failure part-way can never leave items swapped but prices stale, or the gallery half-updated:
+    - **`replaceComboItems`** — delete-then-recreate the entire `combo_items` set for this combo, not a per-row merge (see the repository doc comment: two unique indexes plus the price-snapshot trigger make in-place reconciliation not worth it when the admin UI submits the bundle as one unit anyway).
+    - **Image deletion happens before new-image creation** in the same request, so promoting a newly uploaded file to cover image is decided using the **post-deletion** primary count (`countPrimaryImages`) — a deletion that removes the current cover promotes the first new upload (`isPrimary: survivingPrimaries === 0 && index === 0`). New images append after the gallery's current max `displayOrder + 1` (`findMaxImageDisplayOrder`).
+    - **`quantity`/`stockStatus` are only written when `items` actually changed** (`resolved ? … : undefined`) — Prisma skips an `undefined` key entirely, so an items-untouched patch leaves the trigger-maintained column exactly as it was rather than overwriting it from stale input.
+11. **`publishedAt`**: an explicit `dto.publishedAt` always wins. Otherwise it's stamped `now()` **only** when this patch sets `status` to `ACTIVE` **and** the combo has never been published before (`!existing.publishedAt`) — a one-time backfill for a combo going live for the first time, not a re-stamp on every subsequent edit.
+12. **File cleanup is split by which side of the transaction it's on**: images removed via `deleteImageIds` are unlinked from disk **after** the transaction commits (best-effort — a failed unlink must not roll back a committed edit); images uploaded in step 9 are deleted only if the transaction itself throws.
+
+**Response shape**: `ComboProductResponseDto` (same full admin detail as create).
+
+| Status | Cause                                                                                                                                                                                              |
+| :----- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `200`  | Combo updated successfully.                                                                                                                                                                        |
+| `400`  | DTO validation failed; **or** an image ID in `deleteImageIds` doesn't belong to this combo; **or** (when `items` is sent) the same bundling-rule/price/availability failures as create; **or** `comboPrice`/`offeredQuantity` fails its check against the current (or just-recomputed) `totalPrice`/ceiling. |
+| `401`  | Missing/invalid JWT.                                                                                                                                                                                |
+| `403`  | Authenticated but not `ADMIN`.                                                                                                                                                                      |
+| `404`  | Combo doesn't exist (or is already soft-deleted); **or**, when `items` is sent, a bundled `productId`/`variantId` doesn't exist.                                                                    |
+| `409`  | Another combo already uses the new title (or its derived slug), SKU, or barcode.                                                                                                                   |
+
+---
+
+#### Built but Not Yet Exposed
+
+The service/repository layer implements more than the three routes above wire up:
+
+| Method                                             | What it does                                                                                                                     |
+| :-------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------- |
+| `ComboProductRepository.findBySlugPublic`           | Storefront single-combo lookup by slug, via `COMBO_PRODUCT_SELECT_PUBLIC`. No controller route calls it yet (no PDP-equivalent for combos).           |
+| `ComboProductService.getActiveCombosForHome` / `ComboProductRepository.findActiveCombosForHome` | Active, non-deleted combos newest-first, for a "Combo Deals" home-page section — same pattern as `ProductService`'s home-section methods. Not composed into any route; presumably meant to be injected into a future `home` module the way `ProductModule`'s equivalents already are. |
+| `ComboProductRepository.deleteComboProduct`         | Hard delete. Exists only as the **rollback path** for a create that failed after the row was written — not a general delete endpoint. There is no soft-delete route either (see [Known Gaps](#known-gaps--recommended-hardening)). |

@@ -103,7 +103,13 @@ yarn start:prod      # .env.production
   - [Conventions](./docs/combo-product.md#conventions)
   - [Example Data](./docs/combo-product.md#example-data)
   - [Known Gaps / Recommended Hardening](./docs/combo-product.md#known-gaps--recommended-hardening)
-- api end point and business logic
+- [api end point and business logic](./docs/combo-product.md#api-end-point--business-logic)
+  - [Endpoint Overview](./docs/combo-product.md#endpoint-overview)
+  - [Response Shapes & Select Projections](./docs/combo-product.md#response-shapes--select-projections)
+  - [Get All Combos (Admin) — `GET /combo/all-combo`](./docs/combo-product.md#get-all-combos-admin)
+  - [Create a Combo Product — `POST /combo/create-combo`](./docs/combo-product.md#create-a-combo-product)
+  - [Update a Combo Product — `PATCH /combo/update/:id`](./docs/combo-product.md#update-a-combo-product)
+  - [Built but Not Yet Exposed](./docs/combo-product.md#built-but-not-yet-exposed)
 ### Blog
 - [db schema](./docs/blog.md#db-schema)
   - [Entity-Relationship Diagram (ERD)](./docs/blog.md#entity-relationship-diagram-erd)
