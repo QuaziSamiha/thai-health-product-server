@@ -282,7 +282,7 @@ A combo may legitimately contain:
 **Practical implications:**
 
 - `ProductVariant → ComboItem` being `RESTRICT` means a normal product edit that removes a bundled variant will fail. `ProductService.assertVariantsNotBundled` runs before the update transaction and returns a `409` naming the blocking combo, instead of surfacing a raw `P2003`.
-- Combos are intended to be **soft-deleted** (`deletedAt`/`deletedBy`), not hard-deleted. The repository's `deleteComboProduct` exists as the rollback path for a create that failed after the row was written.
+- `deletedAt`/`deletedBy` are declared and read by the admin list's soft-delete filter, but no route writes them yet — see [Known Gaps](#known-gaps--recommended-hardening). The only delete path live today is the [hard delete](#delete-a-combo-product) (`DELETE /delete/:id`), which the repository's `deleteComboProduct` also serves as the rollback path for a create that failed after the row was written.
 
 ---
 
@@ -364,17 +364,20 @@ A combo may legitimately contain:
 
 Every endpoint below is served by `ComboProductController` → `ComboProductService` → `ComboProductRepository`. All routes are prefixed `/api/v1/combo` — **not** `/combo-product`; the route prefix matches the admin client's `COMBO_API` constants and the public-facing vocabulary, while the module/file names keep the `combo-product` prefix to mirror the Prisma model (`ComboProduct`), a different naming axis. For the DTO/Swagger contract see `src/modules/combo-product/dto/`; for the Prisma `select` shapes behind each read see `src/modules/combo-product/combo-product.select.ts`.
 
-> **Scope note:** these three routes are the module's *entire* HTTP surface today — `ComboProductController` declares no others. The service/repository layer has more capability than is wired to a route (a public slug lookup, a home-section listing). See [Built but Not Yet Exposed](#built-but-not-yet-exposed).
+> **Scope note:** these six routes are the module's *entire* HTTP surface today — `ComboProductController` declares no others. The service/repository layer still has a little more capability than is wired to a route (a home-section listing). See [Built but Not Yet Exposed](#built-but-not-yet-exposed).
 
 #### Endpoint Overview
 
-| Method  | Path            | Access  | Purpose                                             |
-| :------ | :-------------- | :------ | :--------------------------------------------------- |
-| `GET`   | `/all-combo`    | `ADMIN` | [Paginated admin table, all statuses](#get-all-combos-admin) |
-| `POST`  | `/create-combo` | `ADMIN` | [Bundle products/variants into a new combo](#create-a-combo-product) |
-| `PATCH` | `/update/:id`   | `ADMIN` | [Partial update; `items` replaces the whole bundle](#update-a-combo-product) |
+| Method   | Path                | Access   | Purpose                                             |
+| :------- | :------------------- | :------- | :--------------------------------------------------- |
+| `GET`    | `/all-combo`         | `ADMIN`  | [Paginated admin table, all statuses](#get-all-combos-admin) |
+| `GET`    | `/published-combos`  | Public   | [Paginated storefront combo listing](#get-published-combos-public) |
+| `GET`    | `/slug/:slug`        | Public   | [Storefront combo details by slug](#get-combo-details-by-slug-public) |
+| `POST`   | `/create-combo`      | `ADMIN`  | [Bundle products/variants into a new combo](#create-a-combo-product) |
+| `PATCH`  | `/update/:id`        | `ADMIN`  | [Partial update; `items` replaces the whole bundle](#update-a-combo-product) |
+| `DELETE` | `/delete/:id`        | `ADMIN`  | [Permanently remove a combo](#delete-a-combo-product) |
 
-Every route uses `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.ADMIN)` — this module has no public-facing route at all today (see the scope note above).
+Every route except `/published-combos` and `/slug/:slug` uses `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.ADMIN)`.
 
 ---
 
@@ -382,8 +385,8 @@ Every route uses `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.ADMIN)` — th
 
 | Select                      | Fed to                        | Contains                                                                                                                                                                                    |
 | :--------------------------- | :----------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `COMBO_PRODUCT_SELECT_ADMIN`  | `ComboProductResponseDto`     | Everything: raw workflow `status`, `barcode`, `costPrice`, exact `quantity`/`offeredQuantity`, soft-delete state, and the full `createdByUser`/`updatedByUser`/`deletedByUser` audit trail. **Never reuse on an unauthenticated route.** All three endpoints on this page use this select. |
-| `COMBO_PRODUCT_SELECT_PUBLIC` | `ComboProductResponsePublicDto` | No `status`, no `barcode`/`costPrice`, no raw `quantity` (`stockStatus` only), no audit trail. Not fed by any endpoint on this page — see [Built but Not Yet Exposed](#built-but-not-yet-exposed). |
+| `COMBO_PRODUCT_SELECT_ADMIN`  | `ComboProductResponseDto`     | Everything: raw workflow `status`, `barcode`, `costPrice`, exact `quantity`/`offeredQuantity`, soft-delete state, and the full `createdByUser`/`updatedByUser`/`deletedByUser` audit trail. **Never reuse on an unauthenticated route.** Every read/write endpoint on this page uses this select (the delete route returns no body). |
+| `COMBO_PRODUCT_SELECT_PUBLIC` | `ComboProductResponsePublicDto` | No `status`, no `barcode`/`costPrice`, no raw `quantity` (`stockStatus` only), no audit trail. Fed by [`GET /published-combos`](#get-published-combos-public) and [`GET /slug/:slug`](#get-combo-details-by-slug-public). |
 | `COMBO_ITEM_SELECT`           | `ComboItemResponseDto`        | Same shape for every role — no sensitive fields. Nests `COMBO_ITEM_PRODUCT_SELECT`/`COMBO_ITEM_VARIANT_SELECT` (name/slug/price, not cost/quantity internals).                             |
 | `COMBO_IMAGE_SELECT`          | `ComboImageResponseDto`       | Same shape for every role — no sensitive fields.                                                                                                                                            |
 
@@ -422,6 +425,68 @@ Every route uses `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.ADMIN)` — th
 | `400`  | Invalid pagination, filter, or `sortBy` value.                    |
 | `401`  | Missing/invalid JWT.                                              |
 | `403`  | Authenticated but not `ADMIN`.                                    |
+
+---
+
+#### Get Published Combos (Public)
+
+**`GET /api/v1/combo/published-combos`**
+
+**Purpose**: Storefront combo listing — paginated and sortable. Backs the `/product` page's "Combo" type filter (which redirects here, since `Product.type` has no `COMBO` value — see below) and the home page's "Combo Deals" section's "View all" button.
+
+**Access**: None — no guard, no role check.
+
+| Layer      | What happens                                                                                                                                            |
+| :--------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Controller | `getPublishedCombos(query)` — binds `PublishedCombosQueryDto`; no other logic.                                                                            |
+| Service    | `getPublishedCombos(query)` — splits `isFeatured`/`sortBy` off the shared pagination params, calls the repository, wraps each row in `ComboProductResponsePublicDto`. |
+| Repository | `findPublishedCombos(params, filters)` — `AND`-composes `publicVisibilityWhere()` with the optional `isFeatured` filter, `PaginationService.paginate()` with `searchableFields: ['title', 'titleTh', 'slug']`. |
+
+**Business logic:**
+
+1. **`PublishedCombosQueryDto` extends the shared `PaginationQueryDto`** (`page`, `limit`, `sortOrder`, `search`, `cursor`) with one storefront-safe filter, `isFeatured` (boolean, same `parseBooleanInput` transform as the admin DTO), plus `sortBy`, whitelisted against `PUBLIC_COMBO_SORT_FIELDS` (`createdAt`, `comboPrice`, `title`) via `@IsIn`. **This whitelist is a hard security boundary**, same contract as `COMBO_SORT_FIELDS` for the admin list. It is deliberately narrower than the admin whitelist: `quantity`/`updatedAt`/`startsAt`/`endsAt` are admin concerns with no storefront meaning, and `totalPrice` is the pre-discount sum, not what a customer sorting "by price" wants — `comboPrice` is the price they actually pay.
+2. **Visibility is not a query param.** Every row goes through `publicVisibilityWhere()` (`deletedAt: null`, `status: ACTIVE`, `publishedAt <= now()`) unconditionally — same gate as [`GET /slug/:slug`](#get-combo-details-by-slug-public). Unlike `getAllCombos`, there is no `status`/`stockStatus` filter that could be used to leak a non-visible row through.
+3. **Search** — matches `title`, `titleTh`, `slug` only. Unlike the admin list, `sku`/`barcode` are **not** searchable here (an anonymous storefront visitor has no legitimate reason to probe by SKU).
+4. **Sorting/pagination** — offset (`page`/`limit`) or cursor-based; sort column from `sortBy` (default `createdAt`), direction from `sortOrder` (default `desc`).
+5. **Response mapping** — every row wrapped in `new ComboProductResponsePublicDto(combo, baseUrl)`: no `status`, no `barcode`/`costPrice`, no raw `quantity` (`stockStatus` only), no audit trail.
+6. **Why the `/product` page's "Combo" filter redirects here instead of filtering in place**: `Product.type` was reduced to `SIMPLE`/`VARIABLE` only (migration `20260714200004_remove_combo_product_type`) — a combo was never a `Product` row to begin with, it is a separate `ComboProduct`/`ComboItem` bundle (see [Availability Model](#availability-model-the-bottleneck-rule)). `GET /product/active-products?productType=COMBO` is rejected with `400` by `@IsEnum(ProductType)`, since `COMBO` no longer exists in that enum. The client's product-type checkbox for "Combo" therefore navigates to the dedicated combo listing (backed by this endpoint) instead of setting a `productType` query param on the product page.
+
+**Response shape**: `{ data: ComboProductResponsePublicDto[], meta: IPaginationMeta }`.
+
+| Status | Cause                                                             |
+| :----- | :------------------------------------------------------------------ |
+| `200`  | Always — an empty `data` array is a valid response, not a `404`. |
+| `400`  | Invalid pagination or `sortBy` value.                             |
+
+---
+
+#### Get Combo Details by Slug (Public)
+
+**`GET /api/v1/combo/slug/:slug`**
+
+**Purpose**: Storefront combo details page (the PDP-equivalent for combos) — the first public, unauthenticated route this module exposes.
+
+**Access**: None — no guard, no role check.
+
+| Layer      | What happens                                                                                                                                            |
+| :--------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Controller | `getComboBySlug(slug)` — binds the route param; no other logic.                                                                                          |
+| Service    | `getComboBySlug(slug)` — calls the repository, throws `NotFoundException` on a miss, wraps the row in `ComboProductResponsePublicDto`.                   |
+| Repository | `findBySlugPublic(slug)` — `findFirst` `AND`-composing `{ slug }` with `publicVisibilityWhere()`, selecting `COMBO_PRODUCT_SELECT_PUBLIC`.               |
+
+**Business logic:**
+
+1. **Visibility gate — `publicVisibilityWhere()`**: `deletedAt: null` AND `status: ACTIVE` AND `publishedAt: { lte: now() }`. Unlike `ProductRepository.activeVisibilityWhere()`, `publishedAt` **is** part of the gate here — a combo defaults to `DRAFT` and must be explicitly published (see [Conventions](#conventions)), so an `ACTIVE` combo whose `publishedAt` is still in the future (a scheduled launch) is correctly invisible until that moment. A draft, archived, hidden, inactive, soft-deleted, or not-yet-published combo all resolve to the same `404` — the route never distinguishes "doesn't exist" from "not visible yet", same as `Product`'s public routes.
+2. **`findFirst`, not `findUnique`**, because the lookup is no longer on `slug` alone — the visibility gate is `AND`-composed into the same `where`, exactly mirroring `ProductRepository.findBySlugPublic`.
+3. **Response mapping** — `new ComboProductResponsePublicDto(combo, baseUrl)`: no `status`, no `barcode`/`costPrice`, no raw `quantity` (`stockStatus` only), no audit trail. See [Response Shapes & Select Projections](#response-shapes--select-projections).
+4. **Same repository method backs the home-section listing.** `ComboProductRepository.findActiveCombosForHome` now shares `publicVisibilityWhere()` too, so a combo scheduled for a future `publishedAt` no longer leaks into the "Combo Deals" home section either — previously that query only checked `status: ACTIVE`, not `publishedAt`.
+
+**Response shape**: `{ data: ComboProductResponsePublicDto }`.
+
+| Status | Cause                                                                 |
+| :----- | :--------------------------------------------------------------------- |
+| `200`  | Combo found and publicly visible.                                    |
+| `404`  | No combo with this slug, or it exists but isn't ACTIVE + published.  |
 
 ---
 
@@ -518,12 +583,42 @@ Every route uses `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.ADMIN)` — th
 
 ---
 
+#### Delete a Combo Product
+
+**`DELETE /api/v1/combo/delete/:id`**
+
+**Purpose**: Permanently removes a combo. This is the module's only delete route — there is still no soft-delete route (see [Known Gaps](#known-gaps--recommended-hardening)).
+
+**Access**: `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.ADMIN)`.
+
+| Layer      | What happens                                                                                                      |
+| :--------- | :------------------------------------------------------------------------------------------------------------------ |
+| Controller | `deleteCombo(id)` — no other logic.                                                                                |
+| Service    | `hardDeleteComboProduct(id)` — existence check, delete, best-effort file cleanup.                                  |
+| Repository | `findComboImagePathsForDeletion(id)` → `deleteComboProduct(id)`.                                                   |
+
+**Business logic — in order:**
+
+1. **Existence check** — `findComboImagePathsForDeletion(id)` doubles as the gallery-path lookup for step 3 → `404` if the combo doesn't exist. Not soft-delete-aware, since no write path sets `deletedAt` on a combo yet.
+2. **`comboProduct.delete()`** — one statement. `ON DELETE CASCADE` on `ComboItem.comboId` and `ComboImage.comboId` removes the bundle's item and gallery rows automatically; it does not touch the physical files.
+3. **Gallery files unlinked best-effort, after the DB delete commits** — same rationale as `ProductService.hardDeleteProduct`: a failed unlink must not roll back a delete the DB has already committed.
+4. **No `Product`/`ProductVariant` stock adjustment.** A combo's `quantity` is a live-computed `MIN` over its items' current stock (see the [Availability Model](#availability-model-the-bottleneck-rule)) — it is never written back to `Product.quantity`/`ProductVariant.quantity`, and nothing reserves stock when a combo is created. Deleting the combo has no stock to give back.
+
+**Response shape**: no body (`204 No Content`).
+
+| Status | Cause                         |
+| :----- | :------------------------------ |
+| `204`  | Combo permanently deleted.      |
+| `401`  | Missing/invalid JWT.            |
+| `403`  | Authenticated but not `ADMIN`.  |
+| `404`  | Combo doesn't exist.            |
+
+---
+
 #### Built but Not Yet Exposed
 
-The service/repository layer implements more than the three routes above wire up:
+The service/repository layer implements a little more than the five routes above wire up:
 
 | Method                                             | What it does                                                                                                                     |
 | :-------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------- |
-| `ComboProductRepository.findBySlugPublic`           | Storefront single-combo lookup by slug, via `COMBO_PRODUCT_SELECT_PUBLIC`. No controller route calls it yet (no PDP-equivalent for combos).           |
-| `ComboProductService.getActiveCombosForHome` / `ComboProductRepository.findActiveCombosForHome` | Active, non-deleted combos newest-first, for a "Combo Deals" home-page section — same pattern as `ProductService`'s home-section methods. Not composed into any route; presumably meant to be injected into a future `home` module the way `ProductModule`'s equivalents already are. |
-| `ComboProductRepository.deleteComboProduct`         | Hard delete. Exists only as the **rollback path** for a create that failed after the row was written — not a general delete endpoint. There is no soft-delete route either (see [Known Gaps](#known-gaps--recommended-hardening)). |
+| `ComboProductService.getActiveCombosForHome` / `ComboProductRepository.findActiveCombosForHome` | Active, published, non-deleted combos newest-first, for a "Combo Deals" home-page section — same pattern as `ProductService`'s home-section methods. Not composed into any route; presumably meant to be injected into a future `home` module the way `ProductModule`'s equivalents already are. |

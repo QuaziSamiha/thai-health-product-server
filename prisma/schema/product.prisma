@@ -1,15 +1,11 @@
 //* ============= PRODUCT DOMAIN =============
 //* COVERS: PRODUCT, VARIANTS, IMAGES
-//* CategoryProductStatus IS SHARED WITH category.prisma — DEFINED IN shared.prisma
+//* CategoryProductStatus AND DiscountType ARE SHARED WITH category.prisma AND
+//* promotion.prisma RESPECTIVELY — BOTH DEFINED IN shared.prisma
 
 enum ProductType {
   SIMPLE
   VARIABLE
-}
-
-enum DiscountType {
-  FIXED
-  PERCENTAGE
 }
 
 enum StockStatus {
@@ -88,6 +84,8 @@ model Product {
   inventoryLogs Inventory[]
   batches       Batch[]
   comboItems    ComboItem[]
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
 
   //* AUDIT & TIMESTAMPS
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
@@ -151,6 +149,8 @@ model ProductVariant {
   inventoryLogs Inventory[]
   batches       Batch[]
   comboItems    ComboItem[]
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
 
   @@index([productId])
   @@index([productId, isDefault]) //* FETCH THE DEFAULT VARIANT FAST

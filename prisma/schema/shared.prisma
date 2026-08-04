@@ -10,3 +10,9 @@ enum CategoryProductStatus {
   ARCHIVED
   HIDDEN
 }
+
+//* USED BY Product/ProductVariant.discountType (product.prisma) AND PromoCode.discountType (promotion.prisma)
+enum DiscountType {
+  FIXED
+  PERCENTAGE
+}

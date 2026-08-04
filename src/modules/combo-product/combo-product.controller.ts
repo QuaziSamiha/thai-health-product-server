@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
@@ -33,7 +36,11 @@ import { ComboProductService } from './combo-product.service';
 import { CreateComboProductDto } from './dto/create-combo-product.dto';
 import { UpdateComboProductDto } from './dto/update-combo-product.dto';
 import { AllCombosQueryDto } from './dto/all-combos-query.dto';
-import { ComboProductResponseDto } from './dto/combo-product-response.dto';
+import { PublishedCombosQueryDto } from './dto/published-combos-query.dto';
+import {
+  ComboProductResponseDto,
+  ComboProductResponsePublicDto,
+} from './dto/combo-product-response.dto';
 import { ApiPaginatedResponse } from '../../shared/pagination';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -71,6 +78,40 @@ export class ComboProductController {
   @ResponseMessage('Combos retrieved successfully')
   async getAllCombos(@Query() query: AllCombosQueryDto) {
     return this.comboProductService.getAllCombos(query);
+  }
+
+  @Get('published-combos')
+  @ApiOperation({
+    summary: 'Get published combos (paginated, Public)',
+    description:
+      'Storefront combo listing — every ACTIVE, published combo, optionally narrowed to featured-only and sorted by createdAt / comboPrice / title. Backs the `/product` page\'s "Combo" filter and the home page\'s "Combo Deals" → "View all".',
+  })
+  @ApiPaginatedResponse(
+    ComboProductResponsePublicDto,
+    'Combos retrieved successfully.',
+  )
+  @ApiBadRequestResponse({
+    description: 'Invalid pagination or sort parameter.',
+  })
+  @ResponseMessage('Combos retrieved successfully')
+  async getPublishedCombos(@Query() query: PublishedCombosQueryDto) {
+    return await this.comboProductService.getPublishedCombos(query);
+  }
+
+  @Get('slug/:slug')
+  @ApiOperation({
+    summary: 'Get combo details by slug (Public)',
+    description:
+      'Storefront combo details page. Looks up a single combo by its URL-friendly slug, visible only once it is ACTIVE and published (`publishedAt <= now()`).',
+  })
+  @ApiOkResponse({
+    description: 'Combo retrieved successfully.',
+    type: ComboProductResponsePublicDto,
+  })
+  @ApiNotFoundResponse({ description: 'Combo not found.' })
+  @ResponseMessage('Combo retrieved successfully')
+  async getComboBySlug(@Param('slug') slug: string) {
+    return await this.comboProductService.getComboBySlug(slug);
   }
 
   @Post('create-combo')
@@ -163,5 +204,23 @@ export class ComboProductController {
       updateComboProductDto,
       images ?? [],
     );
+  }
+
+  @Delete('delete/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Permanently delete a combo',
+    description:
+      "Irreversibly removes the combo along with its bundled items and gallery images (DB rows via cascade, files via cleanup). Does not adjust the stock of any bundled product/variant — a combo's quantity is derived from live stock, never reserved from it. Admin only.",
+  })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
+  @ApiForbiddenResponse({ description: 'Admin role required.' })
+  @ApiNotFoundResponse({ description: 'Combo not found.' })
+  @ResponseMessage('Combo deleted successfully')
+  async deleteCombo(@Param('id', ParseIntPipe) id: number) {
+    return await this.comboProductService.hardDeleteComboProduct(id);
   }
 }

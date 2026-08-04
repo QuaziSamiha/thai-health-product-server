@@ -58,24 +58,29 @@ model User {
   lastLoginAt DateTime? @map("last_login_at") @db.Timestamptz(3)
 
   // Relations
-  profile             Profile?
-  security            UserSecurity?
-  sessions            Session[] // Replaces single refreshToken for multi-device support
-  otps                OTP[]
-  createdCategories   Category[]     @relation("CategoryCreatedBy")
-  updatedCategories   Category[]     @relation("CategoryUpdatedBy")
-  createdProducts     Product[]      @relation("ProductCreatedBy")
-  updatedProducts     Product[]      @relation("ProductUpdatedBy")
-  deletedProducts     Product[]      @relation("ProductDeletedBy")
-  inventories         Inventory[]
-  createdCombos       ComboProduct[] @relation("ComboCreatedBy")
-  updatedCombos       ComboProduct[] @relation("ComboUpdatedBy")
-  deletedCombos       ComboProduct[] @relation("ComboDeletedBy")
-  blogs               Blog[]
-  createdHomeContents Home[]         @relation("HomeCreatedBy")
-  updatedHomeContents Home[]         @relation("HomeUpdatedBy")
-  createdSupports     Support[]      @relation("SupportCreatedBy")
-  updatedSupports     Support[]      @relation("SupportUpdatedBy")
+  profile              Profile?
+  security             UserSecurity?
+  sessions             Session[] // Replaces single refreshToken for multi-device support
+  otps                 OTP[]
+  createdCategories    Category[]            @relation("CategoryCreatedBy")
+  updatedCategories    Category[]            @relation("CategoryUpdatedBy")
+  createdProducts      Product[]             @relation("ProductCreatedBy")
+  updatedProducts      Product[]             @relation("ProductUpdatedBy")
+  deletedProducts      Product[]             @relation("ProductDeletedBy")
+  inventories          Inventory[]
+  createdCombos        ComboProduct[]        @relation("ComboCreatedBy")
+  updatedCombos        ComboProduct[]        @relation("ComboUpdatedBy")
+  deletedCombos        ComboProduct[]        @relation("ComboDeletedBy")
+  blogs                Blog[]
+  createdHomeContents  Home[]                @relation("HomeCreatedBy")
+  updatedHomeContents  Home[]                @relation("HomeUpdatedBy")
+  createdSupports      Support[]             @relation("SupportCreatedBy")
+  updatedSupports      Support[]             @relation("SupportUpdatedBy")
+  addresses            Address[]
+  carts                Cart[]
+  orders               Order[]
+  orderStatusChanges   OrderStatusHistory[]  @relation("OrderStatusChangedBy")
+  promoCodeRedemptions PromoCodeRedemption[]
 
   @@index([email, phone])
   @@map("users")

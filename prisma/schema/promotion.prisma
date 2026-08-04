@@ -1,0 +1,56 @@
+//* ============= PROMOTION DOMAIN =============
+//* COVERS: PROMO/COUPON CODES AND THEIR REDEMPTION LEDGER
+//* DiscountType IS SHARED WITH product.prisma — DEFINED IN shared.prisma
+//* Order.appliedPromoCode / PromoCodeRedemption.order LIVE ON Order (order.prisma)
+
+model PromoCode {
+  id  Int    @id @default(autoincrement())
+  sid String @unique @default(uuid()) @db.Uuid
+
+  code        String  @unique @db.VarChar(50) //* CUSTOMER-FACING CODE, STORED UPPERCASE BY APP-LAYER CONVENTION
+  description String? @db.Text
+
+  discountType  DiscountType @map("discount_type")
+  discountValue Decimal      @map("discount_value") @db.Decimal(12, 2) //* FIXED AMOUNT OR PERCENTAGE, PAIRED WITH discountType — SAME SHAPE AS Product.discountValue
+
+  minOrderAmount    Decimal? @map("min_order_amount") @db.Decimal(12, 2) //* ORDER SUBTOTAL MUST REACH THIS BEFORE THE CODE APPLIES
+  maxDiscountAmount Decimal? @map("max_discount_amount") @db.Decimal(12, 2) //* CAPS THE PAYOUT FOR PERCENTAGE CODES SO A LARGE CART DOESN'T BLOW THE MARGIN
+
+  usageLimit        Int? @map("usage_limit") //* TOTAL REDEMPTIONS ALLOWED ACROSS ALL CUSTOMERS, NULL = UNLIMITED
+  usageLimitPerUser Int? @default(1) @map("usage_limit_per_user") //* NULL = UNLIMITED PER USER
+  usedCount         Int  @default(0) @map("used_count") //* DENORMALIZED COUNTER, INCREMENTED PER REDEMPTION — SAME CACHE PATTERN AS Product.totalStock
+
+  isActive Boolean   @default(true) @map("is_active")
+  startsAt DateTime? @map("starts_at") @db.Timestamptz(3)
+  endsAt   DateTime? @map("ends_at") @db.Timestamptz(3)
+
+  redemptions PromoCodeRedemption[]
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([isActive, startsAt, endsAt]) //* FAST VALIDITY LOOKUPS AT CHECKOUT
+  @@map("promo_codes")
+}
+
+//* ONE ROW PER ORDER A CODE WAS APPLIED TO — THE AUTHORITATIVE LEDGER FOR
+//* ENFORCING usageLimit/usageLimitPerUser. Order.appliedPromoCode IS ONLY A
+//* DENORMALIZED DISPLAY COPY; THIS TABLE IS THE SOURCE OF TRUTH.
+model PromoCodeRedemption {
+  id Int @id @default(autoincrement())
+
+  promoCodeId Int       @map("promo_code_id")
+  promoCode   PromoCode @relation(fields: [promoCodeId], references: [id], onDelete: Cascade)
+
+  userId Int?  @map("user_id") //* NULL FOR GUEST REDEMPTIONS — ENFORCING usageLimitPerUser FOR GUESTS IS APP-LAYER ONLY (BY EMAIL)
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  orderId Int   @unique @map("order_id") //* ONE REDEMPTION ROW PER ORDER — A CODE IS APPLIED AT MOST ONCE PER ORDER
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  discountApplied Decimal  @map("discount_applied") @db.Decimal(12, 2) //* ACTUAL AMOUNT DISCOUNTED ON THIS ORDER — SNAPSHOT, INDEPENDENT OF LATER CHANGES TO PromoCode.discountValue
+  redeemedAt      DateTime @default(now()) @map("redeemed_at") @db.Timestamptz(3)
+
+  @@index([userId])
+  @@map("promo_code_redemptions")
+}

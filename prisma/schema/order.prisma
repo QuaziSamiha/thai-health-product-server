@@ -1,0 +1,318 @@
+//* ============= ORDER DOMAIN =============
+//* COVERS: CART, ADDRESS BOOK, ORDER, ORDER ITEMS, PAYMENTS
+//* PromoCode / PromoCodeRedemption LIVE IN THEIR OWN promotion.prisma — Order
+//* ONLY HOLDS THE DENORMALIZED appliedPromoCode DISPLAY COPY AND THE
+//* promoCodeRedemption BACK-RELATION
+
+enum CartStatus {
+  ACTIVE
+  CONVERTED //* SUCCESSFULLY TURNED INTO AN Order
+  ABANDONED //* EXPIRED WITHOUT CHECKOUT — SWEPT BY A SCHEDULED JOB, USEFUL FOR CART-RECOVERY MARKETING
+}
+
+enum AddressType {
+  SHIPPING
+  BILLING
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  PACKED
+  SHIPPED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+  RETURNED
+  REFUNDED
+  FAILED
+}
+
+enum PaymentMethod {
+  CARD
+  SCANPAY
+  CASH_ON_DELIVERY
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  PAID
+  FAILED
+  PARTIALLY_REFUNDED
+  REFUNDED
+  CANCELLED
+}
+
+enum PaymentTransactionType {
+  CHARGE
+  REFUND
+}
+
+//* ============= CART =============
+
+model Cart {
+  id  Int    @id @default(autoincrement())
+  sid String @unique @default(uuid()) @db.Uuid
+
+  status CartStatus @default(ACTIVE)
+
+  //* RELATIONS
+  userId Int?  @map("user_id") //* NULL FOR GUEST CARTS, IDENTIFIED BY sessionToken INSTEAD
+  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  sessionToken String?   @map("session_token") @db.VarChar(255) //* GUEST CART IDENTIFIER (COOKIE/LOCALSTORAGE ID) — MERGED INTO THE USER'S CART ON LOGIN
+  expiresAt    DateTime? @map("expires_at") @db.Timestamptz(3) //* GUEST CARTS ARE SWEPT AFTER THIS; USER CARTS PERSIST INDEFINITELY
+
+  items CartItem[]
+
+  //* TIMESTAMPS
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([userId, status])
+  @@index([sessionToken])
+  @@map("carts")
+}
+
+model CartItem {
+  id Int @id @default(autoincrement())
+
+  cartId Int  @map("cart_id")
+  cart   Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  //* EXACTLY ONE OF (productId [+ OPTIONAL variantId]) OR comboId IS SET —
+  //* SAME XOR CONTRACT AS ComboItem'S product/variant/combo SHAPE, ENFORCED
+  //* AT THE APP LAYER, NOT THE DB
+  productId Int?            @map("product_id")
+  product   Product?        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId Int?            @map("variant_id")
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  comboId   Int?            @map("combo_id")
+  combo     ComboProduct?   @relation(fields: [comboId], references: [id], onDelete: Cascade)
+
+  quantity Int @default(1)
+
+  //* NO PRICE COLUMNS HERE — UNLIKE OrderItem, A CART ALWAYS PRICES LIVE OFF
+  //* THE CURRENT Product/ProductVariant/ComboProduct ROW, SO A PRICE CHANGE
+  //* IS REFLECTED IMMEDIATELY INSTEAD OF BEING FROZEN LIKE A PLACED ORDER
+
+  addedAt DateTime @default(now()) @map("added_at") @db.Timestamptz(3)
+
+  //* COVERS ROWS WITH A NON-NULL variantId ONLY — POSTGRES TREATS NULLS AS
+  //* DISTINCT, SO PLAIN (cartId, productId) ROWS NEED A SEPARATE PARTIAL
+  //* UNIQUE INDEX AT THE MIGRATION LEVEL, SAME CAVEAT AS
+  //* combo_items_unique_without_variant IN combo-product.prisma
+  @@unique([cartId, productId, variantId])
+  @@index([comboId])
+  @@map("cart_items")
+}
+
+//* ============= ADDRESS BOOK =============
+
+model Address {
+  id  Int    @id @default(autoincrement())
+  sid String @unique @default(uuid()) @db.Uuid
+
+  label     String?     @db.VarChar(100) //* USER-FACING NICKNAME, E.G. "HOME", "OFFICE"
+  type      AddressType @default(SHIPPING)
+  isDefault Boolean     @default(false) @map("is_default")
+
+  recipientName String @map("recipient_name") @db.VarChar(200)
+  phone         String @db.VarChar(20)
+
+  addressLine String @map("address_line") @db.VarChar(255) //* STREET NAME & HOUSE NUMBER
+  state       String @db.VarChar(100) //* PROVINCE LEVEL — CHECKOUT'S "SELECT STATE"
+  region      String @db.VarChar(100) //* DISTRICT LEVEL — CHECKOUT'S "SELECT REGION"
+  postalCode  String @map("postal_code") @db.VarChar(20)
+  country     String @default("Thailand") @db.VarChar(100)
+
+  //* RELATIONS
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  orderAddresses OrderAddress[] //* BEST-EFFORT BACK-LINK — SEE OrderAddress.sourceAddress
+
+  //* TIMESTAMPS
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([userId, isDefault])
+  @@map("addresses")
+}
+
+//* ============= ORDER =============
+
+model Order {
+  id          Int    @id @default(autoincrement())
+  sid         String @unique @default(uuid()) @db.Uuid
+  orderNumber String @unique @map("order_number") @db.VarChar(50) //* HUMAN-READABLE, CUSTOMER-FACING (E.G. THP-20260804-00042) — sid STAYS THE INTERNAL/API IDENTIFIER
+
+  status        OrderStatus   @default(PENDING)
+  paymentStatus PaymentStatus @default(PENDING) @map("payment_status")
+  paymentMethod PaymentMethod @map("payment_method")
+
+  //* CUSTOMER SNAPSHOT — CAPTURED FROM THE CHECKOUT FORM, NOT JOINED LIVE OFF
+  //* User/Profile, SO THE ORDER RECORD SURVIVES A LATER PROFILE EDIT AND
+  //* WORKS IDENTICALLY FOR GUEST CHECKOUTS (userId NULL, SAME CONTRACT AS
+  //* OTP.userId)
+  customerFirstName String @map("customer_first_name") @db.VarChar(100)
+  customerLastName  String @map("customer_last_name") @db.VarChar(100)
+  customerEmail     String @map("customer_email") @db.VarChar(255)
+  customerPhone     String @map("customer_phone") @db.VarChar(20)
+
+  //* PRICING SNAPSHOT (DECIMAL FOR FINANCIAL ACCURACY) — FROZEN AT
+  //* PLACEMENT, NEVER RECOMPUTED FROM CURRENT PRODUCT PRICES
+  subtotal       Decimal @db.Decimal(12, 2) //* SUM OF OrderItem.totalPrice BEFORE ORDER-LEVEL DISCOUNT
+  discountAmount Decimal @default(0) @map("discount_amount") @db.Decimal(12, 2) //* PROMO CODE DISCOUNT, SEE appliedPromoCode
+  deliveryCharge Decimal @default(0) @map("delivery_charge") @db.Decimal(12, 2)
+  taxAmount      Decimal @default(0) @map("tax_amount") @db.Decimal(12, 2)
+  totalAmount    Decimal @map("total_amount") @db.Decimal(12, 2) //* subtotal - discountAmount + deliveryCharge + taxAmount — SERVER-COMPUTED AT PLACEMENT, NEVER CLIENT INPUT
+
+  appliedPromoCode String? @map("applied_promo_code") @db.VarChar(50) //* DENORMALIZED DISPLAY COPY OF PromoCode.code — PromoCodeRedemption IS THE AUTHORITATIVE USAGE LEDGER
+
+  customerNote String? @map("customer_note") @db.Text //* OPTIONAL NOTE LEFT BY THE CUSTOMER AT CHECKOUT
+  cancelReason String? @map("cancel_reason") @db.Text
+
+  //* LIFECYCLE TIMESTAMPS
+  placedAt    DateTime  @default(now()) @map("placed_at") @db.Timestamptz(3)
+  confirmedAt DateTime? @map("confirmed_at") @db.Timestamptz(3)
+  shippedAt   DateTime? @map("shipped_at") @db.Timestamptz(3)
+  deliveredAt DateTime? @map("delivered_at") @db.Timestamptz(3)
+  cancelledAt DateTime? @map("cancelled_at") @db.Timestamptz(3)
+
+  //* RELATIONS
+  userId Int?  @map("user_id") //* NULL FOR GUEST CHECKOUTS
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  items               OrderItem[]
+  addresses           OrderAddress[]
+  payments            Payment[]
+  statusHistory       OrderStatusHistory[]
+  promoCodeRedemption PromoCodeRedemption?
+
+  //* TIMESTAMPS
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([userId, createdAt]) //* "MY ORDERS" LISTING, NEWEST FIRST
+  @@index([status, createdAt]) //* ADMIN DASHBOARD FILTERING BY STATUS
+  @@index([paymentStatus])
+  @@index([customerEmail]) //* GUEST ORDER LOOKUP BY EMAIL
+  @@map("orders")
+}
+
+//* SHIPPING/BILLING SNAPSHOT TAKEN AT CHECKOUT TIME. NEVER JOINED LIVE OFF
+//* Address — KEEPS THE ORDER'S ADDRESS CORRECT EVEN IF THE CUSTOMER LATER
+//* EDITS OR DELETES THE SOURCE ADDRESS BOOK ROW.
+model OrderAddress {
+  id   Int         @id @default(autoincrement())
+  type AddressType
+
+  recipientName String @map("recipient_name") @db.VarChar(200)
+  phone         String @db.VarChar(20)
+  addressLine   String @map("address_line") @db.VarChar(255)
+  state         String @db.VarChar(100)
+  region        String @db.VarChar(100)
+  postalCode    String @map("postal_code") @db.VarChar(20)
+  country       String @default("Thailand") @db.VarChar(100)
+
+  sourceAddressId Int?     @map("source_address_id") //* BEST-EFFORT LINK BACK TO THE ADDRESS BOOK ROW THIS WAS COPIED FROM, FOR "REORDER" UX — NOT AUTHORITATIVE, MAY BE NULL/DANGLING IF THE SOURCE WAS DELETED
+  sourceAddress   Address? @relation(fields: [sourceAddressId], references: [id], onDelete: SetNull)
+
+  orderId Int   @map("order_id")
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@unique([orderId, type]) //* AT MOST ONE SHIPPING + ONE BILLING SNAPSHOT PER ORDER
+  @@map("order_addresses")
+}
+
+model OrderItem {
+  id Int @id @default(autoincrement())
+
+  orderId Int   @map("order_id")
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  //* EXACTLY ONE OF (productId [+ OPTIONAL variantId]) OR comboId IS SET —
+  //* SAME XOR CONTRACT AS ComboItem. onDelete: SetNull (NOT Cascade LIKE
+  //* Inventory/Batch/CartItem) BECAUSE A PLACED ORDER MUST SURVIVE THE
+  //* SOURCE PRODUCT BEING DELETED — THE SNAPSHOT COLUMNS BELOW ARE WHAT
+  //* ACTUALLY RENDER THE ORDER HISTORY UI
+  productId Int?            @map("product_id")
+  product   Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
+  variantId Int?            @map("variant_id")
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  comboId   Int?            @map("combo_id")
+  combo     ComboProduct?   @relation(fields: [comboId], references: [id], onDelete: SetNull)
+
+  //* PRODUCT SNAPSHOT — FROZEN AT PLACEMENT SO ORDER HISTORY RENDERS
+  //* IDENTICALLY EVEN AFTER THE PRODUCT IS RENAMED, REPRICED, OR DELETED
+  name       String  @db.VarChar(255)
+  nameTh     String? @map("name_th") @db.VarChar(255)
+  sku        String? @db.VarChar(100)
+  imageUrl   String? @map("image_url") @db.VarChar(512)
+  attributes Json?   @default("{}") //* E.G. {"size": "30ml"} — SNAPSHOT OF ProductVariant.attributes AT ORDER TIME
+
+  quantity       Int     @default(1)
+  unitPrice      Decimal @map("unit_price") @db.Decimal(12, 2) //* PRICE PER UNIT AT TIME OF ORDER — SNAPSHOT, SAME CONTRACT AS ComboItem.unitPrice
+  discountAmount Decimal @default(0) @map("discount_amount") @db.Decimal(12, 2) //* PER-LINE SHARE OF ANY ORDER-LEVEL DISCOUNT, FOR ACCURATE PER-ITEM REFUNDS
+  totalPrice     Decimal @map("total_price") @db.Decimal(12, 2) //* (unitPrice * quantity) - discountAmount — SERVER-COMPUTED, NEVER CLIENT INPUT
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([variantId])
+  @@index([comboId])
+  @@map("order_items")
+}
+
+model OrderStatusHistory {
+  id     Int         @id @default(autoincrement())
+  status OrderStatus
+  note   String?     @db.Text //* OPTIONAL REASON, E.G. CANCELLATION REASON OR DELAY EXPLANATION
+
+  orderId Int   @map("order_id")
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  changedBy     Int?  @map("changed_by") //* NULL = SYSTEM/AUTOMATED TRANSITION (E.G. PAYMENT WEBHOOK)
+  changedByUser User? @relation("OrderStatusChangedBy", fields: [changedBy], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([orderId, createdAt])
+  @@map("order_status_history")
+}
+
+//* ============= PAYMENT =============
+
+model Payment {
+  id  Int    @id @default(autoincrement())
+  sid String @unique @default(uuid()) @db.Uuid
+
+  type   PaymentTransactionType @default(CHARGE)
+  method PaymentMethod
+  status PaymentStatus          @default(PENDING)
+  amount Decimal                @db.Decimal(12, 2)
+
+  provider        String? @db.VarChar(100) //* E.G. "OMISE", "PROMPTPAY", "STRIPE" — NULL FOR CASH_ON_DELIVERY
+  transactionId   String? @map("transaction_id") @db.VarChar(255) //* GATEWAY'S OWN REFERENCE, FOR RECONCILIATION/SUPPORT LOOKUPS
+  gatewayResponse Json?   @default("{}") @map("gateway_response") //* RAW PAYLOAD SNAPSHOT FOR AUDITING/DEBUGGING FAILED PAYMENTS
+
+  failureReason String?   @map("failure_reason") @db.Text
+  paidAt        DateTime? @map("paid_at") @db.Timestamptz(3)
+
+  orderId Int   @map("order_id")
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([orderId])
+  @@index([transactionId])
+  @@index([status])
+  @@map("payments")
+}

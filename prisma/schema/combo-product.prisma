@@ -56,8 +56,10 @@ model ComboProduct {
   seoMetadata Json? @default("{}") @map("seo_metadata") //* metaTitle, metaDescription, metaTitleTh, metaDescriptionTh
 
   //* RELATIONS
-  images ComboImage[]
-  items  ComboItem[]
+  images     ComboImage[]
+  items      ComboItem[]
+  cartItems  CartItem[]
+  orderItems OrderItem[]
 
   //* AUDIT & TIMESTAMPS
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)

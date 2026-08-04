@@ -11,6 +11,7 @@ import { ComboProductRepository } from './combo-product.repository';
 import { CreateComboProductDto } from './dto/create-combo-product.dto';
 import { UpdateComboProductDto } from './dto/update-combo-product.dto';
 import { AllCombosQueryDto } from './dto/all-combos-query.dto';
+import { PublishedCombosQueryDto } from './dto/published-combos-query.dto';
 import { ComboItemDto } from './dto/combo-item.dto';
 import {
   ComboProductResponseDto,
@@ -406,6 +407,34 @@ export class ComboProductService {
   }
 
   /**
+   * Hard delete — permanently removes the combo row along with its bundled
+   * items and gallery images. `ComboItem`/`ComboImage` cascade via the DB
+   * relation; the physical gallery files are cleaned up here afterward,
+   * best-effort, same rationale as `ProductService.hardDeleteProduct`.
+   *
+   * Does NOT touch `Product.quantity`/`ProductVariant.quantity`: a combo's
+   * own `quantity` is derived from live product/variant stock (see the
+   * Availability Model doc), never reserved from it, so there is nothing to
+   * give back when the combo disappears.
+   */
+  async hardDeleteComboProduct(id: number): Promise<void> {
+    const combo =
+      await this.comboProductRepository.findComboImagePathsForDeletion(id);
+    if (!combo) {
+      throw new NotFoundException('Combo not found');
+    }
+
+    await this.comboProductRepository.deleteComboProduct(id);
+
+    const filePaths = combo.images.flatMap((image) =>
+      [image.url, image.thumbnailUrl, image.bannerUrl, image.iconUrl].filter(
+        (path): path is string => Boolean(path),
+      ),
+    );
+    await Promise.all(filePaths.map((path) => this.deleteStoredFile(path)));
+  }
+
+  /**
    * Admin listing — paginated, searchable, filterable and sortable, matching
    * the contract every other admin table uses. Soft-deleted combos are
    * excluded (see the repository note); drafts, archived, and hidden ones are
@@ -432,6 +461,49 @@ export class ComboProductService {
         (combo) => new ComboProductResponseDto(combo, baseUrl),
       ),
     };
+  }
+
+  /**
+   * Storefront combo listing — paginated, searchable (title/titleTh/slug),
+   * optionally featured-only, sortable by createdAt/comboPrice/title. Every
+   * row is ACTIVE + published (see `ComboProductRepository.publicVisibilityWhere`);
+   * unlike `getAllCombos` there is no status/stockStatus filter to leak
+   * non-visible rows through. Mirrors `ProductService.getActiveProducts`.
+   */
+  async getPublishedCombos(
+    query: PublishedCombosQueryDto,
+  ): Promise<IPaginatedResult<ComboProductResponsePublicDto>> {
+    const { isFeatured, sortBy, ...paginationParams } = query;
+
+    const paginated = await this.comboProductRepository.findPublishedCombos(
+      paginationParams,
+      { isFeatured, sortBy },
+    );
+
+    const baseUrl = this.configService.get<string>('app.baseUrl');
+    return {
+      ...paginated,
+      data: paginated.data.map(
+        (combo) => new ComboProductResponsePublicDto(combo, baseUrl),
+      ),
+    };
+  }
+
+  /**
+   * Storefront combo details (PDP-equivalent) — looks up a single combo by
+   * its slug, gated to ACTIVE + published rows only (see
+   * `ComboProductRepository.publicVisibilityWhere`). Mirrors
+   * `ProductService.getProductBySlug`.
+   */
+  async getComboBySlug(slug: string): Promise<ComboProductResponsePublicDto> {
+    const combo = await this.comboProductRepository.findBySlugPublic(slug);
+    if (!combo) {
+      throw new NotFoundException('Combo not found');
+    }
+    return new ComboProductResponsePublicDto(
+      combo,
+      this.configService.get<string>('app.baseUrl'),
+    );
   }
 
   /** Active combos for a "Combo Deals" home section. */

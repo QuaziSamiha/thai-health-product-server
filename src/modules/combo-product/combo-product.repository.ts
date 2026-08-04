@@ -12,6 +12,7 @@ import {
   COMBO_PRODUCT_SELECT_PUBLIC,
 } from './combo-product.select';
 import type { ComboSortField } from './dto/all-combos-query.dto';
+import type { PublicComboSortField } from './dto/published-combos-query.dto';
 
 //* ALREADY-VALIDATED ADMIN LIST FILTERS — PULLING THEM OFF THE QUERY DTO IS
 //* THE SERVICE'S JOB, SO THIS ONLY BUILDS THE PRISMA FILTER. sortBy IS SAFE TO
@@ -22,6 +23,14 @@ export interface AdminComboListFilters {
   stockStatus?: StockStatus;
   isFeatured?: boolean;
   sortBy?: ComboSortField;
+}
+
+//* SAME IDEA AS AdminComboListFilters, SCOPED TO THE ONE FILTER THE PUBLIC
+//* LIST EXPOSES. VISIBILITY ITSELF IS NOT A FILTER HERE — publicVisibilityWhere()
+//* IS ALWAYS APPLIED, NOT CONDITIONAL ON ANYTHING THE CALLER PASSES.
+export interface PublicComboListFilters {
+  isFeatured?: boolean;
+  sortBy?: PublicComboSortField;
 }
 
 @Injectable()
@@ -76,19 +85,35 @@ export class ComboProductRepository extends BaseRepository {
     });
   }
 
+  /**
+   * Storefront visibility gate, applied to every public-facing read below:
+   * not soft-deleted, status ACTIVE, AND published (`publishedAt <= now()`).
+   * Unlike `Product`'s equivalent gate, `publishedAt` IS part of combo
+   * visibility — see the "only publicly live once status = ACTIVE AND
+   * publishedAt <= now()" contract on `ComboProductResponsePublicDto`, and
+   * the scheduled-publish gate a combo defaults to `DRAFT` for.
+   */
+  private publicVisibilityWhere(): Prisma.ComboProductWhereInput {
+    return {
+      deletedAt: null,
+      status: CategoryProductStatus.ACTIVE,
+      publishedAt: { lte: new Date() },
+    };
+  }
+
   async findBySlugPublic(slug: string, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
-    return await client.comboProduct.findUnique({
-      where: { slug },
+    return await client.comboProduct.findFirst({
+      where: { AND: [{ slug }, this.publicVisibilityWhere()] },
       select: COMBO_PRODUCT_SELECT_PUBLIC,
     });
   }
 
-  /** Active combos, newest first — for a "Combo Deals" home section. */
+  /** Active, published combos, newest first — for a "Combo Deals" home section. */
   async findActiveCombosForHome(limit: number, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return await client.comboProduct.findMany({
-      where: { deletedAt: null, status: CategoryProductStatus.ACTIVE },
+      where: this.publicVisibilityWhere(),
       select: COMBO_PRODUCT_SELECT_PUBLIC,
       orderBy: { createdAt: 'desc' },
       take: limit,
@@ -142,6 +167,46 @@ export class ComboProductRepository extends BaseRepository {
       //* sku/barcode ARE SEARCHABLE HERE BUT NOT ON THE PUBLIC SIDE — AN ADMIN
       //* PASTES THEM STRAIGHT OFF A SUPPORT TICKET OR A PACKING SLIP.
       searchableFields: ['title', 'titleTh', 'slug', 'sku', 'barcode'],
+      defaultSortField: filters.sortBy ?? 'createdAt',
+    });
+  }
+
+  /**
+   * Public storefront listing — ACTIVE, published, non-deleted combos only
+   * (see `publicVisibilityWhere`), optionally narrowed to featured-only and
+   * sorted by a whitelisted column. Backs the `/product` page's "Combo"
+   * type filter and the home page's "Combo Deals" → "View all". Mirrors
+   * `ProductRepository.paginateStorefrontList`.
+   */
+  async findPublishedCombos(
+    params: PaginationQueryDto,
+    filters: PublicComboListFilters = {},
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+
+    //* publicVisibilityWhere() IS AND-COMPOSED, NEVER SPREAD-MERGED — SAME
+    //* REASONING AS findAllCombosAdmin's deletedAt GATE, SO A FILTER CAN ONLY
+    //* NARROW THE RESULT, NEVER WIDEN PAST WHAT VISIBILITY ALLOWS.
+    const where: Prisma.ComboProductWhereInput = {
+      AND: [
+        this.publicVisibilityWhere(),
+        ...(filters.isFeatured !== undefined
+          ? [{ isFeatured: filters.isFeatured }]
+          : []),
+      ],
+    };
+
+    return await this.paginationService.paginate<
+      Prisma.ComboProductGetPayload<{
+        select: typeof COMBO_PRODUCT_SELECT_PUBLIC;
+      }>,
+      typeof client.comboProduct
+    >(client.comboProduct, params, {
+      select: COMBO_PRODUCT_SELECT_PUBLIC,
+      where,
+      //* NO sku HERE, UNLIKE THE ADMIN LIST — SEE THE NOTE ABOVE findAllCombosAdmin.
+      searchableFields: ['title', 'titleTh', 'slug'],
       defaultSortField: filters.sortBy ?? 'createdAt',
     });
   }
@@ -302,12 +367,41 @@ export class ComboProductRepository extends BaseRepository {
     });
   }
 
-  /** Rollback path for a create that failed after the row was written (e.g. a later image upload). */
+  /**
+   * Rollback path for a create that failed after the row was written (e.g. a
+   * later image upload), and the DB step behind the permanent-delete route.
+   * `ON DELETE CASCADE` on the ComboItem/ComboImage relations removes their
+   * rows automatically; it does NOT touch the actual files on disk — the
+   * caller is responsible for cleaning those up (see
+   * `findComboImagePathsForDeletion`).
+   */
   async deleteComboProduct(id: number, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return await client.comboProduct.delete({
       where: { id },
       select: { id: true },
+    });
+  }
+
+  /** Gallery file paths to unlink after a hard delete — same shape/purpose as ProductRepository.findImagePathsForDeletion. */
+  async findComboImagePathsForDeletion(
+    id: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return await client.comboProduct.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        images: {
+          select: {
+            url: true,
+            thumbnailUrl: true,
+            bannerUrl: true,
+            iconUrl: true,
+          },
+        },
+      },
     });
   }
 }
