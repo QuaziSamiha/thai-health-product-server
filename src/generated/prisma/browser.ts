@@ -58,6 +58,46 @@ export type Batch = Prisma.BatchModel
  */
 export type Inventory = Prisma.InventoryModel
 /**
+ * Model Cart
+ * 
+ */
+export type Cart = Prisma.CartModel
+/**
+ * Model CartItem
+ * 
+ */
+export type CartItem = Prisma.CartItemModel
+/**
+ * Model Address
+ * 
+ */
+export type Address = Prisma.AddressModel
+/**
+ * Model Order
+ * 
+ */
+export type Order = Prisma.OrderModel
+/**
+ * Model OrderAddress
+ * 
+ */
+export type OrderAddress = Prisma.OrderAddressModel
+/**
+ * Model OrderItem
+ * 
+ */
+export type OrderItem = Prisma.OrderItemModel
+/**
+ * Model OrderStatusHistory
+ * 
+ */
+export type OrderStatusHistory = Prisma.OrderStatusHistoryModel
+/**
+ * Model Payment
+ * 
+ */
+export type Payment = Prisma.PaymentModel
+/**
  * Model Product
  * 
  */
@@ -72,6 +112,16 @@ export type ProductVariant = Prisma.ProductVariantModel
  * 
  */
 export type ProductImage = Prisma.ProductImageModel
+/**
+ * Model PromoCode
+ * 
+ */
+export type PromoCode = Prisma.PromoCodeModel
+/**
+ * Model PromoCodeRedemption
+ * 
+ */
+export type PromoCodeRedemption = Prisma.PromoCodeRedemptionModel
 /**
  * Model Support
  * 

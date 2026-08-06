@@ -43,7 +43,7 @@ erDiagram
         int quantity "authoritative for SIMPLE"
         int totalStock "denormalized cache for VARIABLE"
         enum stockStatus
-        int comboQuantity "units per bundle prefill"
+        int comboQuantity "live sum, DRAFT/ACTIVE combos"
         int categoryId FK
         int createdBy FK "nullable"
         int updatedBy FK "nullable"
@@ -180,7 +180,7 @@ erDiagram
 | `status`                | `ENUM(CategoryProductStatus)` | NOT NULL, DEFAULT `ACTIVE`                                                       | Lifecycle/visibility state.                                                                                                                                                                             |
 | `isFeatured`            | `BOOLEAN`                     | NOT NULL, DEFAULT `false`, `@map("is_featured")`                                 | Drives homepage/featured sections.                                                                                                                                                                      |
 | `hasVariants`           | `BOOLEAN`                     | NOT NULL, DEFAULT `false`, `@map("has_variants")`                                | **Denormalized cache** of `variants.length > 0` — read-fast flag for UI branching (Add-to-Cart vs. Select-Options). No trigger; application code must set it.                                           |
-| `comboQuantity`         | `INT`                         | NOT NULL, DEFAULT `1`, `@map("combo_quantity")`, `CHECK > 0`                     | How many units of this product go into a combo — prefills `ComboItem.quantity` when bundled. `ComboItem.quantity` stays authoritative per combo and may override it.                                    |
+| `comboQuantity`         | `INT`                         | NOT NULL, DEFAULT `0`, `@map("combo_quantity")`, `CHECK >= 0`                    | **Live, trigger-maintained.** SUM, across every DRAFT/ACTIVE combo currently bundling this product (unpinned items only — a pinned item counts toward the variant's own column instead), of `ComboItem.quantity * effective sellable bundles` — `LEAST(ComboProduct.quantity, COALESCE(ComboProduct.offeredQuantity, ComboProduct.quantity))`. Informational only: never subtracted from `quantity` or gating a sale. Returns to 0 once no such combo references the product. See `20260804010000_repurpose_combo_quantity_as_live_commitment`.                                    |
 | `costPrice`             | `DECIMAL(12,2)`               | NULLABLE, `@map("cost_price")`                                                   | Internal cost basis for margin reporting. **Never expose on a public API.**                                                                                                                             |
 | `discountType`          | `ENUM(DiscountType)`          | NOT NULL, DEFAULT `PERCENTAGE`, `@map("discount_type")`                          | `FIXED` or `PERCENTAGE` — how `discountValue` should be read.                                                                                                                                           |
 | `discountValue`         | `DECIMAL(12,2)`               | NULLABLE, `@map("discount_value")`, `CHECK` (see below)                          | Raw configured discount. `CHECK`: `NULL`, or `>= 0` and (`PERCENTAGE` → `<= 100`, `FIXED` → `<= basePrice`).                                                                                            |
@@ -244,7 +244,7 @@ erDiagram
 | `salePrice`                                | `DECIMAL(12,2)`       | NOT NULL, DEFAULT `0`, `@map("sale_price")`, `CHECK 0 <= salePrice <= basePrice` | Final price for this variant. Server-derived, never client input.                                                                                              |
 | `attributes`                               | `JSONB`               | NOT NULL, DEFAULT `{}`                                                           | Free-form key/value pairs, e.g. `{"color": "Red", "size": "XL"}`. Defaults to `{}` when omitted.                                                               |
 | `isDefault`                                | `BOOLEAN`             | NOT NULL, DEFAULT `false`, `@map("is_default")`                                  | Marks the variant pre-selected on the PDP. **No DB constraint** prevents multiple defaults per product — see [Known Gaps](#known-gaps--recommended-hardening). |
-| `comboQuantity`                            | `INT`                 | NOT NULL, DEFAULT `1`, `@map("combo_quantity")`, `CHECK > 0`                     | Same semantics as `Product.comboQuantity`, scoped to this variant — wins over the parent's value when a `ComboItem` pins this variant.                         |
+| `comboQuantity`                            | `INT`                 | NOT NULL, DEFAULT `0`, `@map("combo_quantity")`, `CHECK >= 0`                    | Same semantics as `Product.comboQuantity`, scoped to this variant — wins over the parent's value when a `ComboItem` pins this variant.                         |
 | `productId`                                | `INT`                 | FK → `products.id`, NOT NULL, **ON DELETE CASCADE**, `@map("product_id")`        | Parent product. Deleting the parent deletes all variants.                                                                                                      |
 
 > `ProductVariant` has **no timestamp columns of its own** — no `createdAt`, no `updatedAt`, no `deletedAt`. Anything needing a variant's "last modified" reads the parent product's `updatedAt`.
@@ -745,8 +745,9 @@ The projections in `product.select.ts` each feed exactly one DTO and must be kep
 1. **One option per _selectable thing_, not per product row.** A product with no variants contributes itself; a product with variants contributes **one option per variant instead of its own row** (e.g. `"Colette Collins 23 July variant 200 ml"`, `"… variant 30 Capsules"`) — a variant is what an order line or discount rule actually needs to reference.
 2. **Only `ACTIVE`, non-deleted products** are included — the same visibility rule as the storefront, since you can't sell what isn't live.
 3. **Product-level values are shared across every option that product contributes.** `type`, `status`, `updatedAt`, and the image are always the _product's_ own, because `ProductVariant` has none of its own. `stockStatus` is the exception: a variant option carries the variant's own, a product option the product's.
-4. **Image selection is a single-row read** — `where: { variantId: null }` (product-level gallery only), ordered `isPrimary: 'desc'` then `displayOrder: 'asc'`, `take: 1`. That picks the primary image if one is flagged, otherwise the first in gallery order, without fetching the whole gallery.
-5. **No pagination.** The response is the complete list, sorted by product name ascending.
+4. **`comboQuantity` rides along too** — the live, trigger-maintained total of stock currently committed to DRAFT/ACTIVE combos (see the field table above). Unlike `combo-inventory`'s `availableForCombo`, this endpoint applies no stock filter — every ACTIVE, non-deleted option is returned regardless of how much (or little) of its stock a combo has claimed.
+5. **Image selection is a single-row read** — `where: { variantId: null }` (product-level gallery only), ordered `isPrimary: 'desc'` then `displayOrder: 'asc'`, `take: 1`. That picks the primary image if one is flagged, otherwise the first in gallery order, without fetching the whole gallery.
+6. **No pagination.** The response is the complete list, sorted by product name ascending.
 
 **Response shape**: `ProductDropdownOptionDto[]` (a bare array, not paginated).
 
@@ -770,14 +771,13 @@ The projections in `product.select.ts` each feed exactly one DTO and must be kep
 | :--------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Controller | `getProductComboInventoryOptions()` — no params at all, same as `product-inventory`.                                                                                             |
 | Service    | `getProductComboInventoryOptions()` — `flatMap`s each product into one `ProductComboInventoryOptionDto` per variant, or a single option for the product itself when it has none. |
-| Repository | `findProductComboInventoryOptions()` — same shape/filter as `findProductDropdownOptions`, with `comboQuantity` added to both the product and variant `select`.                   |
+| Repository | `findProductComboInventoryOptions()` — same shape/filter as `findProductDropdownOptions` (both now select `comboQuantity`), plus the extra `availableForCombo` computation below.                   |
 
 **Business logic:**
 
-Mostly the same flattening/visibility/image-selection rules as [Get Product Dropdown Options](#get-product-dropdown-options-admin) (one option per selectable thing, `ACTIVE` + non-deleted only, product-level values shared across every option that product contributes), plus two differences:
+Mostly the same flattening/visibility/image-selection rules as [Get Product Dropdown Options](#get-product-dropdown-options-admin) (one option per selectable thing, `ACTIVE` + non-deleted only, product-level values shared across every option that product contributes, `comboQuantity` — the live total committed to other combos), plus one difference:
 
-- `comboQuantity` — the variant's own value for a variant option, otherwise the product's (same "variant wins" rule as `quantity`/`stockStatus`).
-- `availableForCombo` — `quantity - comboQuantity`.
+- `availableForCombo` — `quantity - comboQuantity`: stock still free to commit to a *new* combo, on top of what's already committed elsewhere.
 - **An option that can't cover even one more combo is excluded outright**, unlike `product-inventory` (which has no stock filter at all): any option whose `availableForCombo < 1` (zero, or stock at/below its own `comboQuantity`) is dropped, not returned with a non-positive number. This comparison is between two columns (`quantity` vs. `comboQuantity`), so it's applied in `ProductService` after each option's DTO is built — it isn't expressible as a single-column Prisma `where` filter.
 
 **Response shape**: `ProductComboInventoryOptionDto[]` (a bare array, not paginated).

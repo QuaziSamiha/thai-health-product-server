@@ -11,8 +11,8 @@ import { toAbsoluteUrl } from './product-shared.dto';
 //* ADMIN COMBO-INVENTORY OPTION — SAME FLATTENING RULE AS
 //* ProductDropdownOptionDto (ONE ENTRY PER *SELECTABLE* THING, NOT PER
 //* PRODUCT ROW), PLUS `availableForCombo`: HOW MANY UNITS OF THIS
-//* PRODUCT/VARIANT ARE STILL FREE TO PUT INTO A COMBO GIVEN ITS OWN
-//* comboQuantity PREFILL (quantity - comboQuantity). BUILT AS ITS OWN
+//* PRODUCT/VARIANT ARE STILL FREE TO PUT INTO A COMBO GIVEN WHAT'S ALREADY
+//* COMMITTED TO OTHER COMBOS (quantity - comboQuantity). BUILT AS ITS OWN
 //* CLASS RATHER THAN EXTENDING ProductDropdownOptionDto — SEE THE NOTE
 //* ABOVE ProductResponsePublicDto IN product-response.dto.ts FOR WHY THIS
 //* CODEBASE KEEPS `new Dto(row)`-STYLE RESPONSE DTOS INDEPENDENT RATHER
@@ -92,7 +92,7 @@ export class ProductComboInventoryOptionDto {
   @Expose()
   @ApiProperty({
     description:
-      "How many units go into a single combo bundle — the variant's own comboQuantity for a variant option, otherwise the product's.",
+      "Stock currently committed across other DRAFT/ACTIVE combos — the variant's own comboQuantity for a variant option, otherwise the product's. Live-maintained by DB triggers.",
     example: 2,
   })
   comboQuantity!: number;

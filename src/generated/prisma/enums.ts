@@ -48,20 +48,76 @@ export const InventoryExchangeType = {
 export type InventoryExchangeType = (typeof InventoryExchangeType)[keyof typeof InventoryExchangeType]
 
 
+export const CartStatus = {
+  ACTIVE: 'ACTIVE',
+  CONVERTED: 'CONVERTED',
+  ABANDONED: 'ABANDONED'
+} as const
+
+export type CartStatus = (typeof CartStatus)[keyof typeof CartStatus]
+
+
+export const AddressType = {
+  SHIPPING: 'SHIPPING',
+  BILLING: 'BILLING'
+} as const
+
+export type AddressType = (typeof AddressType)[keyof typeof AddressType]
+
+
+export const OrderStatus = {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  PROCESSING: 'PROCESSING',
+  PACKED: 'PACKED',
+  SHIPPED: 'SHIPPED',
+  OUT_FOR_DELIVERY: 'OUT_FOR_DELIVERY',
+  DELIVERED: 'DELIVERED',
+  CANCELLED: 'CANCELLED',
+  RETURNED: 'RETURNED',
+  REFUNDED: 'REFUNDED',
+  FAILED: 'FAILED'
+} as const
+
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
+
+
+export const PaymentMethod = {
+  CARD: 'CARD',
+  SCANPAY: 'SCANPAY',
+  CASH_ON_DELIVERY: 'CASH_ON_DELIVERY'
+} as const
+
+export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
+
+
+export const PaymentStatus = {
+  PENDING: 'PENDING',
+  AUTHORIZED: 'AUTHORIZED',
+  PAID: 'PAID',
+  FAILED: 'FAILED',
+  PARTIALLY_REFUNDED: 'PARTIALLY_REFUNDED',
+  REFUNDED: 'REFUNDED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
+
+
+export const PaymentTransactionType = {
+  CHARGE: 'CHARGE',
+  REFUND: 'REFUND'
+} as const
+
+export type PaymentTransactionType = (typeof PaymentTransactionType)[keyof typeof PaymentTransactionType]
+
+
 export const ProductType = {
   SIMPLE: 'SIMPLE',
   VARIABLE: 'VARIABLE'
 } as const
 
 export type ProductType = (typeof ProductType)[keyof typeof ProductType]
-
-
-export const DiscountType = {
-  FIXED: 'FIXED',
-  PERCENTAGE: 'PERCENTAGE'
-} as const
-
-export type DiscountType = (typeof DiscountType)[keyof typeof DiscountType]
 
 
 export const StockStatus = {
@@ -82,6 +138,14 @@ export const CategoryProductStatus = {
 } as const
 
 export type CategoryProductStatus = (typeof CategoryProductStatus)[keyof typeof CategoryProductStatus]
+
+
+export const DiscountType = {
+  FIXED: 'FIXED',
+  PERCENTAGE: 'PERCENTAGE'
+} as const
+
+export type DiscountType = (typeof DiscountType)[keyof typeof DiscountType]
 
 
 export const SupportStatus = {

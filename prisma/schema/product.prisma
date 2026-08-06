@@ -37,7 +37,7 @@ model Product {
   status        CategoryProductStatus @default(ACTIVE)
   isFeatured    Boolean               @default(false) @map("is_featured")
   hasVariants   Boolean               @default(false) @map("has_variants") //* DERIVED FIELD TO READ FASTER (variants.length)
-  comboQuantity Int                   @default(1) @map("combo_quantity") //* HOW MANY UNITS OF THIS PRODUCT GO INTO A COMBO. USED TO PREFILL ComboItem.quantity WHEN THIS PRODUCT IS BUNDLED — ComboItem.quantity STAYS AUTHORITATIVE PER COMBO AND MAY OVERRIDE IT. MUST BE > 0 (products_combo_quantity_positive).
+  comboQuantity Int                   @default(0) @map("combo_quantity") //* LIVE, TRIGGER-MAINTAINED: SUM, ACROSS EVERY DRAFT/ACTIVE COMBO CURRENTLY BUNDLING THIS PRODUCT, OF (ComboItem.quantity * EFFECTIVE SELLABLE BUNDLES — LEAST(combo.quantity, COALESCE(combo.offeredQuantity, combo.quantity))). RETURNS TO 0 ONCE NO SUCH COMBO REFERENCES IT. INFORMATIONAL ONLY — NEVER SUBTRACTED FROM quantity OR GATING A SALE. SEE 20260804010000_repurpose_combo_quantity_as_live_commitment.
 
   //* PRICING (USE DECIMAL FOR FINANCIAL ACCURACY)
   costPrice     Decimal?     @map("cost_price") @db.Decimal(12, 2) //* FOR PROFIT CALCULATION
@@ -140,7 +140,7 @@ model ProductVariant {
 
   attributes    Json    @default("{}") // The JSON structure for attributes (e.g., {"color": "Red", "size": "XL"})  //* E.G. { "size": "500ml", "flavor": "Honey" }
   isDefault     Boolean @default(false) @map("is_default")
-  comboQuantity Int     @default(1) @map("combo_quantity") //* SAME SEMANTICS AS Product.comboQuantity, SCOPED TO THIS VARIANT — WINS OVER THE PARENT PRODUCT'S VALUE WHEN A ComboItem PINS A VARIANT. MUST BE > 0 (product_variants_combo_quantity_positive).
+  comboQuantity Int     @default(0) @map("combo_quantity") //* SAME SEMANTICS AS Product.comboQuantity, SCOPED TO THIS VARIANT — WINS OVER THE PARENT PRODUCT'S VALUE WHEN A ComboItem PINS A VARIANT.
 
   // * RELATIONS
   productId     Int            @map("product_id")

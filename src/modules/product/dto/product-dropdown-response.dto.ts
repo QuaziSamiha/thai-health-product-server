@@ -88,6 +88,14 @@ export class ProductDropdownOptionDto {
 
   @Expose()
   @ApiProperty({
+    description:
+      "Stock currently committed to DRAFT/ACTIVE combos — the variant's own value for a variant option, otherwise the product's. Live-maintained by DB triggers: sum of (per-bundle quantity * effective sellable bundles) across every combo bundling this option.",
+    example: 3,
+  })
+  comboQuantity!: number;
+
+  @Expose()
+  @ApiProperty({
     enum: StockStatus,
     enumName: 'StockStatus',
     description:
@@ -153,6 +161,7 @@ export class ProductDropdownOptionDto {
         type: ProductType;
         status: CategoryProductStatus;
         quantity: number;
+        comboQuantity: number;
         costPrice: unknown;
         basePrice: unknown;
         salePrice: unknown;
@@ -167,6 +176,7 @@ export class ProductDropdownOptionDto {
         sku: string | null;
         barcode: string | null;
         quantity: number;
+        comboQuantity: number;
         costPrice: unknown;
         basePrice: unknown;
         salePrice: unknown;
@@ -184,6 +194,8 @@ export class ProductDropdownOptionDto {
     this.type = input.product.type;
     this.status = input.product.status;
     this.quantity = input.variant?.quantity ?? input.product.quantity;
+    this.comboQuantity =
+      input.variant?.comboQuantity ?? input.product.comboQuantity;
     this.stockStatus = input.variant?.stockStatus ?? input.product.stockStatus;
     this.image = toAbsoluteUrl(input.product.images?.[0]?.url, baseUrl);
     this.updatedAt = input.product.updatedAt;
