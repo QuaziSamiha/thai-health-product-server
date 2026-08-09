@@ -9,6 +9,14 @@
 * 🟢 You can import this file directly.
 */
 
+export const AddressType = {
+  SHIPPING: 'SHIPPING',
+  BILLING: 'BILLING'
+} as const
+
+export type AddressType = (typeof AddressType)[keyof typeof AddressType]
+
+
 export const BlogStatus = {
   PUBLISHED: 'PUBLISHED',
   DRAFT: 'DRAFT',
@@ -16,6 +24,15 @@ export const BlogStatus = {
 } as const
 
 export type BlogStatus = (typeof BlogStatus)[keyof typeof BlogStatus]
+
+
+export const CartStatus = {
+  ACTIVE: 'ACTIVE',
+  CONVERTED: 'CONVERTED',
+  ABANDONED: 'ABANDONED'
+} as const
+
+export type CartStatus = (typeof CartStatus)[keyof typeof CartStatus]
 
 
 export const HomeContentStatus = {
@@ -46,23 +63,6 @@ export const InventoryExchangeType = {
 } as const
 
 export type InventoryExchangeType = (typeof InventoryExchangeType)[keyof typeof InventoryExchangeType]
-
-
-export const CartStatus = {
-  ACTIVE: 'ACTIVE',
-  CONVERTED: 'CONVERTED',
-  ABANDONED: 'ABANDONED'
-} as const
-
-export type CartStatus = (typeof CartStatus)[keyof typeof CartStatus]
-
-
-export const AddressType = {
-  SHIPPING: 'SHIPPING',
-  BILLING: 'BILLING'
-} as const
-
-export type AddressType = (typeof AddressType)[keyof typeof AddressType]
 
 
 export const OrderStatus = {

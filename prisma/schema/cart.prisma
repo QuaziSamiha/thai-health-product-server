@@ -1,0 +1,66 @@
+//* ============= CART DOMAIN =============
+//* NOT WIRED INTO THE APP YET — KEPT AS A STANDALONE MODEL FOR WHEN CART
+//* PERSISTENCE IS NEEDED. NO OTHER DOMAIN FILE REFERENCES Cart/CartItem.
+
+enum CartStatus {
+  ACTIVE
+  CONVERTED //* SUCCESSFULLY TURNED INTO AN Order
+  ABANDONED //* EXPIRED WITHOUT CHECKOUT — SWEPT BY A SCHEDULED JOB, USEFUL FOR CART-RECOVERY MARKETING
+}
+
+model Cart {
+  id  Int    @id @default(autoincrement())
+  sid String @unique @default(uuid()) @db.Uuid
+
+  status CartStatus @default(ACTIVE)
+
+  //* RELATIONS
+  userId Int?  @map("user_id") //* NULL FOR GUEST CARTS, IDENTIFIED BY sessionToken INSTEAD
+  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  sessionToken String?   @map("session_token") @db.VarChar(255) //* GUEST CART IDENTIFIER (COOKIE/LOCALSTORAGE ID) — MERGED INTO THE USER'S CART ON LOGIN
+  expiresAt    DateTime? @map("expires_at") @db.Timestamptz(3) //* GUEST CARTS ARE SWEPT AFTER THIS; USER CARTS PERSIST INDEFINITELY
+
+  items CartItem[]
+
+  //* TIMESTAMPS
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([userId, status])
+  @@index([sessionToken])
+  @@map("carts")
+}
+
+model CartItem {
+  id Int @id @default(autoincrement())
+
+  cartId Int  @map("cart_id")
+  cart   Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  //* EXACTLY ONE OF (productId [+ OPTIONAL variantId]) OR comboId IS SET —
+  //* SAME XOR CONTRACT AS ComboItem'S product/variant/combo SHAPE, ENFORCED
+  //* AT THE APP LAYER, NOT THE DB
+  productId Int?            @map("product_id")
+  product   Product?        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId Int?            @map("variant_id")
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  comboId   Int?            @map("combo_id")
+  combo     ComboProduct?   @relation(fields: [comboId], references: [id], onDelete: Cascade)
+
+  quantity Int @default(1)
+
+  //* NO PRICE COLUMNS HERE — UNLIKE OrderItem, A CART ALWAYS PRICES LIVE OFF
+  //* THE CURRENT Product/ProductVariant/ComboProduct ROW, SO A PRICE CHANGE
+  //* IS REFLECTED IMMEDIATELY INSTEAD OF BEING FROZEN LIKE A PLACED ORDER
+
+  addedAt DateTime @default(now()) @map("added_at") @db.Timestamptz(3)
+
+  //* COVERS ROWS WITH A NON-NULL variantId ONLY — POSTGRES TREATS NULLS AS
+  //* DISTINCT, SO PLAIN (cartId, productId) ROWS NEED A SEPARATE PARTIAL
+  //* UNIQUE INDEX AT THE MIGRATION LEVEL, SAME CAVEAT AS
+  //* combo_items_unique_without_variant IN combo-product.prisma
+  @@unique([cartId, productId, variantId])
+  @@index([comboId])
+  @@map("cart_items")
+}

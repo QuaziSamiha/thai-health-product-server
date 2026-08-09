@@ -1,0 +1,42 @@
+//* ============= ADDRESS DOMAIN =============
+//* CUSTOMER'S SAVED DELIVERY ADDRESS BOOK — MANAGED FROM THE PROFILE PAGE,
+//* INDEPENDENT OF CHECKOUT. Order (order.prisma) IMPORTS THIS VIA
+//* OrderAddress, WHICH TAKES A FROZEN SNAPSHOT OF ONE OF THESE ROWS AT
+//* PLACEMENT TIME RATHER THAN JOINING IT LIVE — SEE THE OrderAddress
+//* COMMENT IN order.prisma.
+
+enum AddressType {
+  SHIPPING
+  BILLING
+}
+
+model Address {
+  id  Int    @id @default(autoincrement())
+  sid String @unique @default(uuid()) @db.Uuid
+
+  label     String?     @db.VarChar(100) //* USER-FACING NICKNAME, E.G. "HOME", "OFFICE"
+  type      AddressType @default(SHIPPING)
+  isDefault Boolean     @default(false) @map("is_default")
+
+  recipientName String @map("recipient_name") @db.VarChar(200)
+  phone         String @db.VarChar(20)
+
+  addressLine String @map("address_line") @db.VarChar(255) //* STREET NAME & HOUSE NUMBER
+  state       String @db.VarChar(100) //* PROVINCE LEVEL — CHECKOUT'S "SELECT STATE"
+  region      String @db.VarChar(100) //* DISTRICT LEVEL — CHECKOUT'S "SELECT REGION"
+  postalCode  String @map("postal_code") @db.VarChar(20)
+  country     String @default("Thailand") @db.VarChar(100)
+
+  //* RELATIONS
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  orderAddresses OrderAddress[] //* BEST-EFFORT BACK-LINK — SEE OrderAddress.sourceAddress
+
+  //* TIMESTAMPS
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([userId, isDefault])
+  @@map("addresses")
+}
