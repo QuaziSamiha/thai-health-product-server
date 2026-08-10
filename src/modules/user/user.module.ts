@@ -7,9 +7,15 @@ import { ProfileRepository } from './repositories/profile.repository';
 import { OtpModule } from '../otp/otp.module';
 import { PaginationModule } from '../../shared/pagination';
 import { HashModule } from '../../shared/hash/hash.module';
+import { StorageModule } from '../../shared/storage/storage.module';
 
 @Module({
-  imports: [forwardRef(() => OtpModule), PaginationModule, HashModule],
+  imports: [
+    forwardRef(() => OtpModule),
+    PaginationModule,
+    HashModule,
+    StorageModule,
+  ],
   controllers: [UserController],
   providers: [
     UserService,

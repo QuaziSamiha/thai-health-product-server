@@ -16,4 +16,13 @@ export class ProfileRepository extends BaseRepository {
     const client = tx || this.prisma;
     return client.profile.create({ data });
   }
+
+  async updateProfile(
+    userId: number,
+    data: Prisma.ProfileUpdateInput,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return client.profile.update({ where: { userId }, data });
+  }
 }

@@ -25,6 +25,8 @@ import { SupportModule } from './modules/support/support.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { ComboProductModule } from './modules/combo-product/combo-product.module';
 import { AddressModule } from './modules/address/address.module';
+import { OrderModule } from './modules/order/order.module';
+import { PromotionModule } from './modules/promotion/promotion.module';
 import { HealthModule } from './health/health.module';
 import { validate } from './config/env.validation';
 import appConfig from './config/app.config';
@@ -83,6 +85,8 @@ import {
     ComboProductModule,
     InventoryModule,
     AddressModule,
+    PromotionModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [

@@ -4,6 +4,7 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -12,6 +13,7 @@ import { ProfileRepository } from './repositories/profile.repository';
 import { UserSecurityRepository } from './repositories/user-security.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import {
   UserResponseDto,
   UserResponseDtoWithDetails,
@@ -27,8 +29,12 @@ import {
 import { Prisma } from '../../generated/prisma/client';
 import { UserSecurityMeResponseDto } from './dto/user-security-response.dto';
 import { PaginationQueryDto, IPaginatedResult } from '../../shared/pagination';
+import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
+import type { IStorageService } from '../../shared/storage/interfaces/storage.interface';
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
   constructor(
     private readonly userRepo: UserRepository,
     private readonly profileRepo: ProfileRepository,
@@ -37,6 +43,8 @@ export class UserService {
     private readonly otpService: OtpService,
     private readonly hashService: HashService,
     private readonly configService: ConfigService,
+    @Inject(STORAGE_SERVICE_TOKEN)
+    private readonly storageService: IStorageService,
   ) {}
 
   async registerUser(
@@ -224,6 +232,99 @@ export class UserService {
     );
   }
 
+  async deactivateUser(userId: number): Promise<UserResponseDtoWithDetails> {
+    const existingUser = await this.userRepo.findUserById(userId);
+
+    if (!existingUser) {
+      throw new NotFoundException(`User with ID ${userId} not found.`);
+    }
+
+    if (existingUser.status === UserStatus.DEACTIVATED) {
+      throw new ConflictException('User is already deactivated.');
+    }
+
+    await this.userRepo.updateUserStatusById(userId, UserStatus.DEACTIVATED);
+
+    const updatedUser = await this.userRepo.findUserById(userId);
+    if (!updatedUser) {
+      throw new NotFoundException(`User with ID ${userId} not found.`);
+    }
+
+    return new UserResponseDtoWithDetails(
+      updatedUser,
+      this.configService.get<string>('app.baseUrl'),
+    );
+  }
+
+  async updateProfile(
+    userId: number,
+    dto: UpdateProfileDto,
+    avatarFile?: Express.Multer.File,
+  ): Promise<UserResponseDtoWithDetails> {
+    const existingUser = await this.userRepo.findUserById(userId);
+    if (!existingUser) {
+      throw new NotFoundException(`User with ID ${userId} not found.`);
+    }
+
+    const profileUpdateData: Prisma.ProfileUpdateInput = {};
+
+    if (dto.firstName !== undefined) {
+      profileUpdateData.firstName = dto.firstName;
+    }
+    if (dto.lastName !== undefined) {
+      profileUpdateData.lastName = dto.lastName;
+    }
+    if (dto.firstName !== undefined || dto.lastName !== undefined) {
+      const firstName = dto.firstName ?? existingUser.profile?.firstName ?? '';
+      const lastName = dto.lastName ?? existingUser.profile?.lastName ?? '';
+      profileUpdateData.name = `${firstName} ${lastName}`.trim();
+    }
+
+    // * UPLOAD BEFORE THE DB WRITE SO A FAILED UPLOAD NEVER LEAVES A DANGLING
+    // * avatarUrl; THE OLD FILE IS ONLY DELETED AFTER THE NEW ONE IS COMMITTED.
+    let oldAvatarFilename: string | undefined;
+    if (avatarFile) {
+      const savedFile = await this.storageService.saveFile(
+        avatarFile,
+        'profiles',
+      );
+      profileUpdateData.avatarUrl = savedFile.path;
+      if (existingUser.profile?.avatarUrl) {
+        oldAvatarFilename = existingUser.profile.avatarUrl.split('/').pop();
+      }
+    } else if (dto.removeAvatar && existingUser.profile?.avatarUrl) {
+      profileUpdateData.avatarUrl = null;
+      oldAvatarFilename = existingUser.profile.avatarUrl.split('/').pop();
+    }
+
+    await this.userRepo.withTransaction(async (tx) => {
+      if (Object.keys(profileUpdateData).length > 0) {
+        await this.profileRepo.updateProfile(userId, profileUpdateData, tx);
+      }
+      if (dto.phone !== undefined) {
+        await this.userRepo.updateUserPhone(userId, dto.phone, tx);
+      }
+    });
+
+    if (oldAvatarFilename) {
+      await this.storageService
+        .deleteFile(oldAvatarFilename, 'profiles')
+        .catch((e) =>
+          this.logger.warn(`Could not delete old avatar file: ${e}`),
+        );
+    }
+
+    const updatedUser = await this.userRepo.findUserById(userId);
+    if (!updatedUser) {
+      throw new NotFoundException(`User with ID ${userId} not found.`);
+    }
+
+    return new UserResponseDtoWithDetails(
+      updatedUser,
+      this.configService.get<string>('app.baseUrl'),
+    );
+  }
+
   async updatePassword(
     userId: number,
     dto: UpdatePasswordDto,
@@ -246,6 +347,16 @@ export class UserService {
     );
     if (!isMatch) {
       throw new BadRequestException('Current password does not match.');
+    }
+
+    const isSameAsCurrent = await this.hashService.compare(
+      dto.newPassword,
+      user.password,
+    );
+    if (isSameAsCurrent) {
+      throw new BadRequestException(
+        'New password must be different from the current password.',
+      );
     }
 
     const hashedNewPassword = await this.hashService.hash(dto.newPassword);

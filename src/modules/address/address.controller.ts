@@ -12,10 +12,14 @@ import {
   Req,
   UnauthorizedException,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiBadRequestResponse,
+  ApiBody,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
@@ -50,12 +54,15 @@ export class AddressController {
     return req.user.id;
   }
 
-  @Post()
+  @Post('create-address')
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(NoFilesInterceptor())
   @ApiOperation({
     summary: 'Create a new address',
     description:
       "Adds a delivery address to the logged-in customer's address book. The first address a customer saves always becomes the default.",
   })
+  @ApiBody({ type: CreateAddressDto })
   @ApiCreatedResponse({
     description: 'Address created successfully.',
     type: AddressResponseDto,

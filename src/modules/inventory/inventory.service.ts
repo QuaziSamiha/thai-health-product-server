@@ -716,4 +716,113 @@ export class InventoryService {
       return results;
     });
   }
+
+  // ─── Sales (order fulfillment) ────────────────────────────────────────────
+  //* CONSUMED BY OrderModule — SEE docs/order.md. UNLIKE addStock/removeStock,
+  //* NEITHER METHOD BELOW TOUCHES Batch: A SALE DRAWS DOWN THE PRODUCT'S/
+  //* VARIANT'S OWN quantity DIRECTLY, WITH NO PER-BATCH/FIFO ATTRIBUTION.
+  //* THAT LEVEL OF PRECISION (WHICH BATCH A GIVEN ORDER LINE CAME FROM, FOR
+  //* EXPIRY-ACCURATE COGS) IS A DELIBERATELY DEFERRED FUTURE ENHANCEMENT.
+
+  /**
+   * Decrements stock for a completed sale and appends one SALE movement per
+   * line, all inside the caller's own transaction (always required — this
+   * runs as one step of OrderService.placeOrder's larger transaction, never
+   * standalone). The caller has already validated availability against an
+   * earlier read; decrementProductQuantityGuarded/decrementVariantQuantityGuarded
+   * re-check it atomically against the live row, so a race that has since
+   * sold the last unit surfaces here as a clear error instead of silently
+   * pushing stock negative.
+   */
+  async deductStockForSale(
+    items: { productId?: number; variantId?: number; quantity: number }[],
+    referenceId: string,
+    userId: number | undefined,
+    tx: Prisma.TransactionClient,
+  ): Promise<void> {
+    for (const item of items) {
+      const applied = item.variantId
+        ? await this.inventoryRepository.decrementVariantQuantityGuarded(
+            item.variantId,
+            item.quantity,
+            tx,
+          )
+        : await this.inventoryRepository.decrementProductQuantityGuarded(
+            item.productId!,
+            item.quantity,
+            tx,
+          );
+
+      if (!applied) {
+        throw new BadRequestException(
+          `Insufficient stock for ${item.variantId ? `variant ${item.variantId}` : `product ${item.productId}`} — someone may have just purchased the last of it`,
+        );
+      }
+
+      await this.inventoryRepository.createMovement(
+        {
+          quantity: -item.quantity,
+          changeType: InventoryExchangeType.SALE,
+          referenceId,
+          ...(item.productId && {
+            product: { connect: { id: item.productId } },
+          }),
+          ...(item.variantId && {
+            variant: { connect: { id: item.variantId } },
+          }),
+          ...(userId && { InventoryRecordedBy: { connect: { id: userId } } }),
+        },
+        tx,
+      );
+    }
+  }
+
+  /**
+   * The inverse of deductStockForSale — restores stock when an order is
+   * cancelled, and logs a RETURN movement per line (not RESTOCK, which
+   * implies a fresh vendor intake rather than stock coming back from a
+   * cancelled sale).
+   */
+  async restoreStockForSale(
+    items: { productId?: number; variantId?: number; quantity: number }[],
+    referenceId: string,
+    reason: string,
+    userId: number | undefined,
+    tx: Prisma.TransactionClient,
+  ): Promise<void> {
+    for (const item of items) {
+      if (item.variantId) {
+        await this.inventoryRepository.incrementVariantQuantity(
+          item.variantId,
+          item.quantity,
+          undefined,
+          tx,
+        );
+      } else if (item.productId) {
+        await this.inventoryRepository.incrementProductQuantity(
+          item.productId,
+          item.quantity,
+          undefined,
+          tx,
+        );
+      }
+
+      await this.inventoryRepository.createMovement(
+        {
+          quantity: item.quantity,
+          changeType: InventoryExchangeType.RETURN,
+          reason,
+          referenceId,
+          ...(item.productId && {
+            product: { connect: { id: item.productId } },
+          }),
+          ...(item.variantId && {
+            variant: { connect: { id: item.variantId } },
+          }),
+          ...(userId && { InventoryRecordedBy: { connect: { id: userId } } }),
+        },
+        tx,
+      );
+    }
+  }
 }

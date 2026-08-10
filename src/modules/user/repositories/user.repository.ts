@@ -166,6 +166,20 @@ export class UserRepository extends BaseRepository {
     });
   }
 
+  async updateUserPhone(
+    userId: number,
+    phone: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+
+    return await client.user.update({
+      where: { id: userId },
+      data: { phone },
+      select: this.USER_SELECT,
+    });
+  }
+
   async updateUserRole(
     userId: number,
     role: UserRole,

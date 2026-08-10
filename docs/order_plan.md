@@ -1,6 +1,6 @@
 # Order Placement — Implementation Plan
 
-Status: **planning only, no code written yet**. This document is the blueprint for building the `order` module (plus a standalone `address` module it depends on) in `thai-health-product-server`.
+Status: **implemented (v1)**. This document was the original planning blueprint; `AddressModule` and `OrderModule` are both now built. For the as-built reference (schema, endpoints, business logic, known gaps), see [docs/order.md](./order.md) and [docs/address.md](./address.md) — this file is kept as historical design context, not a live spec.
 
 ## 0. What this plan is based on
 

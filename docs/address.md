@@ -153,7 +153,7 @@ Every endpoint below is served by `AddressController` → `AddressService` → `
 
 | Method   | Path            | Access     | Purpose                                                              |
 | :------- | :-------------- | :--------- | :--------------------------------------------------------------------- |
-| `POST`   | `/`             | `CUSTOMER` | [Add an address to my address book](#create-an-address)               |
+| `POST`   | `/create-address` | `CUSTOMER` | [Add an address to my address book](#create-an-address)             |
 | `GET`    | `/`             | `CUSTOMER` | [List my addresses, default first](#list-my-addresses)                |
 | `GET`    | `/default`      | `CUSTOMER` | [Get my default address, for checkout auto-fill](#get-my-default-address) |
 | `GET`    | `/:id`          | `CUSTOMER` | [Get one of my addresses by id](#get-an-address-by-id)                |
@@ -173,11 +173,11 @@ A single shape, `AddressResponseDto`, serves every endpoint — there is no admi
 
 #### Create an Address
 
-**`POST /api/v1/address`**
+**`POST /api/v1/address/create-address`**
 
 **Purpose**: Add a new address to the logged-in customer's address book.
 
-**Access**: `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.CUSTOMER)`.
+**Access**: `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.CUSTOMER)`, `multipart/form-data` (`NoFilesInterceptor` — parses form fields with no file upload support; there is nothing to upload on an address).
 
 | Layer      | What happens                                                                                                     |
 | :--------- | :------------------------------------------------------------------------------------------------------------------ |

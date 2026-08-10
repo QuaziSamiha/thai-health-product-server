@@ -322,4 +322,40 @@ export class InventoryRepository extends BaseRepository {
       select: { id: true, quantity: true },
     });
   }
+
+  /**
+   * Guarded decrement for a completed sale (an order) — unlike
+   * incrementProductQuantity above (used by admin add/remove-stock, which
+   * trusts a quantity its own caller already validated), this runs under
+   * real concurrent-customer pressure at checkout: the WHERE clause itself
+   * requires quantity >= amount, so a race that would push stock negative
+   * simply updates zero rows instead. No batch/FIFO bookkeeping is touched —
+   * that precision belongs to the admin-driven removeStock flow; a sale
+   * draws down the product's own running total directly. Returns whether
+   * the guarded update actually applied.
+   */
+  async decrementProductQuantityGuarded(
+    id: number,
+    amount: number,
+    tx: Prisma.TransactionClient,
+  ): Promise<boolean> {
+    const result = await tx.product.updateMany({
+      where: { id, quantity: { gte: amount } },
+      data: { quantity: { decrement: amount } },
+    });
+    return result.count > 0;
+  }
+
+  /** Same guarded-decrement contract as decrementProductQuantityGuarded, scoped to one variant. */
+  async decrementVariantQuantityGuarded(
+    id: number,
+    amount: number,
+    tx: Prisma.TransactionClient,
+  ): Promise<boolean> {
+    const result = await tx.productVariant.updateMany({
+      where: { id, quantity: { gte: amount } },
+      data: { quantity: { decrement: amount } },
+    });
+    return result.count > 0;
+  }
 }

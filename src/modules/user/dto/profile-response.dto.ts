@@ -33,7 +33,7 @@ export class ProfileResponseDto {
     this.avatarUrl = profile.avatarUrl
       ? profile.avatarUrl.startsWith('http')
         ? profile.avatarUrl
-        : `${baseUrl}/uploads/profiles/${profile.avatarUrl}`
+        : `${baseUrl}${profile.avatarUrl}`
       : undefined;
     this.bio = profile.bio ?? undefined;
     // this.dateOfBirth = profile.dateOfBirth ?? undefined;
