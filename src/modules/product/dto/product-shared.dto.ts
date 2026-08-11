@@ -1,6 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { ProductType } from '../../../generated/prisma/browser';
+import { toAbsoluteUrl } from '../../../common/utils/url.util';
+
+export { toAbsoluteUrl };
 
 //* ═══════════════════════════════════════════════════════════════════════
 //* SHARED BUILDING BLOCKS — REUSED ACROSS EVERY PRODUCT RESPONSE VARIANT
@@ -146,16 +149,4 @@ export function toAttributes(
   return value && typeof value === 'object'
     ? (value as Record<string, unknown>)
     : undefined;
-}
-
-//* STORED IMAGE PATHS ARE RELATIVE (E.G. `/uploads/products/gallery/abc.webp`)
-//* — PREFIX WITH THE CONFIGURED BASE URL SO CLIENTS GET A DIRECTLY-USABLE
-//* ABSOLUTE URL. LEFT UNCHANGED IF ALREADY ABSOLUTE OR IF NO BASE URL WAS
-//* SUPPLIED (E.G. A CALLER THAT DOESN'T HAVE ACCESS TO CONFIGSERVICE).
-export function toAbsoluteUrl(
-  path: string | null | undefined,
-  baseUrl?: string,
-): string | undefined {
-  if (!path) return undefined;
-  return path.startsWith('http') || !baseUrl ? path : `${baseUrl}${path}`;
 }

@@ -7,6 +7,7 @@ import {
   PaymentStatus,
   PaymentTransactionType,
 } from '../../../generated/prisma/enums';
+import { toAbsoluteUrl } from '../../../common/utils/url.util';
 
 export class OrderItemResponseDto {
   @Expose()
@@ -73,21 +74,24 @@ export class OrderItemResponseDto {
   })
   totalPrice!: number;
 
-  constructor(item: {
-    id: number;
-    productId: number | null;
-    variantId: number | null;
-    comboId: number | null;
-    name: string;
-    nameTh: string | null;
-    sku: string | null;
-    imageUrl: string | null;
-    attributes: unknown;
-    quantity: number;
-    unitPrice: unknown;
-    discountAmount: unknown;
-    totalPrice: unknown;
-  }) {
+  constructor(
+    item: {
+      id: number;
+      productId: number | null;
+      variantId: number | null;
+      comboId: number | null;
+      name: string;
+      nameTh: string | null;
+      sku: string | null;
+      imageUrl: string | null;
+      attributes: unknown;
+      quantity: number;
+      unitPrice: unknown;
+      discountAmount: unknown;
+      totalPrice: unknown;
+    },
+    baseUrl?: string,
+  ) {
     this.id = item.id;
     this.productId = item.productId;
     this.variantId = item.variantId;
@@ -95,7 +99,10 @@ export class OrderItemResponseDto {
     this.name = item.name;
     this.nameTh = item.nameTh;
     this.sku = item.sku;
-    this.imageUrl = item.imageUrl;
+    //* item.imageUrl IS STORED AS A RELATIVE PATH (E.G.
+    //* "/uploads/products/gallery/abc.webp") — SAME CONVENTION AS
+    //* ProductImage.url — SO IT NEEDS THE SAME baseUrl PREFIXING ON READ.
+    this.imageUrl = toAbsoluteUrl(item.imageUrl, baseUrl) ?? null;
     this.attributes =
       (item.attributes as Record<string, unknown> | null) ?? null;
     this.quantity = item.quantity;
@@ -305,12 +312,12 @@ export class OrderResponseDto {
   customerFirstName!: string;
 
   @Expose()
-  @ApiProperty({ description: 'Customer last name' })
-  customerLastName!: string;
+  @ApiPropertyOptional({ description: 'Customer last name' })
+  customerLastName!: string | null;
 
   @Expose()
-  @ApiProperty({ description: 'Customer email' })
-  customerEmail!: string;
+  @ApiPropertyOptional({ description: 'Customer email' })
+  customerEmail!: string | null;
 
   @Expose()
   @ApiProperty({ description: 'Customer phone' })
@@ -416,40 +423,46 @@ export class OrderResponseDto {
   @ApiProperty()
   updatedAt!: Date;
 
-  constructor(order: {
-    id: number;
-    sid: string;
-    orderNumber: string;
-    status: OrderStatus;
-    paymentStatus: PaymentStatus;
-    paymentMethod: PaymentMethod;
-    customerFirstName: string;
-    customerLastName: string;
-    customerEmail: string;
-    customerPhone: string;
-    subtotal: unknown;
-    discountAmount: unknown;
-    deliveryCharge: unknown;
-    taxAmount: unknown;
-    totalAmount: unknown;
-    appliedPromoCode: string | null;
-    customerNote: string | null;
-    cancelReason: string | null;
-    placedAt: Date;
-    confirmedAt: Date | null;
-    shippedAt: Date | null;
-    deliveredAt: Date | null;
-    cancelledAt: Date | null;
-    userId: number | null;
-    items: ConstructorParameters<typeof OrderItemResponseDto>[0][];
-    addresses: ConstructorParameters<typeof OrderAddressResponseDto>[0][];
-    payments: ConstructorParameters<typeof PaymentResponseDto>[0][];
-    statusHistory?: ConstructorParameters<
-      typeof OrderStatusHistoryResponseDto
-    >[0][];
-    createdAt: Date;
-    updatedAt: Date;
-  }) {
+  constructor(
+    order: {
+      id: number;
+      sid: string;
+      orderNumber: string;
+      status: OrderStatus;
+      paymentStatus: PaymentStatus;
+      paymentMethod: PaymentMethod;
+      customerFirstName: string;
+      customerLastName: string | null;
+      customerEmail: string | null;
+      customerPhone: string;
+      subtotal: unknown;
+      discountAmount: unknown;
+      deliveryCharge: unknown;
+      taxAmount: unknown;
+      totalAmount: unknown;
+      appliedPromoCode: string | null;
+      customerNote: string | null;
+      cancelReason: string | null;
+      placedAt: Date;
+      confirmedAt: Date | null;
+      shippedAt: Date | null;
+      deliveredAt: Date | null;
+      cancelledAt: Date | null;
+      userId: number | null;
+      items: ConstructorParameters<typeof OrderItemResponseDto>[0][];
+      addresses: ConstructorParameters<typeof OrderAddressResponseDto>[0][];
+      payments: ConstructorParameters<typeof PaymentResponseDto>[0][];
+      statusHistory?: ConstructorParameters<
+        typeof OrderStatusHistoryResponseDto
+      >[0][];
+      createdAt: Date;
+      updatedAt: Date;
+    },
+    //* PREFIXES OrderItem.imageUrl (STORED RELATIVE) INTO AN ABSOLUTE URL —
+    //* SAME app.baseUrl CONVENTION AS ProductResponseDto. OMIT TO LEAVE
+    //* RELATIVE PATHS UNCHANGED (E.G. A CALLER WITHOUT CONFIGSERVICE).
+    baseUrl?: string,
+  ) {
     this.id = order.id;
     this.sid = order.sid;
     this.orderNumber = order.orderNumber;
@@ -474,7 +487,9 @@ export class OrderResponseDto {
     this.deliveredAt = order.deliveredAt;
     this.cancelledAt = order.cancelledAt;
     this.userId = order.userId;
-    this.items = order.items.map((item) => new OrderItemResponseDto(item));
+    this.items = order.items.map(
+      (item) => new OrderItemResponseDto(item, baseUrl),
+    );
     this.addresses = order.addresses.map(
       (address) => new OrderAddressResponseDto(address),
     );

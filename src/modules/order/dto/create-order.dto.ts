@@ -206,12 +206,12 @@ export class CreateOrderDto {
   @MaxLength(100, { message: 'First name cannot exceed 100 characters' })
   firstName!: string;
 
-  @ApiProperty({ description: 'Customer last name', maxLength: 100 })
-  @Transform(({ value }) => trimString(value))
-  @IsNotEmpty({ message: 'Last name is required' })
+  @ApiPropertyOptional({ description: 'Customer last name', maxLength: 100 })
+  @IsOptional()
+  @Transform(({ value }) => emptyStringToUndefined(trimString(value)))
   @IsString({ message: 'Last name must be a valid text string' })
   @MaxLength(100, { message: 'Last name cannot exceed 100 characters' })
-  lastName!: string;
+  lastName?: string;
 
   @ApiProperty({ description: 'Contact phone for this order' })
   @Transform(({ value }) => emptyStringToUndefined(value))
@@ -222,12 +222,12 @@ export class CreateOrderDto {
   @TransformThaiPhone()
   phone!: string;
 
-  @ApiProperty({ description: 'Contact email for order confirmation' })
-  @Transform(({ value }) => trimString(value))
-  @IsNotEmpty({ message: 'Email is required' })
+  @ApiPropertyOptional({ description: 'Contact email for order confirmation' })
+  @IsOptional()
+  @Transform(({ value }) => emptyStringToUndefined(trimString(value)))
   @IsEmail({}, { message: 'Please provide a valid email address' })
   @MaxLength(255, { message: 'Email cannot exceed 255 characters' })
-  email!: string;
+  email?: string;
 
   @ApiPropertyOptional({
     description:

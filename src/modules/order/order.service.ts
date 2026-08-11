@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'crypto';
 import { Prisma } from '../../generated/prisma/client';
 import {
@@ -92,7 +93,15 @@ export class OrderService {
     private readonly addressService: AddressService,
     private readonly inventoryService: InventoryService,
     private readonly promotionService: PromotionService,
+    private readonly configService: ConfigService,
   ) {}
+
+  //* CENTRALIZES THE OrderItem.imageUrl RELATIVE→ABSOLUTE PREFIX SO EVERY
+  //* new OrderResponseDto(...) CALL SITE STAYS A ONE-LINER — SAME
+  //* app.baseUrl CONVENTION AS ProductService.
+  private getBaseUrl(): string | undefined {
+    return this.configService.get<string>('app.baseUrl');
+  }
 
   // ─── Place Order ──────────────────────────────────────────────────────────
 
@@ -234,7 +243,7 @@ export class OrderService {
       return this.orderRepository.findOrderDetail(shell.id, false, tx);
     });
 
-    return new OrderResponseDto(order!);
+    return new OrderResponseDto(order!, this.getBaseUrl());
   }
 
   /**
@@ -253,7 +262,9 @@ export class OrderService {
     dto: CreateOrderDto,
     userId: number | undefined,
   ): Promise<ResolvedAddress> {
-    const fallbackRecipientName = `${dto.firstName} ${dto.lastName}`.trim();
+    const fallbackRecipientName = dto.lastName
+      ? `${dto.firstName} ${dto.lastName}`.trim()
+      : dto.firstName.trim();
 
     if (userId) {
       if (dto.addressId) {
@@ -464,7 +475,10 @@ export class OrderService {
           name: `${variant.product.name} - ${variant.name}`,
           nameTh: variant.nameTh,
           sku: variant.sku,
-          imageUrl: variant.images[0]?.url ?? null,
+          //* MOST VARIANTS HAVE NO IMAGE OF THEIR OWN — FALL BACK TO THE
+          //* PARENT PRODUCT'S PRIMARY IMAGE RATHER THAN SNAPSHOTTING null.
+          imageUrl:
+            variant.images[0]?.url ?? variant.product.images[0]?.url ?? null,
           attributes:
             (variant.attributes as Prisma.InputJsonValue | null) ?? undefined,
           quantity: item.quantity,
@@ -576,13 +590,13 @@ export class OrderService {
     if (!isAdmin && order.userId !== requesterId) {
       throw new ForbiddenException('You do not have access to this order');
     }
-    return new OrderResponseDto(order);
+    return new OrderResponseDto(order, this.getBaseUrl());
   }
 
   async getOrderDetailAdmin(id: number): Promise<OrderResponseDto> {
     const order = await this.orderRepository.findOrderDetail(id, true);
     if (!order) throw new NotFoundException('Order not found');
-    return new OrderResponseDto(order);
+    return new OrderResponseDto(order, this.getBaseUrl());
   }
 
   async listMyOrders(
@@ -593,9 +607,10 @@ export class OrderService {
       userId,
       params,
     );
+    const baseUrl = this.getBaseUrl();
     return {
       ...result,
-      data: result.data.map((order) => new OrderResponseDto(order)),
+      data: result.data.map((order) => new OrderResponseDto(order, baseUrl)),
     };
   }
 
@@ -603,9 +618,10 @@ export class OrderService {
     params: PaginationQueryDto,
   ): Promise<IPaginatedResult<OrderResponseDto>> {
     const result = await this.orderRepository.findAllOrdersAdmin(params);
+    const baseUrl = this.getBaseUrl();
     return {
       ...result,
-      data: result.data.map((order) => new OrderResponseDto(order)),
+      data: result.data.map((order) => new OrderResponseDto(order, baseUrl)),
     };
   }
 
@@ -692,7 +708,7 @@ export class OrderService {
       return this.orderRepository.findOrderDetail(id, false, tx);
     });
 
-    return new OrderResponseDto(updated!);
+    return new OrderResponseDto(updated!, this.getBaseUrl());
   }
 
   /** Whole-order stock restoration on cancellation. Partial (line-item-level) editing of an already-placed order is a deferred future enhancement — see docs/order.md. */
@@ -776,6 +792,6 @@ export class OrderService {
       return this.orderRepository.findOrderDetail(id, false, tx);
     });
 
-    return new OrderResponseDto(updated!);
+    return new OrderResponseDto(updated!, this.getBaseUrl());
   }
 }

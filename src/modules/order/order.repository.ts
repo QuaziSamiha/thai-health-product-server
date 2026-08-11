@@ -60,7 +60,20 @@ export class OrderRepository extends BaseRepository {
         salePrice: true,
         attributes: true,
         product: {
-          select: { id: true, name: true, status: true, deletedAt: true },
+          select: {
+            id: true,
+            name: true,
+            status: true,
+            deletedAt: true,
+            //* FALLBACK SOURCE WHEN THE VARIANT HAS NO IMAGE OF ITS OWN — SEE
+            //* order.service.ts buildOrderItems, MOST VARIANTS IN THIS
+            //* CATALOG ONLY EVER GET A PRODUCT-LEVEL IMAGE.
+            images: {
+              where: { isPrimary: true, variantId: null },
+              select: { url: true },
+              take: 1,
+            },
+          },
         },
         images: {
           where: { isPrimary: true },

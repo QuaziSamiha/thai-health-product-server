@@ -57,10 +57,10 @@ model Order {
   //* User/Profile, SO THE ORDER RECORD SURVIVES A LATER PROFILE EDIT AND
   //* WORKS IDENTICALLY FOR GUEST CHECKOUTS (userId NULL, SAME CONTRACT AS
   //* OTP.userId)
-  customerFirstName String @map("customer_first_name") @db.VarChar(100)
-  customerLastName  String @map("customer_last_name") @db.VarChar(100)
-  customerEmail     String @map("customer_email") @db.VarChar(255)
-  customerPhone     String @map("customer_phone") @db.VarChar(20)
+  customerFirstName String  @map("customer_first_name") @db.VarChar(100)
+  customerLastName  String? @map("customer_last_name") @db.VarChar(100) //* OPTIONAL AT CHECKOUT — NOT EVERY CUSTOMER GIVES A LAST NAME
+  customerEmail     String? @map("customer_email") @db.VarChar(255) //* OPTIONAL AT CHECKOUT — phone IS THE GUARANTEED CONTACT CHANNEL FOR COD
+  customerPhone     String  @map("customer_phone") @db.VarChar(20)
 
   //* PRICING SNAPSHOT (DECIMAL FOR FINANCIAL ACCURACY) — FROZEN AT
   //* PLACEMENT, NEVER RECOMPUTED FROM CURRENT PRODUCT PRICES

@@ -33,8 +33,8 @@ erDiagram
         enum paymentStatus "PaymentStatus"
         enum paymentMethod "CASH_ON_DELIVERY only in v1"
         string customerFirstName
-        string customerLastName
-        string customerEmail
+        string customerLastName "nullable — optional at checkout"
+        string customerEmail "nullable — optional at checkout"
         string customerPhone
         decimal subtotal
         decimal discountAmount "promo code discount, 0 if none applied"
@@ -76,7 +76,7 @@ erDiagram
 | `orderNumber` | `VARCHAR(50)` UNIQUE | Human-readable, customer-facing (`THP-260810-000123`). Generated server-side in two steps — see [Order Number Generation](#order-number-generation). |
 | `status` | `ENUM(OrderStatus)` | See [Order Status Lifecycle](#order-status-lifecycle). |
 | `paymentMethod` | `ENUM(PaymentMethod)` | The schema allows `CARD`/`SCANPAY`/`CASH_ON_DELIVERY`; **`CreateOrderDto` only accepts `CASH_ON_DELIVERY`** — see [Conventions](#conventions). |
-| `customerFirstName`/`customerLastName`/`customerEmail`/`customerPhone` | — | Snapshot from the checkout form, never joined live off `User`/`Profile` — works identically for guest and logged-in checkout. |
+| `customerFirstName`/`customerLastName`/`customerEmail`/`customerPhone` | — | Snapshot from the checkout form, never joined live off `User`/`Profile` — works identically for guest and logged-in checkout. Only `customerFirstName`/`customerPhone` are mandatory — `customerLastName`/`customerEmail` are optional; `phone` is the guaranteed contact channel for Cash on Delivery. |
 | `subtotal`/`discountAmount`/`deliveryCharge`/`taxAmount`/`totalAmount` | `DECIMAL(12,2)` | Frozen at placement, never recomputed from current product prices. `totalAmount = subtotal - discountAmount + deliveryCharge + taxAmount`. |
 | `appliedPromoCode` | `VARCHAR(50)` NULLABLE | Denormalized display copy of the applied `PromoCode.code`, set when `CreateOrderDto.promoCode` was supplied and validated. `PromoCodeRedemption` (`promotion.prisma`) is the authoritative ledger — see [Promo Code Integration](#promo-code-integration). |
 | `userId` | `INT` NULLABLE, **ON DELETE SET NULL** | `null` for guest checkout. |
