@@ -1,0 +1,9 @@
+//* SELLER INFO PRINTED ON EVERY GENERATED INVOICE — NO DEDICATED "COMPANY
+//* SETTINGS" MODULE EXISTS YET, SO THIS IS A PLAIN CONSTANTS BLOCK. MOVE TO
+//* CONFIGSERVICE/ENV IF THIS EVER NEEDS TO BE EDITABLE WITHOUT A DEPLOY.
+export const INVOICE_SELLER = {
+  name: 'Thai Health Product',
+  addressLines: ['Bangkok, Thailand'],
+  email: 'support@thaihealth.example.com',
+  phone: '+66 00 000 0000',
+};

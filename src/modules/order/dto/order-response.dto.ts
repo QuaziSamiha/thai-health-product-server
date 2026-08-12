@@ -411,7 +411,8 @@ export class OrderResponseDto {
   @Expose()
   @ApiPropertyOptional({
     type: [OrderStatusHistoryResponseDto],
-    description: 'Only present on the admin detail endpoint',
+    description:
+      'Present on single-order detail reads (owner or admin) — omitted from list endpoints',
   })
   statusHistory?: OrderStatusHistoryResponseDto[];
 

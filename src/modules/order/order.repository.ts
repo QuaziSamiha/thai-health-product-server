@@ -174,6 +174,19 @@ export class OrderRepository extends BaseRepository {
     });
   }
 
+  /**
+   * sid IS THE UNGUESSABLE PUBLIC IDENTIFIER (UUID) — THE ONLY LOOKUP A
+   * GUEST CHECKOUT CAN USE SINCE THEY HAVE NO ACCOUNT/JWT TO OWNERSHIP-CHECK
+   * AGAINST. USED ONLY BY THE POST-CHECKOUT INVOICE DOWNLOAD — SEE
+   * OrderService.getInvoicePdfBufferBySid.
+   */
+  async findOrderDetailBySid(sid: string) {
+    return this.prisma.order.findUnique({
+      where: { sid },
+      select: ORDER_SELECT,
+    });
+  }
+
   /** Lean lookup for ownership/status-machine checks — avoids paying for the full nested select. */
   async findOrderCore(id: number, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;

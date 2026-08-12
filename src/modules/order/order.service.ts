@@ -27,6 +27,7 @@ import {
   UpdatePaymentStatusDto,
 } from './dto/update-order.dto';
 import { OrderResponseDto } from './dto/order-response.dto';
+import { buildInvoicePdf, streamPdfToBuffer } from './invoice/invoice-pdf.builder';
 
 //* v1 FLAT DELIVERY RATE — NO DELIVERY-PRICING MODULE YET (SEE docs/order.md).
 //* SWAP FOR A REAL RULE ENGINE LATER; totalAmount'S FORMULA DOESN'T CHANGE.
@@ -585,12 +586,47 @@ export class OrderService {
     requesterId: number,
     isAdmin: boolean,
   ): Promise<OrderResponseDto> {
-    const order = await this.orderRepository.findOrderDetail(id, false);
+    const order = await this.orderRepository.findOrderDetail(id, true);
     if (!order) throw new NotFoundException('Order not found');
     if (!isAdmin && order.userId !== requesterId) {
       throw new ForbiddenException('You do not have access to this order');
     }
     return new OrderResponseDto(order, this.getBaseUrl());
+  }
+
+  //* SAME FETCH + OWNERSHIP CHECK AS getOrderById — AN INVOICE IS JUST
+  //* THAT SAME AUTHORIZED VIEW OF THE ORDER, RENDERED AS A PDF INSTEAD OF JSON.
+  async getInvoicePdfBuffer(
+    id: number,
+    requesterId: number,
+    isAdmin: boolean,
+  ): Promise<{ buffer: Buffer; filename: string }> {
+    const order = await this.orderRepository.findOrderDetail(id, true);
+    if (!order) throw new NotFoundException('Order not found');
+    if (!isAdmin && order.userId !== requesterId) {
+      throw new ForbiddenException('You do not have access to this order');
+    }
+
+    const dto = new OrderResponseDto(order, this.getBaseUrl());
+    const buffer = await streamPdfToBuffer(buildInvoicePdf(dto));
+    return { buffer, filename: `invoice-${dto.orderNumber}.pdf` };
+  }
+
+  //* NO OWNERSHIP CHECK — sid ITSELF (AN UNGUESSABLE UUID, NEVER EXPOSED IN
+  //* LISTINGS) IS THE CAPABILITY TOKEN, SAME PATTERN AS A GUEST ORDER
+  //* CONFIRMATION LINK. THIS IS WHAT LETS A GUEST (NO ACCOUNT, NO JWT)
+  //* DOWNLOAD THEIR OWN INVOICE RIGHT AFTER CHECKOUT — SEE
+  //* getInvoicePdfBuffer ABOVE FOR THE AUTHENTICATED owner-or-admin PATH
+  //* USED BY "MY ORDERS" LATER.
+  async getInvoicePdfBufferBySid(
+    sid: string,
+  ): Promise<{ buffer: Buffer; filename: string }> {
+    const order = await this.orderRepository.findOrderDetailBySid(sid);
+    if (!order) throw new NotFoundException('Order not found');
+
+    const dto = new OrderResponseDto(order, this.getBaseUrl());
+    const buffer = await streamPdfToBuffer(buildInvoicePdf(dto));
+    return { buffer, filename: `invoice-${dto.orderNumber}.pdf` };
   }
 
   async getOrderDetailAdmin(id: number): Promise<OrderResponseDto> {

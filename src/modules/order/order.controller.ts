@@ -5,10 +5,12 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
   Req,
+  Res,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
@@ -24,7 +26,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import {
@@ -166,6 +168,70 @@ export class OrderController {
       user.id,
       user.role === UserRole.ADMIN,
     );
+  }
+
+  //* @Res() WITHOUT passthrough:true HANDS RESPONSE-SENDING OFF TO THIS METHOD
+  //* ENTIRELY — THE GLOBAL ResponseInterceptor (app.module.ts) NEVER GETS A
+  //* CHANCE TO WRAP THE PDF BYTES IN THE USUAL {statusCode,success,data} JSON
+  //* ENVELOPE. EVERY OTHER ROUTE IN THIS CONTROLLER RETURNS A PLAIN DTO —
+  //* THIS IS THE ONE ROUTE THAT NEEDS RAW BINARY OUTPUT INSTEAD.
+  @Get(':id/invoice')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Download the PDF invoice for an order (owner or Admin)' })
+  @ApiOkResponse({ description: 'PDF invoice stream.' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
+  @ApiForbiddenResponse({
+    description: 'The order belongs to another customer.',
+  })
+  @ApiNotFoundResponse({ description: 'Order not found.' })
+  async downloadInvoice(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: AuthedRequest,
+    @Res() res: Response,
+  ): Promise<void> {
+    const user = this.requireUser(req);
+    const { buffer, filename } = await this.orderService.getInvoicePdfBuffer(
+      id,
+      user.id,
+      user.role === UserRole.ADMIN,
+    );
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+      'Content-Length': String(buffer.length),
+    });
+    res.send(buffer);
+  }
+
+  //* NO GUARD — sid IS AN UNGUESSABLE UUID (NEVER LISTED, ONLY RETURNED
+  //* ONCE IN THE place-order RESPONSE), SO IT SERVES AS ITS OWN CAPABILITY
+  //* TOKEN. THIS IS THE ONLY WAY A GUEST (NO ACCOUNT, NO JWT) CAN EVER
+  //* FETCH THEIR OWN INVOICE — THE :id/invoice ROUTE ABOVE REQUIRES A
+  //* LOGGED-IN OWNER OR ADMIN. USED RIGHT AFTER CHECKOUT BY BOTH GUEST AND
+  //* LOGGED-IN CUSTOMERS; THE LOGGED-IN "MY ORDERS" PAGE USES :id/invoice
+  //* INSTEAD ONCE THE CUSTOMER IS BROWSING THEIR OWN HISTORY.
+  @Get('by-sid/:sid/invoice')
+  @Public()
+  @ApiOperation({
+    summary: 'Download the PDF invoice by public order sid (no auth required)',
+    description:
+      'sid is the UUID returned once in the place-order response — it functions as a capability token, letting guest checkouts download their own invoice with no account.',
+  })
+  @ApiOkResponse({ description: 'PDF invoice stream.' })
+  @ApiNotFoundResponse({ description: 'Order not found.' })
+  async downloadInvoiceBySid(
+    @Param('sid', ParseUUIDPipe) sid: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const { buffer, filename } =
+      await this.orderService.getInvoicePdfBufferBySid(sid);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+      'Content-Length': String(buffer.length),
+    });
+    res.send(buffer);
   }
 
   @Patch(':id/status')

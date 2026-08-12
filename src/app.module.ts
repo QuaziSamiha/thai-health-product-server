@@ -67,6 +67,7 @@ import {
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',
+      exclude: ['/uploads/{*any}'],
     }),
 
     LoggerModule,

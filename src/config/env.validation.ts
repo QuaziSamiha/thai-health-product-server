@@ -19,8 +19,8 @@ export const appEnvSchema = z.object({
   // Mail
   MAIL_HOST: z.string().optional(),
   MAIL_PORT: z.coerce.number().optional(),
-  MAIL_USER: z.string().optional(),
-  MAIL_PASS: z.string().optional(),
+  MAIL_USERNAME: z.string().optional(),
+  MAIL_PASSWORD: z.string().optional(),
   MAIL_FROM: z.string().optional(),
 });
 

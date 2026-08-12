@@ -7,7 +7,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-// import { ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import { OtpRepository } from './otp.repository';
 import { OTPType } from '../../generated/prisma/enums';
 import { HashService } from '../../shared/hash/hash.service';
@@ -16,7 +16,7 @@ import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { UserService } from '../user/user.service';
 import { VerifyOtpResponseDto } from './dto/verify-otp-response.dto';
 import { Prisma } from '../../generated/prisma/client';
-// import { MailService } from '../mail/mail.service';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class OtpService {
@@ -24,8 +24,8 @@ export class OtpService {
 
   constructor(
     private readonly otpRepo: OtpRepository,
-    // private readonly mailService: MailService,
-    // private readonly configService: ConfigService,
+    private readonly mailService: MailService,
+    private readonly configService: ConfigService,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly hashService: HashService,
@@ -65,15 +65,15 @@ export class OtpService {
 
       // * Send the plain code to the user's email.
       // In development, we allow console-only OTP flow as a fallback.
-      // const isMailSent = await this.mailService.sendOtpEmail(
-      //   identifier,
-      //   plainOtp,
-      // );
-      // const isDev =
-      //   this.configService.get<string>('NODE_ENV') === 'development';
-      // if (!isMailSent && !isDev) {
-      //   throw new InternalServerErrorException('Failed to send OTP email');
-      // }
+      const isMailSent = await this.mailService.sendOtpEmail(
+        identifier,
+        plainOtp,
+      );
+      const isDev =
+        this.configService.get<string>('NODE_ENV') === 'development';
+      if (!isMailSent && !isDev) {
+        throw new InternalServerErrorException('Failed to send OTP email');
+      }
 
       return new VerifyOtpResponseDto({
         success: true,
@@ -130,50 +130,4 @@ export class OtpService {
       message: 'OTP verified successfully',
     });
   }
-  // async verifyOtp(dto: VerifyOtpDto) {
-  //   const { identifier, type, code } = dto;
-
-  //   const user = await this.userService.getUserByEmail(identifier);
-
-  //   if (!user) {
-  //     throw new NotFoundException(
-  //       `No account found with identifier: ${identifier}`,
-  //     );
-  //   }
-
-  //   // * Find the latest valid (unused & not expired) OTP for this user/type
-  //   const otpRecord = await this.otpRepo.findLatestValidOtp(identifier, type);
-
-  //   if (!otpRecord) {
-  //     throw new BadRequestException(
-  //       'OTP has expired or does not exist. Please request a new one.',
-  //     );
-  //   }
-
-  //   // * Compare the plain code from user with the hashed code in DB
-  //   const isMatch = await HashUtil.compare(code, otpRecord.code);
-
-  //   if (!isMatch) {
-  //     throw new BadRequestException('Invalid OTP code.');
-  //   }
-
-  //   // * "Burn" the OTP so it cannot be used again (Atomic security)
-  //   // await this.otpRepo.markAsUsed(otpRecord.id);
-  //   // * TRANSACTIONAL UPDATE (Senior Move)
-  //   await this.otpRepo.withTransaction(async (tx) => {
-  //     // * Burn the OTP so it's a one-time use
-  //     await this.otpRepo.markAsUsed(otpRecord.id, tx);
-
-  //     // * If it's a signup, activate the user via the service
-  //     if (type === OTPType.SIGNUP) {
-  //       await this.userService.activateUser(user.id, tx);
-  //     }
-  //   });
-
-  //   return new VerifyOtpResponseDto({
-  //     success: true,
-  //     userId: otpRecord.userId ?? undefined,
-  //     message: 'OTP verified successfully',
-  //   });
-  // }
 }
