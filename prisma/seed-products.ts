@@ -218,13 +218,15 @@ async function upsertProduct(
     isFeatured: product.isFeatured,
     hasVariants: product.hasVariants,
     basePrice: product.basePrice,
-    discountType: product.discountType as Prisma.ProductCreateInput['discountType'],
+    discountType:
+      product.discountType as Prisma.ProductCreateInput['discountType'],
     discountValue: product.discountValue,
     //* salePrice IS SERVER-DERIVED (basePrice + discountType/discountValue) — NEVER SET DIRECTLY, SEE schema/product.prisma
     costPrice: product.costPrice,
     quantity: product.quantity,
     totalStock: product.totalStock,
-    stockStatus: product.stockStatus as Prisma.ProductCreateInput['stockStatus'],
+    stockStatus:
+      product.stockStatus as Prisma.ProductCreateInput['stockStatus'],
     weight: product.weight,
     dimensions: product.dimensions as Prisma.InputJsonValue,
     seoMetadata: product.seoMetadata as Prisma.InputJsonValue,
@@ -291,11 +293,13 @@ async function upsertProduct(
         sku: variant.sku || null,
         barcode: variant.barcode || null,
         quantity: variant.quantity,
-        stockStatus: variant.stockStatus as Prisma.ProductVariantUpdateInput['stockStatus'],
+        stockStatus:
+          variant.stockStatus as Prisma.ProductVariantUpdateInput['stockStatus'],
         weight: variant.weight,
         size: variant.size,
         costPrice: variant.costPerItem,
-        discountType: variant.discountType as Prisma.ProductVariantUpdateInput['discountType'],
+        discountType:
+          variant.discountType as Prisma.ProductVariantUpdateInput['discountType'],
         discountValue: variant.discountValue,
         basePrice: variant.price,
         //* salePrice IS SERVER-DERIVED — NEVER SET DIRECTLY, SEE schema/product.prisma
@@ -314,11 +318,13 @@ async function upsertProduct(
         sku: variant.sku || null,
         barcode: variant.barcode || null,
         quantity: variant.quantity,
-        stockStatus: variant.stockStatus as Prisma.ProductVariantCreateInput['stockStatus'],
+        stockStatus:
+          variant.stockStatus as Prisma.ProductVariantCreateInput['stockStatus'],
         weight: variant.weight,
         size: variant.size,
         costPrice: variant.costPerItem,
-        discountType: variant.discountType as Prisma.ProductVariantCreateInput['discountType'],
+        discountType:
+          variant.discountType as Prisma.ProductVariantCreateInput['discountType'],
         discountValue: variant.discountValue,
         basePrice: variant.price,
         //* salePrice IS SERVER-DERIVED — NEVER SET DIRECTLY, SEE schema/product.prisma

@@ -1,0 +1,214 @@
+//* ============= EXTERNAL DELIVERY SERVICE DOMAIN =============
+//* COVERS: THIRD-PARTY COURIER/DELIVERY-COMPANY DIRECTORY (SET UP > EXTERNAL
+//* DELIVERY SERVICE TAB), THEIR PER-AREA SERVICE TIERS (DeliveryZone), AND
+//* PER-ORDER FULFILLMENT TRACKING (DeliveryShipment / DeliveryStatusHistory).
+//* DISTINCT FROM UserRole.DELIVERY_PARTNER (user.prisma), WHICH IS AN
+//* IN-HOUSE DELIVERY STAFF ACCOUNT ("DELIVERY MAN" TAB ON THE SAME SET UP
+//* PAGE) — THIS FILE IS FOR OUTSOURCED THIRD-PARTY COURIERS (KEX EXPRESS,
+//* FLASH EXPRESS, THAILAND POST, ETC).
+//*
+//* DELIBERATELY DOES NOT ADD A RELATION FIELD TO Order (order.prisma) — SEE
+//* DeliveryShipment.orderId BELOW — SO THIS MODULE CAN BE ADDED, MIGRATED,
+//* AND ITERATED ON INDEPENDENTLY OF THE ORDER DOMAIN UNTIL IT'S DELIBERATELY
+//* WIRED IN. SEE docs/db-schemas/delivery-db-schema.md FOR THE FULL DESIGN
+//* RATIONALE, API PLAN, AND INTEGRATION STEPS.
+
+enum DeliveryEntityStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED //* TEMPORARILY PAUSED, E.G. REPEATED LATE DELIVERIES UNDER REVIEW
+}
+
+enum DeliveryIntegrationType {
+  MANUAL //* STAFF BOOK AND UPDATE TRACKING BY HAND, NO API
+  API //* REAL-TIME RATE/BOOKING/TRACKING VIA THE PROVIDER'S API
+  WEBHOOK //* PROVIDER PUSHES STATUS UPDATES TO US, NO OUTBOUND API CALLS
+}
+
+enum DeliveryPricingModel {
+  FLAT
+  WEIGHT_BASED
+  DISTANCE_BASED
+}
+
+enum DeliveryShipmentStatus {
+  PENDING
+  BOOKED
+  PICKED_UP
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED_ATTEMPT
+  RETURNED
+  CANCELLED
+}
+
+//* ============= DELIVERY PROVIDER (THE COURIER COMPANY) =============
+model DeliveryProvider {
+  id  Int    @id @default(autoincrement())
+  sid String @unique @default(uuid()) @db.Uuid
+
+  name String @unique @db.VarChar(150) //* "COMPANY NAME" COLUMN, E.G. "KEX EXPRESS"
+  slug String @unique @db.VarChar(150) //* URL/LOOKUP-SAFE IDENTIFIER, DERIVED FROM name
+
+  status          DeliveryEntityStatus    @default(ACTIVE)
+  integrationType DeliveryIntegrationType @default(MANUAL) @map("integration_type")
+
+  logoUrl       String? @map("logo_url") @db.VarChar(512)
+  contactPerson String? @map("contact_person") @db.VarChar(150)
+  phone         String  @db.VarChar(20) //* "NUMBER" COLUMN
+  email         String? @db.VarChar(255)
+  website       String? @db.VarChar(255)
+
+  officeLocation String? @map("office_location") @db.VarChar(255) //* "LOCATION" COLUMN — PROVIDER'S HUB/HEAD-OFFICE ADDRESS, DISTINCT FROM THE AREAS IT DELIVERS TO (SEE DeliveryZone.areaName)
+
+  //* API INTEGRATION — ONLY MEANINGFUL WHEN integrationType IS API OR WEBHOOK
+  apiBaseUrl          String? @map("api_base_url") @db.VarChar(255)
+  apiCredentialRef    String? @map("api_credential_ref") @db.VarChar(255) //* NAME/KEY OF THE SECRET IN THE VAULT/SECRETS MANAGER — NEVER THE RAW API KEY ITSELF, SEE "Implementation & Best Practices" IN THE DOC
+  trackingUrlTemplate String? @map("tracking_url_template") @db.VarChar(512) //* E.G. "https://kex.com/track/{trackingNumber}"
+
+  priority Int     @default(0) //* LOWER = PREFERRED FOR AUTO-ASSIGNMENT WHEN SEVERAL PROVIDERS COVER THE SAME DeliveryZone
+  notes    String? @db.Text
+
+  //* AUDIT TRAIL & TIMESTAMPS
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  createdBy     Int?
+  createdByUser User? @relation("DeliveryProviderCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedBy     Int?
+  updatedByUser User? @relation("DeliveryProviderUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  //* RELATIONS
+  zones     DeliveryZone[]
+  shipments DeliveryShipment[]
+
+  @@index([status])
+  @@map("delivery_providers")
+}
+
+//* ============= DELIVERY ZONE (PER-AREA SERVICE TIER) =============
+//* ONE PROVIDER CAN HAVE MULTIPLE ROWS FOR THE SAME areaName AT DIFFERENT
+//* SERVICE TIERS (E.G. KEX EXPRESS "STANDARD" 3-7 DAYS VS "ECONOMY" 7-10
+//* DAYS) — THE SET UP PAGE'S FLAT TABLE (COMPANY / AREA / TIME) IS A JOIN OF
+//* DeliveryProvider ⋈ DeliveryZone, NOT A DIRECT MAP OF ONE TABLE. SEE
+//* "Conventions" IN THE DOC.
+model DeliveryZone {
+  id  Int    @id @default(autoincrement())
+  sid String @unique @default(uuid()) @db.Uuid
+
+  serviceName String? @map("service_name") @db.VarChar(100) //* OPTIONAL TIER LABEL, E.G. "STANDARD", "EXPRESS", "ECONOMY"
+
+  //* COVERAGE — SAME FIELD SEMANTICS AS Address/OrderAddress (address.prisma)
+  //* SO A CUSTOMER'S ADDRESS CAN BE MATCHED AGAINST A ZONE PROGRAMMATICALLY
+  areaName         String  @map("area_name") @db.VarChar(150) //* "DELIVERY AREA" COLUMN, E.G. "BANGKOK, THAILAND" — DISPLAY LABEL
+  state            String? @db.VarChar(100) //* PROVINCE LEVEL, NULLABLE = COVERS THE WHOLE COUNTRY
+  region           String? @db.VarChar(100) //* DISTRICT LEVEL, NULLABLE = COVERS THE WHOLE STATE
+  postalCodePrefix String? @map("postal_code_prefix") @db.VarChar(10) //* E.G. "10" TO MATCH ALL BANGKOK POSTAL CODES — FINER-GRAINED MATCHING THAN state/region ALONE
+  country          String  @default("Thailand") @db.VarChar(100)
+
+  //* DELIVERY TIME — STORED AS A NUMERIC RANGE, NEVER THE RAW "3-7 days"
+  //* STRING, SO IT STAYS SORTABLE/QUERYABLE; THE UI RENDERS "${min}-${max}
+  //* days" AT READ TIME — SEE "Implementation & Best Practices" IN THE DOC
+  minDeliveryDays Int @map("min_delivery_days")
+  maxDeliveryDays Int @map("max_delivery_days")
+
+  //* PRICING
+  pricingModel  DeliveryPricingModel @default(FLAT) @map("pricing_model")
+  baseFee       Decimal              @default(0) @map("base_fee") @db.Decimal(12, 2)
+  codAvailable  Boolean              @default(false) @map("cod_available")
+  codFeePercent Decimal?             @map("cod_fee_percent") @db.Decimal(5, 2)
+
+  status DeliveryEntityStatus @default(ACTIVE)
+
+  //* TIMESTAMPS
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  //* RELATIONS
+  providerId Int                @map("provider_id")
+  provider   DeliveryProvider   @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  shipments  DeliveryShipment[]
+
+  @@unique([providerId, areaName, minDeliveryDays, maxDeliveryDays]) //* PREVENTS TRUE DUPLICATE ROWS WHILE STILL ALLOWING MULTIPLE SERVICE TIERS PER AREA
+  @@index([providerId])
+  @@index([areaName])
+  @@index([state, region])
+  @@map("delivery_zones")
+}
+
+//* ============= DELIVERY SHIPMENT (PER-ORDER FULFILLMENT) =============
+model DeliveryShipment {
+  id  Int    @id @default(autoincrement())
+  sid String @unique @default(uuid()) @db.Uuid
+
+  //* SOFT REFERENCE TO Order.id — DELIBERATELY *NOT* A PRISMA @relation/FK.
+  //* THIS KEEPS delivery.prisma FROM REQUIRING A CHANGE TO order.prisma (NO
+  //* Order.deliveryShipment BACK-RELATION) SO THE MODULE STAYS A DROP-IN
+  //* THAT CAN BE WIRED UP LATER — SAME LOOSE-REFERENCE PATTERN ALREADY USED
+  //* BY Inventory.referenceId (inventory.prisma). ENFORCE orderId'S
+  //* EXISTENCE IN THE SERVICE LAYER, NOT THE DB, UNTIL IT'S PROMOTED TO A
+  //* REAL FK — SEE "Known Gaps" IN THE DOC.
+  orderId     Int    @unique @map("order_id")
+  orderNumber String @map("order_number") @db.VarChar(50) //* DENORMALIZED DISPLAY COPY OF Order.orderNumber, SAME CONVENTION AS OrderItem's FROZEN SNAPSHOTS
+
+  status DeliveryShipmentStatus @default(PENDING)
+
+  trackingNumber String? @map("tracking_number") @db.VarChar(100)
+  trackingUrl    String? @map("tracking_url") @db.VarChar(512) //* RESOLVED FROM DeliveryProvider.trackingUrlTemplate AT BOOKING TIME, FROZEN
+
+  //* SNAPSHOT OF THE PROVIDER USED, SO THIS ROW STILL RENDERS CORRECTLY IF
+  //* THE PROVIDER IS LATER RENAMED — SAME CONTRACT AS OrderItem's PRODUCT
+  //* SNAPSHOT COLUMNS (order.prisma)
+  providerNameSnapshot String  @map("provider_name_snapshot") @db.VarChar(150)
+  shippingFee          Decimal @default(0) @map("shipping_fee") @db.Decimal(12, 2) //* ACTUAL FEE CHARGED — MAY DIFFER FROM DeliveryZone.baseFee (WEIGHT/PROMO ADJUSTMENTS)
+
+  estimatedDeliveryFrom DateTime? @map("estimated_delivery_from") @db.Timestamptz(3)
+  estimatedDeliveryTo   DateTime? @map("estimated_delivery_to") @db.Timestamptz(3)
+
+  pickedUpAt    DateTime? @map("picked_up_at") @db.Timestamptz(3)
+  deliveredAt   DateTime? @map("delivered_at") @db.Timestamptz(3)
+  failedAt      DateTime? @map("failed_at") @db.Timestamptz(3)
+  failureReason String?   @map("failure_reason") @db.Text
+
+  providerResponse Json? @default("{}") @map("provider_response") //* RAW API/WEBHOOK PAYLOAD SNAPSHOT FOR AUDITING/DEBUGGING, SAME PATTERN AS Payment.gatewayResponse (order.prisma)
+
+  //* RELATIONS
+  providerId Int              @map("provider_id")
+  provider   DeliveryProvider @relation(fields: [providerId], references: [id], onDelete: Restrict) //* RESTRICT, NOT CASCADE/SET NULL — A PROVIDER WITH SHIPMENT HISTORY MUST BE DEACTIVATED (status = INACTIVE), NEVER HARD-DELETED. FIRST USE OF Restrict IN THIS SCHEMA — SEE THE DOC'S CASCADING-RULES TABLE
+  zoneId     Int?             @map("zone_id")
+  zone       DeliveryZone?    @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+
+  //* TIMESTAMPS
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  createdBy     Int?
+  createdByUser User? @relation("DeliveryShipmentCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  statusHistory DeliveryStatusHistory[]
+
+  @@index([orderId])
+  @@index([providerId])
+  @@index([zoneId])
+  @@index([status])
+  @@index([trackingNumber])
+  @@map("delivery_shipments")
+}
+
+model DeliveryStatusHistory {
+  id     Int                    @id @default(autoincrement())
+  status DeliveryShipmentStatus
+  note   String?                @db.Text //* OPTIONAL REASON, E.G. FAILED-ATTEMPT EXPLANATION
+
+  shipmentId Int              @map("shipment_id")
+  shipment   DeliveryShipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  changedBy     Int?  @map("changed_by") //* NULL = SYSTEM/AUTOMATED TRANSITION (E.G. WEBHOOK)
+  changedByUser User? @relation("DeliveryStatusChangedBy", fields: [changedBy], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([shipmentId, createdAt])
+  @@map("delivery_status_history")
+}

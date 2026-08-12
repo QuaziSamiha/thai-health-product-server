@@ -1,0 +1,114 @@
+//* ============= DELIVERY MAN DOMAIN =============
+//* COVERS: IN-HOUSE DELIVERY STAFF ("DELIVERY MAN" TAB, SET UP PAGE) — NID/KYC,
+//* VEHICLE, DISPATCH AVAILABILITY, AND COD SETTLEMENT.
+//*
+//* DISTINCT FROM delivery.prisma (DeliveryProvider/DeliveryZone/DeliveryShipment),
+//* WHICH IS FOR OUTSOURCED THIRD-PARTY COURIERS THAT NEVER LOG IN AND HAVE NO
+//* User ROW AT ALL. A DELIVERY MAN IS THE OPPOSITE: A REAL User WITH
+//* role = UserRole.DELIVERY_PARTNER (user.prisma) — DeliveryManProfile IS A 1:1
+//* EXTENSION OF THAT User, THE SAME PATTERN Profile AND UserSecurity ALREADY
+//* USE. KEPT OUT OF Profile ITSELF BECAUSE THESE FIELDS (NID, VEHICLE, COD
+//* BALANCE) ONLY APPLY TO DELIVERY STAFF, NOT THE VAST MAJORITY OF Users WHO
+//* ARE ORDINARY CUSTOMERS — BOLTING THEM ONTO Profile WOULD LEAVE THEM
+//* PERMANENTLY NULL ON EVERY CUSTOMER ROW.
+//*
+//* "IMAGE" / "NAME" / "NUMBER" / "EMAIL" / "ADDRESS" (THE FIGMA TABLE'S FIRST
+//* FIVE COLUMNS) ARE DELIBERATELY *NOT* DUPLICATED HERE — THEY ALREADY EXIST
+//* ON User/Profile/Address (avatarUrl, firstName/lastName/name, phone, email,
+//* the addresses RELATION). THIS MODEL ONLY OWNS WHAT'S GENUINELY NEW.
+//*
+//* SEE docs/delivery-man.md FOR THE FULL DESIGN RATIONALE AND THE PLANNED
+//* ENDPOINTS/BUSINESS LOGIC (NEITHER IS BUILT YET — SCHEMA ONLY).
+
+enum DeliveryVehicleType {
+  BICYCLE
+  MOTORCYCLE
+  CAR
+  VAN
+  ON_FOOT
+}
+
+//* OPERATIONAL / REAL-TIME DISPATCH STATE — DELIBERATELY SEPARATE FROM
+//* UserStatus (ACCOUNT LIFECYCLE: CAN THIS PERSON LOG IN AT ALL). A DELIVERY
+//* MAN CAN BE UserStatus.ACTIVE BUT DeliveryAvailability.OFFLINE AT 11PM —
+//* CONFLATING THE TWO WOULD MEAN "GOING OFF SHIFT" HAS TO ROUTE THROUGH THE
+//* SAME PATH AS "ACCOUNT SUSPENDED", WHICH THEY SHOULD NEVER SHARE.
+enum DeliveryAvailability {
+  AVAILABLE
+  ON_DELIVERY
+  OFFLINE
+  ON_LEAVE
+}
+
+enum DeliveryEmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  GIG
+}
+
+//* KYC REVIEW STATE FOR THE UPLOADED NID DOCUMENT — SEE THE DOC'S "NID / KYC
+//* Verification Workflow" SECTION FOR THE FULL BUSINESS PROCESS THIS DRIVES.
+enum NidVerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+model DeliveryManProfile {
+  id  Int    @id @default(autoincrement())
+  sid String @unique @default(uuid()) @db.Uuid //* Public identifier, prevents ID enumeration
+
+  //* ===== IDENTITY / KYC (NATIONAL ID) — "NID" COLUMN =====
+  //* nidNumber IS THE STRUCTURED, VALIDATABLE 13-DIGIT THAI CITIZEN ID.
+  //* nidDocumentUrl IS THE UPLOADED SCAN/PDF PROVING IT (THE "NID.pdf" LINK IN
+  //* THE MOCKUP) — TWO SEPARATE FIELDS ON PURPOSE, ONE MACHINE-CHECKABLE, ONE
+  //* HUMAN-REVIEWABLE. SEE THE DOC'S KNOWN GAPS RE: ENCRYPTION-AT-REST AND
+  //* ACCESS CONTROL, NEITHER OF WHICH THE SCHEMA ITSELF CAN ENFORCE.
+  nidNumber             String?               @unique @map("nid_number") @db.VarChar(13)
+  nidDocumentUrl        String?               @map("nid_document_url")
+  nidVerificationStatus NidVerificationStatus @default(PENDING) @map("nid_verification_status")
+  nidVerifiedAt         DateTime?             @map("nid_verified_at") @db.Timestamptz(3)
+
+  //* ===== VEHICLE & OPERATIONS =====
+  vehicleType           DeliveryVehicleType? @map("vehicle_type")
+  vehicleRegistrationNo String?              @map("vehicle_registration_no") @db.VarChar(50) //* license plate
+  drivingLicenseNo      String?              @map("driving_license_no") @db.VarChar(50)
+  availability          DeliveryAvailability @default(OFFLINE)
+  coverageArea          String?              @map("coverage_area") @db.VarChar(255) //* free text for v1 — see the doc's Known Gaps re: normalized zones, mirrors DeliveryZone's own caveat in delivery.prisma
+
+  //* ===== EMPLOYMENT =====
+  employmentType DeliveryEmploymentType? @map("employment_type")
+  joinedAt       DateTime?               @map("joined_at") @db.Timestamptz(3)
+
+  //* ===== COD (CASH ON DELIVERY) SETTLEMENT =====
+  codCollectionEnabled Boolean @default(false) @map("cod_collection_enabled")
+  codBalance           Decimal @default(0) @map("cod_balance") @db.Decimal(12, 2) //* cash currently held, pending settlement to the business
+  bankName             String? @map("bank_name") @db.VarChar(100)
+  bankAccountName      String? @map("bank_account_name") @db.VarChar(200)
+  bankAccountNumber    String? @map("bank_account_number") @db.VarChar(50)
+
+  //* ===== PERFORMANCE (DENORMALIZED CACHE) =====
+  //* SAME "CACHED AGGREGATE KEPT IN SYNC BY THE OWNING WRITE PATH" PATTERN AS
+  //* Product.totalStock / ComboProduct.quantity — NOT A LIVE COUNT. INTENDED
+  //* TO BE DRIVEN BY DeliveryShipment (delivery.prisma) ONCE AN ORDER CAN BE
+  //* ASSIGNED TO AN IN-HOUSE DELIVERY MAN INSTEAD OF AN EXTERNAL PROVIDER —
+  //* NOT WIRED YET, SEE THE DOC'S KNOWN GAPS.
+  completedDeliveryCount Int      @default(0) @map("completed_delivery_count")
+  rating                 Decimal? @db.Decimal(3, 2) //* 0.00-5.00
+
+  //* ===== TIMESTAMPS =====
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  //* ===== RELATIONS =====
+  userId Int  @unique @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  nidVerifiedBy     Int?  @map("nid_verified_by")
+  nidVerifiedByUser User? @relation("DeliveryManNidVerifiedBy", fields: [nidVerifiedBy], references: [id], onDelete: SetNull)
+
+  @@index([availability]) //* dispatch query: "find an available rider"
+  @@index([nidVerificationStatus]) //* admin queue: "pending NID reviews"
+  @@map("delivery_man_profiles")
+}

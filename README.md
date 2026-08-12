@@ -13,6 +13,7 @@ NestJS backend for the Thai Health Product (NestJS Codebase) e-commerce platform
 | Category module | [documentations/CATEGORY.md](./documentations/CATEGORY.md) |
 | Product module | [documentations/PRODUCT.md](./documentations/PRODUCT.md) |
 | Shared pagination pattern | [documentations/PAGINATION.md](./documentations/PAGINATION.md) |
+| Delivery module — schema design + API plan | [docs/delivery.md](./docs/delivery.md) |
 
 ## Environment & Running Commands
 
@@ -133,3 +134,45 @@ yarn start:prod      # .env.production
   - [Delete a Blog Post — `DELETE /blog/delete-blog/:id`](./docs/blog.md#delete-a-blog-post)
   - [Built but Not Yet Exposed](./docs/blog.md#built-but-not-yet-exposed)
 ### Support
+### Delivery (External Delivery Service) — schema design, not yet implemented
+- [db schema](./docs/delivery.md#db-schema)
+  - [Entity-Relationship Diagram (ERD)](./docs/delivery.md#entity-relationship-diagram-erd)
+  - [Enum Definitions](./docs/delivery.md#enum-definitions)
+  - [Data Dictionary — DeliveryProvider](./docs/delivery.md#data-dictionary--deliveryprovider)
+  - [Data Dictionary — DeliveryZone](./docs/delivery.md#data-dictionary--deliveryzone)
+  - [Data Dictionary — DeliveryShipment](./docs/delivery.md#data-dictionary--deliveryshipment)
+  - [Data Dictionary — DeliveryStatusHistory](./docs/delivery.md#data-dictionary--deliverystatushistory)
+  - [Relationships and Cascading Rules](./docs/delivery.md#relationships-and-cascading-rules)
+  - [Performance Optimizations (Indexes)](./docs/delivery.md#performance-optimizations-indexes)
+  - [Conventions](./docs/delivery.md#conventions)
+  - [Example Data](./docs/delivery.md#example-data)
+  - [Example Usage (JSON Response)](./docs/delivery.md#example-usage-json-response)
+  - [Implementation & Best Practices](./docs/delivery.md#implementation--best-practices)
+  - [Known Gaps / Recommended Hardening](./docs/delivery.md#known-gaps--recommended-hardening)
+- [api end point and business logic (planned)](./docs/delivery.md#api-end-point--business-logic-planned)
+  - [Endpoint Overview](./docs/delivery.md#endpoint-overview)
+  - [Get Delivery Quote (Public)](./docs/delivery.md#get-delivery-quote-public)
+  - [Book a Shipment](./docs/delivery.md#book-a-shipment)
+  - [Update Shipment Status](./docs/delivery.md#update-shipment-status)
+  - [Public Tracking Lookup](./docs/delivery.md#public-tracking-lookup)
+  - [Inbound Courier Webhook](./docs/delivery.md#inbound-courier-webhook)
+### Delivery Man (In-House Delivery Staff) — schema design, not yet implemented
+- [db schema](./docs/delivery-man.md#db-schema)
+  - [Entity-Relationship Diagram (ERD)](./docs/delivery-man.md#entity-relationship-diagram-erd)
+  - [Enum Definitions](./docs/delivery-man.md#enum-definitions)
+  - [Data Dictionary — DeliveryManProfile](./docs/delivery-man.md#data-dictionary--deliverymanprofile)
+  - [Relationships and Cascading Rules](./docs/delivery-man.md#relationships-and-cascading-rules)
+  - [Performance Optimizations (Indexes)](./docs/delivery-man.md#performance-optimizations-indexes)
+  - [Conventions](./docs/delivery-man.md#conventions)
+  - [Example Data](./docs/delivery-man.md#example-data)
+  - [Example Usage (JSON Response)](./docs/delivery-man.md#example-usage-json-response)
+  - [Implementation & Best Practices](./docs/delivery-man.md#implementation--best-practices)
+  - [Known Gaps / Recommended Hardening](./docs/delivery-man.md#known-gaps--recommended-hardening)
+- [api end point and business logic (planned)](./docs/delivery-man.md#api-end-point--business-logic-planned)
+  - [Reuse, Don't Duplicate](./docs/delivery-man.md#reuse-dont-duplicate)
+  - [Endpoint Overview](./docs/delivery-man.md#endpoint-overview)
+  - [Onboard a New Delivery Man](./docs/delivery-man.md#onboard-a-new-delivery-man)
+  - [List Delivery Men (Admin)](./docs/delivery-man.md#list-delivery-men-admin)
+  - [Toggle Dispatch Availability](./docs/delivery-man.md#toggle-dispatch-availability)
+  - [Verify / Reject NID](./docs/delivery-man.md#verify--reject-nid)
+  - [Open Questions](./docs/delivery-man.md#open-questions)
