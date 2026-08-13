@@ -348,7 +348,7 @@ async function main() {
   const prisma = new PrismaClient({ adapter });
 
   try {
-    const superAdmin = await prisma.user.findUniqueOrThrow({
+    const superAdmin = await prisma.user.findFirstOrThrow({
       where: { email: SUPER_ADMIN_EMAIL },
     });
 

@@ -95,21 +95,24 @@ export class UserRepository extends BaseRepository {
     return await client.user.create({ data, select: this.USER_SELECT });
   }
 
+  //* email IS ONLY UNIQUE AMONG NON-DELETED ROWS (SEE User.email COMMENT IN
+  //* SCHEMA) — MUST USE findFirst + deletedAt: null, NOT findUnique, OR AN
+  //* ARCHIVED ROW SHARING THE EMAIL COULD BE MATCHED NON-DETERMINISTICALLY.
   async findUserByEmailWithDetails(
     email: string,
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx || this.prisma;
-    return await client.user.findUnique({
-      where: { email },
+    return await client.user.findFirst({
+      where: { email, deletedAt: null },
       select: this.FULL_USER_SELECT_CUSTOMER,
     });
   }
 
   async findUserByEmail(email: string, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
-    return await client.user.findUnique({
-      where: { email },
+    return await client.user.findFirst({
+      where: { email, deletedAt: null },
       select: this.USER_SELECT,
     });
   }
@@ -120,8 +123,8 @@ export class UserRepository extends BaseRepository {
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx || this.prisma;
-    return client.user.findUnique({
-      where: { email },
+    return client.user.findFirst({
+      where: { email, deletedAt: null },
       select: {
         ...this.USER_SELECT,
         password: includePassword, // * Needed for bcrypt compare

@@ -34,7 +34,7 @@ erDiagram
 
     PROFILE {
         int id PK
-        int userId FK UK
+        int userId FK, UK
         string firstName
         string lastName "nullable"
         string name "nullable"
@@ -44,7 +44,7 @@ erDiagram
 
     USER_SECURITY {
         int id PK
-        int userId FK UK
+        int userId FK, UK
         boolean isEmailVerified
         int loginAttempts
         string lastLoginIp "nullable"

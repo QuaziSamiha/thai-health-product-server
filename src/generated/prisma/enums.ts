@@ -35,6 +35,88 @@ export const CartStatus = {
 export type CartStatus = (typeof CartStatus)[keyof typeof CartStatus]
 
 
+export const DeliveryVehicleType = {
+  BICYCLE: 'BICYCLE',
+  MOTORCYCLE: 'MOTORCYCLE',
+  CAR: 'CAR',
+  VAN: 'VAN',
+  ON_FOOT: 'ON_FOOT'
+} as const
+
+export type DeliveryVehicleType = (typeof DeliveryVehicleType)[keyof typeof DeliveryVehicleType]
+
+
+export const DeliveryAvailability = {
+  AVAILABLE: 'AVAILABLE',
+  ON_DELIVERY: 'ON_DELIVERY',
+  OFFLINE: 'OFFLINE',
+  ON_LEAVE: 'ON_LEAVE'
+} as const
+
+export type DeliveryAvailability = (typeof DeliveryAvailability)[keyof typeof DeliveryAvailability]
+
+
+export const DeliveryEmploymentType = {
+  FULL_TIME: 'FULL_TIME',
+  PART_TIME: 'PART_TIME',
+  CONTRACT: 'CONTRACT',
+  GIG: 'GIG'
+} as const
+
+export type DeliveryEmploymentType = (typeof DeliveryEmploymentType)[keyof typeof DeliveryEmploymentType]
+
+
+export const NidVerificationStatus = {
+  PENDING: 'PENDING',
+  VERIFIED: 'VERIFIED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type NidVerificationStatus = (typeof NidVerificationStatus)[keyof typeof NidVerificationStatus]
+
+
+export const DeliveryEntityStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  SUSPENDED: 'SUSPENDED'
+} as const
+
+export type DeliveryEntityStatus = (typeof DeliveryEntityStatus)[keyof typeof DeliveryEntityStatus]
+
+
+export const DeliveryIntegrationType = {
+  MANUAL: 'MANUAL',
+  API: 'API',
+  WEBHOOK: 'WEBHOOK'
+} as const
+
+export type DeliveryIntegrationType = (typeof DeliveryIntegrationType)[keyof typeof DeliveryIntegrationType]
+
+
+export const DeliveryPricingModel = {
+  FLAT: 'FLAT',
+  WEIGHT_BASED: 'WEIGHT_BASED',
+  DISTANCE_BASED: 'DISTANCE_BASED'
+} as const
+
+export type DeliveryPricingModel = (typeof DeliveryPricingModel)[keyof typeof DeliveryPricingModel]
+
+
+export const DeliveryShipmentStatus = {
+  PENDING: 'PENDING',
+  BOOKED: 'BOOKED',
+  PICKED_UP: 'PICKED_UP',
+  IN_TRANSIT: 'IN_TRANSIT',
+  OUT_FOR_DELIVERY: 'OUT_FOR_DELIVERY',
+  DELIVERED: 'DELIVERED',
+  FAILED_ATTEMPT: 'FAILED_ATTEMPT',
+  RETURNED: 'RETURNED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type DeliveryShipmentStatus = (typeof DeliveryShipmentStatus)[keyof typeof DeliveryShipmentStatus]
+
+
 export const HomeContentStatus = {
   ACTIVE: 'ACTIVE',
   INACTIVE: 'INACTIVE'

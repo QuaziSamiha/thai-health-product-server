@@ -42,7 +42,14 @@ enum OTPType {
 model User {
   id       Int     @id @default(autoincrement())
   sid      String  @unique @default(uuid()) @map("user_sid") @db.Uuid // Use native UUID type for performance
-  email    String  @unique
+  //* NOT @unique HERE — PRISMA'S DSL CAN'T EXPRESS A PARTIAL/FILTERED UNIQUE
+  //* INDEX. THE REAL CONSTRAINT IS `users_email_active_key`, A UNIQUE INDEX
+  //* SCOPED TO `deleted_at IS NULL` (SEE MIGRATION
+  //* 20260813082256_soft_delete_user_email_unique). THIS LETS AN ARCHIVED
+  //* ACCOUNT'S EMAIL BE REUSED BY A NEW SIGNUP WITHOUT A UNIQUE-CONSTRAINT
+  //* COLLISION. ANY EMAIL LOOKUP MUST FILTER `deletedAt: null` (findFirst,
+  //* NOT findUnique) OR IT CAN NON-DETERMINISTICALLY MATCH AN ARCHIVED ROW.
+  email    String
   password String? // Null for OAuth
   phone    String? @db.VarChar(20)
 
@@ -56,6 +63,7 @@ model User {
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
   lastLoginAt DateTime? @map("last_login_at") @db.Timestamptz(3)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3) //* FOR SOFT DELETE
 
   // Relations
   profile                  Profile?

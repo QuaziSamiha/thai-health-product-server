@@ -47,6 +47,7 @@ export type UserMinAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   lastLoginAt: Date | null
+  deletedAt: Date | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -62,6 +63,7 @@ export type UserMaxAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   lastLoginAt: Date | null
+  deletedAt: Date | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -77,6 +79,7 @@ export type UserCountAggregateOutputType = {
   createdAt: number
   updatedAt: number
   lastLoginAt: number
+  deletedAt: number
   _all: number
 }
 
@@ -102,6 +105,7 @@ export type UserMinAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   lastLoginAt?: true
+  deletedAt?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -117,6 +121,7 @@ export type UserMaxAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   lastLoginAt?: true
+  deletedAt?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -132,6 +137,7 @@ export type UserCountAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   lastLoginAt?: true
+  deletedAt?: true
   _all?: true
 }
 
@@ -234,6 +240,7 @@ export type UserGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   lastLoginAt: Date | null
+  deletedAt: Date | null
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
   _sum: UserSumAggregateOutputType | null
@@ -272,8 +279,10 @@ export type UserWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   profile?: Prisma.XOR<Prisma.ProfileNullableScalarRelationFilter, Prisma.ProfileWhereInput> | null
   security?: Prisma.XOR<Prisma.UserSecurityNullableScalarRelationFilter, Prisma.UserSecurityWhereInput> | null
+  deliveryManProfile?: Prisma.XOR<Prisma.DeliveryManProfileNullableScalarRelationFilter, Prisma.DeliveryManProfileWhereInput> | null
   sessions?: Prisma.SessionListRelationFilter
   otps?: Prisma.OTPListRelationFilter
   createdCategories?: Prisma.CategoryListRelationFilter
@@ -295,6 +304,11 @@ export type UserWhereInput = {
   orders?: Prisma.OrderListRelationFilter
   orderStatusChanges?: Prisma.OrderStatusHistoryListRelationFilter
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionListRelationFilter
+  createdDeliveryProviders?: Prisma.DeliveryProviderListRelationFilter
+  updatedDeliveryProviders?: Prisma.DeliveryProviderListRelationFilter
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentListRelationFilter
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryListRelationFilter
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -310,8 +324,10 @@ export type UserOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   profile?: Prisma.ProfileOrderByWithRelationInput
   security?: Prisma.UserSecurityOrderByWithRelationInput
+  deliveryManProfile?: Prisma.DeliveryManProfileOrderByWithRelationInput
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   otps?: Prisma.OTPOrderByRelationAggregateInput
   createdCategories?: Prisma.CategoryOrderByRelationAggregateInput
@@ -333,15 +349,20 @@ export type UserOrderByWithRelationInput = {
   orders?: Prisma.OrderOrderByRelationAggregateInput
   orderStatusChanges?: Prisma.OrderStatusHistoryOrderByRelationAggregateInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionOrderByRelationAggregateInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderOrderByRelationAggregateInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderOrderByRelationAggregateInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentOrderByRelationAggregateInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryOrderByRelationAggregateInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: number
   sid?: string
-  email?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
+  email?: Prisma.StringFilter<"User"> | string
   password?: Prisma.StringNullableFilter<"User"> | string | null
   phone?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
@@ -351,8 +372,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   profile?: Prisma.XOR<Prisma.ProfileNullableScalarRelationFilter, Prisma.ProfileWhereInput> | null
   security?: Prisma.XOR<Prisma.UserSecurityNullableScalarRelationFilter, Prisma.UserSecurityWhereInput> | null
+  deliveryManProfile?: Prisma.XOR<Prisma.DeliveryManProfileNullableScalarRelationFilter, Prisma.DeliveryManProfileWhereInput> | null
   sessions?: Prisma.SessionListRelationFilter
   otps?: Prisma.OTPListRelationFilter
   createdCategories?: Prisma.CategoryListRelationFilter
@@ -374,7 +397,12 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   orders?: Prisma.OrderListRelationFilter
   orderStatusChanges?: Prisma.OrderStatusHistoryListRelationFilter
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionListRelationFilter
-}, "id" | "sid" | "email">
+  createdDeliveryProviders?: Prisma.DeliveryProviderListRelationFilter
+  updatedDeliveryProviders?: Prisma.DeliveryProviderListRelationFilter
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentListRelationFilter
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryListRelationFilter
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileListRelationFilter
+}, "id" | "sid">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -389,6 +417,7 @@ export type UserOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -412,6 +441,7 @@ export type UserScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   lastLoginAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
 }
 
 export type UserCreateInput = {
@@ -426,8 +456,10 @@ export type UserCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -449,6 +481,11 @@ export type UserCreateInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -464,8 +501,10 @@ export type UserUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -487,6 +526,11 @@ export type UserUncheckedCreateInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUpdateInput = {
@@ -501,8 +545,10 @@ export type UserUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -524,6 +570,11 @@ export type UserUpdateInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -539,8 +590,10 @@ export type UserUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -562,6 +615,11 @@ export type UserUncheckedUpdateInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -577,6 +635,7 @@ export type UserCreateManyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -591,6 +650,7 @@ export type UserUpdateManyMutationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -606,6 +666,7 @@ export type UserUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserScalarRelationFilter = {
@@ -631,6 +692,7 @@ export type UserCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
@@ -650,6 +712,7 @@ export type UserMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -665,6 +728,7 @@ export type UserMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
@@ -795,6 +859,100 @@ export type UserUpdateOneWithoutDeletedCombosNestedInput = {
   delete?: Prisma.UserWhereInput | boolean
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDeletedCombosInput, Prisma.UserUpdateWithoutDeletedCombosInput>, Prisma.UserUncheckedUpdateWithoutDeletedCombosInput>
+}
+
+export type UserCreateNestedOneWithoutDeliveryManProfileInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDeliveryManProfileInput, Prisma.UserUncheckedCreateWithoutDeliveryManProfileInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeliveryManProfileInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutVerifiedDeliveryMenInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVerifiedDeliveryMenInput, Prisma.UserUncheckedCreateWithoutVerifiedDeliveryMenInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVerifiedDeliveryMenInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutDeliveryManProfileNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDeliveryManProfileInput, Prisma.UserUncheckedCreateWithoutDeliveryManProfileInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeliveryManProfileInput
+  upsert?: Prisma.UserUpsertWithoutDeliveryManProfileInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDeliveryManProfileInput, Prisma.UserUpdateWithoutDeliveryManProfileInput>, Prisma.UserUncheckedUpdateWithoutDeliveryManProfileInput>
+}
+
+export type UserUpdateOneWithoutVerifiedDeliveryMenNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVerifiedDeliveryMenInput, Prisma.UserUncheckedCreateWithoutVerifiedDeliveryMenInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVerifiedDeliveryMenInput
+  upsert?: Prisma.UserUpsertWithoutVerifiedDeliveryMenInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutVerifiedDeliveryMenInput, Prisma.UserUpdateWithoutVerifiedDeliveryMenInput>, Prisma.UserUncheckedUpdateWithoutVerifiedDeliveryMenInput>
+}
+
+export type UserCreateNestedOneWithoutCreatedDeliveryProvidersInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedDeliveryProvidersInput, Prisma.UserUncheckedCreateWithoutCreatedDeliveryProvidersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedDeliveryProvidersInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutUpdatedDeliveryProvidersInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedDeliveryProvidersInput, Prisma.UserUncheckedCreateWithoutUpdatedDeliveryProvidersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedDeliveryProvidersInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutCreatedDeliveryProvidersNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedDeliveryProvidersInput, Prisma.UserUncheckedCreateWithoutCreatedDeliveryProvidersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedDeliveryProvidersInput
+  upsert?: Prisma.UserUpsertWithoutCreatedDeliveryProvidersInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedDeliveryProvidersInput, Prisma.UserUpdateWithoutCreatedDeliveryProvidersInput>, Prisma.UserUncheckedUpdateWithoutCreatedDeliveryProvidersInput>
+}
+
+export type UserUpdateOneWithoutUpdatedDeliveryProvidersNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedDeliveryProvidersInput, Prisma.UserUncheckedCreateWithoutUpdatedDeliveryProvidersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedDeliveryProvidersInput
+  upsert?: Prisma.UserUpsertWithoutUpdatedDeliveryProvidersInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUpdatedDeliveryProvidersInput, Prisma.UserUpdateWithoutUpdatedDeliveryProvidersInput>, Prisma.UserUncheckedUpdateWithoutUpdatedDeliveryProvidersInput>
+}
+
+export type UserCreateNestedOneWithoutBookedDeliveryShipmentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBookedDeliveryShipmentsInput, Prisma.UserUncheckedCreateWithoutBookedDeliveryShipmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBookedDeliveryShipmentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutBookedDeliveryShipmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBookedDeliveryShipmentsInput, Prisma.UserUncheckedCreateWithoutBookedDeliveryShipmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBookedDeliveryShipmentsInput
+  upsert?: Prisma.UserUpsertWithoutBookedDeliveryShipmentsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBookedDeliveryShipmentsInput, Prisma.UserUpdateWithoutBookedDeliveryShipmentsInput>, Prisma.UserUncheckedUpdateWithoutBookedDeliveryShipmentsInput>
+}
+
+export type UserCreateNestedOneWithoutDeliveryStatusChangesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDeliveryStatusChangesInput, Prisma.UserUncheckedCreateWithoutDeliveryStatusChangesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeliveryStatusChangesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutDeliveryStatusChangesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDeliveryStatusChangesInput, Prisma.UserUncheckedCreateWithoutDeliveryStatusChangesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeliveryStatusChangesInput
+  upsert?: Prisma.UserUpsertWithoutDeliveryStatusChangesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDeliveryStatusChangesInput, Prisma.UserUpdateWithoutDeliveryStatusChangesInput>, Prisma.UserUncheckedUpdateWithoutDeliveryStatusChangesInput>
 }
 
 export type UserCreateNestedOneWithoutCreatedHomeContentsInput = {
@@ -1055,8 +1213,10 @@ export type UserCreateWithoutAddressesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -1077,6 +1237,11 @@ export type UserCreateWithoutAddressesInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutAddressesInput = {
@@ -1092,8 +1257,10 @@ export type UserUncheckedCreateWithoutAddressesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -1114,6 +1281,11 @@ export type UserUncheckedCreateWithoutAddressesInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutAddressesInput = {
@@ -1144,8 +1316,10 @@ export type UserUpdateWithoutAddressesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -1166,6 +1340,11 @@ export type UserUpdateWithoutAddressesInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAddressesInput = {
@@ -1181,8 +1360,10 @@ export type UserUncheckedUpdateWithoutAddressesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -1203,6 +1384,11 @@ export type UserUncheckedUpdateWithoutAddressesInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserCreateWithoutBlogsInput = {
@@ -1217,8 +1403,10 @@ export type UserCreateWithoutBlogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -1239,6 +1427,11 @@ export type UserCreateWithoutBlogsInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutBlogsInput = {
@@ -1254,8 +1447,10 @@ export type UserUncheckedCreateWithoutBlogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -1276,6 +1471,11 @@ export type UserUncheckedCreateWithoutBlogsInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutBlogsInput = {
@@ -1306,8 +1506,10 @@ export type UserUpdateWithoutBlogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -1328,6 +1530,11 @@ export type UserUpdateWithoutBlogsInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBlogsInput = {
@@ -1343,8 +1550,10 @@ export type UserUncheckedUpdateWithoutBlogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -1365,6 +1574,11 @@ export type UserUncheckedUpdateWithoutBlogsInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserCreateWithoutCartsInput = {
@@ -1379,8 +1593,10 @@ export type UserCreateWithoutCartsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -1401,6 +1617,11 @@ export type UserCreateWithoutCartsInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCartsInput = {
@@ -1416,8 +1637,10 @@ export type UserUncheckedCreateWithoutCartsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -1438,6 +1661,11 @@ export type UserUncheckedCreateWithoutCartsInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCartsInput = {
@@ -1468,8 +1696,10 @@ export type UserUpdateWithoutCartsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -1490,6 +1720,11 @@ export type UserUpdateWithoutCartsInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCartsInput = {
@@ -1505,8 +1740,10 @@ export type UserUncheckedUpdateWithoutCartsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -1527,6 +1764,11 @@ export type UserUncheckedUpdateWithoutCartsInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserCreateWithoutCreatedCategoriesInput = {
@@ -1541,8 +1783,10 @@ export type UserCreateWithoutCreatedCategoriesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -1563,6 +1807,11 @@ export type UserCreateWithoutCreatedCategoriesInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedCategoriesInput = {
@@ -1578,8 +1827,10 @@ export type UserUncheckedCreateWithoutCreatedCategoriesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -1600,6 +1851,11 @@ export type UserUncheckedCreateWithoutCreatedCategoriesInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedCategoriesInput = {
@@ -1619,8 +1875,10 @@ export type UserCreateWithoutUpdatedCategoriesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -1641,6 +1899,11 @@ export type UserCreateWithoutUpdatedCategoriesInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedCategoriesInput = {
@@ -1656,8 +1919,10 @@ export type UserUncheckedCreateWithoutUpdatedCategoriesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -1678,6 +1943,11 @@ export type UserUncheckedCreateWithoutUpdatedCategoriesInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedCategoriesInput = {
@@ -1708,8 +1978,10 @@ export type UserUpdateWithoutCreatedCategoriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -1730,6 +2002,11 @@ export type UserUpdateWithoutCreatedCategoriesInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedCategoriesInput = {
@@ -1745,8 +2022,10 @@ export type UserUncheckedUpdateWithoutCreatedCategoriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -1767,6 +2046,11 @@ export type UserUncheckedUpdateWithoutCreatedCategoriesInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUpsertWithoutUpdatedCategoriesInput = {
@@ -1792,8 +2076,10 @@ export type UserUpdateWithoutUpdatedCategoriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -1814,6 +2100,11 @@ export type UserUpdateWithoutUpdatedCategoriesInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedCategoriesInput = {
@@ -1829,8 +2120,10 @@ export type UserUncheckedUpdateWithoutUpdatedCategoriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -1851,6 +2144,11 @@ export type UserUncheckedUpdateWithoutUpdatedCategoriesInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserCreateWithoutCreatedCombosInput = {
@@ -1865,8 +2163,10 @@ export type UserCreateWithoutCreatedCombosInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -1887,6 +2187,11 @@ export type UserCreateWithoutCreatedCombosInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedCombosInput = {
@@ -1902,8 +2207,10 @@ export type UserUncheckedCreateWithoutCreatedCombosInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -1924,6 +2231,11 @@ export type UserUncheckedCreateWithoutCreatedCombosInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedCombosInput = {
@@ -1943,8 +2255,10 @@ export type UserCreateWithoutUpdatedCombosInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -1965,6 +2279,11 @@ export type UserCreateWithoutUpdatedCombosInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedCombosInput = {
@@ -1980,8 +2299,10 @@ export type UserUncheckedCreateWithoutUpdatedCombosInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -2002,6 +2323,11 @@ export type UserUncheckedCreateWithoutUpdatedCombosInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedCombosInput = {
@@ -2021,8 +2347,10 @@ export type UserCreateWithoutDeletedCombosInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -2043,6 +2371,11 @@ export type UserCreateWithoutDeletedCombosInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutDeletedCombosInput = {
@@ -2058,8 +2391,10 @@ export type UserUncheckedCreateWithoutDeletedCombosInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -2080,6 +2415,11 @@ export type UserUncheckedCreateWithoutDeletedCombosInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutDeletedCombosInput = {
@@ -2110,8 +2450,10 @@ export type UserUpdateWithoutCreatedCombosInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -2132,6 +2474,11 @@ export type UserUpdateWithoutCreatedCombosInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedCombosInput = {
@@ -2147,8 +2494,10 @@ export type UserUncheckedUpdateWithoutCreatedCombosInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -2169,6 +2518,11 @@ export type UserUncheckedUpdateWithoutCreatedCombosInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUpsertWithoutUpdatedCombosInput = {
@@ -2194,8 +2548,10 @@ export type UserUpdateWithoutUpdatedCombosInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -2216,6 +2572,11 @@ export type UserUpdateWithoutUpdatedCombosInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedCombosInput = {
@@ -2231,8 +2592,10 @@ export type UserUncheckedUpdateWithoutUpdatedCombosInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -2253,6 +2616,11 @@ export type UserUncheckedUpdateWithoutUpdatedCombosInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUpsertWithoutDeletedCombosInput = {
@@ -2278,8 +2646,10 @@ export type UserUpdateWithoutDeletedCombosInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -2300,6 +2670,11 @@ export type UserUpdateWithoutDeletedCombosInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeletedCombosInput = {
@@ -2315,8 +2690,10 @@ export type UserUncheckedUpdateWithoutDeletedCombosInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -2337,6 +2714,1151 @@ export type UserUncheckedUpdateWithoutDeletedCombosInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+}
+
+export type UserCreateWithoutDeliveryManProfileInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+}
+
+export type UserUncheckedCreateWithoutDeliveryManProfileInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+}
+
+export type UserCreateOrConnectWithoutDeliveryManProfileInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDeliveryManProfileInput, Prisma.UserUncheckedCreateWithoutDeliveryManProfileInput>
+}
+
+export type UserCreateWithoutVerifiedDeliveryMenInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+}
+
+export type UserUncheckedCreateWithoutVerifiedDeliveryMenInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+}
+
+export type UserCreateOrConnectWithoutVerifiedDeliveryMenInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutVerifiedDeliveryMenInput, Prisma.UserUncheckedCreateWithoutVerifiedDeliveryMenInput>
+}
+
+export type UserUpsertWithoutDeliveryManProfileInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDeliveryManProfileInput, Prisma.UserUncheckedUpdateWithoutDeliveryManProfileInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDeliveryManProfileInput, Prisma.UserUncheckedCreateWithoutDeliveryManProfileInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDeliveryManProfileInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDeliveryManProfileInput, Prisma.UserUncheckedUpdateWithoutDeliveryManProfileInput>
+}
+
+export type UserUpdateWithoutDeliveryManProfileInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDeliveryManProfileInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+}
+
+export type UserUpsertWithoutVerifiedDeliveryMenInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutVerifiedDeliveryMenInput, Prisma.UserUncheckedUpdateWithoutVerifiedDeliveryMenInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutVerifiedDeliveryMenInput, Prisma.UserUncheckedCreateWithoutVerifiedDeliveryMenInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutVerifiedDeliveryMenInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutVerifiedDeliveryMenInput, Prisma.UserUncheckedUpdateWithoutVerifiedDeliveryMenInput>
+}
+
+export type UserUpdateWithoutVerifiedDeliveryMenInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutVerifiedDeliveryMenInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+}
+
+export type UserCreateWithoutCreatedDeliveryProvidersInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+}
+
+export type UserUncheckedCreateWithoutCreatedDeliveryProvidersInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+}
+
+export type UserCreateOrConnectWithoutCreatedDeliveryProvidersInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedDeliveryProvidersInput, Prisma.UserUncheckedCreateWithoutCreatedDeliveryProvidersInput>
+}
+
+export type UserCreateWithoutUpdatedDeliveryProvidersInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+}
+
+export type UserUncheckedCreateWithoutUpdatedDeliveryProvidersInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+}
+
+export type UserCreateOrConnectWithoutUpdatedDeliveryProvidersInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedDeliveryProvidersInput, Prisma.UserUncheckedCreateWithoutUpdatedDeliveryProvidersInput>
+}
+
+export type UserUpsertWithoutCreatedDeliveryProvidersInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedDeliveryProvidersInput, Prisma.UserUncheckedUpdateWithoutCreatedDeliveryProvidersInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedDeliveryProvidersInput, Prisma.UserUncheckedCreateWithoutCreatedDeliveryProvidersInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCreatedDeliveryProvidersInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedDeliveryProvidersInput, Prisma.UserUncheckedUpdateWithoutCreatedDeliveryProvidersInput>
+}
+
+export type UserUpdateWithoutCreatedDeliveryProvidersInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCreatedDeliveryProvidersInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+}
+
+export type UserUpsertWithoutUpdatedDeliveryProvidersInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedDeliveryProvidersInput, Prisma.UserUncheckedUpdateWithoutUpdatedDeliveryProvidersInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedDeliveryProvidersInput, Prisma.UserUncheckedCreateWithoutUpdatedDeliveryProvidersInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutUpdatedDeliveryProvidersInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedDeliveryProvidersInput, Prisma.UserUncheckedUpdateWithoutUpdatedDeliveryProvidersInput>
+}
+
+export type UserUpdateWithoutUpdatedDeliveryProvidersInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutUpdatedDeliveryProvidersInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+}
+
+export type UserCreateWithoutBookedDeliveryShipmentsInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+}
+
+export type UserUncheckedCreateWithoutBookedDeliveryShipmentsInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+}
+
+export type UserCreateOrConnectWithoutBookedDeliveryShipmentsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutBookedDeliveryShipmentsInput, Prisma.UserUncheckedCreateWithoutBookedDeliveryShipmentsInput>
+}
+
+export type UserUpsertWithoutBookedDeliveryShipmentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutBookedDeliveryShipmentsInput, Prisma.UserUncheckedUpdateWithoutBookedDeliveryShipmentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutBookedDeliveryShipmentsInput, Prisma.UserUncheckedCreateWithoutBookedDeliveryShipmentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutBookedDeliveryShipmentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutBookedDeliveryShipmentsInput, Prisma.UserUncheckedUpdateWithoutBookedDeliveryShipmentsInput>
+}
+
+export type UserUpdateWithoutBookedDeliveryShipmentsInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutBookedDeliveryShipmentsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+}
+
+export type UserCreateWithoutDeliveryStatusChangesInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+}
+
+export type UserUncheckedCreateWithoutDeliveryStatusChangesInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+}
+
+export type UserCreateOrConnectWithoutDeliveryStatusChangesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDeliveryStatusChangesInput, Prisma.UserUncheckedCreateWithoutDeliveryStatusChangesInput>
+}
+
+export type UserUpsertWithoutDeliveryStatusChangesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDeliveryStatusChangesInput, Prisma.UserUncheckedUpdateWithoutDeliveryStatusChangesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDeliveryStatusChangesInput, Prisma.UserUncheckedCreateWithoutDeliveryStatusChangesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDeliveryStatusChangesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDeliveryStatusChangesInput, Prisma.UserUncheckedUpdateWithoutDeliveryStatusChangesInput>
+}
+
+export type UserUpdateWithoutDeliveryStatusChangesInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDeliveryStatusChangesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserCreateWithoutCreatedHomeContentsInput = {
@@ -2351,8 +3873,10 @@ export type UserCreateWithoutCreatedHomeContentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -2373,6 +3897,11 @@ export type UserCreateWithoutCreatedHomeContentsInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedHomeContentsInput = {
@@ -2388,8 +3917,10 @@ export type UserUncheckedCreateWithoutCreatedHomeContentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -2410,6 +3941,11 @@ export type UserUncheckedCreateWithoutCreatedHomeContentsInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedHomeContentsInput = {
@@ -2429,8 +3965,10 @@ export type UserCreateWithoutUpdatedHomeContentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -2451,6 +3989,11 @@ export type UserCreateWithoutUpdatedHomeContentsInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedHomeContentsInput = {
@@ -2466,8 +4009,10 @@ export type UserUncheckedCreateWithoutUpdatedHomeContentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -2488,6 +4033,11 @@ export type UserUncheckedCreateWithoutUpdatedHomeContentsInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedHomeContentsInput = {
@@ -2518,8 +4068,10 @@ export type UserUpdateWithoutCreatedHomeContentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -2540,6 +4092,11 @@ export type UserUpdateWithoutCreatedHomeContentsInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedHomeContentsInput = {
@@ -2555,8 +4112,10 @@ export type UserUncheckedUpdateWithoutCreatedHomeContentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -2577,6 +4136,11 @@ export type UserUncheckedUpdateWithoutCreatedHomeContentsInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUpsertWithoutUpdatedHomeContentsInput = {
@@ -2602,8 +4166,10 @@ export type UserUpdateWithoutUpdatedHomeContentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -2624,6 +4190,11 @@ export type UserUpdateWithoutUpdatedHomeContentsInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedHomeContentsInput = {
@@ -2639,8 +4210,10 @@ export type UserUncheckedUpdateWithoutUpdatedHomeContentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -2661,6 +4234,11 @@ export type UserUncheckedUpdateWithoutUpdatedHomeContentsInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserCreateWithoutInventoriesInput = {
@@ -2675,8 +4253,10 @@ export type UserCreateWithoutInventoriesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -2697,6 +4277,11 @@ export type UserCreateWithoutInventoriesInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutInventoriesInput = {
@@ -2712,8 +4297,10 @@ export type UserUncheckedCreateWithoutInventoriesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -2734,6 +4321,11 @@ export type UserUncheckedCreateWithoutInventoriesInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutInventoriesInput = {
@@ -2764,8 +4356,10 @@ export type UserUpdateWithoutInventoriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -2786,6 +4380,11 @@ export type UserUpdateWithoutInventoriesInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInventoriesInput = {
@@ -2801,8 +4400,10 @@ export type UserUncheckedUpdateWithoutInventoriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -2823,6 +4424,11 @@ export type UserUncheckedUpdateWithoutInventoriesInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserCreateWithoutOrdersInput = {
@@ -2837,8 +4443,10 @@ export type UserCreateWithoutOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -2859,6 +4467,11 @@ export type UserCreateWithoutOrdersInput = {
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutOrdersInput = {
@@ -2874,8 +4487,10 @@ export type UserUncheckedCreateWithoutOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -2896,6 +4511,11 @@ export type UserUncheckedCreateWithoutOrdersInput = {
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutOrdersInput = {
@@ -2926,8 +4546,10 @@ export type UserUpdateWithoutOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -2948,6 +4570,11 @@ export type UserUpdateWithoutOrdersInput = {
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrdersInput = {
@@ -2963,8 +4590,10 @@ export type UserUncheckedUpdateWithoutOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -2985,6 +4614,11 @@ export type UserUncheckedUpdateWithoutOrdersInput = {
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserCreateWithoutOrderStatusChangesInput = {
@@ -2999,8 +4633,10 @@ export type UserCreateWithoutOrderStatusChangesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -3021,6 +4657,11 @@ export type UserCreateWithoutOrderStatusChangesInput = {
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutOrderStatusChangesInput = {
@@ -3036,8 +4677,10 @@ export type UserUncheckedCreateWithoutOrderStatusChangesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -3058,6 +4701,11 @@ export type UserUncheckedCreateWithoutOrderStatusChangesInput = {
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutOrderStatusChangesInput = {
@@ -3088,8 +4736,10 @@ export type UserUpdateWithoutOrderStatusChangesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -3110,6 +4760,11 @@ export type UserUpdateWithoutOrderStatusChangesInput = {
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrderStatusChangesInput = {
@@ -3125,8 +4780,10 @@ export type UserUncheckedUpdateWithoutOrderStatusChangesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -3147,6 +4804,11 @@ export type UserUncheckedUpdateWithoutOrderStatusChangesInput = {
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserCreateWithoutCreatedProductsInput = {
@@ -3161,8 +4823,10 @@ export type UserCreateWithoutCreatedProductsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -3183,6 +4847,11 @@ export type UserCreateWithoutCreatedProductsInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedProductsInput = {
@@ -3198,8 +4867,10 @@ export type UserUncheckedCreateWithoutCreatedProductsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -3220,6 +4891,11 @@ export type UserUncheckedCreateWithoutCreatedProductsInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedProductsInput = {
@@ -3239,8 +4915,10 @@ export type UserCreateWithoutUpdatedProductsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -3261,6 +4939,11 @@ export type UserCreateWithoutUpdatedProductsInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedProductsInput = {
@@ -3276,8 +4959,10 @@ export type UserUncheckedCreateWithoutUpdatedProductsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -3298,6 +4983,11 @@ export type UserUncheckedCreateWithoutUpdatedProductsInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedProductsInput = {
@@ -3317,8 +5007,10 @@ export type UserCreateWithoutDeletedProductsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -3339,6 +5031,11 @@ export type UserCreateWithoutDeletedProductsInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutDeletedProductsInput = {
@@ -3354,8 +5051,10 @@ export type UserUncheckedCreateWithoutDeletedProductsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -3376,6 +5075,11 @@ export type UserUncheckedCreateWithoutDeletedProductsInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutDeletedProductsInput = {
@@ -3406,8 +5110,10 @@ export type UserUpdateWithoutCreatedProductsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -3428,6 +5134,11 @@ export type UserUpdateWithoutCreatedProductsInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedProductsInput = {
@@ -3443,8 +5154,10 @@ export type UserUncheckedUpdateWithoutCreatedProductsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -3465,6 +5178,11 @@ export type UserUncheckedUpdateWithoutCreatedProductsInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUpsertWithoutUpdatedProductsInput = {
@@ -3490,8 +5208,10 @@ export type UserUpdateWithoutUpdatedProductsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -3512,6 +5232,11 @@ export type UserUpdateWithoutUpdatedProductsInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedProductsInput = {
@@ -3527,8 +5252,10 @@ export type UserUncheckedUpdateWithoutUpdatedProductsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -3549,6 +5276,11 @@ export type UserUncheckedUpdateWithoutUpdatedProductsInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUpsertWithoutDeletedProductsInput = {
@@ -3574,8 +5306,10 @@ export type UserUpdateWithoutDeletedProductsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -3596,6 +5330,11 @@ export type UserUpdateWithoutDeletedProductsInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeletedProductsInput = {
@@ -3611,8 +5350,10 @@ export type UserUncheckedUpdateWithoutDeletedProductsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -3633,6 +5374,11 @@ export type UserUncheckedUpdateWithoutDeletedProductsInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserCreateWithoutPromoCodeRedemptionsInput = {
@@ -3647,8 +5393,10 @@ export type UserCreateWithoutPromoCodeRedemptionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -3669,6 +5417,11 @@ export type UserCreateWithoutPromoCodeRedemptionsInput = {
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutPromoCodeRedemptionsInput = {
@@ -3684,8 +5437,10 @@ export type UserUncheckedCreateWithoutPromoCodeRedemptionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -3706,6 +5461,11 @@ export type UserUncheckedCreateWithoutPromoCodeRedemptionsInput = {
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutPromoCodeRedemptionsInput = {
@@ -3736,8 +5496,10 @@ export type UserUpdateWithoutPromoCodeRedemptionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -3758,6 +5520,11 @@ export type UserUpdateWithoutPromoCodeRedemptionsInput = {
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPromoCodeRedemptionsInput = {
@@ -3773,8 +5540,10 @@ export type UserUncheckedUpdateWithoutPromoCodeRedemptionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -3795,6 +5564,11 @@ export type UserUncheckedUpdateWithoutPromoCodeRedemptionsInput = {
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserCreateWithoutCreatedSupportsInput = {
@@ -3809,8 +5583,10 @@ export type UserCreateWithoutCreatedSupportsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -3831,6 +5607,11 @@ export type UserCreateWithoutCreatedSupportsInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedSupportsInput = {
@@ -3846,8 +5627,10 @@ export type UserUncheckedCreateWithoutCreatedSupportsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -3868,6 +5651,11 @@ export type UserUncheckedCreateWithoutCreatedSupportsInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedSupportsInput = {
@@ -3887,8 +5675,10 @@ export type UserCreateWithoutUpdatedSupportsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -3909,6 +5699,11 @@ export type UserCreateWithoutUpdatedSupportsInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedSupportsInput = {
@@ -3924,8 +5719,10 @@ export type UserUncheckedCreateWithoutUpdatedSupportsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -3946,6 +5743,11 @@ export type UserUncheckedCreateWithoutUpdatedSupportsInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedSupportsInput = {
@@ -3976,8 +5778,10 @@ export type UserUpdateWithoutCreatedSupportsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -3998,6 +5802,11 @@ export type UserUpdateWithoutCreatedSupportsInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedSupportsInput = {
@@ -4013,8 +5822,10 @@ export type UserUncheckedUpdateWithoutCreatedSupportsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -4035,6 +5846,11 @@ export type UserUncheckedUpdateWithoutCreatedSupportsInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUpsertWithoutUpdatedSupportsInput = {
@@ -4060,8 +5876,10 @@ export type UserUpdateWithoutUpdatedSupportsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -4082,6 +5900,11 @@ export type UserUpdateWithoutUpdatedSupportsInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedSupportsInput = {
@@ -4097,8 +5920,10 @@ export type UserUncheckedUpdateWithoutUpdatedSupportsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -4119,6 +5944,11 @@ export type UserUncheckedUpdateWithoutUpdatedSupportsInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserCreateWithoutProfileInput = {
@@ -4133,7 +5963,9 @@ export type UserCreateWithoutProfileInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -4155,6 +5987,11 @@ export type UserCreateWithoutProfileInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutProfileInput = {
@@ -4170,7 +6007,9 @@ export type UserUncheckedCreateWithoutProfileInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -4192,6 +6031,11 @@ export type UserUncheckedCreateWithoutProfileInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutProfileInput = {
@@ -4222,7 +6066,9 @@ export type UserUpdateWithoutProfileInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -4244,6 +6090,11 @@ export type UserUpdateWithoutProfileInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProfileInput = {
@@ -4259,7 +6110,9 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -4281,6 +6134,11 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserCreateWithoutSecurityInput = {
@@ -4295,7 +6153,9 @@ export type UserCreateWithoutSecurityInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
@@ -4317,6 +6177,11 @@ export type UserCreateWithoutSecurityInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutSecurityInput = {
@@ -4332,7 +6197,9 @@ export type UserUncheckedCreateWithoutSecurityInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -4354,6 +6221,11 @@ export type UserUncheckedCreateWithoutSecurityInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutSecurityInput = {
@@ -4384,7 +6256,9 @@ export type UserUpdateWithoutSecurityInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
@@ -4406,6 +6280,11 @@ export type UserUpdateWithoutSecurityInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSecurityInput = {
@@ -4421,7 +6300,9 @@ export type UserUncheckedUpdateWithoutSecurityInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -4443,6 +6324,11 @@ export type UserUncheckedUpdateWithoutSecurityInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -4457,8 +6343,10 @@ export type UserCreateWithoutSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -4479,6 +6367,11 @@ export type UserCreateWithoutSessionsInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -4494,8 +6387,10 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -4516,6 +6411,11 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -4546,8 +6446,10 @@ export type UserUpdateWithoutSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -4568,6 +6470,11 @@ export type UserUpdateWithoutSessionsInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -4583,8 +6490,10 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -4605,6 +6514,11 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserCreateWithoutOtpsInput = {
@@ -4619,8 +6533,10 @@ export type UserCreateWithoutOtpsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -4641,6 +6557,11 @@ export type UserCreateWithoutOtpsInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserUncheckedCreateWithoutOtpsInput = {
@@ -4656,8 +6577,10 @@ export type UserUncheckedCreateWithoutOtpsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -4678,6 +6601,11 @@ export type UserUncheckedCreateWithoutOtpsInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
 }
 
 export type UserCreateOrConnectWithoutOtpsInput = {
@@ -4708,8 +6636,10 @@ export type UserUpdateWithoutOtpsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -4730,6 +6660,11 @@ export type UserUpdateWithoutOtpsInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOtpsInput = {
@@ -4745,8 +6680,10 @@ export type UserUncheckedUpdateWithoutOtpsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -4767,6 +6704,11 @@ export type UserUncheckedUpdateWithoutOtpsInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
 }
 
 
@@ -4796,6 +6738,11 @@ export type UserCountOutputType = {
   orders: number
   orderStatusChanges: number
   promoCodeRedemptions: number
+  createdDeliveryProviders: number
+  updatedDeliveryProviders: number
+  bookedDeliveryShipments: number
+  deliveryStatusChanges: number
+  verifiedDeliveryMen: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -4820,6 +6767,11 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   orders?: boolean | UserCountOutputTypeCountOrdersArgs
   orderStatusChanges?: boolean | UserCountOutputTypeCountOrderStatusChangesArgs
   promoCodeRedemptions?: boolean | UserCountOutputTypeCountPromoCodeRedemptionsArgs
+  createdDeliveryProviders?: boolean | UserCountOutputTypeCountCreatedDeliveryProvidersArgs
+  updatedDeliveryProviders?: boolean | UserCountOutputTypeCountUpdatedDeliveryProvidersArgs
+  bookedDeliveryShipments?: boolean | UserCountOutputTypeCountBookedDeliveryShipmentsArgs
+  deliveryStatusChanges?: boolean | UserCountOutputTypeCountDeliveryStatusChangesArgs
+  verifiedDeliveryMen?: boolean | UserCountOutputTypeCountVerifiedDeliveryMenArgs
 }
 
 /**
@@ -4979,6 +6931,41 @@ export type UserCountOutputTypeCountPromoCodeRedemptionsArgs<ExtArgs extends run
   where?: Prisma.PromoCodeRedemptionWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCreatedDeliveryProvidersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeliveryProviderWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountUpdatedDeliveryProvidersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeliveryProviderWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountBookedDeliveryShipmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeliveryShipmentWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDeliveryStatusChangesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeliveryStatusHistoryWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountVerifiedDeliveryMenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeliveryManProfileWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -4993,8 +6980,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdAt?: boolean
   updatedAt?: boolean
   lastLoginAt?: boolean
+  deletedAt?: boolean
   profile?: boolean | Prisma.User$profileArgs<ExtArgs>
   security?: boolean | Prisma.User$securityArgs<ExtArgs>
+  deliveryManProfile?: boolean | Prisma.User$deliveryManProfileArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   otps?: boolean | Prisma.User$otpsArgs<ExtArgs>
   createdCategories?: boolean | Prisma.User$createdCategoriesArgs<ExtArgs>
@@ -5016,6 +7005,11 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   orders?: boolean | Prisma.User$ordersArgs<ExtArgs>
   orderStatusChanges?: boolean | Prisma.User$orderStatusChangesArgs<ExtArgs>
   promoCodeRedemptions?: boolean | Prisma.User$promoCodeRedemptionsArgs<ExtArgs>
+  createdDeliveryProviders?: boolean | Prisma.User$createdDeliveryProvidersArgs<ExtArgs>
+  updatedDeliveryProviders?: boolean | Prisma.User$updatedDeliveryProvidersArgs<ExtArgs>
+  bookedDeliveryShipments?: boolean | Prisma.User$bookedDeliveryShipmentsArgs<ExtArgs>
+  deliveryStatusChanges?: boolean | Prisma.User$deliveryStatusChangesArgs<ExtArgs>
+  verifiedDeliveryMen?: boolean | Prisma.User$verifiedDeliveryMenArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -5032,6 +7026,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   createdAt?: boolean
   updatedAt?: boolean
   lastLoginAt?: boolean
+  deletedAt?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -5047,6 +7042,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   createdAt?: boolean
   updatedAt?: boolean
   lastLoginAt?: boolean
+  deletedAt?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -5062,12 +7058,14 @@ export type UserSelectScalar = {
   createdAt?: boolean
   updatedAt?: boolean
   lastLoginAt?: boolean
+  deletedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "email" | "password" | "phone" | "role" | "status" | "authProvider" | "providerId" | "createdAt" | "updatedAt" | "lastLoginAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "email" | "password" | "phone" | "role" | "status" | "authProvider" | "providerId" | "createdAt" | "updatedAt" | "lastLoginAt" | "deletedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   profile?: boolean | Prisma.User$profileArgs<ExtArgs>
   security?: boolean | Prisma.User$securityArgs<ExtArgs>
+  deliveryManProfile?: boolean | Prisma.User$deliveryManProfileArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   otps?: boolean | Prisma.User$otpsArgs<ExtArgs>
   createdCategories?: boolean | Prisma.User$createdCategoriesArgs<ExtArgs>
@@ -5089,6 +7087,11 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   orders?: boolean | Prisma.User$ordersArgs<ExtArgs>
   orderStatusChanges?: boolean | Prisma.User$orderStatusChangesArgs<ExtArgs>
   promoCodeRedemptions?: boolean | Prisma.User$promoCodeRedemptionsArgs<ExtArgs>
+  createdDeliveryProviders?: boolean | Prisma.User$createdDeliveryProvidersArgs<ExtArgs>
+  updatedDeliveryProviders?: boolean | Prisma.User$updatedDeliveryProvidersArgs<ExtArgs>
+  bookedDeliveryShipments?: boolean | Prisma.User$bookedDeliveryShipmentsArgs<ExtArgs>
+  deliveryStatusChanges?: boolean | Prisma.User$deliveryStatusChangesArgs<ExtArgs>
+  verifiedDeliveryMen?: boolean | Prisma.User$verifiedDeliveryMenArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -5099,6 +7102,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     profile: Prisma.$ProfilePayload<ExtArgs> | null
     security: Prisma.$UserSecurityPayload<ExtArgs> | null
+    deliveryManProfile: Prisma.$DeliveryManProfilePayload<ExtArgs> | null
     sessions: Prisma.$SessionPayload<ExtArgs>[]
     otps: Prisma.$OTPPayload<ExtArgs>[]
     createdCategories: Prisma.$CategoryPayload<ExtArgs>[]
@@ -5120,6 +7124,11 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     orders: Prisma.$OrderPayload<ExtArgs>[]
     orderStatusChanges: Prisma.$OrderStatusHistoryPayload<ExtArgs>[]
     promoCodeRedemptions: Prisma.$PromoCodeRedemptionPayload<ExtArgs>[]
+    createdDeliveryProviders: Prisma.$DeliveryProviderPayload<ExtArgs>[]
+    updatedDeliveryProviders: Prisma.$DeliveryProviderPayload<ExtArgs>[]
+    bookedDeliveryShipments: Prisma.$DeliveryShipmentPayload<ExtArgs>[]
+    deliveryStatusChanges: Prisma.$DeliveryStatusHistoryPayload<ExtArgs>[]
+    verifiedDeliveryMen: Prisma.$DeliveryManProfilePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -5134,6 +7143,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     createdAt: Date
     updatedAt: Date
     lastLoginAt: Date | null
+    deletedAt: Date | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -5530,6 +7540,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   profile<T extends Prisma.User$profileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$profileArgs<ExtArgs>>): Prisma.Prisma__ProfileClient<runtime.Types.Result.GetResult<Prisma.$ProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   security<T extends Prisma.User$securityArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$securityArgs<ExtArgs>>): Prisma.Prisma__UserSecurityClient<runtime.Types.Result.GetResult<Prisma.$UserSecurityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  deliveryManProfile<T extends Prisma.User$deliveryManProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$deliveryManProfileArgs<ExtArgs>>): Prisma.Prisma__DeliveryManProfileClient<runtime.Types.Result.GetResult<Prisma.$DeliveryManProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   otps<T extends Prisma.User$otpsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$otpsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OTPPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   createdCategories<T extends Prisma.User$createdCategoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdCategoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -5551,6 +7562,11 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   orders<T extends Prisma.User$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   orderStatusChanges<T extends Prisma.User$orderStatusChangesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$orderStatusChangesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderStatusHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   promoCodeRedemptions<T extends Prisma.User$promoCodeRedemptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$promoCodeRedemptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PromoCodeRedemptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  createdDeliveryProviders<T extends Prisma.User$createdDeliveryProvidersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdDeliveryProvidersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryProviderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  updatedDeliveryProviders<T extends Prisma.User$updatedDeliveryProvidersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$updatedDeliveryProvidersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryProviderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  bookedDeliveryShipments<T extends Prisma.User$bookedDeliveryShipmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$bookedDeliveryShipmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryShipmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  deliveryStatusChanges<T extends Prisma.User$deliveryStatusChangesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$deliveryStatusChangesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryStatusHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  verifiedDeliveryMen<T extends Prisma.User$verifiedDeliveryMenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$verifiedDeliveryMenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryManProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5592,6 +7608,7 @@ export interface UserFieldRefs {
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly lastLoginAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly deletedAt: Prisma.FieldRef<"User", 'DateTime'>
 }
     
 
@@ -6020,6 +8037,25 @@ export type User$securityArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   include?: Prisma.UserSecurityInclude<ExtArgs> | null
   where?: Prisma.UserSecurityWhereInput
+}
+
+/**
+ * User.deliveryManProfile
+ */
+export type User$deliveryManProfileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeliveryManProfile
+   */
+  select?: Prisma.DeliveryManProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DeliveryManProfile
+   */
+  omit?: Prisma.DeliveryManProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryManProfileInclude<ExtArgs> | null
+  where?: Prisma.DeliveryManProfileWhereInput
 }
 
 /**
@@ -6524,6 +8560,126 @@ export type User$promoCodeRedemptionsArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.PromoCodeRedemptionScalarFieldEnum | Prisma.PromoCodeRedemptionScalarFieldEnum[]
+}
+
+/**
+ * User.createdDeliveryProviders
+ */
+export type User$createdDeliveryProvidersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeliveryProvider
+   */
+  select?: Prisma.DeliveryProviderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DeliveryProvider
+   */
+  omit?: Prisma.DeliveryProviderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryProviderInclude<ExtArgs> | null
+  where?: Prisma.DeliveryProviderWhereInput
+  orderBy?: Prisma.DeliveryProviderOrderByWithRelationInput | Prisma.DeliveryProviderOrderByWithRelationInput[]
+  cursor?: Prisma.DeliveryProviderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeliveryProviderScalarFieldEnum | Prisma.DeliveryProviderScalarFieldEnum[]
+}
+
+/**
+ * User.updatedDeliveryProviders
+ */
+export type User$updatedDeliveryProvidersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeliveryProvider
+   */
+  select?: Prisma.DeliveryProviderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DeliveryProvider
+   */
+  omit?: Prisma.DeliveryProviderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryProviderInclude<ExtArgs> | null
+  where?: Prisma.DeliveryProviderWhereInput
+  orderBy?: Prisma.DeliveryProviderOrderByWithRelationInput | Prisma.DeliveryProviderOrderByWithRelationInput[]
+  cursor?: Prisma.DeliveryProviderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeliveryProviderScalarFieldEnum | Prisma.DeliveryProviderScalarFieldEnum[]
+}
+
+/**
+ * User.bookedDeliveryShipments
+ */
+export type User$bookedDeliveryShipmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeliveryShipment
+   */
+  select?: Prisma.DeliveryShipmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DeliveryShipment
+   */
+  omit?: Prisma.DeliveryShipmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryShipmentInclude<ExtArgs> | null
+  where?: Prisma.DeliveryShipmentWhereInput
+  orderBy?: Prisma.DeliveryShipmentOrderByWithRelationInput | Prisma.DeliveryShipmentOrderByWithRelationInput[]
+  cursor?: Prisma.DeliveryShipmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeliveryShipmentScalarFieldEnum | Prisma.DeliveryShipmentScalarFieldEnum[]
+}
+
+/**
+ * User.deliveryStatusChanges
+ */
+export type User$deliveryStatusChangesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeliveryStatusHistory
+   */
+  select?: Prisma.DeliveryStatusHistorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DeliveryStatusHistory
+   */
+  omit?: Prisma.DeliveryStatusHistoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryStatusHistoryInclude<ExtArgs> | null
+  where?: Prisma.DeliveryStatusHistoryWhereInput
+  orderBy?: Prisma.DeliveryStatusHistoryOrderByWithRelationInput | Prisma.DeliveryStatusHistoryOrderByWithRelationInput[]
+  cursor?: Prisma.DeliveryStatusHistoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeliveryStatusHistoryScalarFieldEnum | Prisma.DeliveryStatusHistoryScalarFieldEnum[]
+}
+
+/**
+ * User.verifiedDeliveryMen
+ */
+export type User$verifiedDeliveryMenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeliveryManProfile
+   */
+  select?: Prisma.DeliveryManProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DeliveryManProfile
+   */
+  omit?: Prisma.DeliveryManProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryManProfileInclude<ExtArgs> | null
+  where?: Prisma.DeliveryManProfileWhereInput
+  orderBy?: Prisma.DeliveryManProfileOrderByWithRelationInput | Prisma.DeliveryManProfileOrderByWithRelationInput[]
+  cursor?: Prisma.DeliveryManProfileWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeliveryManProfileScalarFieldEnum | Prisma.DeliveryManProfileScalarFieldEnum[]
 }
 
 /**

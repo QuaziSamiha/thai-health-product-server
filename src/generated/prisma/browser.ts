@@ -58,6 +58,31 @@ export type ComboItem = Prisma.ComboItemModel
  */
 export type ComboImage = Prisma.ComboImageModel
 /**
+ * Model DeliveryManProfile
+ * 
+ */
+export type DeliveryManProfile = Prisma.DeliveryManProfileModel
+/**
+ * Model DeliveryProvider
+ * 
+ */
+export type DeliveryProvider = Prisma.DeliveryProviderModel
+/**
+ * Model DeliveryZone
+ * 
+ */
+export type DeliveryZone = Prisma.DeliveryZoneModel
+/**
+ * Model DeliveryShipment
+ * 
+ */
+export type DeliveryShipment = Prisma.DeliveryShipmentModel
+/**
+ * Model DeliveryStatusHistory
+ * 
+ */
+export type DeliveryStatusHistory = Prisma.DeliveryStatusHistoryModel
+/**
  * Model Home
  * 
  */

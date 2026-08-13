@@ -65,22 +65,33 @@ async function main() {
         SALT_ROUNDS,
       );
 
-      await prisma.user.upsert({
+      // email is only unique among non-deleted rows (see User.email comment
+      // in schema), so it can't be used as an upsert `where` — find first.
+      const existing = await prisma.user.findFirst({
         where: { email: user.email },
-        update: {
-          role: user.role,
-          password: hashedPassword,
-          status: 'ACTIVE',
-        },
-        create: {
-          email: user.email,
-          role: user.role,
-          password: hashedPassword,
-          status: 'ACTIVE',
-          profile: { create: { firstName: user.firstName } },
-          security: { create: { isEmailVerified: true } },
-        },
       });
+
+      if (existing) {
+        await prisma.user.update({
+          where: { id: existing.id },
+          data: {
+            role: user.role,
+            password: hashedPassword,
+            status: 'ACTIVE',
+          },
+        });
+      } else {
+        await prisma.user.create({
+          data: {
+            email: user.email,
+            role: user.role,
+            password: hashedPassword,
+            status: 'ACTIVE',
+            profile: { create: { firstName: user.firstName } },
+            security: { create: { isEmailVerified: true } },
+          },
+        });
+      }
 
       console.log(`Seeded user: ${user.email} (${user.role})`);
     }

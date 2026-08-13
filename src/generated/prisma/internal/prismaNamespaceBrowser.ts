@@ -59,6 +59,11 @@ export const ModelName = {
   ComboProduct: 'ComboProduct',
   ComboItem: 'ComboItem',
   ComboImage: 'ComboImage',
+  DeliveryManProfile: 'DeliveryManProfile',
+  DeliveryProvider: 'DeliveryProvider',
+  DeliveryZone: 'DeliveryZone',
+  DeliveryShipment: 'DeliveryShipment',
+  DeliveryStatusHistory: 'DeliveryStatusHistory',
   Home: 'Home',
   Batch: 'Batch',
   Inventory: 'Inventory',
@@ -259,6 +264,126 @@ export const ComboImageScalarFieldEnum = {
 } as const
 
 export type ComboImageScalarFieldEnum = (typeof ComboImageScalarFieldEnum)[keyof typeof ComboImageScalarFieldEnum]
+
+
+export const DeliveryManProfileScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  nidNumber: 'nidNumber',
+  nidDocumentUrl: 'nidDocumentUrl',
+  nidVerificationStatus: 'nidVerificationStatus',
+  nidVerifiedAt: 'nidVerifiedAt',
+  vehicleType: 'vehicleType',
+  vehicleRegistrationNo: 'vehicleRegistrationNo',
+  drivingLicenseNo: 'drivingLicenseNo',
+  availability: 'availability',
+  coverageArea: 'coverageArea',
+  employmentType: 'employmentType',
+  joinedAt: 'joinedAt',
+  codCollectionEnabled: 'codCollectionEnabled',
+  codBalance: 'codBalance',
+  bankName: 'bankName',
+  bankAccountName: 'bankAccountName',
+  bankAccountNumber: 'bankAccountNumber',
+  completedDeliveryCount: 'completedDeliveryCount',
+  rating: 'rating',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId',
+  nidVerifiedBy: 'nidVerifiedBy'
+} as const
+
+export type DeliveryManProfileScalarFieldEnum = (typeof DeliveryManProfileScalarFieldEnum)[keyof typeof DeliveryManProfileScalarFieldEnum]
+
+
+export const DeliveryProviderScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  name: 'name',
+  slug: 'slug',
+  status: 'status',
+  integrationType: 'integrationType',
+  logoUrl: 'logoUrl',
+  contactPerson: 'contactPerson',
+  phone: 'phone',
+  email: 'email',
+  website: 'website',
+  officeLocation: 'officeLocation',
+  apiBaseUrl: 'apiBaseUrl',
+  apiCredentialRef: 'apiCredentialRef',
+  trackingUrlTemplate: 'trackingUrlTemplate',
+  priority: 'priority',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy'
+} as const
+
+export type DeliveryProviderScalarFieldEnum = (typeof DeliveryProviderScalarFieldEnum)[keyof typeof DeliveryProviderScalarFieldEnum]
+
+
+export const DeliveryZoneScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  serviceName: 'serviceName',
+  areaName: 'areaName',
+  state: 'state',
+  region: 'region',
+  postalCodePrefix: 'postalCodePrefix',
+  country: 'country',
+  minDeliveryDays: 'minDeliveryDays',
+  maxDeliveryDays: 'maxDeliveryDays',
+  pricingModel: 'pricingModel',
+  baseFee: 'baseFee',
+  codAvailable: 'codAvailable',
+  codFeePercent: 'codFeePercent',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  providerId: 'providerId'
+} as const
+
+export type DeliveryZoneScalarFieldEnum = (typeof DeliveryZoneScalarFieldEnum)[keyof typeof DeliveryZoneScalarFieldEnum]
+
+
+export const DeliveryShipmentScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  orderId: 'orderId',
+  orderNumber: 'orderNumber',
+  status: 'status',
+  trackingNumber: 'trackingNumber',
+  trackingUrl: 'trackingUrl',
+  providerNameSnapshot: 'providerNameSnapshot',
+  shippingFee: 'shippingFee',
+  estimatedDeliveryFrom: 'estimatedDeliveryFrom',
+  estimatedDeliveryTo: 'estimatedDeliveryTo',
+  pickedUpAt: 'pickedUpAt',
+  deliveredAt: 'deliveredAt',
+  failedAt: 'failedAt',
+  failureReason: 'failureReason',
+  providerResponse: 'providerResponse',
+  providerId: 'providerId',
+  zoneId: 'zoneId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdBy: 'createdBy'
+} as const
+
+export type DeliveryShipmentScalarFieldEnum = (typeof DeliveryShipmentScalarFieldEnum)[keyof typeof DeliveryShipmentScalarFieldEnum]
+
+
+export const DeliveryStatusHistoryScalarFieldEnum = {
+  id: 'id',
+  status: 'status',
+  note: 'note',
+  shipmentId: 'shipmentId',
+  changedBy: 'changedBy',
+  createdAt: 'createdAt'
+} as const
+
+export type DeliveryStatusHistoryScalarFieldEnum = (typeof DeliveryStatusHistoryScalarFieldEnum)[keyof typeof DeliveryStatusHistoryScalarFieldEnum]
 
 
 export const HomeScalarFieldEnum = {
@@ -592,7 +717,8 @@ export const UserScalarFieldEnum = {
   providerId: 'providerId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  lastLoginAt: 'lastLoginAt'
+  lastLoginAt: 'lastLoginAt',
+  deletedAt: 'deletedAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
