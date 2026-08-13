@@ -11,6 +11,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './modules/user/user.module';
+import { DeliveryManModule } from './modules/delivery-man/delivery-man.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -27,6 +28,7 @@ import { ComboProductModule } from './modules/combo-product/combo-product.module
 import { AddressModule } from './modules/address/address.module';
 import { OrderModule } from './modules/order/order.module';
 import { PromotionModule } from './modules/promotion/promotion.module';
+import { DeliveryModule } from './modules/delivery/delivery.module';
 import { HealthModule } from './health/health.module';
 import { validate } from './config/env.validation';
 import appConfig from './config/app.config';
@@ -74,6 +76,7 @@ import {
     PrismaModule,
     HealthModule,
     UserModule,
+    DeliveryManModule,
     AuthModule,
     OtpModule,
     SessionModule,
@@ -88,6 +91,7 @@ import {
     AddressModule,
     PromotionModule,
     OrderModule,
+    DeliveryModule,
   ],
   controllers: [AppController],
   providers: [

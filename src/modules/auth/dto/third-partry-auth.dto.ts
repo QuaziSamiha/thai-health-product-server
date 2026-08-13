@@ -18,7 +18,12 @@ export class SocialAuthDto {
   @ApiProperty({ example: 'Quazi Samiha' })
   @IsString()
   @IsNotEmpty()
-  name!: string;
+  firstName!: string;
+
+  @ApiPropertyOptional({ example: 'Tasnim' })
+  @IsOptional()
+  @IsString()
+  lastName?: string;
 
   @ApiProperty({ example: '1029384756', description: 'Google Provider ID' })
   @IsString()

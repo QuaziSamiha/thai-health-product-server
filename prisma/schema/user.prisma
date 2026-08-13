@@ -128,11 +128,12 @@ model UserSecurity {
   isEmailVerified Boolean   @default(false)
   emailVerifiedAt DateTime? @db.Timestamptz(3)
 
-  // Multi-step Auth logic
-  verificationToken        String?
-  verificationTokenExpires DateTime? @db.Timestamptz(3)
-  resetToken               String?
-  resetTokenExpires        DateTime? @db.Timestamptz(3)
+  //* SIGNUP/PASSWORD_RESET/LOGIN_2FA/PHONE_CHANGE VERIFICATION ALL FLOW
+  //* THROUGH THE `OTP` MODEL — NO PARALLEL TOKEN MECHANISM HERE. (A PRIOR
+  //* verificationToken/resetToken PAIR WAS REMOVED IN MIGRATION
+  //* 20260813085902_drop_unused_user_security_tokens: DECLARED BUT NEVER
+  //* READ OR WRITTEN BY ANY REPOSITORY, AND — UNLIKE `OTP` — COULD ONLY HOLD
+  //* ONE LIVE TOKEN AT A TIME, WITH NO HISTORY OF PRIOR REQUESTS.)
 
   // Security Logs
   loginAttempts Int     @default(0)

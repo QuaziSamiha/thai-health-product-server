@@ -275,7 +275,11 @@ export class OrderService {
         );
         return {
           recipientName: saved.recipientName,
-          phone: saved.phone,
+          //* saved.phone CAN BE undefined — ADDRESS-BOOK ROWS ARE ALLOWED TO
+          //* HAVE NO PHONE (SEE address.prisma). dto.phone IS ALWAYS PRESENT
+          //* (CreateOrderDto.phone IS REQUIRED), SO IT'S THE GUARANTEED
+          //* FALLBACK FOR THE OrderAddress SNAPSHOT, WHICH STAYS NON-NULL.
+          phone: saved.phone ?? dto.phone,
           addressLine: saved.addressLine,
           state: saved.state,
           region: saved.region,
@@ -301,7 +305,10 @@ export class OrderService {
       const saved = await this.addressService.createAddress(userId, payload);
       return {
         recipientName: saved.recipientName,
-        phone: saved.phone,
+        //* payload.phone WAS ALREADY SEEDED WITH dto.phone AS A FALLBACK
+        //* ABOVE, SO saved.phone IS ALWAYS DEFINED HERE — THE ?? IS JUST TO
+        //* SATISFY AddressResponseDto.phone'S WIDER (OPTIONAL) TYPE.
+        phone: saved.phone ?? dto.phone,
         addressLine: saved.addressLine,
         state: saved.state,
         region: saved.region,

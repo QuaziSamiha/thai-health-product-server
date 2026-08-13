@@ -18,8 +18,8 @@ model Address {
   type      AddressType @default(SHIPPING)
   isDefault Boolean     @default(false) @map("is_default")
 
-  recipientName String @map("recipient_name") @db.VarChar(200)
-  phone         String @db.VarChar(20)
+  recipientName String  @map("recipient_name") @db.VarChar(200)
+  phone         String? @db.VarChar(20) //* NULLABLE — NOT EVERY ACCOUNT (E.G. SOCIAL LOGIN) HAS A PHONE ON FILE TO FALL BACK TO. phone IS MANDATORY AT ORDER PLACEMENT INSTEAD (CreateOrderDto.phone), NOT AT ADDRESS-BOOK SAVE TIME.
 
   addressLine String @map("address_line") @db.VarChar(255) //* STREET NAME & HOUSE NUMBER
   state       String @db.VarChar(100) //* PROVINCE LEVEL — CHECKOUT'S "SELECT STATE"

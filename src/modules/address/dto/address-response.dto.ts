@@ -45,8 +45,12 @@ export class AddressResponseDto {
   recipientName!: string;
 
   @Expose()
-  @ApiProperty({ description: 'Contact phone number', example: '+66812345678' })
-  phone!: string;
+  @ApiPropertyOptional({
+    description:
+      'Contact phone number. May be absent — not every account (e.g. social login) has a phone on file, and phone is only mandatory at order placement, not address-book save time.',
+    example: '+66812345678',
+  })
+  phone?: string;
 
   @Expose()
   @ApiProperty({
@@ -86,7 +90,7 @@ export class AddressResponseDto {
     this.type = address.type!;
     this.isDefault = address.isDefault!;
     this.recipientName = address.recipientName!;
-    this.phone = address.phone!;
+    this.phone = address.phone ?? undefined;
     this.addressLine = address.addressLine!;
     this.state = address.state!;
     this.region = address.region!;

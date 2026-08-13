@@ -250,7 +250,7 @@ export type AddressGroupByOutputType = {
   type: $Enums.AddressType
   isDefault: boolean
   recipientName: string
-  phone: string
+  phone: string | null
   addressLine: string
   state: string
   region: string
@@ -291,7 +291,7 @@ export type AddressWhereInput = {
   type?: Prisma.EnumAddressTypeFilter<"Address"> | $Enums.AddressType
   isDefault?: Prisma.BoolFilter<"Address"> | boolean
   recipientName?: Prisma.StringFilter<"Address"> | string
-  phone?: Prisma.StringFilter<"Address"> | string
+  phone?: Prisma.StringNullableFilter<"Address"> | string | null
   addressLine?: Prisma.StringFilter<"Address"> | string
   state?: Prisma.StringFilter<"Address"> | string
   region?: Prisma.StringFilter<"Address"> | string
@@ -311,7 +311,7 @@ export type AddressOrderByWithRelationInput = {
   type?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   recipientName?: Prisma.SortOrder
-  phone?: Prisma.SortOrder
+  phone?: Prisma.SortOrderInput | Prisma.SortOrder
   addressLine?: Prisma.SortOrder
   state?: Prisma.SortOrder
   region?: Prisma.SortOrder
@@ -334,7 +334,7 @@ export type AddressWhereUniqueInput = Prisma.AtLeast<{
   type?: Prisma.EnumAddressTypeFilter<"Address"> | $Enums.AddressType
   isDefault?: Prisma.BoolFilter<"Address"> | boolean
   recipientName?: Prisma.StringFilter<"Address"> | string
-  phone?: Prisma.StringFilter<"Address"> | string
+  phone?: Prisma.StringNullableFilter<"Address"> | string | null
   addressLine?: Prisma.StringFilter<"Address"> | string
   state?: Prisma.StringFilter<"Address"> | string
   region?: Prisma.StringFilter<"Address"> | string
@@ -354,7 +354,7 @@ export type AddressOrderByWithAggregationInput = {
   type?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   recipientName?: Prisma.SortOrder
-  phone?: Prisma.SortOrder
+  phone?: Prisma.SortOrderInput | Prisma.SortOrder
   addressLine?: Prisma.SortOrder
   state?: Prisma.SortOrder
   region?: Prisma.SortOrder
@@ -380,7 +380,7 @@ export type AddressScalarWhereWithAggregatesInput = {
   type?: Prisma.EnumAddressTypeWithAggregatesFilter<"Address"> | $Enums.AddressType
   isDefault?: Prisma.BoolWithAggregatesFilter<"Address"> | boolean
   recipientName?: Prisma.StringWithAggregatesFilter<"Address"> | string
-  phone?: Prisma.StringWithAggregatesFilter<"Address"> | string
+  phone?: Prisma.StringNullableWithAggregatesFilter<"Address"> | string | null
   addressLine?: Prisma.StringWithAggregatesFilter<"Address"> | string
   state?: Prisma.StringWithAggregatesFilter<"Address"> | string
   region?: Prisma.StringWithAggregatesFilter<"Address"> | string
@@ -397,7 +397,7 @@ export type AddressCreateInput = {
   type?: $Enums.AddressType
   isDefault?: boolean
   recipientName: string
-  phone: string
+  phone?: string | null
   addressLine: string
   state: string
   region: string
@@ -416,7 +416,7 @@ export type AddressUncheckedCreateInput = {
   type?: $Enums.AddressType
   isDefault?: boolean
   recipientName: string
-  phone: string
+  phone?: string | null
   addressLine: string
   state: string
   region: string
@@ -434,7 +434,7 @@ export type AddressUpdateInput = {
   type?: Prisma.EnumAddressTypeFieldUpdateOperationsInput | $Enums.AddressType
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
@@ -453,7 +453,7 @@ export type AddressUncheckedUpdateInput = {
   type?: Prisma.EnumAddressTypeFieldUpdateOperationsInput | $Enums.AddressType
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
@@ -472,7 +472,7 @@ export type AddressCreateManyInput = {
   type?: $Enums.AddressType
   isDefault?: boolean
   recipientName: string
-  phone: string
+  phone?: string | null
   addressLine: string
   state: string
   region: string
@@ -489,7 +489,7 @@ export type AddressUpdateManyMutationInput = {
   type?: Prisma.EnumAddressTypeFieldUpdateOperationsInput | $Enums.AddressType
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
@@ -506,7 +506,7 @@ export type AddressUncheckedUpdateManyInput = {
   type?: Prisma.EnumAddressTypeFieldUpdateOperationsInput | $Enums.AddressType
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
@@ -688,7 +688,7 @@ export type AddressCreateWithoutOrderAddressesInput = {
   type?: $Enums.AddressType
   isDefault?: boolean
   recipientName: string
-  phone: string
+  phone?: string | null
   addressLine: string
   state: string
   region: string
@@ -706,7 +706,7 @@ export type AddressUncheckedCreateWithoutOrderAddressesInput = {
   type?: $Enums.AddressType
   isDefault?: boolean
   recipientName: string
-  phone: string
+  phone?: string | null
   addressLine: string
   state: string
   region: string
@@ -739,7 +739,7 @@ export type AddressUpdateWithoutOrderAddressesInput = {
   type?: Prisma.EnumAddressTypeFieldUpdateOperationsInput | $Enums.AddressType
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
@@ -757,7 +757,7 @@ export type AddressUncheckedUpdateWithoutOrderAddressesInput = {
   type?: Prisma.EnumAddressTypeFieldUpdateOperationsInput | $Enums.AddressType
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
@@ -774,7 +774,7 @@ export type AddressCreateWithoutUserInput = {
   type?: $Enums.AddressType
   isDefault?: boolean
   recipientName: string
-  phone: string
+  phone?: string | null
   addressLine: string
   state: string
   region: string
@@ -792,7 +792,7 @@ export type AddressUncheckedCreateWithoutUserInput = {
   type?: $Enums.AddressType
   isDefault?: boolean
   recipientName: string
-  phone: string
+  phone?: string | null
   addressLine: string
   state: string
   region: string
@@ -839,7 +839,7 @@ export type AddressScalarWhereInput = {
   type?: Prisma.EnumAddressTypeFilter<"Address"> | $Enums.AddressType
   isDefault?: Prisma.BoolFilter<"Address"> | boolean
   recipientName?: Prisma.StringFilter<"Address"> | string
-  phone?: Prisma.StringFilter<"Address"> | string
+  phone?: Prisma.StringNullableFilter<"Address"> | string | null
   addressLine?: Prisma.StringFilter<"Address"> | string
   state?: Prisma.StringFilter<"Address"> | string
   region?: Prisma.StringFilter<"Address"> | string
@@ -857,7 +857,7 @@ export type AddressCreateManyUserInput = {
   type?: $Enums.AddressType
   isDefault?: boolean
   recipientName: string
-  phone: string
+  phone?: string | null
   addressLine: string
   state: string
   region: string
@@ -873,7 +873,7 @@ export type AddressUpdateWithoutUserInput = {
   type?: Prisma.EnumAddressTypeFieldUpdateOperationsInput | $Enums.AddressType
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
@@ -891,7 +891,7 @@ export type AddressUncheckedUpdateWithoutUserInput = {
   type?: Prisma.EnumAddressTypeFieldUpdateOperationsInput | $Enums.AddressType
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
@@ -909,7 +909,7 @@ export type AddressUncheckedUpdateManyWithoutUserInput = {
   type?: Prisma.EnumAddressTypeFieldUpdateOperationsInput | $Enums.AddressType
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1053,7 +1053,7 @@ export type $AddressPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     type: $Enums.AddressType
     isDefault: boolean
     recipientName: string
-    phone: string
+    phone: string | null
     addressLine: string
     state: string
     region: string

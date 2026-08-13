@@ -14,6 +14,7 @@ import { UserResponseDto } from '../user/dto/user-response.dto';
 import { IJwtPayload, ITokens } from './interfaces/jwt-payload.interface';
 import { LoginDto } from './dto/login.dto';
 import { TokensResponseDto } from './dto/token-response.dto';
+import { SocialAuthDto } from './dto/third-partry-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -87,6 +88,25 @@ export class AuthService {
 
   async login(loginDto: LoginDto, ip?: string): Promise<TokensResponseDto> {
     const user = await this.validateUser(loginDto.email, loginDto.password, ip);
+
+    const payload: IJwtPayload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    };
+
+    const tokens = await this.generateTokens(payload);
+    return new TokensResponseDto(tokens);
+  }
+
+  async socialAuth(
+    socialAuthDto: SocialAuthDto,
+    ip?: string,
+  ): Promise<TokensResponseDto> {
+    const user = await this.userService.findOrCreateSocialUser(
+      socialAuthDto,
+      ip,
+    );
 
     const payload: IJwtPayload = {
       sub: user.id,

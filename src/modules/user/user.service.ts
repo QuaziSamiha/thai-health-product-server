@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   forwardRef,
   Inject,
   Injectable,
@@ -12,6 +13,7 @@ import { UserRepository } from './repositories/user.repository';
 import { ProfileRepository } from './repositories/profile.repository';
 import { UserSecurityRepository } from './repositories/user-security.repository';
 import { CreateUserDto } from './dto/create-user.dto';
+import { SocialAuthDto } from '../auth/dto/third-partry-auth.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import {
@@ -406,5 +408,72 @@ export class UserService {
       throw new NotFoundException('User not found to update login time');
     }
     return new UserResponseDto(user);
+  }
+
+  //* CALLED BY AuthService.socialAuth. THE OAUTH PROVIDER HAS ALREADY PROVEN
+  //* OWNERSHIP OF `dto.email`, SO A MATCH IS LOGGED IN DIRECTLY (NO PASSWORD
+  //* CHECK) AND A MISS IS SILENTLY REGISTERED — NO OTP, ALREADY VERIFIED.
+  async findOrCreateSocialUser(
+    dto: SocialAuthDto,
+    ipAddress?: string,
+  ): Promise<UserResponseDto> {
+    const existing = await this.userRepo.findUserByEmail(dto.email);
+
+    if (!existing) {
+      return this.userRepo.withTransaction(async (tx) => {
+        const user = await this.userRepo.createUser(
+          {
+            email: dto.email,
+            authProvider: dto.provider,
+            providerId: dto.providerId,
+            status: UserStatus.ACTIVE,
+          },
+          tx,
+        );
+
+        await this.profileRepo.createUserProfile(
+          {
+            userId: user.id,
+            firstName: dto.firstName,
+            lastName: dto.lastName,
+            name: `${dto.firstName} ${dto.lastName ?? ''}`.trim(),
+            avatarUrl: dto.image,
+          },
+          tx,
+        );
+
+        await this.securityRepo.createUserSecurity(
+          {
+            userId: user.id,
+            isEmailVerified: true,
+            emailVerifiedAt: new Date(),
+            lastLoginIp: ipAddress,
+          },
+          tx,
+        );
+
+        return new UserResponseDto(user);
+      });
+    }
+
+    if (
+      existing.status === UserStatus.BLOCKED ||
+      existing.status === UserStatus.SUSPENDED
+    ) {
+      throw new ForbiddenException(
+        `Account is ${existing.status.toLowerCase()}`,
+      );
+    }
+
+    if (existing.status === UserStatus.PENDING_VERIFICATION) {
+      // * The provider already verified this email — finish the
+      // * signup-verification step the user never completed via OTP.
+      await this.activateUser(existing.id);
+    }
+
+    await this.updateLoginSuccess(existing.id, ipAddress);
+    await this.updateLastLoginTime(existing.id);
+
+    return new UserResponseDto(existing);
   }
 }

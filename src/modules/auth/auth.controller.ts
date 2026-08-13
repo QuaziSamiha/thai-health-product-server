@@ -26,14 +26,12 @@ import { LoginDto } from './dto/login.dto';
 import { TokensResponseDto } from './dto/token-response.dto';
 import type { Request, Response } from 'express';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { SocialAuthDto } from './dto/third-partry-auth.dto';
 import { ResponseMessage } from '../../common/decorators/response/response-message.decorator';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  // a post api for third party login (google, facebook, apple)
-  //   a post api for logout
-
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
@@ -66,24 +64,52 @@ export class AuthController {
     @Ip() ip: string,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const authConfig = this.configService.get('auth');
     this.logger.debug(`Login attempt for ${loginDto.email}`);
     const tokens = await this.authService.login(loginDto, ip);
     this.logger.log(`Successful login for ${loginDto.email}`);
-    const refreshTokenExpires = authConfig?.refreshExpiresInMs;
-
-    // parseInt will stop at the first non-numeric character (like a space or #)
-    const maxAge = parseInt(refreshTokenExpires, 10);
-    res.cookie('refreshToken', tokens.refresh_token, {
-      httpOnly: true,
-      secure: authConfig?.nodeEnv === 'production',
-      sameSite: 'strict',
-      maxAge: isNaN(maxAge) ? Number(authConfig?.refreshExpiresInMs) : maxAge,
-    });
+    this.setRefreshTokenCookie(res, tokens.refresh_token);
 
     return {
       access_token: tokens.access_token,
       refresh_token: tokens.refresh_token, // Include refresh token in response
+    };
+  }
+
+  @Post('social-auth')
+  @ApiOperation({
+    summary: 'Social login (Google, Facebook, Apple)',
+    description:
+      'Logs in the matching account, or silently registers one from a verified OAuth identity, then returns JWT tokens.',
+  })
+  @ApiBody({ type: SocialAuthDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Social login successful',
+    type: TokensResponseDto,
+    headers: {
+      'Set-Cookie': {
+        description: 'Refresh token in HTTP-only cookie',
+        schema: { type: 'string' },
+      },
+    },
+  })
+  @ApiForbiddenResponse({ description: 'Account is blocked or suspended' })
+  @ApiBadRequestResponse({ description: 'Validation error' })
+  @HttpCode(200)
+  @ResponseMessage('Login successful')
+  async socialAuth(
+    @Body() socialAuthDto: SocialAuthDto,
+    @Ip() ip: string,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    this.logger.debug(`Social login attempt for ${socialAuthDto.email}`);
+    const tokens = await this.authService.socialAuth(socialAuthDto, ip);
+    this.logger.log(`Successful social login for ${socialAuthDto.email}`);
+    this.setRefreshTokenCookie(res, tokens.refresh_token);
+
+    return {
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token,
     };
   }
 
@@ -140,5 +166,19 @@ export class AuthController {
     }
 
     return this.authService.refreshToken(refreshToken);
+  }
+
+  private setRefreshTokenCookie(res: Response, refreshToken: string): void {
+    const authConfig = this.configService.get('auth');
+    const refreshTokenExpires = authConfig?.refreshExpiresInMs;
+
+    // parseInt will stop at the first non-numeric character (like a space or #)
+    const maxAge = parseInt(refreshTokenExpires, 10);
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: authConfig?.nodeEnv === 'production',
+      sameSite: 'strict',
+      maxAge: isNaN(maxAge) ? Number(authConfig?.refreshExpiresInMs) : maxAge,
+    });
   }
 }

@@ -5,13 +5,15 @@ import { Prisma } from '../../generated/prisma/client';
 import { AddressType } from '../../generated/prisma/enums';
 import { UpdateAddressDto } from './dto/update-address.dto';
 
-//* recipientName/phone ARE REQUIRED HERE EVEN THOUGH CreateAddressDto MAKES
-//* THEM OPTIONAL — AddressService RESOLVES THE FALLBACK (USER'S OWN
-//* PROFILE NAME / ACCOUNT PHONE) BEFORE CALLING createAddress
+//* recipientName IS REQUIRED HERE EVEN THOUGH CreateAddressDto MAKES IT
+//* OPTIONAL — AddressService RESOLVES THE FALLBACK (USER'S OWN PROFILE NAME)
+//* BEFORE CALLING createAddress. phone STAYS OPTIONAL ALL THE WAY DOWN —
+//* NOT EVERY ACCOUNT HAS ONE ON FILE TO FALL BACK TO, AND IT'S ONLY
+//* MANDATORY AT ORDER PLACEMENT, NOT ADDRESS-BOOK SAVE TIME.
 interface CreateAddressData {
   label?: string;
   recipientName: string;
-  phone: string;
+  phone?: string;
   addressLine: string;
   state: string;
   region: string;

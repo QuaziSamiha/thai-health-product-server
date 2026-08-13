@@ -42,10 +42,6 @@ export type UserSecurityMinAggregateOutputType = {
   id: number | null
   isEmailVerified: boolean | null
   emailVerifiedAt: Date | null
-  verificationToken: string | null
-  verificationTokenExpires: Date | null
-  resetToken: string | null
-  resetTokenExpires: Date | null
   loginAttempts: number | null
   lastLoginIp: string | null
   assignedIp: string | null
@@ -56,10 +52,6 @@ export type UserSecurityMaxAggregateOutputType = {
   id: number | null
   isEmailVerified: boolean | null
   emailVerifiedAt: Date | null
-  verificationToken: string | null
-  verificationTokenExpires: Date | null
-  resetToken: string | null
-  resetTokenExpires: Date | null
   loginAttempts: number | null
   lastLoginIp: string | null
   assignedIp: string | null
@@ -70,10 +62,6 @@ export type UserSecurityCountAggregateOutputType = {
   id: number
   isEmailVerified: number
   emailVerifiedAt: number
-  verificationToken: number
-  verificationTokenExpires: number
-  resetToken: number
-  resetTokenExpires: number
   loginAttempts: number
   lastLoginIp: number
   assignedIp: number
@@ -98,10 +86,6 @@ export type UserSecurityMinAggregateInputType = {
   id?: true
   isEmailVerified?: true
   emailVerifiedAt?: true
-  verificationToken?: true
-  verificationTokenExpires?: true
-  resetToken?: true
-  resetTokenExpires?: true
   loginAttempts?: true
   lastLoginIp?: true
   assignedIp?: true
@@ -112,10 +96,6 @@ export type UserSecurityMaxAggregateInputType = {
   id?: true
   isEmailVerified?: true
   emailVerifiedAt?: true
-  verificationToken?: true
-  verificationTokenExpires?: true
-  resetToken?: true
-  resetTokenExpires?: true
   loginAttempts?: true
   lastLoginIp?: true
   assignedIp?: true
@@ -126,10 +106,6 @@ export type UserSecurityCountAggregateInputType = {
   id?: true
   isEmailVerified?: true
   emailVerifiedAt?: true
-  verificationToken?: true
-  verificationTokenExpires?: true
-  resetToken?: true
-  resetTokenExpires?: true
   loginAttempts?: true
   lastLoginIp?: true
   assignedIp?: true
@@ -227,10 +203,6 @@ export type UserSecurityGroupByOutputType = {
   id: number
   isEmailVerified: boolean
   emailVerifiedAt: Date | null
-  verificationToken: string | null
-  verificationTokenExpires: Date | null
-  resetToken: string | null
-  resetTokenExpires: Date | null
   loginAttempts: number
   lastLoginIp: string | null
   assignedIp: string | null
@@ -264,10 +236,6 @@ export type UserSecurityWhereInput = {
   id?: Prisma.IntFilter<"UserSecurity"> | number
   isEmailVerified?: Prisma.BoolFilter<"UserSecurity"> | boolean
   emailVerifiedAt?: Prisma.DateTimeNullableFilter<"UserSecurity"> | Date | string | null
-  verificationToken?: Prisma.StringNullableFilter<"UserSecurity"> | string | null
-  verificationTokenExpires?: Prisma.DateTimeNullableFilter<"UserSecurity"> | Date | string | null
-  resetToken?: Prisma.StringNullableFilter<"UserSecurity"> | string | null
-  resetTokenExpires?: Prisma.DateTimeNullableFilter<"UserSecurity"> | Date | string | null
   loginAttempts?: Prisma.IntFilter<"UserSecurity"> | number
   lastLoginIp?: Prisma.StringNullableFilter<"UserSecurity"> | string | null
   assignedIp?: Prisma.StringNullableFilter<"UserSecurity"> | string | null
@@ -279,10 +247,6 @@ export type UserSecurityOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   isEmailVerified?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  verificationToken?: Prisma.SortOrderInput | Prisma.SortOrder
-  verificationTokenExpires?: Prisma.SortOrderInput | Prisma.SortOrder
-  resetToken?: Prisma.SortOrderInput | Prisma.SortOrder
-  resetTokenExpires?: Prisma.SortOrderInput | Prisma.SortOrder
   loginAttempts?: Prisma.SortOrder
   lastLoginIp?: Prisma.SortOrderInput | Prisma.SortOrder
   assignedIp?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -298,10 +262,6 @@ export type UserSecurityWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.UserSecurityWhereInput | Prisma.UserSecurityWhereInput[]
   isEmailVerified?: Prisma.BoolFilter<"UserSecurity"> | boolean
   emailVerifiedAt?: Prisma.DateTimeNullableFilter<"UserSecurity"> | Date | string | null
-  verificationToken?: Prisma.StringNullableFilter<"UserSecurity"> | string | null
-  verificationTokenExpires?: Prisma.DateTimeNullableFilter<"UserSecurity"> | Date | string | null
-  resetToken?: Prisma.StringNullableFilter<"UserSecurity"> | string | null
-  resetTokenExpires?: Prisma.DateTimeNullableFilter<"UserSecurity"> | Date | string | null
   loginAttempts?: Prisma.IntFilter<"UserSecurity"> | number
   lastLoginIp?: Prisma.StringNullableFilter<"UserSecurity"> | string | null
   assignedIp?: Prisma.StringNullableFilter<"UserSecurity"> | string | null
@@ -312,10 +272,6 @@ export type UserSecurityOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   isEmailVerified?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  verificationToken?: Prisma.SortOrderInput | Prisma.SortOrder
-  verificationTokenExpires?: Prisma.SortOrderInput | Prisma.SortOrder
-  resetToken?: Prisma.SortOrderInput | Prisma.SortOrder
-  resetTokenExpires?: Prisma.SortOrderInput | Prisma.SortOrder
   loginAttempts?: Prisma.SortOrder
   lastLoginIp?: Prisma.SortOrderInput | Prisma.SortOrder
   assignedIp?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -334,10 +290,6 @@ export type UserSecurityScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"UserSecurity"> | number
   isEmailVerified?: Prisma.BoolWithAggregatesFilter<"UserSecurity"> | boolean
   emailVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"UserSecurity"> | Date | string | null
-  verificationToken?: Prisma.StringNullableWithAggregatesFilter<"UserSecurity"> | string | null
-  verificationTokenExpires?: Prisma.DateTimeNullableWithAggregatesFilter<"UserSecurity"> | Date | string | null
-  resetToken?: Prisma.StringNullableWithAggregatesFilter<"UserSecurity"> | string | null
-  resetTokenExpires?: Prisma.DateTimeNullableWithAggregatesFilter<"UserSecurity"> | Date | string | null
   loginAttempts?: Prisma.IntWithAggregatesFilter<"UserSecurity"> | number
   lastLoginIp?: Prisma.StringNullableWithAggregatesFilter<"UserSecurity"> | string | null
   assignedIp?: Prisma.StringNullableWithAggregatesFilter<"UserSecurity"> | string | null
@@ -347,10 +299,6 @@ export type UserSecurityScalarWhereWithAggregatesInput = {
 export type UserSecurityCreateInput = {
   isEmailVerified?: boolean
   emailVerifiedAt?: Date | string | null
-  verificationToken?: string | null
-  verificationTokenExpires?: Date | string | null
-  resetToken?: string | null
-  resetTokenExpires?: Date | string | null
   loginAttempts?: number
   lastLoginIp?: string | null
   assignedIp?: string | null
@@ -361,10 +309,6 @@ export type UserSecurityUncheckedCreateInput = {
   id?: number
   isEmailVerified?: boolean
   emailVerifiedAt?: Date | string | null
-  verificationToken?: string | null
-  verificationTokenExpires?: Date | string | null
-  resetToken?: string | null
-  resetTokenExpires?: Date | string | null
   loginAttempts?: number
   lastLoginIp?: string | null
   assignedIp?: string | null
@@ -374,10 +318,6 @@ export type UserSecurityUncheckedCreateInput = {
 export type UserSecurityUpdateInput = {
   isEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  verificationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  verificationTokenExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  resetTokenExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   loginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   lastLoginIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -388,10 +328,6 @@ export type UserSecurityUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   isEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  verificationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  verificationTokenExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  resetTokenExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   loginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   lastLoginIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -402,10 +338,6 @@ export type UserSecurityCreateManyInput = {
   id?: number
   isEmailVerified?: boolean
   emailVerifiedAt?: Date | string | null
-  verificationToken?: string | null
-  verificationTokenExpires?: Date | string | null
-  resetToken?: string | null
-  resetTokenExpires?: Date | string | null
   loginAttempts?: number
   lastLoginIp?: string | null
   assignedIp?: string | null
@@ -415,10 +347,6 @@ export type UserSecurityCreateManyInput = {
 export type UserSecurityUpdateManyMutationInput = {
   isEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  verificationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  verificationTokenExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  resetTokenExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   loginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   lastLoginIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -428,10 +356,6 @@ export type UserSecurityUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   isEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  verificationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  verificationTokenExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  resetTokenExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   loginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   lastLoginIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -447,10 +371,6 @@ export type UserSecurityCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   isEmailVerified?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
-  verificationToken?: Prisma.SortOrder
-  verificationTokenExpires?: Prisma.SortOrder
-  resetToken?: Prisma.SortOrder
-  resetTokenExpires?: Prisma.SortOrder
   loginAttempts?: Prisma.SortOrder
   lastLoginIp?: Prisma.SortOrder
   assignedIp?: Prisma.SortOrder
@@ -467,10 +387,6 @@ export type UserSecurityMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   isEmailVerified?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
-  verificationToken?: Prisma.SortOrder
-  verificationTokenExpires?: Prisma.SortOrder
-  resetToken?: Prisma.SortOrder
-  resetTokenExpires?: Prisma.SortOrder
   loginAttempts?: Prisma.SortOrder
   lastLoginIp?: Prisma.SortOrder
   assignedIp?: Prisma.SortOrder
@@ -481,10 +397,6 @@ export type UserSecurityMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   isEmailVerified?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
-  verificationToken?: Prisma.SortOrder
-  verificationTokenExpires?: Prisma.SortOrder
-  resetToken?: Prisma.SortOrder
-  resetTokenExpires?: Prisma.SortOrder
   loginAttempts?: Prisma.SortOrder
   lastLoginIp?: Prisma.SortOrder
   assignedIp?: Prisma.SortOrder
@@ -532,10 +444,6 @@ export type UserSecurityUncheckedUpdateOneWithoutUserNestedInput = {
 export type UserSecurityCreateWithoutUserInput = {
   isEmailVerified?: boolean
   emailVerifiedAt?: Date | string | null
-  verificationToken?: string | null
-  verificationTokenExpires?: Date | string | null
-  resetToken?: string | null
-  resetTokenExpires?: Date | string | null
   loginAttempts?: number
   lastLoginIp?: string | null
   assignedIp?: string | null
@@ -545,10 +453,6 @@ export type UserSecurityUncheckedCreateWithoutUserInput = {
   id?: number
   isEmailVerified?: boolean
   emailVerifiedAt?: Date | string | null
-  verificationToken?: string | null
-  verificationTokenExpires?: Date | string | null
-  resetToken?: string | null
-  resetTokenExpires?: Date | string | null
   loginAttempts?: number
   lastLoginIp?: string | null
   assignedIp?: string | null
@@ -573,10 +477,6 @@ export type UserSecurityUpdateToOneWithWhereWithoutUserInput = {
 export type UserSecurityUpdateWithoutUserInput = {
   isEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  verificationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  verificationTokenExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  resetTokenExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   loginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   lastLoginIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -586,10 +486,6 @@ export type UserSecurityUncheckedUpdateWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   isEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  verificationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  verificationTokenExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  resetTokenExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   loginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   lastLoginIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -601,10 +497,6 @@ export type UserSecuritySelect<ExtArgs extends runtime.Types.Extensions.Internal
   id?: boolean
   isEmailVerified?: boolean
   emailVerifiedAt?: boolean
-  verificationToken?: boolean
-  verificationTokenExpires?: boolean
-  resetToken?: boolean
-  resetTokenExpires?: boolean
   loginAttempts?: boolean
   lastLoginIp?: boolean
   assignedIp?: boolean
@@ -616,10 +508,6 @@ export type UserSecuritySelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   id?: boolean
   isEmailVerified?: boolean
   emailVerifiedAt?: boolean
-  verificationToken?: boolean
-  verificationTokenExpires?: boolean
-  resetToken?: boolean
-  resetTokenExpires?: boolean
   loginAttempts?: boolean
   lastLoginIp?: boolean
   assignedIp?: boolean
@@ -631,10 +519,6 @@ export type UserSecuritySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   id?: boolean
   isEmailVerified?: boolean
   emailVerifiedAt?: boolean
-  verificationToken?: boolean
-  verificationTokenExpires?: boolean
-  resetToken?: boolean
-  resetTokenExpires?: boolean
   loginAttempts?: boolean
   lastLoginIp?: boolean
   assignedIp?: boolean
@@ -646,17 +530,13 @@ export type UserSecuritySelectScalar = {
   id?: boolean
   isEmailVerified?: boolean
   emailVerifiedAt?: boolean
-  verificationToken?: boolean
-  verificationTokenExpires?: boolean
-  resetToken?: boolean
-  resetTokenExpires?: boolean
   loginAttempts?: boolean
   lastLoginIp?: boolean
   assignedIp?: boolean
   userId?: boolean
 }
 
-export type UserSecurityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "isEmailVerified" | "emailVerifiedAt" | "verificationToken" | "verificationTokenExpires" | "resetToken" | "resetTokenExpires" | "loginAttempts" | "lastLoginIp" | "assignedIp" | "userId", ExtArgs["result"]["userSecurity"]>
+export type UserSecurityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "isEmailVerified" | "emailVerifiedAt" | "loginAttempts" | "lastLoginIp" | "assignedIp" | "userId", ExtArgs["result"]["userSecurity"]>
 export type UserSecurityInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -676,10 +556,6 @@ export type $UserSecurityPayload<ExtArgs extends runtime.Types.Extensions.Intern
     id: number
     isEmailVerified: boolean
     emailVerifiedAt: Date | null
-    verificationToken: string | null
-    verificationTokenExpires: Date | null
-    resetToken: string | null
-    resetTokenExpires: Date | null
     loginAttempts: number
     lastLoginIp: string | null
     assignedIp: string | null
@@ -1111,10 +987,6 @@ export interface UserSecurityFieldRefs {
   readonly id: Prisma.FieldRef<"UserSecurity", 'Int'>
   readonly isEmailVerified: Prisma.FieldRef<"UserSecurity", 'Boolean'>
   readonly emailVerifiedAt: Prisma.FieldRef<"UserSecurity", 'DateTime'>
-  readonly verificationToken: Prisma.FieldRef<"UserSecurity", 'String'>
-  readonly verificationTokenExpires: Prisma.FieldRef<"UserSecurity", 'DateTime'>
-  readonly resetToken: Prisma.FieldRef<"UserSecurity", 'String'>
-  readonly resetTokenExpires: Prisma.FieldRef<"UserSecurity", 'DateTime'>
   readonly loginAttempts: Prisma.FieldRef<"UserSecurity", 'Int'>
   readonly lastLoginIp: Prisma.FieldRef<"UserSecurity", 'String'>
   readonly assignedIp: Prisma.FieldRef<"UserSecurity", 'String'>

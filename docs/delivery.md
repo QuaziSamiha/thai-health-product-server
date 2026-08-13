@@ -5,7 +5,7 @@ Third-party courier directory and shipment tracking for the storefront's **Set U
 > **Not the same thing as `UserRole.DELIVERY_PARTNER`** (`user.prisma`). That role is for **in-house delivery staff** accounts — the Set Up page's separate **"Delivery Man"** tab. This module is for **outsourced third-party couriers** (KEX Express, Flash Express, Thailand Post, etc.) — the **"External Delivery Service"** tab shown in the screenshot this doc was written from.
 
 Schema source: `prisma/schema/delivery.prisma` (models `DeliveryProvider`, `DeliveryZone`, `DeliveryShipment`, `DeliveryStatusHistory`; enums `DeliveryEntityStatus`, `DeliveryIntegrationType`, `DeliveryPricingModel`, `DeliveryShipmentStatus`).
-Module source: **not implemented yet.** This doc is a schema + API **design**, written before any `src/modules/delivery/` code exists — see [API End Point & Business Logic (Planned)](#api-end-point--business-logic-planned).
+Module source: **`DeliveryProvider`/`DeliveryZone` are implemented** — `src/modules/delivery/` (`delivery.controller.ts`, `delivery.service.ts`, `delivery.repository.ts`, `delivery.select.ts`, `dto/`). **`DeliveryShipment`/`DeliveryStatusHistory` are schema-only** — no module reads or writes them yet. See [API End Point & Business Logic](#api-end-point--business-logic) for what's real vs. still a roadmap sketch.
 
 > **Scope note:** `User` is documented in its own reference (`user.md`) — it appears here only as the `createdBy`/`updatedBy`/`changedBy` foreign-key target needed for the audit trail. `Order` is deliberately **not** a Prisma relation from this module — see [Known Gaps](#known-gaps--recommended-hardening).
 

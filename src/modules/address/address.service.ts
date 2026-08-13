@@ -37,14 +37,17 @@ export class AddressService {
   }
 
   //* recipientName/phone ARE OPTIONAL ON CreateAddressDto — WHEN OMITTED,
-  //* DEFAULT TO THE LOGGED-IN USER'S OWN PROFILE NAME / ACCOUNT PHONE. FAILS
-  //* CLEARLY IF NEITHER THE CLIENT NOR THE PROFILE CAN SUPPLY ONE (E.G. A
-  //* BARE ACCOUNT WITH NO PHONE ON FILE — SEE User.phone IS NULLABLE).
+  //* DEFAULT TO THE LOGGED-IN USER'S OWN PROFILE NAME / ACCOUNT PHONE.
+  //* recipientName FAILS CLEARLY IF NEITHER THE CLIENT NOR THE PROFILE CAN
+  //* SUPPLY ONE. phone HAS NO SUCH GUARD — SOCIAL-LOGIN ACCOUNTS OFTEN HAVE
+  //* NO PHONE ON FILE (SEE User.phone IS NULLABLE), AND phone IS ONLY
+  //* MANDATORY AT ORDER PLACEMENT (CreateOrderDto.phone), NOT AT
+  //* ADDRESS-BOOK SAVE TIME — SO IT'S LEFT undefined RATHER THAN REJECTED.
   private async resolveContactDefaults(
     userId: number,
     dto: CreateAddressDto,
     tx?: Parameters<AddressRepository['findUserContactInfo']>[1],
-  ): Promise<{ recipientName: string; phone: string }> {
+  ): Promise<{ recipientName: string; phone?: string }> {
     if (dto.recipientName && dto.phone) {
       return { recipientName: dto.recipientName, phone: dto.phone };
     }
@@ -58,11 +61,6 @@ export class AddressService {
     if (!recipientName) {
       throw new BadRequestException(
         'Recipient name is required — your profile has no name on file',
-      );
-    }
-    if (!phone) {
-      throw new BadRequestException(
-        'Phone is required — your account has no phone number on file',
       );
     }
 
