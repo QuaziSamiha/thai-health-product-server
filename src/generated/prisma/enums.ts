@@ -17,6 +17,16 @@ export const AddressType = {
 export type AddressType = (typeof AddressType)[keyof typeof AddressType]
 
 
+export const AuditAction = {
+  CREATE: 'CREATE',
+  UPDATE: 'UPDATE',
+  SOFT_DELETE: 'SOFT_DELETE',
+  DELETE: 'DELETE'
+} as const
+
+export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction]
+
+
 export const BlogStatus = {
   PUBLISHED: 'PUBLISHED',
   DRAFT: 'DRAFT',

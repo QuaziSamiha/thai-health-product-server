@@ -1,31 +1,42 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   Logger,
+  ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { OAuth2Client, TokenPayload } from 'google-auth-library';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { HashService } from '../../shared/hash/hash.service';
-import { UserStatus } from '../../generated/prisma/enums';
+import { AuthProvider, UserStatus } from '../../generated/prisma/enums';
 import { UserResponseDto } from '../user/dto/user-response.dto';
 // import type { SignOptions } from 'jsonwebtoken';
 import { IJwtPayload, ITokens } from './interfaces/jwt-payload.interface';
 import { LoginDto } from './dto/login.dto';
 import { TokensResponseDto } from './dto/token-response.dto';
-import { SocialAuthDto } from './dto/third-partry-auth.dto';
+import {
+  SocialAuthDto,
+  VerifiedSocialProfile,
+} from './dto/third-partry-auth.dto';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
+  private readonly googleClient: OAuth2Client;
 
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
     private configService: ConfigService,
     private hashService: HashService,
-  ) {}
+  ) {
+    this.googleClient = new OAuth2Client(
+      this.configService.get<string>('auth.googleClientId'),
+    );
+  }
 
   async validateUser(
     email: string,
@@ -103,10 +114,8 @@ export class AuthService {
     socialAuthDto: SocialAuthDto,
     ip?: string,
   ): Promise<TokensResponseDto> {
-    const user = await this.userService.findOrCreateSocialUser(
-      socialAuthDto,
-      ip,
-    );
+    const profile = await this.verifySocialToken(socialAuthDto);
+    const user = await this.userService.findOrCreateSocialUser(profile, ip);
 
     const payload: IJwtPayload = {
       sub: user.id,
@@ -116,6 +125,70 @@ export class AuthService {
 
     const tokens = await this.generateTokens(payload);
     return new TokensResponseDto(tokens);
+  }
+
+  //* TURNS A CLIENT-SUPPLIED PROVIDER TOKEN INTO A TRUSTED IDENTITY. NOTHING
+  //* IN THE RETURNED PROFILE COMES FROM THE REQUEST BODY DIRECTLY — IT IS ALL
+  //* READ BACK OUT OF THE PROVIDER'S OWN VERIFIED TOKEN PAYLOAD, SO A CALLER
+  //* CANNOT CLAIM AN IDENTITY (email/providerId) THEY DON'T ACTUALLY OWN.
+  private async verifySocialToken(
+    dto: SocialAuthDto,
+  ): Promise<VerifiedSocialProfile> {
+    switch (dto.provider) {
+      case AuthProvider.GOOGLE:
+        return this.verifyGoogleIdToken(dto.idToken);
+      case AuthProvider.FACEBOOK:
+      case AuthProvider.APPLE:
+        throw new BadRequestException(
+          `Social login via ${dto.provider} is not supported yet`,
+        );
+      default:
+        throw new BadRequestException('Unsupported social login provider');
+    }
+  }
+
+  private async verifyGoogleIdToken(
+    idToken: string,
+  ): Promise<VerifiedSocialProfile> {
+    const audience = this.configService.get<string>('auth.googleClientId');
+    if (!audience) {
+      throw new ServiceUnavailableException(
+        'Google sign-in is not configured on this server',
+      );
+    }
+
+    let payload: TokenPayload | undefined;
+    try {
+      const ticket = await this.googleClient.verifyIdToken({
+        idToken,
+        audience,
+      });
+      payload = ticket.getPayload();
+    } catch {
+      throw new UnauthorizedException(
+        'Invalid or expired Google identity token',
+      );
+    }
+
+    if (!payload?.email || !payload.sub) {
+      throw new UnauthorizedException(
+        'Google identity token is missing required claims',
+      );
+    }
+    if (payload.email_verified === false) {
+      throw new UnauthorizedException(
+        'Google account email is not verified',
+      );
+    }
+
+    return {
+      email: payload.email,
+      firstName: payload.given_name ?? payload.name ?? 'User',
+      lastName: payload.family_name,
+      providerId: payload.sub,
+      provider: AuthProvider.GOOGLE,
+      image: payload.picture,
+    };
   }
 
   async refreshToken(refreshToken: string): Promise<TokensResponseDto> {

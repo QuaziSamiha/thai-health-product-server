@@ -45,6 +45,11 @@ export { Prisma }
  */
 export type Address = Prisma.AddressModel
 /**
+ * Model AuditLog
+ * 
+ */
+export type AuditLog = Prisma.AuditLogModel
+/**
  * Model Blog
  * 
  */

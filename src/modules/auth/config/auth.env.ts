@@ -8,6 +8,13 @@ export const authEnvSchema = z.object({
   JWT_ACCESS_EXPIRES_IN: z.string().default('5d'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('30d'),
   JWT_REFRESH_EXPIRES_IN_MS: z.coerce.number().default(2592000000),
+  //* AUDIENCE FOR VERIFYING GOOGLE ID TOKENS SUBMITTED TO /auth/social-auth —
+  //* MUST MATCH THE CLIENT ID THE FRONTEND'S NextAuth GoogleProvider ACTUALLY
+  //* AUTHENTICATED WITH, OR EVERY TOKEN WILL FAIL VERIFICATION. OPTIONAL AT
+  //* THE SCHEMA LEVEL (NOT EVERY DEPLOYMENT HAS IT SET YET) — AuthService
+  //* REJECTS GOOGLE SOCIAL-AUTH ATTEMPTS AT RUNTIME IF IT'S MISSING, RATHER
+  //* THAN CRASHING THE WHOLE APP'S BOOT OVER AN UNRELATED ENV FILE GAP.
+  GOOGLE_CLIENT_ID: z.string().min(1).optional(),
 });
 
 export type AuthEnv = z.infer<typeof authEnvSchema>;

@@ -98,19 +98,19 @@ None of the four enums below carry inline doc comments in `user.prisma` — only
 
 | Value       | Meaning                                                          |
 | :---------- | :----------------------------------------------------------------- |
-| `EMAIL`     | **Default.** Password-based signup; `password` is required.       |
-| `GOOGLE`    | OAuth signup; `password` must be absent, `providerId` required.    |
-| `FACEBOOK`  | OAuth signup; same contract as `GOOGLE`.                            |
-| `APPLE`     | OAuth signup; same contract as `GOOGLE`.                            |
+| `EMAIL`     | **Default, and the only value `POST /create-user` can produce.** Password-based signup; `password` is required. `CreateUserDto` has no `authProvider`/`providerId` fields at all — this endpoint cannot create an OAuth-flagged row. |
+| `GOOGLE`    | Only ever set by `AuthService.socialAuth` (`auth.md`'s [Social Login](./auth.md#social-login-google)), after verifying a real Google ID token server-side. `providerId` is the token's verified `sub` claim, never client input. |
+| `FACEBOOK`  | Declared in the enum but currently unreachable — `AuthService.socialAuth` explicitly rejects `FACEBOOK` with `400` since no real provider is wired (backend or frontend). |
+| `APPLE`     | Same as `FACEBOOK` — declared, explicitly rejected, not implemented.                |
 
-> See [Known Gaps](#known-gaps--recommended-hardening) — no OAuth token is actually verified by this module for any of the three provider values.
+> Was: "no OAuth token is actually verified by this module for any of the three provider values." **Now fixed for `GOOGLE`** — see [Known Gaps](#known-gaps--recommended-hardening) and `auth.md`'s [Known Gaps](./auth.md#known-gaps--recommended-hardening) #10 for the before/after and what's still unimplemented (`FACEBOOK`/`APPLE`).
 
 ##### `UserStatus`
 
 | Value                    | Meaning                                                                                     |
 | :------------------------ | :--------------------------------------------------------------------------------------------- |
-| `PENDING_VERIFICATION`    | **Default for an `EMAIL`-provider signup.** Login is rejected (`401`) until the signup OTP is verified. |
-| `ACTIVE`                  | Normal, usable account. Default (via `isEmailAuth ? PENDING_VERIFICATION : ACTIVE`) for OAuth signups. |
+| `PENDING_VERIFICATION`    | **Default for every `POST /create-user` signup** — that endpoint is `EMAIL`-only now. Login is rejected (`401`) until the signup OTP is verified. |
+| `ACTIVE`                  | Normal, usable account. Set directly (no OTP step) for accounts created via `POST /auth/social-auth` — see `auth.md`'s [Social Login](./auth.md#social-login-google). |
 | `INACTIVE`                | Declared; no write path in this module sets it.                                                 |
 | `SUSPENDED`                | Login rejected with `403 ForbiddenException` in `AuthService.validateUser`.                    |
 | `BLOCKED`                  | Login rejected with `403 ForbiddenException`, same branch as `SUSPENDED`.                       |
@@ -142,7 +142,7 @@ None of the four enums below carry inline doc comments in `user.prisma` — only
 | `role`         | `ENUM(UserRole)`     | NOT NULL, DEFAULT `CUSTOMER`                                              | See [`UserRole`](#userrole).                                                                                    |
 | `status`       | `ENUM(UserStatus)`   | NOT NULL, DEFAULT `PENDING_VERIFICATION`                                  | See [`UserStatus`](#userstatus).                                                                                |
 | `authProvider` | `ENUM(AuthProvider)` | NOT NULL, DEFAULT `EMAIL`                                                 | See [`AuthProvider`](#authprovider).                                                                            |
-| `providerId`   | `VARCHAR`            | NULLABLE                                                                  | OAuth account id. **No uniqueness constraint** — see [Known Gaps](#known-gaps--recommended-hardening).           |
+| `providerId`   | `VARCHAR`            | NULLABLE                                                                  | OAuth account id. Composite-unique with `authProvider` (`users_auth_provider_provider_id_key`, `NULL`s excluded) as of `20260816120000_add_user_oauth_identity_unique` — two rows can no longer claim the same OAuth identity. Token *ownership* is still unverified; see [Known Gaps](#known-gaps--recommended-hardening). |
 | `createdAt`    | `TIMESTAMPTZ(3)`     | NOT NULL, DEFAULT `now()`, `@map("created_at")`                          | Row creation time.                                                                                               |
 | `updatedAt`    | `TIMESTAMPTZ(3)`     | NOT NULL, auto-updated, `@map("updated_at")`                             | Last modification time.                                                                                          |
 | `lastLoginAt`  | `TIMESTAMPTZ(3)`     | NULLABLE, `@map("last_login_at")`                                         | Stamped on every successful login by `AuthService.validateUser` via `UserService.updateLastLoginTime`.          |
@@ -234,6 +234,7 @@ None of the four enums below carry inline doc comments in `user.prisma` — only
 | `Order`                  | `userId`                          | **SET NULL** | Nullable — `null` for guest checkouts; customer fields are snapshotted rather than joined live, so an order survives later profile edits. |
 | `OrderStatusHistory`     | `changedBy`                       | **SET NULL** | Nullable — `null` means a system/automated transition (e.g. a payment webhook), not a missing actor.     |
 | `PromoCodeRedemption`    | `userId`                          | **SET NULL** | Nullable — guest redemptions enforce `usageLimitPerUser` at the app layer only, by email.                 |
+| `AuditLog`               | `actorId`                          | **SET NULL** | The single generic audit-trail FK — see [`audit-log.md`](./audit-log.md). Nullable; `NULL` means the mutation ran with no authenticated request context. Deliberately **not** one more `createdBy`/`updatedBy` pair — this is the one relation field meant to cover every current and future tracked model. |
 
 **Pattern:** every audit-stamp FK (`createdBy`/`updatedBy`/`deletedBy`/`changedBy`/`authorId`/`recordedBy`) is `SET NULL` — deleting a staff account never blocks or cascades into content they touched. Every ownership FK to a genuine end-user record is `CASCADE` (`Profile`, `UserSecurity`, `Session`, `Cart`, `Address`, `OTP`) **except** `Order` and `PromoCodeRedemption`, which are `SET NULL` — deliberately, since both are historical financial records that must survive account deletion and both already support a guest `userId: null` as a first-class state.
 
@@ -306,7 +307,7 @@ None of the four enums below carry inline doc comments in `user.prisma` — only
 
 #### Known Gaps / Recommended Hardening
 
-- **No OAuth token verification exists.** `POST /create-user` is public. Setting `authProvider: GOOGLE` (or `FACEBOOK`/`APPLE`) with any string `providerId` skips the password requirement and immediately sets `status: ACTIVE` and `isEmailVerified: true` — with no proof the caller actually owns that OAuth account. `providerId` also has no uniqueness constraint, so multiple accounts could claim the same OAuth id. This is the module's most significant gap and should be treated as a priority before OAuth is trusted in production.
+- ~~No OAuth token verification exists.~~ **Fixed for Google.** `POST /create-user` no longer accepts `authProvider`/`providerId` at all — it's email/password registration only now. OAuth accounts are created exclusively via `POST /auth/social-auth` (`auth.md`'s [Social Login](./auth.md#social-login-google)), which verifies a real Google ID token server-side via `google-auth-library` before trusting any identity claim; `FACEBOOK`/`APPLE` are explicitly rejected rather than silently accepted, since neither has a real provider wired anywhere in the stack. `(authProvider, providerId)` is also now DB-uniqueness-constrained (migration `20260816120000_add_user_oauth_identity_unique`), so even a future bug in the verified path can't produce two rows claiming the same identity.
 - **`CreateUserSecurityDto.assignedIp` is reachable from the public registration endpoint** with no role gate, despite the schema describing `assignedIp` as "for internal/vendor restricted access."
 - **`GET /all-user` has no filters and no sortable-field whitelist.** It binds the bare `PaginationQueryDto` — no `status`/`role` filter, and `sortBy` isn't even a declared field, so `defaultSortField: 'createdAt'` is the only ordering available. Every other admin list module in this codebase (e.g. `combo-product`'s `AllCombosQueryDto`) layers filter/sort DTOs on top of the shared pagination base; `user` does not yet follow that pattern.
 - **`UserSecurityAdminResponseDto` is fully implemented but never used.** The admin queries (`FULL_USER_SELECT_ADMIN`) do fetch `loginAttempts`/`lastLoginIp`/`assignedIp` from the DB, but both `GET /all-user` and `PATCH /update-user-role/:id` wrap the result in `UserResponseDtoWithDetails`, whose `security` field is hardcoded to `new UserSecurityMeResponseDto(...)` — the customer-tier shape. The admin UI never actually receives the extra fields it's paying to query.
@@ -314,7 +315,6 @@ None of the four enums below carry inline doc comments in `user.prisma` — only
 - **`UserSecurityRepository` declares a dead local `SECURITY_SELECT_ADMIN` constant** that duplicates `UserRepository`'s field of the same name and is never referenced in the file.
 - **`UserRepository.findByEmailWithAuth` is fully commented out**, superseded by `findUserByEmailWithPassword`. Worth deleting rather than leaving dead in the file.
 - **`UserSecurity.verificationToken`/`verificationTokenExpires`/`resetToken`/`resetTokenExpires` are declared but unused.** No repository method reads or writes them; password reset/email-verification-by-token appears to have been abandoned in favor of the OTP flow, but the columns were never removed.
-- **OTP is generated on every registration, including OAuth signups that are already verified.** `registerUser` calls `otpService.generateAndSendOtp` unconditionally, even when `isEmailAuth` is `false` and the account is already `ACTIVE`/`isEmailVerified: true` — a functionally pointless OTP row (and, if mail sending is ever re-enabled, a pointless email).
 - **Password `@MinLength` message says 8, enforces 6.** Both `CreateUserDto.password` and `UpdatePasswordDto.newPassword` use `@MinLength(6, { message: 'Password must be at least 8 characters long' })` — the validator and its own error message disagree.
 - **No self-service profile update endpoint.** A customer can change their password (`PATCH /update-password/:id`) but cannot edit their own `Profile` (name, avatar, bio, DOB, gender) through any route in this module.
 - **No delete route of any kind** — soft or hard — exists on `UserController`, and the schema doesn't declare `deletedAt`/`deletedBy` on `User` to support one yet.
@@ -362,37 +362,38 @@ Every endpoint below is served by `UserController` → `UserService` → `UserRe
 
 **`POST /api/v1/user/create-user`**
 
-**Purpose**: Create a new account — either `EMAIL` (password-based) or OAuth (`GOOGLE`/`FACEBOOK`/`APPLE`) — with its `Profile` and `UserSecurity` rows, and kick off signup-OTP verification.
+**Purpose**: Create a new `EMAIL` (password-based) account, with its `Profile` and `UserSecurity` rows, and kick off signup-OTP verification. **Email/password only** — see the note below.
 
 **Access**: None — public route.
+
+> **This endpoint cannot create OAuth accounts.** `CreateUserDto` has no `authProvider`/`providerId` fields, so every row it creates is `authProvider: EMAIL` (the schema default). OAuth accounts (`GOOGLE`) are created exclusively by `POST /auth/social-auth` after verifying a real provider token server-side — see `auth.md`'s [Social Login](./auth.md#social-login-google). This split exists specifically so a public, unauthenticated endpoint can never let a caller self-assert an OAuth identity they don't own; see [Known Gaps](#known-gaps--recommended-hardening).
 
 | Layer      | What happens                                                                                                          |
 | :--------- | :-------------------------------------------------------------------------------------------------------------------- |
 | Controller | `createUser(dto, @Ip())` — no other logic.                                                                            |
-| Service    | `registerUser(dto, ipAddress)` — provider-consistency validation, uniqueness check, password hashing, one transaction spanning `User`/`Profile`/`UserSecurity`/OTP dispatch. |
+| Service    | `registerUser(dto, ipAddress)` — uniqueness check, password hashing, one transaction spanning `User`/`Profile`/`UserSecurity`/OTP dispatch. |
 | Repository | `findUserByEmail` (uniqueness) → (inside `withTransaction`) `createUser` → `ProfileRepository.createUserProfile` → `UserSecurityRepository.createUserSecurity` → `OtpService.generateAndSendOtp` → `findUserByEmailWithDetails`. |
 
 **Business logic — in order:**
 
-1. Destructure `{ profile, security, ...userData }` from the DTO; compute `isEmailAuth = !authProvider || authProvider === EMAIL`.
-2. **Provider/password consistency**: `isEmailAuth && providerId` → `400` ("Provider ID is not allowed for Email registration"). `isEmailAuth && !password` → `400` ("Password is required for Email registration"). Note the inverse is **not** enforced — an OAuth-provider signup is not required to supply a `providerId`, and no uniqueness check exists on `providerId` at all. See [Known Gaps](#known-gaps--recommended-hardening).
-3. **Email uniqueness** — `findUserByEmail(email)` → `409` if already registered.
-4. **Password hashing** — `hashService.hash(password)` (bcrypt) if a password was supplied; `undefined` for OAuth signups (the column stays `NULL`).
-5. **Everything below runs inside one transaction**:
-   - `createUser({ ...userData, password: hashed, status: isEmailAuth ? PENDING_VERIFICATION : ACTIVE })` — `role` is never taken from the DTO, so it's always the schema default `CUSTOMER`.
+1. Destructure `{ profile, security, ...userData }` from the DTO. `password` is a required field on the DTO now (`@IsString`/`@IsNotEmpty`, no `@IsOptional`) — validation rejects a missing password before the service even runs.
+2. **Email uniqueness** — `findUserByEmail(email)` → `409` if already registered.
+3. **Password hashing** — `hashService.hash(password)` (bcrypt) — always runs; there's no OAuth branch to skip it anymore.
+4. **Everything below runs inside one transaction**:
+   - `createUser({ ...userData, password: hashed, status: PENDING_VERIFICATION })` — `role` is never taken from the DTO, so it's always the schema default `CUSTOMER`; `authProvider`/`providerId` are never taken from the DTO either, so they fall to the schema defaults (`EMAIL`/`NULL`).
    - `createUserProfile({ ...profile, userId, name: profile.name || \`${firstName} ${lastName ?? ''}\`.trim() })`.
-   - `createUserSecurity({ userId, isEmailVerified: !isEmailAuth, emailVerifiedAt: !isEmailAuth ? now() : null, lastLoginIp: ipAddress, assignedIp: security?.assignedIp })` — an OAuth signup is marked verified immediately; an `EMAIL` signup is not.
-   - `otpService.generateAndSendOtp(email, OTPType.SIGNUP, userId, tx)` — called **unconditionally**, even for an OAuth signup that is already verified. See [Known Gaps](#known-gaps--recommended-hardening).
+   - `createUserSecurity({ userId, isEmailVerified: false, emailVerifiedAt: null, lastLoginIp: ipAddress, assignedIp: security?.assignedIp })`.
+   - `otpService.generateAndSendOtp(email, OTPType.SIGNUP, userId, tx)` — every account created here needs signup verification now, so this is no longer a conditionally-pointless call the way it was when this endpoint could also produce pre-verified OAuth accounts.
    - Re-fetch the full row via `findUserByEmailWithDetails` — `409` ("Failed to retrieve user after registration") on the practically-impossible miss.
-6. **Response mapping** — `new UserResponseDtoWithDetails(user, baseUrl)`.
+5. **Response mapping** — `new UserResponseDtoWithDetails(user, baseUrl)`.
 
 **Response shape**: `UserResponseDtoWithDetails` (account + nested `profile` + `security` summary; no `password`).
 
 | Status | Cause                                                                                                     |
 | :----- | :------------------------------------------------------------------------------------------------------------ |
 | `201`  | User created successfully.                                                                                |
-| `400`  | DTO validation failed; **or** `providerId` supplied for an `EMAIL` registration; **or** `password` missing for an `EMAIL` registration. |
-| `409`  | Email already registered.                                                                                  |
+| `400`  | DTO validation failed (missing/short password, invalid email, etc.).                                      |
+| `409`  | Email already registered.                                                                                 |
 
 ---
 

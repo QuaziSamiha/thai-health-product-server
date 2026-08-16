@@ -13,5 +13,6 @@ export default registerAs('auth', () => {
     accessExpiresIn: env.JWT_ACCESS_EXPIRES_IN,
     refreshExpiresIn: env.JWT_REFRESH_EXPIRES_IN,
     refreshExpiresInMs: env.JWT_REFRESH_EXPIRES_IN_MS,
+    googleClientId: env.GOOGLE_CLIENT_ID,
   };
 });

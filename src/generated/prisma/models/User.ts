@@ -309,6 +309,7 @@ export type UserWhereInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentListRelationFilter
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryListRelationFilter
   verifiedDeliveryMen?: Prisma.DeliveryManProfileListRelationFilter
+  auditLogs?: Prisma.AuditLogListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -354,11 +355,13 @@ export type UserOrderByWithRelationInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentOrderByRelationAggregateInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryOrderByRelationAggregateInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileOrderByRelationAggregateInput
+  auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: number
   sid?: string
+  authProvider_providerId?: Prisma.UserAuthProviderProviderIdCompoundUniqueInput
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
@@ -402,7 +405,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   bookedDeliveryShipments?: Prisma.DeliveryShipmentListRelationFilter
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryListRelationFilter
   verifiedDeliveryMen?: Prisma.DeliveryManProfileListRelationFilter
-}, "id" | "sid">
+  auditLogs?: Prisma.AuditLogListRelationFilter
+}, "id" | "sid" | "authProvider_providerId">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -486,6 +490,7 @@ export type UserCreateInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -531,6 +536,7 @@ export type UserUncheckedCreateInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserUpdateInput = {
@@ -575,6 +581,7 @@ export type UserUpdateInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -620,6 +627,7 @@ export type UserUncheckedUpdateInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -677,6 +685,11 @@ export type UserScalarRelationFilter = {
 export type UserNullableScalarRelationFilter = {
   is?: Prisma.UserWhereInput | null
   isNot?: Prisma.UserWhereInput | null
+}
+
+export type UserAuthProviderProviderIdCompoundUniqueInput = {
+  authProvider: $Enums.AuthProvider
+  providerId: string
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -747,6 +760,22 @@ export type UserUpdateOneRequiredWithoutAddressesNestedInput = {
   upsert?: Prisma.UserUpsertWithoutAddressesInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAddressesInput, Prisma.UserUpdateWithoutAddressesInput>, Prisma.UserUncheckedUpdateWithoutAddressesInput>
+}
+
+export type UserCreateNestedOneWithoutAuditLogsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuditLogsInput, Prisma.UserUncheckedCreateWithoutAuditLogsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuditLogsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutAuditLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuditLogsInput, Prisma.UserUncheckedCreateWithoutAuditLogsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuditLogsInput
+  upsert?: Prisma.UserUpsertWithoutAuditLogsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAuditLogsInput, Prisma.UserUpdateWithoutAuditLogsInput>, Prisma.UserUncheckedUpdateWithoutAuditLogsInput>
 }
 
 export type UserCreateNestedOneWithoutBlogsInput = {
@@ -1242,6 +1271,7 @@ export type UserCreateWithoutAddressesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutAddressesInput = {
@@ -1286,6 +1316,7 @@ export type UserUncheckedCreateWithoutAddressesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutAddressesInput = {
@@ -1345,6 +1376,7 @@ export type UserUpdateWithoutAddressesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAddressesInput = {
@@ -1380,6 +1412,201 @@ export type UserUncheckedUpdateWithoutAddressesInput = {
   updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserCreateWithoutAuditLogsInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+}
+
+export type UserUncheckedCreateWithoutAuditLogsInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+}
+
+export type UserCreateOrConnectWithoutAuditLogsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuditLogsInput, Prisma.UserUncheckedCreateWithoutAuditLogsInput>
+}
+
+export type UserUpsertWithoutAuditLogsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAuditLogsInput, Prisma.UserUncheckedUpdateWithoutAuditLogsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuditLogsInput, Prisma.UserUncheckedCreateWithoutAuditLogsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAuditLogsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAuditLogsInput, Prisma.UserUncheckedUpdateWithoutAuditLogsInput>
+}
+
+export type UserUpdateWithoutAuditLogsInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAuditLogsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
@@ -1432,6 +1659,7 @@ export type UserCreateWithoutBlogsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutBlogsInput = {
@@ -1476,6 +1704,7 @@ export type UserUncheckedCreateWithoutBlogsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutBlogsInput = {
@@ -1535,6 +1764,7 @@ export type UserUpdateWithoutBlogsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBlogsInput = {
@@ -1579,6 +1809,7 @@ export type UserUncheckedUpdateWithoutBlogsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutCartsInput = {
@@ -1622,6 +1853,7 @@ export type UserCreateWithoutCartsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutCartsInput = {
@@ -1666,6 +1898,7 @@ export type UserUncheckedCreateWithoutCartsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutCartsInput = {
@@ -1725,6 +1958,7 @@ export type UserUpdateWithoutCartsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCartsInput = {
@@ -1769,6 +2003,7 @@ export type UserUncheckedUpdateWithoutCartsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutCreatedCategoriesInput = {
@@ -1812,6 +2047,7 @@ export type UserCreateWithoutCreatedCategoriesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutCreatedCategoriesInput = {
@@ -1856,6 +2092,7 @@ export type UserUncheckedCreateWithoutCreatedCategoriesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutCreatedCategoriesInput = {
@@ -1904,6 +2141,7 @@ export type UserCreateWithoutUpdatedCategoriesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedCategoriesInput = {
@@ -1948,6 +2186,7 @@ export type UserUncheckedCreateWithoutUpdatedCategoriesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedCategoriesInput = {
@@ -2007,6 +2246,7 @@ export type UserUpdateWithoutCreatedCategoriesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedCategoriesInput = {
@@ -2051,6 +2291,7 @@ export type UserUncheckedUpdateWithoutCreatedCategoriesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserUpsertWithoutUpdatedCategoriesInput = {
@@ -2105,6 +2346,7 @@ export type UserUpdateWithoutUpdatedCategoriesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedCategoriesInput = {
@@ -2149,6 +2391,7 @@ export type UserUncheckedUpdateWithoutUpdatedCategoriesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutCreatedCombosInput = {
@@ -2192,6 +2435,7 @@ export type UserCreateWithoutCreatedCombosInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutCreatedCombosInput = {
@@ -2236,6 +2480,7 @@ export type UserUncheckedCreateWithoutCreatedCombosInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutCreatedCombosInput = {
@@ -2284,6 +2529,7 @@ export type UserCreateWithoutUpdatedCombosInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedCombosInput = {
@@ -2328,6 +2574,7 @@ export type UserUncheckedCreateWithoutUpdatedCombosInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedCombosInput = {
@@ -2376,6 +2623,7 @@ export type UserCreateWithoutDeletedCombosInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutDeletedCombosInput = {
@@ -2420,6 +2668,7 @@ export type UserUncheckedCreateWithoutDeletedCombosInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutDeletedCombosInput = {
@@ -2479,6 +2728,7 @@ export type UserUpdateWithoutCreatedCombosInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedCombosInput = {
@@ -2523,6 +2773,7 @@ export type UserUncheckedUpdateWithoutCreatedCombosInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserUpsertWithoutUpdatedCombosInput = {
@@ -2577,6 +2828,7 @@ export type UserUpdateWithoutUpdatedCombosInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedCombosInput = {
@@ -2621,6 +2873,7 @@ export type UserUncheckedUpdateWithoutUpdatedCombosInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserUpsertWithoutDeletedCombosInput = {
@@ -2675,6 +2928,7 @@ export type UserUpdateWithoutDeletedCombosInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeletedCombosInput = {
@@ -2719,6 +2973,7 @@ export type UserUncheckedUpdateWithoutDeletedCombosInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutDeliveryManProfileInput = {
@@ -2762,6 +3017,7 @@ export type UserCreateWithoutDeliveryManProfileInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutDeliveryManProfileInput = {
@@ -2806,6 +3062,7 @@ export type UserUncheckedCreateWithoutDeliveryManProfileInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutDeliveryManProfileInput = {
@@ -2854,6 +3111,7 @@ export type UserCreateWithoutVerifiedDeliveryMenInput = {
   updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutVerifiedDeliveryMenInput = {
@@ -2898,6 +3156,7 @@ export type UserUncheckedCreateWithoutVerifiedDeliveryMenInput = {
   updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutVerifiedDeliveryMenInput = {
@@ -2957,6 +3216,7 @@ export type UserUpdateWithoutDeliveryManProfileInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeliveryManProfileInput = {
@@ -3001,6 +3261,7 @@ export type UserUncheckedUpdateWithoutDeliveryManProfileInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserUpsertWithoutVerifiedDeliveryMenInput = {
@@ -3055,6 +3316,7 @@ export type UserUpdateWithoutVerifiedDeliveryMenInput = {
   updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVerifiedDeliveryMenInput = {
@@ -3099,6 +3361,7 @@ export type UserUncheckedUpdateWithoutVerifiedDeliveryMenInput = {
   updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutCreatedDeliveryProvidersInput = {
@@ -3142,6 +3405,7 @@ export type UserCreateWithoutCreatedDeliveryProvidersInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutCreatedDeliveryProvidersInput = {
@@ -3186,6 +3450,7 @@ export type UserUncheckedCreateWithoutCreatedDeliveryProvidersInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutCreatedDeliveryProvidersInput = {
@@ -3234,6 +3499,7 @@ export type UserCreateWithoutUpdatedDeliveryProvidersInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedDeliveryProvidersInput = {
@@ -3278,6 +3544,7 @@ export type UserUncheckedCreateWithoutUpdatedDeliveryProvidersInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedDeliveryProvidersInput = {
@@ -3337,6 +3604,7 @@ export type UserUpdateWithoutCreatedDeliveryProvidersInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedDeliveryProvidersInput = {
@@ -3381,6 +3649,7 @@ export type UserUncheckedUpdateWithoutCreatedDeliveryProvidersInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserUpsertWithoutUpdatedDeliveryProvidersInput = {
@@ -3435,6 +3704,7 @@ export type UserUpdateWithoutUpdatedDeliveryProvidersInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedDeliveryProvidersInput = {
@@ -3479,6 +3749,7 @@ export type UserUncheckedUpdateWithoutUpdatedDeliveryProvidersInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutBookedDeliveryShipmentsInput = {
@@ -3522,6 +3793,7 @@ export type UserCreateWithoutBookedDeliveryShipmentsInput = {
   updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutBookedDeliveryShipmentsInput = {
@@ -3566,6 +3838,7 @@ export type UserUncheckedCreateWithoutBookedDeliveryShipmentsInput = {
   updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutBookedDeliveryShipmentsInput = {
@@ -3625,6 +3898,7 @@ export type UserUpdateWithoutBookedDeliveryShipmentsInput = {
   updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBookedDeliveryShipmentsInput = {
@@ -3669,6 +3943,7 @@ export type UserUncheckedUpdateWithoutBookedDeliveryShipmentsInput = {
   updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutDeliveryStatusChangesInput = {
@@ -3712,6 +3987,7 @@ export type UserCreateWithoutDeliveryStatusChangesInput = {
   updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutDeliveryStatusChangesInput = {
@@ -3756,6 +4032,7 @@ export type UserUncheckedCreateWithoutDeliveryStatusChangesInput = {
   updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutDeliveryStatusChangesInput = {
@@ -3815,6 +4092,7 @@ export type UserUpdateWithoutDeliveryStatusChangesInput = {
   updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeliveryStatusChangesInput = {
@@ -3859,6 +4137,7 @@ export type UserUncheckedUpdateWithoutDeliveryStatusChangesInput = {
   updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutCreatedHomeContentsInput = {
@@ -3902,6 +4181,7 @@ export type UserCreateWithoutCreatedHomeContentsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutCreatedHomeContentsInput = {
@@ -3946,6 +4226,7 @@ export type UserUncheckedCreateWithoutCreatedHomeContentsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutCreatedHomeContentsInput = {
@@ -3994,6 +4275,7 @@ export type UserCreateWithoutUpdatedHomeContentsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedHomeContentsInput = {
@@ -4038,6 +4320,7 @@ export type UserUncheckedCreateWithoutUpdatedHomeContentsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedHomeContentsInput = {
@@ -4097,6 +4380,7 @@ export type UserUpdateWithoutCreatedHomeContentsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedHomeContentsInput = {
@@ -4141,6 +4425,7 @@ export type UserUncheckedUpdateWithoutCreatedHomeContentsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserUpsertWithoutUpdatedHomeContentsInput = {
@@ -4195,6 +4480,7 @@ export type UserUpdateWithoutUpdatedHomeContentsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedHomeContentsInput = {
@@ -4239,6 +4525,7 @@ export type UserUncheckedUpdateWithoutUpdatedHomeContentsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutInventoriesInput = {
@@ -4282,6 +4569,7 @@ export type UserCreateWithoutInventoriesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutInventoriesInput = {
@@ -4326,6 +4614,7 @@ export type UserUncheckedCreateWithoutInventoriesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutInventoriesInput = {
@@ -4385,6 +4674,7 @@ export type UserUpdateWithoutInventoriesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInventoriesInput = {
@@ -4429,6 +4719,7 @@ export type UserUncheckedUpdateWithoutInventoriesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutOrdersInput = {
@@ -4472,6 +4763,7 @@ export type UserCreateWithoutOrdersInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutOrdersInput = {
@@ -4516,6 +4808,7 @@ export type UserUncheckedCreateWithoutOrdersInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutOrdersInput = {
@@ -4575,6 +4868,7 @@ export type UserUpdateWithoutOrdersInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrdersInput = {
@@ -4619,6 +4913,7 @@ export type UserUncheckedUpdateWithoutOrdersInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutOrderStatusChangesInput = {
@@ -4662,6 +4957,7 @@ export type UserCreateWithoutOrderStatusChangesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutOrderStatusChangesInput = {
@@ -4706,6 +5002,7 @@ export type UserUncheckedCreateWithoutOrderStatusChangesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutOrderStatusChangesInput = {
@@ -4765,6 +5062,7 @@ export type UserUpdateWithoutOrderStatusChangesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrderStatusChangesInput = {
@@ -4809,6 +5107,7 @@ export type UserUncheckedUpdateWithoutOrderStatusChangesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutCreatedProductsInput = {
@@ -4852,6 +5151,7 @@ export type UserCreateWithoutCreatedProductsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutCreatedProductsInput = {
@@ -4896,6 +5196,7 @@ export type UserUncheckedCreateWithoutCreatedProductsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutCreatedProductsInput = {
@@ -4944,6 +5245,7 @@ export type UserCreateWithoutUpdatedProductsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedProductsInput = {
@@ -4988,6 +5290,7 @@ export type UserUncheckedCreateWithoutUpdatedProductsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedProductsInput = {
@@ -5036,6 +5339,7 @@ export type UserCreateWithoutDeletedProductsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutDeletedProductsInput = {
@@ -5080,6 +5384,7 @@ export type UserUncheckedCreateWithoutDeletedProductsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutDeletedProductsInput = {
@@ -5139,6 +5444,7 @@ export type UserUpdateWithoutCreatedProductsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedProductsInput = {
@@ -5183,6 +5489,7 @@ export type UserUncheckedUpdateWithoutCreatedProductsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserUpsertWithoutUpdatedProductsInput = {
@@ -5237,6 +5544,7 @@ export type UserUpdateWithoutUpdatedProductsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedProductsInput = {
@@ -5281,6 +5589,7 @@ export type UserUncheckedUpdateWithoutUpdatedProductsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserUpsertWithoutDeletedProductsInput = {
@@ -5335,6 +5644,7 @@ export type UserUpdateWithoutDeletedProductsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeletedProductsInput = {
@@ -5379,6 +5689,7 @@ export type UserUncheckedUpdateWithoutDeletedProductsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutPromoCodeRedemptionsInput = {
@@ -5422,6 +5733,7 @@ export type UserCreateWithoutPromoCodeRedemptionsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutPromoCodeRedemptionsInput = {
@@ -5466,6 +5778,7 @@ export type UserUncheckedCreateWithoutPromoCodeRedemptionsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutPromoCodeRedemptionsInput = {
@@ -5525,6 +5838,7 @@ export type UserUpdateWithoutPromoCodeRedemptionsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPromoCodeRedemptionsInput = {
@@ -5569,6 +5883,7 @@ export type UserUncheckedUpdateWithoutPromoCodeRedemptionsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutCreatedSupportsInput = {
@@ -5612,6 +5927,7 @@ export type UserCreateWithoutCreatedSupportsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutCreatedSupportsInput = {
@@ -5656,6 +5972,7 @@ export type UserUncheckedCreateWithoutCreatedSupportsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutCreatedSupportsInput = {
@@ -5704,6 +6021,7 @@ export type UserCreateWithoutUpdatedSupportsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedSupportsInput = {
@@ -5748,6 +6066,7 @@ export type UserUncheckedCreateWithoutUpdatedSupportsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedSupportsInput = {
@@ -5807,6 +6126,7 @@ export type UserUpdateWithoutCreatedSupportsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedSupportsInput = {
@@ -5851,6 +6171,7 @@ export type UserUncheckedUpdateWithoutCreatedSupportsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserUpsertWithoutUpdatedSupportsInput = {
@@ -5905,6 +6226,7 @@ export type UserUpdateWithoutUpdatedSupportsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedSupportsInput = {
@@ -5949,6 +6271,7 @@ export type UserUncheckedUpdateWithoutUpdatedSupportsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutProfileInput = {
@@ -5992,6 +6315,7 @@ export type UserCreateWithoutProfileInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutProfileInput = {
@@ -6036,6 +6360,7 @@ export type UserUncheckedCreateWithoutProfileInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutProfileInput = {
@@ -6095,6 +6420,7 @@ export type UserUpdateWithoutProfileInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProfileInput = {
@@ -6139,6 +6465,7 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutSecurityInput = {
@@ -6182,6 +6509,7 @@ export type UserCreateWithoutSecurityInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutSecurityInput = {
@@ -6226,6 +6554,7 @@ export type UserUncheckedCreateWithoutSecurityInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutSecurityInput = {
@@ -6285,6 +6614,7 @@ export type UserUpdateWithoutSecurityInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSecurityInput = {
@@ -6329,6 +6659,7 @@ export type UserUncheckedUpdateWithoutSecurityInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -6372,6 +6703,7 @@ export type UserCreateWithoutSessionsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -6416,6 +6748,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -6475,6 +6808,7 @@ export type UserUpdateWithoutSessionsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -6519,6 +6853,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutOtpsInput = {
@@ -6562,6 +6897,7 @@ export type UserCreateWithoutOtpsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
 export type UserUncheckedCreateWithoutOtpsInput = {
@@ -6606,6 +6942,7 @@ export type UserUncheckedCreateWithoutOtpsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type UserCreateOrConnectWithoutOtpsInput = {
@@ -6665,6 +7002,7 @@ export type UserUpdateWithoutOtpsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOtpsInput = {
@@ -6709,6 +7047,7 @@ export type UserUncheckedUpdateWithoutOtpsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 
@@ -6743,6 +7082,7 @@ export type UserCountOutputType = {
   bookedDeliveryShipments: number
   deliveryStatusChanges: number
   verifiedDeliveryMen: number
+  auditLogs: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -6772,6 +7112,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   bookedDeliveryShipments?: boolean | UserCountOutputTypeCountBookedDeliveryShipmentsArgs
   deliveryStatusChanges?: boolean | UserCountOutputTypeCountDeliveryStatusChangesArgs
   verifiedDeliveryMen?: boolean | UserCountOutputTypeCountVerifiedDeliveryMenArgs
+  auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
 }
 
 /**
@@ -6966,6 +7307,13 @@ export type UserCountOutputTypeCountVerifiedDeliveryMenArgs<ExtArgs extends runt
   where?: Prisma.DeliveryManProfileWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AuditLogWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -7010,6 +7358,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   bookedDeliveryShipments?: boolean | Prisma.User$bookedDeliveryShipmentsArgs<ExtArgs>
   deliveryStatusChanges?: boolean | Prisma.User$deliveryStatusChangesArgs<ExtArgs>
   verifiedDeliveryMen?: boolean | Prisma.User$verifiedDeliveryMenArgs<ExtArgs>
+  auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -7092,6 +7441,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   bookedDeliveryShipments?: boolean | Prisma.User$bookedDeliveryShipmentsArgs<ExtArgs>
   deliveryStatusChanges?: boolean | Prisma.User$deliveryStatusChangesArgs<ExtArgs>
   verifiedDeliveryMen?: boolean | Prisma.User$verifiedDeliveryMenArgs<ExtArgs>
+  auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -7129,6 +7479,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     bookedDeliveryShipments: Prisma.$DeliveryShipmentPayload<ExtArgs>[]
     deliveryStatusChanges: Prisma.$DeliveryStatusHistoryPayload<ExtArgs>[]
     verifiedDeliveryMen: Prisma.$DeliveryManProfilePayload<ExtArgs>[]
+    auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -7567,6 +7918,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   bookedDeliveryShipments<T extends Prisma.User$bookedDeliveryShipmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$bookedDeliveryShipmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryShipmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   deliveryStatusChanges<T extends Prisma.User$deliveryStatusChangesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$deliveryStatusChangesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryStatusHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   verifiedDeliveryMen<T extends Prisma.User$verifiedDeliveryMenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$verifiedDeliveryMenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryManProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8680,6 +9032,30 @@ export type User$verifiedDeliveryMenArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.DeliveryManProfileScalarFieldEnum | Prisma.DeliveryManProfileScalarFieldEnum[]
+}
+
+/**
+ * User.auditLogs
+ */
+export type User$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AuditLog
+   */
+  select?: Prisma.AuditLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AuditLog
+   */
+  omit?: Prisma.AuditLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditLogInclude<ExtArgs> | null
+  where?: Prisma.AuditLogWhereInput
+  orderBy?: Prisma.AuditLogOrderByWithRelationInput | Prisma.AuditLogOrderByWithRelationInput[]
+  cursor?: Prisma.AuditLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
 }
 
 /**

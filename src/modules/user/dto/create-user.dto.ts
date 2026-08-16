@@ -3,19 +3,21 @@ import {
   IsNotEmpty,
   IsString,
   IsOptional,
-  IsEnum,
   MinLength,
   ValidateNested,
   MaxLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { AuthProvider } from '../../../generated/prisma/enums';
 import { CreateProfileDto } from './create-profile.dto';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { CreateUserSecurityDto } from './create-user-security.dto';
 import { IsThaiPhone } from '../../../common/decorators/validation/is-thai-phone.decorator';
 import { TransformThaiPhone } from '../../../common/decorators/transformation/transform-thai-phone.decorator';
 
+//* EMAIL/PASSWORD REGISTRATION ONLY — DELIBERATELY HAS NO authProvider/
+//* providerId FIELDS. THIS ENDPOINT IS PUBLIC AND UNAUTHENTICATED, SO IT
+//* MUST NEVER LET A CALLER SELF-ASSERT AN OAUTH IDENTITY; OAUTH ACCOUNTS ARE
+//* ONLY EVER CREATED VIA AuthService.socialAuth's VERIFIED-TOKEN FLOW.
 export class CreateUserDto {
   @ApiProperty({
     description: 'The email address of the user',
@@ -27,7 +29,7 @@ export class CreateUserDto {
   email!: string;
   // @IsUnique(['User', 'email'])
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: 'The password of the user',
     example: 'Password@123',
   })
@@ -35,7 +37,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   @MinLength(6, { message: 'Password must be at least 8 characters long' })
   @MaxLength(255, { message: 'Password must be at most 255 characters long' })
-  password?: string;
+  password!: string;
 
   @ApiPropertyOptional({
     description:
@@ -51,20 +53,6 @@ export class CreateUserDto {
   @TransformThaiPhone()
   @IsOptional()
   phone?: string;
-
-  @ApiPropertyOptional({
-    description: 'Authentication provider',
-    enum: AuthProvider,
-    example: AuthProvider.EMAIL,
-  })
-  @IsEnum(AuthProvider)
-  @IsOptional()
-  authProvider?: AuthProvider;
-
-  @ApiPropertyOptional({ description: 'Provider ID for OAuth' })
-  @IsString()
-  @IsOptional()
-  providerId?: string;
 
   @ApiProperty({ description: 'User profile information' })
   @IsNotEmpty()

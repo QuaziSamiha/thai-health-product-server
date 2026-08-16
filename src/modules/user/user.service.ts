@@ -13,7 +13,7 @@ import { UserRepository } from './repositories/user.repository';
 import { ProfileRepository } from './repositories/profile.repository';
 import { UserSecurityRepository } from './repositories/user-security.repository';
 import { CreateUserDto } from './dto/create-user.dto';
-import { SocialAuthDto } from '../auth/dto/third-partry-auth.dto';
+import { VerifiedSocialProfile } from '../auth/dto/third-partry-auth.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import {
@@ -22,12 +22,7 @@ import {
 } from './dto/user-response.dto';
 import { HashService } from '../../shared/hash/hash.service';
 import { OtpService } from '../otp/otp.service';
-import {
-  AuthProvider,
-  OTPType,
-  UserStatus,
-  UserRole,
-} from '../../generated/prisma/enums';
+import { OTPType, UserStatus, UserRole } from '../../generated/prisma/enums';
 import { Prisma } from '../../generated/prisma/client';
 import { UserSecurityMeResponseDto } from './dto/user-security-response.dto';
 import { PaginationQueryDto, IPaginatedResult } from '../../shared/pagination';
@@ -49,46 +44,32 @@ export class UserService {
     private readonly storageService: IStorageService,
   ) {}
 
+  //* THIS ENDPOINT IS EMAIL/PASSWORD REGISTRATION ONLY. OAUTH ACCOUNTS ARE
+  //* NEVER CREATED HERE — THEY ONLY EVER COME FROM AuthService.socialAuth,
+  //* WHICH DERIVES authProvider/providerId FROM A SERVER-VERIFIED PROVIDER
+  //* TOKEN. CreateUserDto HAS NO authProvider/providerId FIELDS FOR THIS
+  //* REASON: A PUBLIC, UNAUTHENTICATED ENDPOINT MUST NEVER LET A CALLER
+  //* SELF-ASSERT AN OAUTH IDENTITY THEY MAY NOT ACTUALLY OWN.
   async registerUser(
     dto: CreateUserDto,
     ipAddress: string,
   ): Promise<UserResponseDtoWithDetails> {
     const { profile, security, ...userData } = dto;
-    const isEmailAuth =
-      !userData.authProvider || userData.authProvider === AuthProvider.EMAIL;
 
-    // * RULE 1: Guard against manual Provider ID injection -- If no authProvider is specified (defaults to EMAIL), they cannot provide an external ID
-    if (isEmailAuth && userData.providerId) {
-      throw new BadRequestException(
-        'Provider ID is not allowed for Email registration',
-      );
-    }
-
-    // * RULE 2: Password logic -- If it's an EMAIL signup, password is required.
-    if (isEmailAuth && !userData.password) {
-      throw new BadRequestException(
-        'Password is required for Email registration',
-      );
-    }
-
-    // * RULE 3: Check if user exists
+    // * RULE 1: Check if user exists
     const existing = await this.userRepo.findUserByEmail(dto.email);
     if (existing) throw new ConflictException('Email already registered');
 
-    const hashedPassword = userData.password
-      ? await this.hashService.hash(userData.password)
-      : undefined;
+    const hashedPassword = await this.hashService.hash(userData.password);
 
-    // * RULE 4: Execute Transaction
+    // * RULE 2: Execute Transaction
     return await this.userRepo.withTransaction(async (tx) => {
       // * Create User
       const user = await this.userRepo.createUser(
         {
           ...userData,
           password: hashedPassword,
-          status: isEmailAuth
-            ? UserStatus.PENDING_VERIFICATION
-            : UserStatus.ACTIVE,
+          status: UserStatus.PENDING_VERIFICATION,
         },
         tx,
       );
@@ -112,8 +93,8 @@ export class UserService {
       await this.securityRepo.createUserSecurity(
         {
           userId: user.id,
-          isEmailVerified: !isEmailAuth,
-          emailVerifiedAt: !isEmailAuth ? new Date() : null,
+          isEmailVerified: false,
+          emailVerifiedAt: null,
           lastLoginIp: ipAddress,
           assignedIp: security?.assignedIp ?? undefined,
         },
@@ -414,7 +395,7 @@ export class UserService {
   //* OWNERSHIP OF `dto.email`, SO A MATCH IS LOGGED IN DIRECTLY (NO PASSWORD
   //* CHECK) AND A MISS IS SILENTLY REGISTERED — NO OTP, ALREADY VERIFIED.
   async findOrCreateSocialUser(
-    dto: SocialAuthDto,
+    dto: VerifiedSocialProfile,
     ipAddress?: string,
   ): Promise<UserResponseDto> {
     const existing = await this.userRepo.findUserByEmail(dto.email);

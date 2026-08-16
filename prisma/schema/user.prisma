@@ -42,13 +42,6 @@ enum OTPType {
 model User {
   id       Int     @id @default(autoincrement())
   sid      String  @unique @default(uuid()) @map("user_sid") @db.Uuid // Use native UUID type for performance
-  //* NOT @unique HERE — PRISMA'S DSL CAN'T EXPRESS A PARTIAL/FILTERED UNIQUE
-  //* INDEX. THE REAL CONSTRAINT IS `users_email_active_key`, A UNIQUE INDEX
-  //* SCOPED TO `deleted_at IS NULL` (SEE MIGRATION
-  //* 20260813082256_soft_delete_user_email_unique). THIS LETS AN ARCHIVED
-  //* ACCOUNT'S EMAIL BE REUSED BY A NEW SIGNUP WITHOUT A UNIQUE-CONSTRAINT
-  //* COLLISION. ANY EMAIL LOOKUP MUST FILTER `deletedAt: null` (findFirst,
-  //* NOT findUnique) OR IT CAN NON-DETERMINISTICALLY MATCH AN ARCHIVED ROW.
   email    String
   password String? // Null for OAuth
   phone    String? @db.VarChar(20)
@@ -95,8 +88,13 @@ model User {
   bookedDeliveryShipments  DeliveryShipment[]      @relation("DeliveryShipmentCreatedBy")
   deliveryStatusChanges    DeliveryStatusHistory[] @relation("DeliveryStatusChangedBy")
   verifiedDeliveryMen      DeliveryManProfile[]    @relation("DeliveryManNidVerifiedBy")
+  auditLogs                AuditLog[]              @relation("AuditLogActor")
 
   @@index([email, phone])
+  //* PREVENTS TWO ROWS FROM CLAIMING THE SAME OAUTH IDENTITY. NULLs (EVERY
+  //* EMAIL-AUTH USER) ARE NOT DISTINCT-CHECKED BY POSTGRES, SO THIS ONLY
+  //* CONSTRAINS ROWS THAT ACTUALLY HAVE A providerId.
+  @@unique([authProvider, providerId], map: "users_auth_provider_provider_id_key")
   @@map("users")
 }
 
@@ -107,15 +105,9 @@ model Profile {
   name        String?   @db.VarChar(200)
   avatarUrl   String? // One source of truth for the image
   bio         String?   @db.Text
-  //* DELIBERATELY *NOT* @db.Timestamptz(3), UNLIKE EVERY OTHER DateTime IN THIS
-  //* SCHEMA (SEE MIGRATION 20260802160000_timestamptz_repo_wide): A BIRTH DATE
-  //* IS A CALENDAR DATE, NOT AN INSTANT — MAKING IT TZ-AWARE WOULD RENDER IT AS
-  //* A DIFFERENT DAY DEPENDING ON THE READER'S ZONE. SHOULD BECOME @db.Date.
   dateOfBirth DateTime?
   gender      String?   @db.VarChar(20)
-
   metadata Json? @default("{}")
-
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @unique @map("user_id")
 

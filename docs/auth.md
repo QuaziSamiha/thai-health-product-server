@@ -119,8 +119,9 @@ Source: `src/modules/auth/config/auth.env.ts` (Zod schema, validated at boot) �
 | `JWT_ACCESS_EXPIRES_IN`       | `z.string()`               | `'5d'`               | `accessExpiresIn`              |
 | `JWT_REFRESH_EXPIRES_IN`      | `z.string()`               | `'30d'`              | `refreshExpiresIn`             |
 | `JWT_REFRESH_EXPIRES_IN_MS`   | `z.coerce.number()`         | `2592000000` (30 days) | `refreshExpiresInMs`         |
+| `GOOGLE_CLIENT_ID`            | `z.string().min(1)`, **optional** | — | `googleClientId`             |
 
-Boot fails fast (Zod `.parse(process.env)`) if either secret is missing — there is no hardcoded fallback secret anywhere in code, which is the one place this module defaults to the safe choice.
+Boot fails fast (Zod `.parse(process.env)`) if either JWT secret is missing — there is no hardcoded fallback secret anywhere in code, which is the one place this module defaults to the safe choice. `GOOGLE_CLIENT_ID` is the one deliberate exception to fail-fast: it's schema-optional so a deployment without Google OAuth configured yet doesn't crash on boot over an unrelated env gap. If it's unset, `POST /auth/social-auth` with `provider: GOOGLE` fails at request time with `503 ServiceUnavailableException('Google sign-in is not configured on this server')` instead. It must be set to the **same** OAuth client ID `thai-health-product-client-office`'s NextAuth `GoogleProvider` authenticates with — `AuthService.verifyGoogleIdToken` uses it as the `audience` check on every incoming ID token, so a mismatch fails every social login with `401`.
 
 **There is no `auth.nodeEnv` key.** The `'auth'` namespace's `registerAs` factory only returns the five keys above. `NODE_ENV` lives under the separate `'app'` namespace (`app.config.ts`, default `'development'`) — see [Known Gaps](#known-gaps--recommended-hardening) for why this matters directly to cookie security.
 
@@ -139,7 +140,7 @@ Ranked roughly by how much it matters to fix before this module is trusted with 
 7. **`validateUser` and `refreshToken` disagree on which statuses are allowed to authenticate.** `validateUser` (used by `/login`) only special-cases `BLOCKED`/`SUSPENDED`/`PENDING_VERIFICATION` — `INACTIVE`, `DEACTIVATED`, and `ARCHIVED` fall through and are allowed to log in. `refreshToken` (used by `/refresh`) strictly requires `status === ACTIVE`. Net effect: a `DEACTIVATED` user can log in and get a fresh token pair, then get rejected the moment they try to refresh it.
 8. **`refreshToken()` flattens every internal error into one generic message.** The whole method body is wrapped in `try { ... } catch { throw new UnauthorizedException('Invalid or expired refresh token') }`, so the more specific internal errors (`'Invalid token payload'`, `'User not found'`, `'Account is not active'`) are thrown but never actually reach the client — everything becomes the same 401 with the same wording, one level removed from what actually failed.
 9. **No password-reset flow exists**, despite the pieces suggesting one was planned: `UserSecurity.resetToken`/`resetTokenExpires` columns, an `OTPType.PASSWORD_RESET` enum value, and a commented-out `resetToken` field in `VerifyOtpResponseDto`. `OtpService.verifyOtp()` only special-cases `OTPType.SIGNUP` — verifying a `PASSWORD_RESET` OTP burns the code but triggers no downstream action. The only password-*change* path (`UserService.updatePassword`, documented in `user.md`) requires the caller to already be authenticated and know their current password — it cannot help a locked-out user.
-10. **Third-party/social login is entirely unimplemented.** `SocialAuthDto` and the `AuthProvider` enum (`GOOGLE`/`FACEBOOK`/`APPLE`) exist, and `validateUser`'s own error message references "third-party (Google, Facebook) login" — but there is no OAuth strategy, no callback route, and no code anywhere that verifies a provider token. Setting `authProvider`/`providerId` at registration (`user.md`'s `POST /create-user`) is accepted with zero verification that the caller owns that OAuth account.
+10. ~~Third-party/social login is entirely unimplemented.~~ **Fixed for Google** (migration-adjacent change, see [Social Login](#social-login-google) below): `POST /auth/social-auth` now takes `{ provider, idToken }` and `AuthService.verifyGoogleIdToken` verifies the token server-side via `google-auth-library` against `GOOGLE_CLIENT_ID` before trusting any identity claim — `email`/`providerId`/name/picture are all read from the verified payload, never the request body. `FACEBOOK`/`APPLE` are explicitly rejected with `400` (no real provider is wired for either, on this backend or the frontend's NextAuth config) rather than silently accepted. `POST /user/create-user` (`user.md`) no longer accepts `authProvider`/`providerId` at all — that endpoint is email/password registration only now; OAuth accounts are exclusively created through the verified `/auth/social-auth` path. `User.@@unique([authProvider, providerId])` (see `user.md`) also now stops two rows from claiming the same identity at the DB level, independent of this.
 11. **`@Public()` is dead code**, and its presence without a global guard is misleading — a developer reading `JwtAuthGuard` would reasonably assume some route uses `@Public()` to opt out of auth; none does. If a global `APP_GUARD` is ever added later, every currently-"public by omission" route (`/auth/login`, `/auth/refresh`, `/otp/verify-otp`) would suddenly require `@Public()` to keep working — worth fixing proactively rather than at that migration's expense.
 12. **`JwtStrategy`'s cookie extractor is dead code.** It looks for an `access_token` cookie that nothing in the app ever sets — only `Authorization: Bearer` actually works.
 13. **No CSRF protection on the cookie-based refresh flow.** `sameSite: 'strict'` on the `refreshToken` cookie covers most cross-site cases, but there's no CSRF token / double-submit-cookie pattern backing `POST /auth/refresh`.
@@ -159,9 +160,10 @@ Every endpoint below is served by `AuthController` → `AuthService` → `UserSe
 | Method | Path              | Access | Purpose                                                              |
 | :------- | :------------------ | :------- | :------------------------------------------------------------------------ |
 | `POST`  | `/auth/login`       | Public | [Authenticate with email/password, issue a token pair](#login)          |
+| `POST`  | `/auth/social-auth` | Public | [Verify a Google identity token, issue a token pair](#social-login-google) |
 | `POST`  | `/auth/refresh`     | Public (requires a valid refresh token, not a guard) | [Exchange a refresh token for a new token pair](#refresh-token) |
 
-Neither route carries `@UseGuards(...)` — they're reachable pre-authentication by omission, not via `@Public()` (see [Guards, Strategies & Decorators](#guards-strategies--decorators)).
+None of these routes carry `@UseGuards(...)` — they're reachable pre-authentication by omission, not via `@Public()` (see [Guards, Strategies & Decorators](#guards-strategies--decorators)).
 
 ---
 
@@ -170,6 +172,8 @@ Neither route carries `@UseGuards(...)` — they're reachable pre-authentication
 | DTO                    | Fed to                     | Contains                                                                                                  |
 | :------------------------ | :---------------------------- | :--------------------------------------------------------------------------------------------------------- |
 | `LoginDto`                | `POST /auth/login` body       | `email` (`@IsEmail`), `password` (`@IsString`, `@MinLength(6)`, `@MaxLength(255)`).                        |
+| `SocialAuthDto`           | `POST /auth/social-auth` body | `provider` (`@IsEnum(AuthProvider)`), `idToken` (`@IsString`) — the raw provider token, verified server-side. No `email`/`providerId`/name fields; the client cannot self-assert an identity. |
+| `VerifiedSocialProfile`   | Internal only — `AuthService` → `UserService.findOrCreateSocialUser` | `{ email, firstName, lastName?, providerId, provider, image? }`, built exclusively from the verified token payload. Never constructed from request input. |
 | `RefreshTokenDto`         | `POST /auth/refresh` body      | `refreshToken?` (`@IsOptional`) — only used as a fallback when the cookie is absent.                        |
 | `TokensResponseDto`       | Both routes' response body     | `{ access_token, refresh_token }`. No `user`/profile data — the client must call `GET /user/my-profile` (see `user.md`) to hydrate account info. |
 | `IJwtPayload`             | Signed into the access token   | `{ sub, email, role }` — see [Architecture Overview](#architecture-overview).                               |
@@ -223,6 +227,49 @@ No response ever includes `password` — `AuthService.validateUser` manually con
 | `400`  | DTO validation failed (`email` not a valid email, `password` too short/long).                                                 |
 | `401`  | No user with that email; **or** wrong password; **or** account `PENDING_VERIFICATION`; **or** OAuth account with no password set. |
 | `403`  | Account `BLOCKED` or `SUSPENDED`.                                                                                              |
+
+---
+
+#### Social Login (Google)
+
+**`POST /api/v1/auth/social-auth`**
+
+**Purpose**: Verify a Google identity token server-side, then log in the matching account or silently register one — issuing an access/refresh token pair either way.
+
+**Access**: Public.
+
+| Layer      | What happens                                                                                                                              |
+| :--------- | :-------------------------------------------------------------------------------------------------------------------------------------------- |
+| Controller | `socialAuth(socialAuthDto, ip, res)` — calls the service, then sets the `refreshToken` cookie, then returns the token pair in the body (same shape as `/login`). |
+| Service    | `socialAuth(dto, ip)` → `verifySocialToken(dto)` → `userService.findOrCreateSocialUser(profile, ip)` → `generateTokens(payload)`.            |
+| (via User) | `UserService.findOrCreateSocialUser` — see `user.md`'s registration/social-auth section.                                                     |
+
+**Business logic — in order:**
+
+1. **`verifySocialToken(dto)`** dispatches on `dto.provider`:
+   - `GOOGLE` → `verifyGoogleIdToken(dto.idToken)`.
+   - `FACEBOOK` / `APPLE` → `400 BadRequestException` ("Social login via FACEBOOK/APPLE is not supported yet") — neither has a real provider wired anywhere in this stack (backend or the frontend's NextAuth config), so nothing verifies a token for them; rejecting outright avoids silently trusting an unverifiable claim.
+   - Anything else → `400 BadRequestException('Unsupported social login provider')`.
+2. **`verifyGoogleIdToken(idToken)`**:
+   - `auth.googleClientId` unset → `503 ServiceUnavailableException('Google sign-in is not configured on this server')`.
+   - `google-auth-library`'s `OAuth2Client.verifyIdToken({ idToken, audience: googleClientId })` — validates the token's signature, issuer, expiry, and that its `aud` claim matches `googleClientId`. Throws → `401 UnauthorizedException('Invalid or expired Google identity token')`.
+   - Missing `email`/`sub` in the verified payload → `401 UnauthorizedException('Google identity token is missing required claims')`.
+   - `email_verified === false` → `401 UnauthorizedException('Google account email is not verified')`.
+   - Returns a `VerifiedSocialProfile` built **only** from the verified payload: `{ email, firstName: given_name ?? name ?? 'User', lastName: family_name, providerId: sub, provider: GOOGLE, image: picture }`.
+3. **`userService.findOrCreateSocialUser(profile, ip)`** — see `user.md`. No password check (ownership is already proven); a first-time email registers a new `ACTIVE`, `isEmailVerified: true` account, no OTP.
+4. **Build payload, generate tokens, set cookie, respond** — identical to [Login](#login) steps 2–5.
+
+**Where the token actually comes from**: the client never sends identity claims. `thai-health-product-client-office`'s NextAuth `GoogleProvider` does the real OAuth exchange; the resulting ID token is captured into the (httpOnly, encrypted) NextAuth JWT cookie and deliberately never exposed to browser JS (`auth.config.ts`'s `session` callback). A same-origin Next.js route, `POST /api/auth/social-login`, reads it back out server-side via `next-auth/jwt`'s `getToken()` and relays `{ provider, idToken }` to this endpoint — so the raw token only ever exists in two server-side hops, never in the browser.
+
+**Response shape**: `TokensResponseDto`, envelope `{ statusCode: 200, success: true, message: 'Login successful', data: { access_token, refresh_token } }` — identical to `/login`.
+
+| Status | Cause                                                                                                                          |
+| :----- | :----------------------------------------------------------------------------------------------------------------------------- |
+| `200`  | Social login successful (existing or newly-registered account).                                                                |
+| `400`  | DTO validation failed; **or** `provider` is `FACEBOOK`/`APPLE`/unrecognized.                                                   |
+| `401`  | Google ID token invalid, expired, missing required claims, or its email isn't verified.                                        |
+| `403`  | Matching account is `BLOCKED` or `SUSPENDED`.                                                                                  |
+| `503`  | `GOOGLE_CLIENT_ID` is not configured on this deployment.                                                                       |
 
 ---
 

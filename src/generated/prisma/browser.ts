@@ -23,6 +23,11 @@ export * from './enums.js';
  */
 export type Address = Prisma.AddressModel
 /**
+ * Model AuditLog
+ * 
+ */
+export type AuditLog = Prisma.AuditLogModel
+/**
  * Model Blog
  * 
  */

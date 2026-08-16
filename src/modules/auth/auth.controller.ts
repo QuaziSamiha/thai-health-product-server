@@ -102,9 +102,9 @@ export class AuthController {
     @Ip() ip: string,
     @Res({ passthrough: true }) res: Response,
   ) {
-    this.logger.debug(`Social login attempt for ${socialAuthDto.email}`);
+    this.logger.debug(`Social login attempt via ${socialAuthDto.provider}`);
     const tokens = await this.authService.socialAuth(socialAuthDto, ip);
-    this.logger.log(`Successful social login for ${socialAuthDto.email}`);
+    this.logger.log(`Successful social login via ${socialAuthDto.provider}`);
     this.setRefreshTokenCookie(res, tokens.refresh_token);
 
     return {
