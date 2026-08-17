@@ -23,10 +23,6 @@ import { StorageModule } from '../../shared/storage/storage.module';
     ProfileRepository,
     UserSecurityRepository,
   ],
-  //* UserRepository/ProfileRepository/UserSecurityRepository ARE EXPORTED SO
-  //* DeliveryManModule CAN REUSE THEM DIRECTLY FOR ITS create/update FLOWS
-  //* INSTEAD OF DUPLICATING User/Profile CREATION LOGIC — SEE
-  //* docs/delivery-man.md "Reuse, Don't Duplicate".
-  exports: [UserService, UserRepository, ProfileRepository, UserSecurityRepository],
+  exports: [UserService],
 })
 export class UserModule {}

@@ -13,7 +13,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './modules/user/user.module';
 import { DeliveryManModule } from './modules/delivery-man/delivery-man.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { AppThrottlerModule } from './common/throttler/throttler.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { OtpModule } from './modules/otp/otp.module';
 import { MailModule } from './modules/mail/mail.module';
@@ -59,12 +59,15 @@ import {
     //* APP-WIDE NAMESPACED CONFIG (PORT, API_PREFIX, BASE_URL, NODE_ENV) — OWNED BY THE ROOT MODULE ITSELF
     ConfigModule.forFeature(appConfig),
 
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60, // * Reset counter after 60 seconds
-        limit: 100, // * Allow 100 requests per IP in 60s
-      },
-    ]),
+    //* RATE LIMITING — OWNS THE 'throttler' CONFIG NAMESPACE, THE NAMED short/long TIERS,
+    //* AND THE APP_GUARD THAT ENFORCES THEM. IMPORTED FIRST SO THE THROTTLER IS THE FIRST
+    //* GUARD IN THE PIPELINE AND PROTECTS THE AUTH PATH ITSELF.
+    //*
+    //* REPLACED `ThrottlerModule.forRoot([{ ttl: 60, limit: 100 }])`, WHICH HAD TWO BUGS:
+    //* IT REGISTERED NO GUARD (SO IT ENFORCED NOTHING AT ALL), AND ITS ttl WAS READ AS
+    //* 60 **MILLISECONDS** — @nestjs/throttler CHANGED THE UNIT IN v5 AND THIS APP IS ON
+    //* v6.5.0, SO THE "RESET COUNTER AFTER 60 SECONDS" COMMENT WAS WRONG BY 1000x.
+    AppThrottlerModule,
 
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),

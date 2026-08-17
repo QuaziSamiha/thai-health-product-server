@@ -16,7 +16,7 @@ export class UpdatePasswordDto {
   })
   @IsNotEmpty()
   @IsString()
-  @MinLength(6, { message: 'Password must be at least 8 characters long' })
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
   @MaxLength(255, { message: 'Password must be at most 255 characters long' })
   newPassword: string;
 }

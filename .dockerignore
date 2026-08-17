@@ -1,0 +1,46 @@
+#* ─────────────────────────────────────────────────────────────────────────
+#* BUILD CONTEXT EXCLUSIONS — EVERYTHING HERE IS EITHER REBUILT INSIDE THE
+#* IMAGE, MOUNTED AS A VOLUME AT RUNTIME, OR A SECRET THAT MUST NEVER BE
+#* BAKED INTO A LAYER.
+#* ─────────────────────────────────────────────────────────────────────────
+
+#* HOST-BUILT ARTEFACTS — node_modules IS LINUX-INCOMPATIBLE (bcrypt IS A
+#* NATIVE ADDON COMPILED FOR WINDOWS), AND dist IS REBUILT BY THE BUILDER STAGE
+node_modules
+dist
+build
+coverage
+.nyc_output
+*.tsbuildinfo
+
+#* VCS / TOOLING
+.git
+.gitignore
+.github
+.vscode
+.idea
+.prettierrc
+eslint.config.mjs
+
+#* SECRETS — NOTE THIS ALSO MAKES @nestjs/config FIND NO .env FILE INSIDE THE
+#* CONTAINER, SO CONFIGURATION COMES *ONLY* FROM REAL ENVIRONMENT VARIABLES
+#* INJECTED BY COMPOSE. THAT IS DELIBERATE: ONE SOURCE OF TRUTH, NO SHADOWING.
+.env
+.env.*
+!.env.example
+
+#* RUNTIME STATE — BOTH ARE BACKED BY NAMED VOLUMES (SEE docker-compose.yml).
+#* uploads/ IS ~53 MB OF PRODUCT IMAGERY; SHIPPING IT IN THE IMAGE WOULD MAKE
+#* EVERY REBUILD RE-PUSH IT. SEE DOCKER.md FOR SEEDING THE VOLUME INSTEAD.
+uploads
+logs
+custom-logs
+
+#* DOCS / TESTS — NOT NEEDED TO RUN THE SERVICE
+docs
+documentations
+claude-doc
+test
+README.md
+Dockerfile
+.dockerignore

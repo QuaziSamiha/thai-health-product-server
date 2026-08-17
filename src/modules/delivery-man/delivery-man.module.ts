@@ -7,9 +7,6 @@ import { PaginationModule } from '../../shared/pagination';
 import { StorageModule } from '../../shared/storage/storage.module';
 
 @Module({
-  //* REUSES UserRepository/ProfileRepository/UserSecurityRepository FROM
-  //* UserModule (NOW EXPORTED THERE) RATHER THAN RE-IMPLEMENTING USER/PROFILE
-  //* CREATION — SEE docs/delivery-man.md "Reuse, Don't Duplicate".
   imports: [UserModule, PaginationModule, StorageModule],
   controllers: [DeliveryManController],
   providers: [DeliveryManService, DeliveryManRepository],

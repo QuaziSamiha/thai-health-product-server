@@ -1,6 +1,25 @@
 # Rate Limiting — Current State, Issues & Remediation Plan
 
-Status: **Not enforced.** `@nestjs/throttler` is installed and configured in both `thai-health-product-server` and `thai-health-product-server-office`, but neither app ever registers the guard that enforces it. Every route in both services is currently unlimited, including `POST /auth/login` and the OTP endpoints.
+Status: **Phase 1 shipped on `thai-health-product-server`. `thai-health-product-server-office` is still unenforced.**
+
+Everything below §2 was written before that pass and describes the pre-fix state; it is kept as-is because it is still an accurate description of the office server, and because §3's defect list is what the fix was checked against. What changed on this server:
+
+| §3 defect | Status |
+|---|---|
+| §3.1 — throttler never enforced (no guard registered) | **Fixed.** `AppThrottlerGuard` registered as `APP_GUARD` in `src/common/throttler/throttler.module.ts` |
+| §3.2 — `ttl: 60` was a 60-**millisecond** window | **Fixed.** Config layer names every window `*_TTL_MS`; tiers are 10s/60s |
+| §3.3 — in-memory storage | **Accepted, documented.** §4.1 answered *single-instance*; `THROTTLE_REDIS_URL` is parsed and warns loudly if set, but is not yet consumed |
+| §3.4 — one uniform limit | **Fixed.** Named `short`/`long` tiers + per-route overrides per §5 |
+| §3.6 — no `ThrottlerException` branch in the filter | **Fixed.** Branch added *ahead* of the generic `HttpException` one, emits `errorCode: 'RATE_LIMIT_EXCEEDED'` |
+| §3.5 / §3.9 — proxy awareness and guard ordering | **Fixed.** `THROTTLE_TRUST_PROXY_HOPS` → `app.set('trust proxy', …)`; throttler runs first, keyed by IP |
+| §3.8 — limits not env-driven | **Partially.** Global tiers and the kill switch are env-driven; the per-route overrides in §5 are code constants — see the deviation note below |
+| §3.7 / §4.7 / §4.8 — per-account lockout, per-OTP attempt cap | **Not done.** Phase 2, untouched |
+| §4.9 — 429 observability | **Not done.** Phase 2, untouched |
+| §3.10 — office server parity | **Not done.** Phase 3 |
+
+**One deliberate deviation from §4.3.** The planned `THROTTLE_AUTH_TTL_MS` / `THROTTLE_AUTH_LIMIT` / `THROTTLE_AUTH_BLOCK_MS` vars were **not** implemented. `@Throttle()` is a decorator, evaluated when the controller file is first imported — during module resolution, before `ConfigModule` has loaded any `.env` file into `process.env`. An env-driven value there would read `undefined` at decoration time and silently fall back to the global tier, i.e. a limit that looks configured while actually being 30-per-10s instead of 3-per-hour. The per-route numbers therefore live in `src/common/throttler/throttler.constants.ts`; the operational escape hatch is `THROTTLE_ENABLED`, which kills the whole limiter.
+
+**One defect this pass introduced and then fixed** — worth recording because it is a trap for anyone adding a tier. `@SkipThrottle()` with no argument defaults to `{ default: true }`: it exempts only a throttler *literally named* `default`, which is what an unnamed `forRoot` throttler gets. The moment §4.2's named `short`/`long` tiers landed, the pre-existing `@SkipThrottle()` on `HealthController` matched nothing and stopped exempting anything — `/health/live` returned `429` under a 35-request burst, which is precisely the "pod killed for the wrong reason" failure that decorator was added to prevent. Fixed by exporting `SKIP_ALL_THROTTLERS` and passing it explicitly. **Adding a new tier means adding it to that constant too.**
 
 This document records *what exists today*, *every defect in it*, and *the target design* — so the fix is a deliberate engineering decision, not a scramble during an incident.
 
@@ -549,18 +568,35 @@ Sequenced so that no step ships a change that is wrong on its own.
 - [ ] Lockout policy: exponential backoff (recommended) vs. hard lock.
 - [ ] Which server first. **Recommendation: `-office`.** It is the admin surface, its blast radius is larger, and its smaller traffic profile makes a misconfigured limit cheaper to discover.
 
-### Phase 1 — Make the limiter real (P0)
+### Phase 1 — Make the limiter real (P0) — **DONE on `thai-health-product-server`**
 
-- [ ] `src/common/throttler/` config module per §4.3; merge schema into `env.validation.ts`.
-- [ ] Convert to `forRootAsync` with named `short`/`long` tiers, **all TTLs in ms** (§3.2).
-- [ ] `AppThrottlerGuard` (§4.5) + `trust proxy` in `main.ts`.
-- [ ] Register `{ provide: APP_GUARD, useClass: AppThrottlerGuard }` — first in the guard order (§3.9).
-- [ ] `ThrottlerException` branch in `GlobalExceptionFilter`, ahead of the generic `HttpException` branch (§4.6).
-- [ ] `@Throttle()` on `login`, `refresh`, `verify-otp`, `create-user` per §5.
-- [ ] Tests 1, 2, 3, 5 from §4.10.
-- [ ] Redis storage **if** Phase 0 said multi-instance.
+- [x] `src/common/throttler/` config module per §4.3; merge schema into `env.validation.ts`. *(minus the `THROTTLE_AUTH_*` vars — see the deviation note at the top)*
+- [x] Convert to `forRootAsync` with named `short`/`long` tiers, **all TTLs in ms** (§3.2).
+- [x] `AppThrottlerGuard` (§4.5) + `trust proxy` in `main.ts`.
+- [x] Register `{ provide: APP_GUARD, useClass: AppThrottlerGuard }` — first in the guard order (§3.9).
+- [x] `ThrottlerException` branch in `GlobalExceptionFilter`, ahead of the generic `HttpException` branch (§4.6).
+- [x] `@Throttle()` on `login`, `refresh`, `verify-otp`, `create-user` per §5 — plus `resend-otp`, which §5 lists under "OTP issuance" and is the other route that costs an outbound email.
+- [x] `@SkipThrottle(SKIP_ALL_THROTTLERS)` on `HealthController` — the bare form silently stopped working under named tiers.
+- [ ] Tests 1, 2, 3, 5 from §4.10. **Not written.** Verified manually against a running server instead (results below); the registration test in particular is one assertion and should still be added.
+- [ ] Redis storage — deferred, Phase 0 answered single-instance.
 
-**Acceptance:** 101 rapid requests to a listing endpoint yield a 429 with `errorCode: 'RATE_LIMIT_EXCEEDED'`; `/health/live` never 429s; a request from a known external IP logs that IP, not the proxy's.
+**Acceptance — verified manually, `.env.development` on :5001:**
+
+| Check | Result |
+|---|---|
+| `POST /user/create-user` x5 | `400 400 400 429 429` — trips on the 4th, as configured |
+| `POST /auth/login` x7 | `400 400 400 400 400 429 429` |
+| `POST /otp/verify-otp` x7 | `400 400 400 400 400 429 429` |
+| `POST /otp/resend-otp` x5 | `400 400 400 429 429` |
+| `POST /auth/refresh` x22 | 20x `400`, then `429 429` |
+| `GET /category/all-active-categories` x33 (global `short` tier) | 30x `200`, then `429 429 429` |
+| `GET /health/live` x40 | 40x `200` — exempt |
+| `blockDuration`: login re-hit 70s after tripping (past the 60s `ttl`) | still `429` — the 15-minute block outlasts the window |
+| 429 envelope | `{"statusCode":429,"success":false,"message":"Too many requests. Please try again later.","error":"Too Many Requests","errorCode":"RATE_LIMIT_EXCEEDED","timestamp":…}` |
+
+Note the `400`s above: guards run ahead of the `ValidationPipe`, so an empty body still consumes budget. That is why the counts could be verified without writing a single row.
+
+**Not verifiable locally:** `trust proxy`. There is no proxy in front of `localhost` — a staging deploy logging `req.ip` for a known external client is the only real test (§7.4).
 
 ### Phase 2 — Business-layer controls (P1)
 

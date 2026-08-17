@@ -185,7 +185,7 @@ None of the four enums below carry inline doc comments in `user.prisma` — only
 | `resetTokenExpires`         | `TIMESTAMPTZ(3)` | NULLABLE                                                                | Same — unused.                                                                                                       |
 | `loginAttempts`             | `INT`            | NOT NULL, DEFAULT `0`                                                   | Incremented on every failed login (`AuthService.validateUser` → `updateLoginAttempts`); reset to `0` on success.       |
 | `lastLoginIp`                | `VARCHAR`        | NULLABLE                                                                | Set from the request IP on successful login, and at registration.                                                    |
-| `assignedIp`                | `VARCHAR`        | NULLABLE                                                                | "For internal/vendor restricted access" per schema comment — but reachable from the **public** registration endpoint with no role gate. See [Known Gaps](#known-gaps--recommended-hardening). |
+| `assignedIp`                | `INET`           | NULLABLE                                                                | "For internal/vendor restricted access" per schema comment. **Admin-set only** — written exclusively by `PATCH /update-user-security/:id`; `CreateUserDto` has no `security` sub-object, so a self-registering caller cannot seed it. See [Update a User's Assigned IP](#update-a-users-assigned-ip). |
 | `userId`                    | `INT`            | FK → `users.id`, UNIQUE, NOT NULL, **ON DELETE CASCADE**, `@map("user_id")` | Owning user.                                                                                                          |
 
 ---
@@ -275,6 +275,7 @@ None of the four enums below carry inline doc comments in `user.prisma` — only
 - **`password` is never returned from a query unless explicitly opted in.** `findUserByEmailWithPassword`/`findUserByIdWithPassword` take an `includePassword` flag that defaults to `false`; every other repository method's `select` omits the column outright. See [Password/Security Handling](#passwordsecurity-handling).
 - **`sid` (not `id`) is the public-facing identifier**, same convention as `ComboProduct.sid` — a native `@db.Uuid` column rather than a string, for index/comparison performance.
 - **`role` is never client-settable at signup.** Every new account is `CUSTOMER` regardless of registration path; only an `ADMIN` can promote via `PATCH /update-user-role/:id`.
+- **Nor is `assignedIp`.** `CreateUserDto` carries no `security` sub-object, so the IP-allowlist value can only be set by an `ADMIN` via `PATCH /update-user-security/:id`. Fields with administrative/security semantics stay off the public registration payload as a rule here — the same rule that keeps `role` and `authProvider`/`providerId` off it.
 
 ---
 
@@ -307,14 +308,20 @@ None of the four enums below carry inline doc comments in `user.prisma` — only
 #### Known Gaps / Recommended Hardening
 
 - ~~No OAuth token verification exists.~~ **Fixed for Google.** `POST /create-user` no longer accepts `authProvider`/`providerId` at all — it's email/password registration only now. OAuth accounts are created exclusively via `POST /auth/social-auth` (`auth.md`'s [Social Login](./auth.md#social-login-google)), which verifies a real Google ID token server-side via `google-auth-library` before trusting any identity claim; `FACEBOOK`/`APPLE` are explicitly rejected rather than silently accepted, since neither has a real provider wired anywhere in the stack. `(authProvider, providerId)` is also now DB-uniqueness-constrained (migration `20260816120000_add_user_oauth_identity_unique`), so even a future bug in the verified path can't produce two rows claiming the same identity.
-- **`CreateUserSecurityDto.assignedIp` is reachable from the public registration endpoint** with no role gate, despite the schema describing `assignedIp` as "for internal/vendor restricted access."
+- ~~`CreateUserSecurityDto.assignedIp` is reachable from the public registration endpoint with no role gate.~~ **Fixed.** `CreateUserSecurityDto` is gone and `CreateUserDto` no longer has a `security` sub-object at all, so `registerUser` cannot write `assignedIp`. The field is now writable only through `PATCH /update-user-security/:id` (`JwtAuthGuard` + `RolesGuard` + `@Roles(ADMIN)`), via the new `UpdateUserSecurityDto`. Same reasoning as the `authProvider`/`providerId` split above: a public, unauthenticated endpoint must never let a caller seed a field with administrative/security semantics, because a self-chosen value sitting in the row from day one defeats any IP restriction later built on it (e.g. after the account is promoted or invited into a restricted role). **Still open:** nothing in the codebase *reads* `assignedIp` yet — it is stored and admin-editable, but no guard or interceptor enforces it as an allowlist.
+- ~~**No rate limiting on `POST /create-user`** — a public, unauthenticated, email-sending endpoint.~~ **Fixed.** The endpoint is now capped at **3 per hour per IP**, and — more to the point — the limiter now *exists*: `@nestjs/throttler` was configured in `app.module.ts` but no `ThrottlerGuard` was ever registered anywhere, so `ThrottlerModule.forRoot()` was inert and every route in the app was unlimited. Its `ttl: 60` was also being read as **60 milliseconds**, not 60 seconds (v5 moved the unit to ms; this app is on v6.5.0), so even a registered guard would have enforced a nonsense window. Both are fixed by `src/common/throttler/`; see [Rate Limiting](#rate-limiting). **Still open, in rough priority order:**
+  - **No per-account lockout.** The limiter is per IP, so an attacker distributing guesses against one account across many IPs defeats it entirely. `UserSecurity.loginAttempts` is still incremented and never read. This is the Phase 2 business layer in `docs/issues/rate-limiting.md` §4.7 and is the control that actually stops credential stuffing — per-IP limiting cannot substitute for it.
+  - **No per-OTP attempt cap.** Same shape: `POST /otp/verify-otp` is capped per IP, but nothing caps guesses against a *specific* issued code (§4.8).
+  - **In-memory storage only.** Correct while single-instance; see the operational notes in [Rate Limiting](#rate-limiting).
+  - **No 429 observability.** Nothing logs or counts throttle events, so there is no signal to alert on and no data to tune the limits with (§4.9). The starting numbers are `docs/issues/rate-limiting.md` §5's proposals, not measurements.
+  - **The office server is untouched.** `thai-health-product-server-office` still has the same inert-throttler configuration this server had (§3.10).
 - **`GET /all-user` has no filters and no sortable-field whitelist.** It binds the bare `PaginationQueryDto` — no `status`/`role` filter, and `sortBy` isn't even a declared field, so `defaultSortField: 'createdAt'` is the only ordering available. Every other admin list module in this codebase (e.g. `combo-product`'s `AllCombosQueryDto`) layers filter/sort DTOs on top of the shared pagination base; `user` does not yet follow that pattern.
-- **`UserSecurityAdminResponseDto` is fully implemented but never used.** The admin queries (`FULL_USER_SELECT_ADMIN`) do fetch `loginAttempts`/`lastLoginIp`/`assignedIp` from the DB, but both `GET /all-user` and `PATCH /update-user-role/:id` wrap the result in `UserResponseDtoWithDetails`, whose `security` field is hardcoded to `new UserSecurityMeResponseDto(...)` — the customer-tier shape. The admin UI never actually receives the extra fields it's paying to query.
+- **`UserSecurityAdminResponseDto` is used by exactly one route.** `PATCH /update-user-security/:id` returns it, but the admin *read* paths still don't: the admin queries (`FULL_USER_SELECT_ADMIN`) do fetch `loginAttempts`/`lastLoginIp`/`assignedIp` from the DB, but both `GET /all-user` and `PATCH /update-user-role/:id` wrap the result in `UserResponseDtoWithDetails`, whose `security` field is hardcoded to `new UserSecurityMeResponseDto(...)` — the customer-tier shape. The admin UI never actually receives the extra fields it's paying to query.
 - **`UserService.getUserById` is dead code** — not called by `UserController` or any other module (`getUserByEmail` and `findForAuth` are the methods actually consumed externally, by `OtpService`/`AuthService`). Looks like a leftover duplicate of `getMyProfile`'s lookup.
-- **`UserSecurityRepository` declares a dead local `SECURITY_SELECT_ADMIN` constant** that duplicates `UserRepository`'s field of the same name and is never referenced in the file.
+- **`UserSecurityRepository.SECURITY_SELECT_ADMIN` still duplicates `UserRepository`'s field of the same name** — no longer dead (`updateAssignedIp` selects with it), but the two copies must be kept in sync by hand.
 - **`UserRepository.findByEmailWithAuth` is fully commented out**, superseded by `findUserByEmailWithPassword`. Worth deleting rather than leaving dead in the file.
 - **`UserSecurity.verificationToken`/`verificationTokenExpires`/`resetToken`/`resetTokenExpires` are declared but unused.** No repository method reads or writes them; password reset/email-verification-by-token appears to have been abandoned in favor of the OTP flow, but the columns were never removed.
-- **Password `@MinLength` message says 8, enforces 6.** Both `CreateUserDto.password` and `UpdatePasswordDto.newPassword` use `@MinLength(6, { message: 'Password must be at least 8 characters long' })` — the validator and its own error message disagree.
+- ~~**Password `@MinLength` message says 8, enforces 6.**~~ **Fixed.** Both `CreateUserDto.password` and `UpdatePasswordDto.newPassword` now read `@MinLength(6, { message: 'Password must be at least 6 characters long' })`, so the message matches the rule actually enforced. The 6-character minimum was kept deliberately — no complexity requirement (letter/number/symbol) has been added yet, and raising the floor is a separate decision.
 - **No self-service profile update endpoint.** A customer can change their password (`PATCH /update-password/:id`) but cannot edit their own `Profile` (name, avatar, bio, DOB, gender) through any route in this module.
 - **No delete route of any kind** — soft or hard — exists on `UserController`, and the schema doesn't declare `deletedAt`/`deletedBy` on `User` to support one yet.
 
@@ -330,13 +337,16 @@ Every endpoint below is served by `UserController` → `UserService` → `UserRe
 
 | Method  | Path                        | Access                          | Purpose                                                                 |
 | :------ | :---------------------------- | :--------------------------------- | :--------------------------------------------------------------------------- |
-| `POST`  | `/create-user`               | Public                             | [Register a new user (email or OAuth)](#register-a-user)                    |
+| `POST`  | `/create-user`               | Public, **rate limited 3/hour/IP** | [Register a new user](#register-a-user)                                     |
 | `GET`   | `/all-user`                  | `ADMIN`                            | [Paginated admin user list](#get-all-users-admin)                           |
 | `GET`   | `/my-profile`                | Authenticated (self)               | [Get the caller's own account + profile + security summary](#get-my-profile) |
 | `PATCH` | `/update-user-role/:id`      | `ADMIN`                            | [Change a user's role](#update-a-users-role)                                |
+| `PATCH` | `/update-user-security/:id`  | `ADMIN`                            | [Set/clear a user's assigned IP](#update-a-users-assigned-ip)               |
 | `PATCH` | `/update-password/:id`       | Authenticated (self **or** `ADMIN`) | [Change a user's password](#update-a-password)                             |
 
-`GET /all-user` and `PATCH /update-user-role/:id` use `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.ADMIN)`. `GET /my-profile` and `PATCH /update-password/:id` use `JwtAuthGuard` only — `update-password`'s self-or-admin check is a manual `if` in the controller, not `RolesGuard`, since any authenticated caller may hit the route but only self or `ADMIN` passes.
+`GET /all-user`, `PATCH /update-user-role/:id`, and `PATCH /update-user-security/:id` use `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.ADMIN)`. `GET /my-profile` and `PATCH /update-password/:id` use `JwtAuthGuard` only — `update-password`'s self-or-admin check is a manual `if` in the controller, not `RolesGuard`, since any authenticated caller may hit the route but only self or `ADMIN` passes.
+
+**Every route above also passes through the global rate limiter** (`AppThrottlerGuard`, registered as an `APP_GUARD` by `src/common/throttler/`). It runs *before* `JwtAuthGuard`, so it buckets by IP on every route including the authenticated ones. All routes get the global `short` (30 per 10s) and `long` (200 per 60s) tiers; `POST /create-user` narrows `short` to **3 per hour**. Exceeding a limit returns `429` with `errorCode: 'RATE_LIMIT_EXCEEDED'` — see [Rate Limiting](#rate-limiting).
 
 ---
 
@@ -363,28 +373,30 @@ Every endpoint below is served by `UserController` → `UserService` → `UserRe
 
 **Purpose**: Create a new `EMAIL` (password-based) account, with its `Profile` and `UserSecurity` rows, and kick off signup-OTP verification. **Email/password only** — see the note below.
 
-**Access**: None — public route.
+**Access**: None — public route. **Rate limited to 3 per hour per IP** (`@Throttle({ short: SIGNUP_THROTTLE })`), the tightest budget in the app — see [Rate Limiting](#rate-limiting) for why this route in particular.
+
+> **This endpoint cannot set `assignedIp` either.** `CreateUserDto` has no `security` sub-object (`CreateUserSecurityDto` was deleted), so the IP-allowlist column is untouched by registration and every new row gets `assignedIp: NULL`. Because the global `ValidationPipe` runs with `forbidNonWhitelisted: true`, a stale client still posting `security` gets a `400` rather than a silent strip. See [Update a User's Assigned IP](#update-a-users-assigned-ip).
 
 > **This endpoint cannot create OAuth accounts.** `CreateUserDto` has no `authProvider`/`providerId` fields, so every row it creates is `authProvider: EMAIL` (the schema default). OAuth accounts (`GOOGLE`) are created exclusively by `POST /auth/social-auth` after verifying a real provider token server-side — see `auth.md`'s [Social Login](./auth.md#social-login-google). This split exists specifically so a public, unauthenticated endpoint can never let a caller self-assert an OAuth identity they don't own; see [Known Gaps](#known-gaps--recommended-hardening).
 
 | Layer      | What happens                                                                                                          |
 | :--------- | :-------------------------------------------------------------------------------------------------------------------- |
-| Controller | `createUser(dto, @Ip())` — no other logic.                                                                            |
-| Service    | `registerUser(dto, ipAddress)` — uniqueness check, password hashing, one transaction spanning `User`/`Profile`/`UserSecurity`/OTP dispatch. |
-| Repository | `findUserByEmail` (uniqueness) → (inside `withTransaction`) `createUser` → `ProfileRepository.createUserProfile` → `UserSecurityRepository.createUserSecurity` → `OtpService.generateAndSendOtp` → `findUserByEmailWithDetails`. |
+| Guard      | `AppThrottlerGuard` (global `APP_GUARD`) — 3 per hour per IP, before anything else runs.                               |
+| Controller | `register(dto, @Ip())` — no other logic.                                                                              |
+| Service    | `registerUser(dto, ipAddress)` — uniqueness check, password hashing, one transaction spanning `User`/`Profile`/`UserSecurity`/OTP row. |
+| Repository | `findUserByEmail` (uniqueness) → (inside `withTransaction`) `createUserWithDetails` → `OtpService.createOtp`. Then, **after commit**, `OtpService.sendOtp`. |
 
 **Business logic — in order:**
 
-1. Destructure `{ profile, security, ...userData }` from the DTO. `password` is a required field on the DTO now (`@IsString`/`@IsNotEmpty`, no `@IsOptional`) — validation rejects a missing password before the service even runs.
+1. Destructure `{ profile, ...userData }` from the DTO. `password` is a required field on the DTO now (`@IsString`/`@IsNotEmpty`, no `@IsOptional`) — validation rejects a missing password before the service even runs.
 2. **Email uniqueness** — `findUserByEmail(email)` → `409` if already registered.
 3. **Password hashing** — `hashService.hash(password)` (bcrypt) — always runs; there's no OAuth branch to skip it anymore.
-4. **Everything below runs inside one transaction**:
-   - `createUser({ ...userData, password: hashed, status: PENDING_VERIFICATION })` — `role` is never taken from the DTO, so it's always the schema default `CUSTOMER`; `authProvider`/`providerId` are never taken from the DTO either, so they fall to the schema defaults (`EMAIL`/`NULL`).
-   - `createUserProfile({ ...profile, userId, name: profile.name || \`${firstName} ${lastName ?? ''}\`.trim() })`.
-   - `createUserSecurity({ userId, isEmailVerified: false, emailVerifiedAt: null, lastLoginIp: ipAddress, assignedIp: security?.assignedIp })`.
-   - `otpService.generateAndSendOtp(email, OTPType.SIGNUP, userId, tx)` — every account created here needs signup verification now, so this is no longer a conditionally-pointless call the way it was when this endpoint could also produce pre-verified OAuth accounts.
-   - Re-fetch the full row via `findUserByEmailWithDetails` — `409` ("Failed to retrieve user after registration") on the practically-impossible miss.
-5. **Response mapping** — `new UserResponseDtoWithDetails(user, baseUrl)`.
+4. **DB writes run inside one transaction** — two queries, not five:
+   - `createUserWithDetails(...)` — a **single nested Prisma `create`** writing `User` + `Profile` + `UserSecurity` at once, selecting back `FULL_USER_SELECT_CUSTOMER`. `role` is never taken from the DTO, so it's always the schema default `CUSTOMER`; `authProvider`/`providerId` are never taken from the DTO either, so they fall to the schema defaults (`EMAIL`/`NULL`). The nested `security.create` sets `isEmailVerified: false`, `emailVerifiedAt: null`, `lastLoginIp: ipAddress` — `assignedIp` is **not** written here; it's admin-only, see [Update a User's Assigned IP](#update-a-users-assigned-ip). `lastLoginIp` is the socket IP from `@Ip()`, not caller-supplied input.
+   - `otpService.createOtp(email, OTPType.SIGNUP, userId, tx)` — persists the OTP **row only**. Every account created here needs signup verification now, so this is no longer a conditionally-pointless call the way it was when this endpoint could also produce pre-verified OAuth accounts.
+   > Was: three separate repository calls (`createUser` → `createUserProfile` → `createUserSecurity`) followed by a fourth query re-fetching the row with `findUserByEmailWithDetails`, plus a `409` guard for the practically-impossible miss. The nested write collapses all four into one round-trip and returns exactly the shape `UserResponseDtoWithDetails` needs, so the re-fetch and its guard are gone. Registration is a spiky endpoint (marketing campaigns), which is why the round-trips were worth removing. The atomicity guarantee is unchanged — it was already one transaction.
+5. **The OTP email is sent *after* the transaction commits** — `otpService.sendOtp` runs outside `withTransaction`, and a send failure is caught and logged rather than thrown. Holding Prisma's interactive transaction open across an SMTP round-trip risks the default 5s timeout and would roll back an otherwise-valid registration over mail-provider latency. The account already exists at that point; the user recovers via `POST /otp/resend-otp`.
+6. **Response mapping** — `new UserResponseDtoWithDetails(user, baseUrl)`.
 
 **Response shape**: `UserResponseDtoWithDetails` (account + nested `profile` + `security` summary; no `password`).
 
@@ -393,6 +405,9 @@ Every endpoint below is served by `UserController` → `UserService` → `UserRe
 | `201`  | User created successfully.                                                                                |
 | `400`  | DTO validation failed (missing/short password, invalid email, etc.).                                      |
 | `409`  | Email already registered.                                                                                 |
+| `429`  | More than 3 signup attempts from this IP within the hour. Body carries `errorCode: 'RATE_LIMIT_EXCEEDED'`. |
+
+> **The `429` is charged before validation.** Guards run ahead of the `ValidationPipe`, so a request that would have failed with a `400` still consumes one of the three. That is deliberate — an attacker spraying malformed payloads costs the server the same connection and parse work as a well-formed one.
 
 ---
 
@@ -492,6 +507,41 @@ Every endpoint below is served by `UserController` → `UserService` → `UserRe
 
 ---
 
+#### Update a User's Assigned IP
+
+**`PATCH /api/v1/user/update-user-security/:id`**
+
+**Purpose**: Set or clear `UserSecurity.assignedIp` — the static IP allowlist value the schema reserves for internal/vendor restricted access. This is the **only** write path for that column.
+
+**Access**: `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.ADMIN)`.
+
+> **Why admin-only.** `assignedIp` carries administrative semantics: it exists to *restrict* access, so a value the account holder chose for themselves is worthless as a control. It used to be reachable from the public `POST /create-user` payload — see the (now-fixed) entry in [Known Gaps](#known-gaps--recommended-hardening) for the full reasoning.
+
+| Layer      | What happens                                                                                          |
+| :--------- | :------------------------------------------------------------------------------------------------------ |
+| Controller | `updateUserSecurity(id, dto)` — `ParseIntPipe` on `id`; guards do the access work.                       |
+| Service    | `updateUserSecurity(id, dto)` — existence check, then delegate, then wrap in `UserSecurityAdminResponseDto`. |
+| Repository | `findUserById(id)` → `UserSecurityRepository.updateAssignedIp(id, dto.assignedIp)` — `upsert` on `userId` with `select: SECURITY_SELECT_ADMIN`. |
+
+**Business logic:**
+
+1. **Existence check** — `findUserById(id)` → `404` if missing.
+2. **`updateAssignedIp(userId, assignedIp)`** — an `upsert`, not an `update`: every user this app creates gets a `UserSecurity` row alongside it, but the upsert keeps an admin from hitting a `P2025` on any imported/legacy row that predates that invariant.
+3. **`UpdateUserSecurityDto`** requires `assignedIp` to be a valid IPv4 (`@IsIP(4)`) **or** explicitly `null` to clear it. `@IsOptional` is deliberately not used — it would also skip `undefined` and turn an empty body into a silent no-op instead of a `400`. The column itself is native `INET`, so Postgres rejects a malformed value even if validation were bypassed.
+4. **Response mapping** — `new UserSecurityAdminResponseDto(updated)`: `isEmailVerified`, `emailVerifiedAt`, `assignedIp`, `lastLoginIp`, `loginAttempts`. Safe to return the admin tier here since only an `ADMIN` can reach the route.
+
+**Response shape**: `UserSecurityAdminResponseDto`.
+
+| Status | Cause                                              |
+| :----- | :---------------------------------------------------- |
+| `200`  | Assigned IP updated successfully.                    |
+| `400`  | `assignedIp` missing, or neither a valid IPv4 nor `null`. |
+| `401`  | Missing/invalid JWT.                                 |
+| `403`  | Authenticated but not `ADMIN`.                       |
+| `404`  | Target user doesn't exist.                           |
+
+---
+
 #### Update a Password
 
 **`PATCH /api/v1/user/update-password/:id`**
@@ -544,6 +594,41 @@ Every endpoint below is served by `UserController` → `UserService` → `UserRe
   - The only two call sites that pass `includePassword: true` are `UserService.findForAuth` (login — `AuthService.validateUser` manually reconstructs a `UserResponseDto` field-by-field, never returning the raw fetched object) and `UserService.updatePassword` (change-password — the hash is used only for `hashService.compare`, and the method returns a freshly re-fetched row via a password-omitting `select`).
   - `UserResponseDto`, `UserResponseDtoWithDetails`, and `UserMinifiedResponseDto` declare **no `password` property at all** — even a raw object with `password` set would never be copied onto `this` by these classes.
   - `UserRepository.updateLastLoginTime` is the one write that runs with no explicit `select` (so its raw Prisma result technically carries `password`) — but that result only ever flows into `new UserResponseDto(user)`, and that class doesn't have a `password` field to copy it into. Filtered at the DTO boundary, not the query boundary.
+
+---
+
+#### Rate Limiting
+
+Enforced app-wide by `AppThrottlerGuard`, registered as an `APP_GUARD` in `src/common/throttler/throttler.module.ts`. Owned by that module, not this one — documented here because `POST /create-user` carries the tightest limit in the codebase and because registration is the abuse vector the limiter was turned on for.
+
+**Why this endpoint is the tight one.** It is public, unauthenticated, and every accepted call costs a real outbound email (the signup OTP) plus a bcrypt hash. Left open it is two things at once: a mail-cost and sender-reputation sink (each distinct email address = one more real send, and bounce/complaint rates on spray traffic are what get a sending domain blocklisted), and a cheap way to burn CPU — repeated submissions of an *already-registered* address still pay for `findUserByEmail` and, before the uniqueness check short-circuits, nothing else, but a spray of *fresh* addresses pays for a bcrypt hash and a transaction each.
+
+| Scope | Tier | Limit | Window | Block | Where |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Every route (default) | `short` | 30 | 10 s | — | `THROTTLE_SHORT_*` |
+| Every route (default) | `long` | 200 | 60 s | — | `THROTTLE_LONG_*` |
+| `POST /user/create-user` | `short` (overridden) | **3** | **1 hour** | — | `SIGNUP_THROTTLE` |
+| `POST /auth/login` | `short` (overridden) | 5 | 1 min | 15 min | `LOGIN_THROTTLE` |
+| `POST /auth/refresh` | `short` (overridden) | 20 | 1 min | — | `REFRESH_THROTTLE` |
+| `POST /otp/verify-otp` | `short` (overridden) | 5 | 5 min | 15 min | `OTP_VERIFY_THROTTLE` |
+| `POST /otp/resend-otp` | `short` (overridden) | 3 | 1 hour | — | `OTP_RESEND_THROTTLE` |
+| `/health/*` | — | exempt | — | — | `@SkipThrottle(SKIP_ALL_THROTTLERS)` |
+
+**How the tiers compose.** `@nestjs/throttler` v6 evaluates every configured throttler on every request and requires *all* of them to pass. A per-route `@Throttle({ short: ... })` overrides only the `short` tier for that handler; `long` stays at its global 200-per-minute setting and can never bind first, because every override above is strictly tighter.
+
+**Behavior on breach.** `429`, with the standard error envelope and a stable `errorCode: 'RATE_LIMIT_EXCEEDED'` the client can branch on (`GlobalExceptionFilter`). The branch sits ahead of the generic `HttpException` one — `ThrottlerException` extends it, so placed after, it would be unreachable and the client would get the library's raw `"ThrottlerException: Too Many Requests"` default, a leaked internal class name in a user-facing string.
+
+**Response headers are tier-suffixed.** With named tiers the guard emits `Retry-After-short` / `X-RateLimit-*-short`, **not** a plain `Retry-After`. A client written against the bare header name will not find it.
+
+**Tracking is per IP, not per user.** `AppThrottlerGuard.getTracker` prefers `user:<id>` and falls back to `ip:<addr>`, but the user branch never fires today: `APP_GUARD`s run before controller-scoped `@UseGuards(JwtAuthGuard)`, so `req.user` is still undefined. That ordering is the deliberate choice — throttling before auth is what protects the JWT-verification and bcrypt paths themselves, and it is the only order under which public routes like `create-user` and `login` get any protection at all.
+
+**Operational notes.**
+
+- `THROTTLE_ENABLED=false` kills the limiter app-wide without a code change (wired through `skipIf`, so the DI graph is identical either way). The module logs a warning at boot when it is off.
+- `THROTTLE_TRUST_PROXY_HOPS` must be set to the real hop count in any environment behind a load balancer, or every caller presents as the proxy's IP and the entire internet shares one bucket. Setting it *higher* than reality is worse: it lets a client spoof `X-Forwarded-For` and mint a fresh bucket per request. Cannot be validated locally.
+- Storage is the in-process default (a `Map` in the Node heap). Counters are per-process and reset on restart, so this is only correct while the app is single-instance — going multi-instance makes the effective limit `limit x instance count` and requires Redis. `THROTTLE_REDIS_URL` is accepted but not yet consumed; the module logs a loud warning if it is set, so it can never silently look like distributed limiting is on.
+
+Full design, rejected alternatives, and the Phase 2/3 backlog: [`docs/issues/rate-limiting.md`](./issues/rate-limiting.md).
 
 ---
 

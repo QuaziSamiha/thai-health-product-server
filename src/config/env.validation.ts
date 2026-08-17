@@ -3,6 +3,7 @@ import { databaseEnvSchema } from '../prisma/config/database.env';
 import { authEnvSchema } from '../modules/auth/config/auth.env';
 import { healthEnvSchema } from '../health/config/health.env';
 import { loggerEnvSchema } from '../shared/logger/config/logger.env';
+import { throttlerEnvSchema } from '../common/throttler/config/throttler.env';
 
 //* APP-SHELL-OWNED FIELDS ONLY — VARS NOT TIED TO ANY SELF-CONTAINED DOMAIN MODULE.
 //* EXPORTED SO app.config.ts CAN VALIDATE AGAINST THIS SLICE DIRECTLY, JUST LIKE EACH
@@ -31,7 +32,8 @@ const envSchema = appEnvSchema
   .merge(databaseEnvSchema)
   .merge(authEnvSchema)
   .merge(healthEnvSchema)
-  .merge(loggerEnvSchema);
+  .merge(loggerEnvSchema)
+  .merge(throttlerEnvSchema);
 
 export type EnvConfig = z.infer<typeof envSchema>;
 

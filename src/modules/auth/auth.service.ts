@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   Logger,
   ServiceUnavailableException,
@@ -28,6 +30,10 @@ export class AuthService {
   private readonly googleClient: OAuth2Client;
 
   constructor(
+    //* forwardRef: UserModule → OtpModule → AuthModule → UserModule IS NOW A
+    //* CYCLE (SEE auth.module.ts), SO THE UserService BINDING IS UNDEFINED AT
+    //* THE TIME THIS CONSTRUCTOR IS EVALUATED WITHOUT A LAZY REFERENCE.
+    @Inject(forwardRef(() => UserService))
     private userService: UserService,
     private jwtService: JwtService,
     private configService: ConfigService,
@@ -107,6 +113,41 @@ export class AuthService {
     };
 
     const tokens = await this.generateTokens(payload);
+    return new TokensResponseDto(tokens);
+  }
+
+  //* ISSUES A SESSION FOR A USER WHOSE IDENTITY HAS *ALREADY* BEEN PROVEN BY
+  //* ANOTHER TRUSTED FLOW — CURRENTLY ONLY OtpService.verifyOtp, WHICH ONLY
+  //* REACHES HERE AFTER MATCHING A HASHED, UNEXPIRED, SINGLE-USE OTP THAT WAS
+  //* EMAILED TO THE ACCOUNT'S OWN ADDRESS. THAT PROOF IS EQUIVALENT TO A
+  //* PASSWORD CHECK, WHICH IS WHY NO CREDENTIAL IS REQUIRED HERE.
+  //*
+  //* NEVER CALL THIS FROM A PATH THAT HASN'T VERIFIED OWNERSHIP OF THE
+  //* ACCOUNT — IT MINTS A FULL ACCESS/REFRESH PAIR FROM NOTHING BUT A userId.
+  async issueTokensForVerifiedUser(
+    userId: number,
+    ip?: string,
+  ): Promise<TokensResponseDto> {
+    const user = await this.userService.getUserById(userId);
+
+    if (
+      user.status === UserStatus.BLOCKED ||
+      user.status === UserStatus.SUSPENDED
+    ) {
+      throw new ForbiddenException(`Account is ${user.status.toLowerCase()}`);
+    }
+    if (user.status !== UserStatus.ACTIVE) {
+      throw new UnauthorizedException('Account is not active');
+    }
+
+    await this.userService.updateLoginSuccess(user.id, ip);
+    await this.userService.updateLastLoginTime(user.id);
+
+    const tokens = await this.generateTokens({
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    });
     return new TokensResponseDto(tokens);
   }
 

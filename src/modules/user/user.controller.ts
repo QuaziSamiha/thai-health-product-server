@@ -17,6 +17,7 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Throttle } from '@nestjs/throttler';
 import { UserService } from './user.service';
 import {
   ApiBadRequestResponse,
@@ -32,6 +33,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UpdateUserSecurityDto } from './dto/update-user-security.dto';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -43,12 +45,21 @@ import {
 } from '../../shared/pagination';
 import { UserResponseDtoWithDetails } from './dto/user-response.dto';
 import { ResponseMessage } from '../../common/decorators/response/response-message.decorator';
+import {
+  SIGNUP_THROTTLE,
+  THROTTLER_SHORT,
+} from '../../common/throttler/throttler.constants';
 
 @ApiTags('Users')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  //* TIGHTLY THROTTLED: THIS IS PUBLIC, UNAUTHENTICATED, AND EVERY ACCEPTED CALL COSTS A
+  //* REAL OUTBOUND EMAIL (THE SIGNUP OTP) PLUS A BCRYPT HASH. LEFT OPEN IT IS BOTH A MAIL
+  //* -COST/SENDER-REPUTATION SINK AND A CHEAP WAY TO BURN CPU. 3 PER HOUR PER IP — SEE
+  //* SIGNUP_THROTTLE AND docs/issues/rate-limiting.md §5.
+  @Throttle({ [THROTTLER_SHORT]: SIGNUP_THROTTLE })
   @Post('create-user')
   @ApiConsumes('application/json')
   @ApiOperation({
@@ -59,6 +70,10 @@ export class UserController {
     description: 'User created successfully',
   })
   @ApiBadRequestResponse({ description: 'Invalid input data' })
+  @ApiResponse({
+    status: 429,
+    description: 'Too many signup attempts from this IP. Limit is 3 per hour.',
+  })
   @ApiBody({ type: CreateUserDto })
   @ResponseMessage('User created successfully')
   async register(@Body() createUserDto: CreateUserDto, @Ip() ip: string) {
@@ -102,7 +117,7 @@ export class UserController {
   @ApiOperation({
     summary: 'Update profile (first name, last name, phone, avatar)',
     description:
-      'Partially updates the caller\'s own profile. Uploading a new avatar replaces the old one. Admins may also update any user\'s profile.',
+      "Partially updates the caller's own profile. Uploading a new avatar replaces the old one. Admins may also update any user's profile.",
   })
   @ApiBody({ type: UpdateProfileDto })
   @ApiResponse({ status: 200, description: 'Profile updated successfully.' })
@@ -144,6 +159,34 @@ export class UserController {
     @Body() updateUserRoleDto: UpdateUserRoleDto,
   ) {
     return this.userService.updateUserRole(id, updateUserRoleDto.role);
+  }
+
+  //* THE ONLY WRITE PATH FOR assignedIp. IT IS AN IP-ALLOWLIST VALUE FOR
+  //* INTERNAL/VENDOR RESTRICTED ACCESS, SO IT IS ADMIN-SET ONLY AND IS NOT
+  //* PART OF THE PUBLIC create-user PAYLOAD — SEE UpdateUserSecurityDto.
+  @Patch('update-user-security/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Update a user's assigned IP (Admin only)",
+    description:
+      'Sets or clears the static IP allowlist value used for internal/vendor restricted access. Send `assignedIp: null` to clear it. Admin-set only — this field is deliberately not accepted during self-registration.',
+  })
+  @ApiBody({ type: UpdateUserSecurityDto })
+  @ApiResponse({
+    status: 200,
+    description: 'User security updated successfully.',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input data.' })
+  @ApiResponse({ status: 403, description: 'Forbidden. Admin role required.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  @ResponseMessage('User security updated successfully')
+  updateUserSecurity(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateUserSecurityDto: UpdateUserSecurityDto,
+  ) {
+    return this.userService.updateUserSecurity(id, updateUserSecurityDto);
   }
 
   @Delete('deactivate-user/:id')

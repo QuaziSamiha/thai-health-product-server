@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
@@ -28,7 +28,11 @@ import { HashModule } from '../../shared/hash/hash.module';
       }),
       inject: [ConfigService],
     }),
-    UserModule,
+    //* forwardRef: OtpModule NOW IMPORTS AuthModule (verifyOtp MINTS A SESSION
+    //* AFTER A SIGNUP CODE IS BURNED), CLOSING THE LOOP
+    //* UserModule → OtpModule → AuthModule → UserModule. WITHOUT THIS, THE
+    //* UserModule BINDING IS STILL undefined WHEN AuthModule IS EVALUATED.
+    forwardRef(() => UserModule),
     PrismaModule,
   ],
   providers: [AuthService, JwtStrategy, JwtAuthGuard, RolesGuard],

@@ -5,6 +5,7 @@ import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
 import { GlobalExceptionFilter } from './common/errors/global-exception.filter';
 import { Request, Response } from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { swaggerMultipartLogoRequestInterceptor } from './common/utils/swagger-multipart-formdata.util';
 import cookieParser from 'cookie-parser';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
@@ -12,12 +13,27 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 async function bootstrap() {
   //* bufferLogs HOLDS FRAMEWORK BOOTSTRAP LOGS (ROUTE MAPPING, MODULE INIT) UNTIL app.useLogger()
   //* ATTACHES WINSTON BELOW, SO EVERY LOG — INCLUDING NEST'S OWN — GOES THROUGH THE SAME PIPELINE
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  //* TYPED AS NestExpressApplication SO app.set('trust proxy', ...) BELOW IS AVAILABLE.
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    bufferLogs: true,
+  });
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('app.port') || 8000;
   const prefix = configService.get<string>('app.apiPrefix') || 'api/v1';
+
+  //* DECIDES WHAT req.ip RESOLVES TO, WHICH IS WHAT THE RATE LIMITER BUCKETS BY.
+  //* 0 (THE DEFAULT) TRUSTS NO PROXY AND USES THE RAW SOCKET IP — CORRECT FOR LOCAL AND
+  //* DIRECT-EXPOSURE RUNS. BEHIND A LOAD BALANCER THIS **MUST** BE SET TO THE REAL HOP
+  //* COUNT VIA THROTTLE_TRUST_PROXY_HOPS, OR EVERY CALLER PRESENTS AS THE PROXY'S IP AND
+  //* THE ENTIRE INTERNET SHARES ONE RATE-LIMIT BUCKET. NOTE THE OTHER FAILURE DIRECTION IS
+  //* WORSE: TRUSTING MORE HOPS THAN EXIST LETS A CLIENT SPOOF X-Forwarded-For AND MINT A
+  //* FRESH BUCKET PER REQUEST. THIS CANNOT BE VALIDATED LOCALLY — THERE IS NO PROXY IN
+  //* FRONT OF localhost. SEE docs/issues/rate-limiting.md §4.5 AND §7.
+  const trustProxyHops =
+    configService.get<number>('throttler.trustProxyHops') ?? 0;
+  app.set('trust proxy', trustProxyHops);
 
   // * Security middleware
   app.enableCors({

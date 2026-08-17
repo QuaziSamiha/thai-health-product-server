@@ -107,13 +107,13 @@ model Profile {
   //* DISCARDED (OVERWRITTEN BY A firstName+lastName CONCATENATION) — REMOVED
   //* IN MIGRATION 20260817120000_drop_profile_name_column RATHER THAN
   //* DOCUMENTED, SINCE THERE WAS NOTHING WORTH KEEPING IN SYNC.
-  avatarUrl String? // One source of truth for the image
+  avatarUrl   String? // One source of truth for the image
   bio         String?   @db.Text
   dateOfBirth DateTime?
   gender      String?   @db.VarChar(20)
-  metadata Json? @default("{}")
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int  @unique @map("user_id")
+  metadata    Json?     @default("{}")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int       @unique @map("user_id")
 
   //* PLAIN BTREE ON (firstName, lastName) REPLACED BY TWO pg_trgm GIN
   //* INDEXES — THE ADMIN USER-SEARCH ENDPOINTS (UserRepository.findAllUsers,
@@ -142,8 +142,13 @@ model UserSecurity {
   //* NATIVE inet (NOT String) — VALIDATES ON WRITE AND KEEPS CIDR/RANGE
   //* QUERIES AVAILABLE FOR FUTURE FRAUD/GEO RULES WITHOUT APP-LAYER PARSING.
   //* CONVERTED IN MIGRATION 20260817140000_ip_fields_to_inet.
-  lastLoginIp String? @db.Inet
-  assignedIp  String? @db.Inet // For internal/vendor restricted access
+  lastLoginIp   String? @db.Inet
+  //* IP ALLOWLIST VALUE FOR INTERNAL/VENDOR RESTRICTED ACCESS. ADMIN-SET ONLY:
+  //* WRITTEN EXCLUSIVELY BY PATCH /user/update-user-security/:id (ADMIN GUARD).
+  //* CreateUserDto DELIBERATELY CARRIES NO `security` SUB-OBJECT, SO A PUBLIC
+  //* SELF-REGISTRATION CANNOT SEED THIS FIELD — A CALLER-CHOSEN VALUE WOULD
+  //* DEFEAT ANY IP RESTRICTION LATER BUILT ON TOP OF IT.
+  assignedIp    String? @db.Inet
 
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @unique @map("user_id")

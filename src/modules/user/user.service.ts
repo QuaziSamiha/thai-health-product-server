@@ -16,6 +16,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { VerifiedSocialProfile } from '../auth/dto/third-partry-auth.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UpdateUserSecurityDto } from './dto/update-user-security.dto';
 import {
   UserResponseDto,
   UserResponseDtoWithDetails,
@@ -24,7 +25,10 @@ import { HashService } from '../../shared/hash/hash.service';
 import { OtpService } from '../otp/otp.service';
 import { OTPType, UserStatus, UserRole } from '../../generated/prisma/enums';
 import { Prisma } from '../../generated/prisma/client';
-import { UserSecurityMeResponseDto } from './dto/user-security-response.dto';
+import {
+  UserSecurityAdminResponseDto,
+  UserSecurityMeResponseDto,
+} from './dto/user-security-response.dto';
 import { PaginationQueryDto, IPaginatedResult } from '../../shared/pagination';
 import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
 import type { IStorageService } from '../../shared/storage/interfaces/storage.interface';
@@ -54,7 +58,7 @@ export class UserService {
     dto: CreateUserDto,
     ipAddress: string,
   ): Promise<UserResponseDtoWithDetails> {
-    const { profile, security, ...userData } = dto;
+    const { profile, ...userData } = dto;
 
     // * RULE 1: Check if user exists
     const existing = await this.userRepo.findUserByEmail(dto.email);
@@ -62,65 +66,188 @@ export class UserService {
 
     const hashedPassword = await this.hashService.hash(userData.password);
 
-    // * RULE 2: Execute Transaction
-    return await this.userRepo.withTransaction(async (tx) => {
-      // * Create User
+    //* RULE 2: EXECUTE TRANSACTION — DB WRITES ONLY. THE OTP EMAIL IS SENT
+    //* AFTER COMMIT (SEE BELOW): HOLDING PRISMA'S INTERACTIVE TRANSACTION
+    //* OPEN ACROSS AN SMTP ROUND-TRIP RISKS THE DEFAULT 5S TIMEOUT AND WOULD
+    //* ROLL BACK AN OTHERWISE-VALID REGISTRATION OVER MAIL-PROVIDER LATENCY.
+    const { fullUser, plainOtp } = await this.userRepo.withTransaction(
+      async (tx) => {
+        //* USER + PROFILE + SECURITY AS ONE NESTED WRITE. THE THREE ROWS USED
+        //* TO BE THREE SEPARATE REPOSITORY CALLS FOLLOWED BY A FOURTH QUERY
+        //* (findUserByEmailWithDetails) TO READ BACK WHAT HAD JUST BEEN
+        //* WRITTEN; A NESTED create WITH THE FULL SELECT COLLAPSES ALL FOUR
+        //* INTO ONE ROUND-TRIP AND RETURNS EXACTLY THE SHAPE
+        //* UserResponseDtoWithDetails NEEDS. REGISTRATION IS A SPIKY ENDPOINT
+        //* (CAMPAIGN TRAFFIC), SO THE SAVED ROUND-TRIPS ARE WORTH IT — THE
+        //* ATOMICITY GUARANTEE IS UNCHANGED, IT WAS ALREADY ONE TRANSACTION.
+        //*
+        //* security.assignedIp IS DELIBERATELY NOT SET HERE — IT IS AN
+        //* ADMIN-ASSIGNED IP ALLOWLIST VALUE AND MUST NOT BE SELF-ASSERTED
+        //* FROM THIS PUBLIC ENDPOINT. SEE UpdateUserSecurityDto. lastLoginIp
+        //* IS THE OBSERVED SOCKET IP FROM @Ip(), NOT CALLER INPUT.
+        const fullUser = await this.userRepo.createUserWithDetails(
+          {
+            ...userData,
+            password: hashedPassword,
+            status: UserStatus.PENDING_VERIFICATION,
+            profile: {
+              create: {
+                ...profile,
+                dateOfBirth: profile.dateOfBirth
+                  ? new Date(profile.dateOfBirth)
+                  : undefined,
+              },
+            },
+            security: {
+              create: {
+                isEmailVerified: false,
+                emailVerifiedAt: null,
+                lastLoginIp: ipAddress,
+              },
+            },
+          },
+          tx,
+        );
+
+        // * Persist the OTP row only — no network I/O inside the transaction.
+        const plainOtp = await this.otpService.createOtp(
+          fullUser.email,
+          OTPType.SIGNUP,
+          fullUser.id,
+          tx,
+        );
+
+        return { fullUser, plainOtp };
+      },
+    );
+
+    //* SENT AFTER COMMIT. THE ACCOUNT IS ALREADY CREATED AT THIS POINT, SO A
+    //* MAIL-PROVIDER FAILURE HERE MUST NOT FAIL REGISTRATION — SWALLOW AND
+    //* LOG. THE USER CAN STILL COMPLETE VERIFICATION VIA OtpService.verifyOtp
+    //* ONCE A RESEND PATH EXISTS / THE PROVIDER RECOVERS.
+    try {
+      await this.otpService.sendOtp(fullUser.email, plainOtp);
+    } catch (error) {
+      this.logger.warn(
+        `Registered ${fullUser.email} but OTP email failed to send: ${error}`,
+      );
+    }
+
+    return new UserResponseDtoWithDetails(
+      fullUser,
+      this.configService.get<string>('app.baseUrl'),
+    );
+  }
+
+  async emailExists(email: string): Promise<boolean> {
+    const existing = await this.userRepo.findUserByEmail(email);
+    return !!existing;
+  }
+
+  //* USED BY OTHER MODULES (E.G. DeliveryManService) TO CREATE AN
+  //* ADMIN-ONBOARDED User + Profile + UserSecurity ROW WITHOUT IMPORTING
+  //* UserRepository/ProfileRepository/UserSecurityRepository DIRECTLY — SEE
+  //* docs/delivery-man.md "Reuse, Don't Duplicate". `onCreated` RUNS INSIDE
+  //* THE SAME TRANSACTION SO A CALLER CAN ATOMICALLY CREATE ITS OWN
+  //* ROLE-SPECIFIC EXTENSION ROW (E.G. DeliveryManProfile) ALONGSIDE THE USER.
+  async createManagedUser(
+    dto: {
+      email: string;
+      phone?: string;
+      role: UserRole;
+      firstName: string;
+      lastName?: string;
+      avatarUrl?: string;
+    },
+    onCreated?: (userId: number, tx: Prisma.TransactionClient) => Promise<void>,
+  ): Promise<number> {
+    const existing = await this.userRepo.findUserByEmail(dto.email);
+    if (existing) throw new ConflictException('Email already registered');
+
+    return this.userRepo.withTransaction(async (tx) => {
       const user = await this.userRepo.createUser(
         {
-          ...userData,
-          password: hashedPassword,
-          status: UserStatus.PENDING_VERIFICATION,
+          email: dto.email,
+          phone: dto.phone,
+          role: dto.role,
+          status: UserStatus.ACTIVE,
+          password: null,
         },
         tx,
       );
 
-      // * Create Profile
       await this.profileRepo.createUserProfile(
         {
-          ...profile,
           userId: user.id,
-          dateOfBirth: profile.dateOfBirth
-            ? new Date(profile.dateOfBirth)
-            : undefined,
+          firstName: dto.firstName,
+          lastName: dto.lastName,
+          name: `${dto.firstName} ${dto.lastName ?? ''}`.trim(),
+          avatarUrl: dto.avatarUrl,
         },
         tx,
       );
 
-      // * Create Security record
       await this.securityRepo.createUserSecurity(
         {
           userId: user.id,
-          isEmailVerified: false,
-          emailVerifiedAt: null,
-          lastLoginIp: ipAddress,
-          assignedIp: security?.assignedIp ?? undefined,
+          isEmailVerified: true,
+          emailVerifiedAt: new Date(),
         },
         tx,
       );
 
-      // * Create and Send OTP
-      await this.otpService.generateAndSendOtp(
-        user.email,
-        OTPType.SIGNUP,
-        user.id,
-        tx,
-      );
-
-      const fullUser = await this.userRepo.findUserByEmailWithDetails(
-        user.email,
-        tx,
-      );
-
-      if (!fullUser) {
-        throw new ConflictException(
-          'Failed to retrieve user after registration',
-        );
+      if (onCreated) {
+        await onCreated(user.id, tx);
       }
 
-      return new UserResponseDtoWithDetails(
-        fullUser,
-        this.configService.get<string>('app.baseUrl'),
-      );
+      return user.id;
+    });
+  }
+
+  //* SAME REUSE PRINCIPLE AS createManagedUser — LETS A CALLER UPDATE
+  //* Profile/User FIELDS INSIDE THE SAME TRANSACTION AS ITS OWN
+  //* ROLE-SPECIFIC EXTENSION WRITE (VIA onUpdated) WITHOUT IMPORTING
+  //* ProfileRepository/UserRepository DIRECTLY.
+  async updateManagedUser(
+    userId: number,
+    data: {
+      firstName?: string;
+      lastName?: string;
+      name?: string;
+      phone?: string;
+      avatarUrl?: string | null;
+    },
+    onUpdated?: (tx: Prisma.TransactionClient) => Promise<void>,
+  ): Promise<void> {
+    const existingUser = await this.userRepo.findUserById(userId);
+    if (!existingUser) {
+      throw new NotFoundException(`User with ID ${userId} not found.`);
+    }
+
+    await this.userRepo.withTransaction(async (tx) => {
+      const profileUpdateData: Prisma.ProfileUpdateInput = {};
+      if (data.firstName !== undefined) {
+        profileUpdateData.firstName = data.firstName;
+      }
+      if (data.lastName !== undefined) {
+        profileUpdateData.lastName = data.lastName;
+      }
+      if (data.name !== undefined) {
+        profileUpdateData.name = data.name;
+      }
+      if (data.avatarUrl !== undefined) {
+        profileUpdateData.avatarUrl = data.avatarUrl;
+      }
+
+      if (Object.keys(profileUpdateData).length > 0) {
+        await this.profileRepo.updateProfile(userId, profileUpdateData, tx);
+      }
+      if (data.phone !== undefined) {
+        await this.userRepo.updateUserPhone(userId, data.phone, tx);
+      }
+      if (onUpdated) {
+        await onUpdated(tx);
+      }
     });
   }
 
@@ -210,6 +337,28 @@ export class UserService {
       updatedUser,
       this.configService.get<string>('app.baseUrl'),
     );
+  }
+
+  //* ADMIN-ONLY (GUARDED AT THE CONTROLLER). THE ONLY WRITE PATH FOR
+  //* assignedIp — THE PUBLIC registerUser PAYLOAD CANNOT REACH IT, SEE
+  //* UpdateUserSecurityDto. RETURNS THE ADMIN TIER (loginAttempts/lastLoginIp/
+  //* assignedIp), WHICH IS SAFE BECAUSE ONLY ADMINS CAN CALL THIS.
+  async updateUserSecurity(
+    userId: number,
+    dto: UpdateUserSecurityDto,
+  ): Promise<UserSecurityAdminResponseDto> {
+    const existingUser = await this.userRepo.findUserById(userId);
+
+    if (!existingUser) {
+      throw new NotFoundException(`User with ID ${userId} not found.`);
+    }
+
+    const updatedSecurity = await this.securityRepo.updateAssignedIp(
+      userId,
+      dto.assignedIp,
+    );
+
+    return new UserSecurityAdminResponseDto(updatedSecurity);
   }
 
   async deactivateUser(userId: number): Promise<UserResponseDtoWithDetails> {

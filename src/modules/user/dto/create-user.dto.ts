@@ -10,7 +10,6 @@ import {
 import { Transform, Type } from 'class-transformer';
 import { CreateProfileDto } from './create-profile.dto';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { CreateUserSecurityDto } from './create-user-security.dto';
 import { IsThaiPhone } from '../../../common/decorators/validation/is-thai-phone.decorator';
 import { TransformThaiPhone } from '../../../common/decorators/transformation/transform-thai-phone.decorator';
 
@@ -18,6 +17,14 @@ import { TransformThaiPhone } from '../../../common/decorators/transformation/tr
 //* providerId FIELDS. THIS ENDPOINT IS PUBLIC AND UNAUTHENTICATED, SO IT
 //* MUST NEVER LET A CALLER SELF-ASSERT AN OAUTH IDENTITY; OAUTH ACCOUNTS ARE
 //* ONLY EVER CREATED VIA AuthService.socialAuth's VERIFIED-TOKEN FLOW.
+//*
+//* FOR THE SAME REASON THERE IS NO `security` SUB-OBJECT HERE: UserSecurity's
+//* assignedIp IS AN ADMIN-ASSIGNED IP ALLOWLIST VALUE FOR INTERNAL/VENDOR
+//* RESTRICTED ACCESS, AND A SELF-REGISTERED VALUE WOULD DEFEAT THAT CONTROL
+//* THE MOMENT ANYTHING CONSULTS IT. IT IS SET ONLY THROUGH THE ADMIN-GUARDED
+//* PATCH /user/update-user-security/:id — SEE UpdateUserSecurityDto. THE
+//* GLOBAL ValidationPipe RUNS WITH forbidNonWhitelisted, SO A LEGACY CLIENT
+//* STILL POSTING `security` GETS A LOUD 400 RATHER THAN A SILENT STRIP.
 export class CreateUserDto {
   @ApiProperty({
     description: 'The email address of the user',
@@ -40,7 +47,7 @@ export class CreateUserDto {
   })
   @IsString()
   @IsNotEmpty()
-  @MinLength(6, { message: 'Password must be at least 8 characters long' })
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
   @MaxLength(255, { message: 'Password must be at most 255 characters long' })
   password!: string;
 
@@ -64,10 +71,4 @@ export class CreateUserDto {
   @ValidateNested()
   @Type(() => CreateProfileDto)
   profile!: CreateProfileDto;
-
-  @ApiPropertyOptional({ description: 'User security information' })
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => CreateUserSecurityDto)
-  security?: CreateUserSecurityDto;
 }

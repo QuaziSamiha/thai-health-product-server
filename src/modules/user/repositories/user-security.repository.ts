@@ -33,6 +33,25 @@ export class UserSecurityRepository extends BaseRepository {
     });
   }
 
+  //* ADMIN-ONLY PATH (SEE UserService.updateUserSecurity). UPSERT RATHER THAN
+  //* UPDATE: EVERY USER THIS APP CREATES GETS A UserSecurity ROW ALONGSIDE IT,
+  //* BUT AN UPSERT KEEPS AN ADMIN FROM HITTING A P2025 ON ANY IMPORTED/LEGACY
+  //* ROW THAT PREDATES THAT INVARIANT. RETURNS THE ADMIN TIER BECAUSE ONLY
+  //* ADMINS CAN REACH IT.
+  async updateAssignedIp(
+    userId: number,
+    assignedIp: string | null,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return client.userSecurity.upsert({
+      where: { userId },
+      update: { assignedIp },
+      create: { userId, assignedIp },
+      select: this.SECURITY_SELECT_ADMIN,
+    });
+  }
+
   async updateEmailVerification(
     userId: number,
     isVerified: boolean,

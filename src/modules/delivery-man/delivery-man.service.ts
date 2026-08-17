@@ -7,9 +7,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DeliveryManRepository } from './repositories/delivery-man.repository';
-import { UserRepository } from '../user/repositories/user.repository';
-import { ProfileRepository } from '../user/repositories/profile.repository';
-import { UserSecurityRepository } from '../user/repositories/user-security.repository';
+import { UserService } from '../user/user.service';
 import { CreateDeliveryManDto } from './dto/create-delivery-man.dto';
 import { UpdateDeliveryManDto } from './dto/update-delivery-man.dto';
 import { DeliveryManResponseDto } from './dto/delivery-man-response.dto';
@@ -17,7 +15,6 @@ import {
   NidVerificationStatus,
   Prisma,
   UserRole,
-  UserStatus,
 } from '../../generated/prisma/client';
 import { PaginationQueryDto, IPaginatedResult } from '../../shared/pagination';
 import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
@@ -32,9 +29,7 @@ export class DeliveryManService {
 
   constructor(
     private readonly deliveryManRepo: DeliveryManRepository,
-    private readonly userRepo: UserRepository,
-    private readonly profileRepo: ProfileRepository,
-    private readonly securityRepo: UserSecurityRepository,
+    private readonly userService: UserService,
     private readonly configService: ConfigService,
     @Inject(STORAGE_SERVICE_TOKEN)
     private readonly storageService: IStorageService,
@@ -55,8 +50,7 @@ export class DeliveryManService {
     avatarFile?: Express.Multer.File,
     nidDocumentFile?: Express.Multer.File,
   ): Promise<DeliveryManResponseDto> {
-    const existing = await this.userRepo.findUserByEmail(dto.email);
-    if (existing) {
+    if (await this.userService.emailExists(dto.email)) {
       throw new ConflictException('Email already registered');
     }
 
@@ -79,55 +73,32 @@ export class DeliveryManService {
         nidDocumentUrl = saved.path;
       }
 
-      const userId = await this.userRepo.withTransaction(async (tx) => {
-        const user = await this.userRepo.createUser(
-          {
-            email: dto.email,
-            phone: dto.phone,
-            role: UserRole.DELIVERY_PARTNER,
-            status: UserStatus.ACTIVE,
-            password: null,
-          },
-          tx,
-        );
-
-        await this.profileRepo.createUserProfile(
-          {
-            userId: user.id,
-            firstName: dto.firstName,
-            lastName: dto.lastName,
-            name: `${dto.firstName} ${dto.lastName ?? ''}`.trim(),
-            avatarUrl,
-          },
-          tx,
-        );
-
-        await this.securityRepo.createUserSecurity(
-          {
-            userId: user.id,
-            isEmailVerified: true,
-            emailVerifiedAt: new Date(),
-          },
-          tx,
-        );
-
-        await this.deliveryManRepo.createDeliveryManProfile(
-          {
-            userId: user.id,
-            nidNumber: dto.nidNumber,
-            nidDocumentUrl,
-            vehicleType: dto.vehicleType,
-            vehicleRegistrationNo: dto.vehicleRegistrationNo,
-            drivingLicenseNo: dto.drivingLicenseNo,
-            coverageArea: dto.coverageArea,
-            employmentType: dto.employmentType,
-            joinedAt: dto.joinedAt ? new Date(dto.joinedAt) : undefined,
-          },
-          tx,
-        );
-
-        return user.id;
-      });
+      const userId = await this.userService.createManagedUser(
+        {
+          email: dto.email,
+          phone: dto.phone,
+          role: UserRole.DELIVERY_PARTNER,
+          firstName: dto.firstName,
+          lastName: dto.lastName,
+          avatarUrl,
+        },
+        async (createdUserId, tx) => {
+          await this.deliveryManRepo.createDeliveryManProfile(
+            {
+              userId: createdUserId,
+              nidNumber: dto.nidNumber,
+              nidDocumentUrl,
+              vehicleType: dto.vehicleType,
+              vehicleRegistrationNo: dto.vehicleRegistrationNo,
+              drivingLicenseNo: dto.drivingLicenseNo,
+              coverageArea: dto.coverageArea,
+              employmentType: dto.employmentType,
+              joinedAt: dto.joinedAt ? new Date(dto.joinedAt) : undefined,
+            },
+            tx,
+          );
+        },
+      );
 
       const created = await this.deliveryManRepo.findByUserId(userId);
       if (!created) {
@@ -190,7 +161,12 @@ export class DeliveryManService {
       throw new NotFoundException(`Delivery man with ID ${userId} not found.`);
     }
 
-    const profileUpdateData: Prisma.ProfileUpdateInput = {};
+    const profileUpdateData: {
+      firstName?: string;
+      lastName?: string;
+      name?: string;
+      avatarUrl?: string | null;
+    } = {};
     if (dto.firstName !== undefined) profileUpdateData.firstName = dto.firstName;
     if (dto.lastName !== undefined) profileUpdateData.lastName = dto.lastName;
     if (dto.firstName !== undefined || dto.lastName !== undefined) {
@@ -248,21 +224,22 @@ export class DeliveryManService {
       }
     }
 
-    await this.userRepo.withTransaction(async (tx) => {
-      if (Object.keys(profileUpdateData).length > 0) {
-        await this.profileRepo.updateProfile(userId, profileUpdateData, tx);
-      }
-      if (dto.phone !== undefined) {
-        await this.userRepo.updateUserPhone(userId, dto.phone, tx);
-      }
-      if (Object.keys(deliveryManUpdateData).length > 0) {
-        await this.deliveryManRepo.updateDeliveryManProfile(
-          userId,
-          deliveryManUpdateData,
-          tx,
-        );
-      }
-    });
+    await this.userService.updateManagedUser(
+      userId,
+      {
+        ...profileUpdateData,
+        phone: dto.phone,
+      },
+      async (tx) => {
+        if (Object.keys(deliveryManUpdateData).length > 0) {
+          await this.deliveryManRepo.updateDeliveryManProfile(
+            userId,
+            deliveryManUpdateData,
+            tx,
+          );
+        }
+      },
+    );
 
     if (oldAvatarFilename) {
       await this.storageService

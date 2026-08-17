@@ -94,6 +94,24 @@ export class UserRepository extends BaseRepository {
     return await client.user.create({ data, select: this.USER_SELECT });
   }
 
+  //* SAME CREATE AS ABOVE BUT RETURNS THE FULL CUSTOMER-TIER SHAPE, SO A
+  //* CALLER PASSING NESTED `profile.create` / `security.create` GETS THE WHOLE
+  //* AGGREGATE BACK FROM THE ONE STATEMENT INSTEAD OF WRITING THE THREE ROWS
+  //* SEPARATELY AND THEN RE-READING THEM WITH findUserByEmailWithDetails.
+  //* SEE UserService.registerUser. SECURITY TIER IS DELIBERATELY THE CUSTOMER
+  //* ONE (NO assignedIp/loginAttempts/lastLoginIp) — THIS FEEDS THE PUBLIC
+  //* REGISTRATION RESPONSE.
+  async createUserWithDetails(
+    data: Prisma.UserCreateInput,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return await client.user.create({
+      data,
+      select: this.FULL_USER_SELECT_CUSTOMER,
+    });
+  }
+
   //* email IS ONLY UNIQUE AMONG NON-DELETED ROWS (SEE User.email COMMENT IN
   //* SCHEMA) — MUST USE findFirst + deletedAt: null, NOT findUnique, OR AN
   //* ARCHIVED ROW SHARING THE EMAIL COULD BE MATCHED NON-DETERMINISTICALLY.

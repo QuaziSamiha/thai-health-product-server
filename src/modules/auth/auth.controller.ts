@@ -20,6 +20,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
 import { LoginDto } from './dto/login.dto';
@@ -28,6 +29,11 @@ import type { Request, Response } from 'express';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { SocialAuthDto } from './dto/third-partry-auth.dto';
 import { ResponseMessage } from '../../common/decorators/response/response-message.decorator';
+import {
+  LOGIN_THROTTLE,
+  REFRESH_THROTTLE,
+  THROTTLER_SHORT,
+} from '../../common/throttler/throttler.constants';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -38,6 +44,14 @@ export class AuthController {
   ) {}
   private readonly logger = new Logger(AuthController.name);
 
+  //* THE MOST ATTACKED ROUTE IN THE APP AND THE MOST EXPENSIVE ONE TO CALL — EVERY ATTEMPT
+  //* COSTS A BCRYPT COMPARE. 5 PER MINUTE PER IP, THEN A 15-MINUTE BLOCK; blockDuration IS
+  //* WHAT MAKES THE PENALTY OUTLAST THE WINDOW SO AN ATTACKER CAN'T JUST WAIT OUT ONE ttl
+  //* AND RESUME AT FULL RATE. THIS IS THE PER-IP LAYER ONLY — PER-ACCOUNT LOCKOUT, WHICH IS
+  //* WHAT ACTUALLY STOPS CREDENTIAL STUFFING SPREAD ACROSS MANY IPs, IS PHASE 2 AND NOT
+  //* IMPLEMENTED YET (UserSecurity.loginAttempts IS STILL WRITE-ONLY). SEE §4.7 OF
+  //* docs/issues/rate-limiting.md.
+  @Throttle({ [THROTTLER_SHORT]: LOGIN_THROTTLE })
   @Post('login')
   @ApiOperation({
     summary: 'User login',
@@ -113,6 +127,10 @@ export class AuthController {
     };
   }
 
+  //* LEGITIMATE CLIENTS REFRESH RARELY — A BURST HERE IS A TOKEN-REPLAY LOOP, NOT A USER.
+  //* NO blockDuration: A BUGGY-BUT-HONEST CLIENT STUCK IN A REFRESH LOOP SHOULD RECOVER ON
+  //* ITS OWN ONCE THE WINDOW ROLLS, NOT GET ITS SESSION HARD-KILLED FOR 15 MINUTES.
+  @Throttle({ [THROTTLER_SHORT]: REFRESH_THROTTLE })
   @Post('refresh')
   @ApiOperation({
     summary: 'Refresh access token',

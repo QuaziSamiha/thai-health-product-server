@@ -9,11 +9,14 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OtpRepository } from './otp.repository';
-import { OTPType } from '../../generated/prisma/enums';
+import { OTPType, UserStatus } from '../../generated/prisma/enums';
 import { HashService } from '../../shared/hash/hash.service';
 import * as crypto from 'crypto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
+import { ResendOtpDto } from './dto/resend-otp.dto';
 import { UserService } from '../user/user.service';
+import { AuthService } from '../auth/auth.service';
+import { TokensResponseDto } from '../auth/dto/token-response.dto';
 import { VerifyOtpResponseDto } from './dto/verify-otp-response.dto';
 import { Prisma } from '../../generated/prisma/client';
 import { MailService } from '../mail/mail.service';
@@ -22,6 +25,10 @@ import { MailService } from '../mail/mail.service';
 export class OtpService {
   private readonly logger = new Logger(OtpService.name);
 
+  //* MINIMUM GAP BETWEEN TWO OTPS FOR THE SAME identifier+type — STOPS
+  //* resendOtp FROM BEING USED TO SPAM AN INBOX / HAMMER THE MAIL PROVIDER.
+  private readonly RESEND_COOLDOWN_SECONDS = 60;
+
   constructor(
     private readonly otpRepo: OtpRepository,
     private readonly mailService: MailService,
@@ -29,15 +36,20 @@ export class OtpService {
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly hashService: HashService,
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
   ) {}
 
-  // * Generates a secure 6-digit OTP, hashes it for the DB, and sends the plain code via email.
-  async generateAndSendOtp(
+  //* DB-ONLY HALF OF OTP ISSUANCE — SAFE TO CALL INSIDE AN INTERACTIVE
+  //* TRANSACTION (tx) SINCE IT NEVER PERFORMS NETWORK I/O. CALLERS THAT ALSO
+  //* NEED THE EMAIL SENT MUST CALL sendOtp() SEPARATELY, AFTER THEIR
+  //* TRANSACTION COMMITS — SEE generateAndSendOtp's COMMENT FOR WHY.
+  async createOtp(
     identifier: string,
     type: OTPType,
     userId?: number,
     tx?: Prisma.TransactionClient,
-  ) {
+  ): Promise<string> {
     try {
       // * Generate a cryptographically secure 6-digit number (100000 - 999999)
       const plainOtp = crypto.randomInt(100000, 999999).toString();
@@ -63,26 +75,83 @@ export class OtpService {
         tx,
       );
 
-      // * Send the plain code to the user's email.
-      // In development, we allow console-only OTP flow as a fallback.
-      const isMailSent = await this.mailService.sendOtpEmail(
-        identifier,
-        plainOtp,
-      );
-      const isDev =
-        this.configService.get<string>('NODE_ENV') === 'development';
-      if (!isMailSent && !isDev) {
-        throw new InternalServerErrorException('Failed to send OTP email');
-      }
-
-      return new VerifyOtpResponseDto({
-        success: true,
-        message: `OTP sent to ${identifier}`,
-      });
+      return plainOtp;
     } catch (error) {
       this.logger.error('OTP Generation Error', error);
       throw new InternalServerErrorException('Failed to process OTP request');
     }
+  }
+
+  //* NETWORK-ONLY HALF OF OTP ISSUANCE. NEVER CALL THIS FROM INSIDE A DB
+  //* TRANSACTION — PRISMA'S INTERACTIVE $transaction HAS A DEFAULT 5S TIMEOUT,
+  //* AND HOLDING IT OPEN ACROSS AN SMTP ROUND-TRIP MEANS ANY MAIL-PROVIDER
+  //* LATENCY SPIKE THROWS P2028 AND ROLLS BACK AN OTHERWISE-VALID DB WRITE.
+  async sendOtp(identifier: string, plainOtp: string) {
+    // In development, we allow console-only OTP flow as a fallback.
+    const isMailSent = await this.mailService.sendOtpEmail(
+      identifier,
+      plainOtp,
+    );
+    const isDev =
+      this.configService.get<string>('NODE_ENV') === 'development';
+    if (!isMailSent && !isDev) {
+      throw new InternalServerErrorException('Failed to send OTP email');
+    }
+
+    return new VerifyOtpResponseDto({
+      success: true,
+      message: `OTP sent to ${identifier}`,
+    });
+  }
+
+  //* CONVENIENCE WRAPPER FOR CALLERS THAT ARE NOT ALREADY INSIDE A DB
+  //* TRANSACTION. A CALLER THAT NEEDS TO SAVE THE OTP AS PART OF ITS OWN
+  //* TRANSACTION (E.G. UserService.registerUser) MUST NOT USE THIS — CALL
+  //* createOtp(..., tx) INSIDE THE TRANSACTION, THEN sendOtp() AFTER IT
+  //* COMMITS, SO EMAIL LATENCY CAN NEVER ROLL BACK THE DB WRITE.
+  async generateAndSendOtp(
+    identifier: string,
+    type: OTPType,
+    userId?: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const plainOtp = await this.createOtp(identifier, type, userId, tx);
+    return this.sendOtp(identifier, plainOtp);
+  }
+
+  //* SELF-SERVE RECOVERY PATH FOR THE POST-COMMIT SEND IN
+  //* UserService.registerUser (AND ANY OTHER createOtp/sendOtp CALLER):
+  //* IF THE FIRST EMAIL NEVER ARRIVES (PROVIDER HICCUP, SPAM FOLDER), THE
+  //* ACCOUNT/OTP ROW ALREADY EXISTS — THIS JUST ISSUES A FRESH CODE RATHER
+  //* THAN MAKING THE USER RE-REGISTER.
+  async resendOtp(dto: ResendOtpDto): Promise<VerifyOtpResponseDto> {
+    const { identifier, type } = dto;
+
+    // * Throws NotFoundException if no account exists for this identifier.
+    const user = await this.userService.getUserByEmail(identifier);
+
+    if (type === OTPType.SIGNUP && user.status !== UserStatus.PENDING_VERIFICATION) {
+      throw new BadRequestException(
+        'This account is already verified. No need to resend an OTP.',
+      );
+    }
+
+    const latestOtp = await this.otpRepo.findLatestValidOtp(identifier, type);
+    if (latestOtp) {
+      const elapsedSeconds =
+        (Date.now() - latestOtp.createdAt.getTime()) / 1000;
+      if (elapsedSeconds < this.RESEND_COOLDOWN_SECONDS) {
+        const waitSeconds = Math.ceil(
+          this.RESEND_COOLDOWN_SECONDS - elapsedSeconds,
+        );
+        throw new BadRequestException(
+          `Please wait ${waitSeconds}s before requesting another OTP.`,
+        );
+      }
+    }
+
+    const plainOtp = await this.createOtp(identifier, type, user.id);
+    return this.sendOtp(identifier, plainOtp);
   }
 
   async verifyOtp(dto: VerifyOtpDto) {
@@ -124,10 +193,26 @@ export class OtpService {
       }
     });
 
+    //* SIGNUP ONLY: HAND BACK A REAL SESSION SO THE USER LANDS LOGGED IN
+    //* INSTEAD OF BEING BOUNCED TO A SIGN-IN FORM SECONDS AFTER PROVING THEY
+    //* OWN THE ADDRESS. THE BURNED OTP ABOVE IS THE OWNERSHIP PROOF — SEE
+    //* AuthService.issueTokensForVerifiedUser. ISSUED AFTER THE TRANSACTION
+    //* COMMITS BECAUSE activateUser's ACTIVE STATUS MUST BE VISIBLE TO THE
+    //* STATUS CHECK INSIDE IT.
+    //*
+    //* DELIBERATELY NOT DONE FOR PASSWORD_RESET/LOGIN_2FA/PHONE_CHANGE —
+    //* THOSE HAVE THEIR OWN FOLLOW-UP STEPS AND MUST NOT SILENTLY MINT A
+    //* SESSION AS A SIDE EFFECT OF CODE ENTRY.
+    let tokens: TokensResponseDto | undefined;
+    if (type === OTPType.SIGNUP) {
+      tokens = await this.authService.issueTokensForVerifiedUser(user.id);
+    }
+
     return new VerifyOtpResponseDto({
       success: true,
       userId: otpRecord.userId ?? undefined,
       message: 'OTP verified successfully',
+      data: tokens,
     });
   }
 }

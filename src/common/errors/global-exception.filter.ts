@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ValidationError } from 'class-validator';
+import { ThrottlerException } from '@nestjs/throttler';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import { Prisma } from '../../generated/prisma/client';
 import { formatValidationErrors } from '../utils/validation.util';
@@ -112,6 +113,18 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         message = (validationErrors.message as string) || 'Validation failed';
         error = 'Bad Request';
       }
+    } else if (exception instanceof ThrottlerException) {
+      //* ORDER IS LOAD-BEARING FOR THE SAME REASON AS TokenExpiredError ABOVE:
+      //* ThrottlerException EXTENDS HttpException, SO PLACED AFTER THE GENERIC BRANCH THIS
+      //* WOULD BE UNREACHABLE AND THE CLIENT WOULD GET THE LIBRARY'S RAW DEFAULT MESSAGE,
+      //* "ThrottlerException: Too Many Requests" — A LEAKED INTERNAL CLASS NAME IN A
+      //* USER-FACING, UNTRANSLATABLE STRING. SEE docs/issues/rate-limiting.md §3.6.
+      //* THE GUARD HAS ALREADY SET Retry-After AND THE X-RateLimit-* HEADERS ON THE
+      //* RESPONSE BY THIS POINT; response.status().json() BELOW KEEPS THEM.
+      statusCode = HttpStatus.TOO_MANY_REQUESTS;
+      message = 'Too many requests. Please try again later.';
+      error = 'Too Many Requests';
+      errorCode = 'RATE_LIMIT_EXCEEDED';
     } else if (exception instanceof HttpException) {
       //* GENERIC FALLBACK FOR EVERY HttpException SUBCLASS (BUILT-IN OR CUSTOM) —
       //* COVERS ANY CURRENT OR FUTURE EXCEPTION WITHOUT NEEDING ITS OWN NAMED BRANCH HERE

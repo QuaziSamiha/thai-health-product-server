@@ -16,10 +16,16 @@ import {
 } from '@nestjs/terminus';
 import { DatabaseHealthIndicator } from './indicators/database.health';
 import { HealthResponseDto } from './dto/health-response.dto';
+import { SKIP_ALL_THROTTLERS } from '../common/throttler/throttler.constants';
 
-//* PROBES ARE HIT BY ORCHESTRATORS/LOAD BALANCERS EVERY FEW SECONDS — IF A GLOBAL THROTTLER GUARD
-//* IS EVER ADDED TO THIS APP, IT MUST NOT BE ABLE TO 429 THESE ROUTES AND GET THE POD KILLED FOR THE WRONG REASON
-@SkipThrottle()
+//* PROBES ARE HIT BY ORCHESTRATORS/LOAD BALANCERS EVERY FEW SECONDS — THE GLOBAL THROTTLER GUARD
+//* (AppThrottlerModule) MUST NOT BE ABLE TO 429 THESE ROUTES AND GET THE POD KILLED FOR THE WRONG REASON
+//*
+//* MUST PASS SKIP_ALL_THROTTLERS EXPLICITLY. A BARE @SkipThrottle() DEFAULTS TO
+//* { default: true } AND SKIPS ONLY A THROTTLER NAMED "default" — WITH THE NAMED short/long
+//* TIERS THAT IS NO TIER AT ALL, AND THIS CONTROLLER *DID* START RETURNING 429 UNDER A
+//* 35-REQUEST BURST BEFORE THIS ARGUMENT WAS ADDED. SEE throttler.constants.ts.
+@SkipThrottle(SKIP_ALL_THROTTLERS)
 @ApiTags('Health')
 @Controller('health')
 export class HealthController {
