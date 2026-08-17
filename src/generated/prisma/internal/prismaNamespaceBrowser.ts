@@ -82,7 +82,6 @@ export const ModelName = {
   User: 'User',
   Profile: 'Profile',
   UserSecurity: 'UserSecurity',
-  Session: 'Session',
   OTP: 'OTP'
 } as const
 
@@ -765,19 +764,6 @@ export const UserSecurityScalarFieldEnum = {
 } as const
 
 export type UserSecurityScalarFieldEnum = (typeof UserSecurityScalarFieldEnum)[keyof typeof UserSecurityScalarFieldEnum]
-
-
-export const SessionScalarFieldEnum = {
-  id: 'id',
-  refreshToken: 'refreshToken',
-  refreshTokenExpiresAt: 'refreshTokenExpiresAt',
-  createdAt: 'createdAt',
-  userAgent: 'userAgent',
-  ipAddress: 'ipAddress',
-  userId: 'userId'
-} as const
-
-export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
 
 
 export const OTPScalarFieldEnum = {

@@ -33,7 +33,7 @@ export const AUDIT_LOG_SELECT = {
       email: true,
       role: true,
       status: true,
-      profile: { select: { name: true } },
+      profile: { select: { firstName: true, lastName: true } },
     },
   },
 } satisfies Prisma.AuditLogSelect;

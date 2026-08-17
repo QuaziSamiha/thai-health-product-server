@@ -224,7 +224,6 @@ Two infrastructure pitfalls block tests that touch `PrismaService`, both already
 
 ## Known scaffolding — don't assume these are bugs
 
-- `src/modules/session/session.repository.ts` and `session.service.ts` are empty stubs (`@Injectable() export class SessionService {}`) — `Session` exists in the schema but has no working implementation yet.
 - `Product`, `ProductVariant`, `ProductImage`, and `Inventory` have schema models (`product.prisma`, `inventory.prisma`) but **no `src/modules` directory at all** — no repository, service, or controller exists for them yet.
 
 ---

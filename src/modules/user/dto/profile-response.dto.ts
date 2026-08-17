@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ProfileModel } from '../../../generated/prisma/models';
+import { formatDisplayName } from '../../../common/utils/display-name.util';
 
 export class ProfileResponseDto {
   @ApiProperty({ description: 'First name', example: 'John' })
@@ -8,7 +9,10 @@ export class ProfileResponseDto {
   @ApiPropertyOptional({ description: 'Last name', example: 'Doe' })
   lastName?: string;
 
-  @ApiPropertyOptional({ description: 'Full name', example: 'John Doe' })
+  @ApiPropertyOptional({
+    description: 'Full name, derived from firstName + lastName',
+    example: 'John Doe',
+  })
   name?: string;
 
   @ApiPropertyOptional({ description: 'Profile image URL' })
@@ -29,7 +33,7 @@ export class ProfileResponseDto {
   constructor(profile: Partial<ProfileModel>, baseUrl?: string) {
     this.firstName = profile.firstName!;
     this.lastName = profile.lastName ?? undefined;
-    this.name = profile.name ?? undefined;
+    this.name = formatDisplayName(profile);
     this.avatarUrl = profile.avatarUrl
       ? profile.avatarUrl.startsWith('http')
         ? profile.avatarUrl

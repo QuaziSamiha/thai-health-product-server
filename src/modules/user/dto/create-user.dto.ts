@@ -7,7 +7,7 @@ import {
   ValidateNested,
   MaxLength,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { CreateProfileDto } from './create-profile.dto';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { CreateUserSecurityDto } from './create-user-security.dto';
@@ -26,6 +26,11 @@ export class CreateUserDto {
   @IsEmail()
   @IsNotEmpty()
   @MaxLength(100, { message: 'Email must be at most 100 characters long' })
+  //* CASE-INSENSITIVE UNIQUENESS IS ENFORCED BY ALWAYS STORING/COMPARING
+  //* LOWERCASE — SEE UserRepository's email LOOKUPS.
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.toLowerCase().trim() : value,
+  )
   email!: string;
   // @IsUnique(['User', 'email'])
 

@@ -5,6 +5,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginDto {
@@ -15,6 +16,11 @@ export class LoginDto {
   @IsEmail()
   @IsNotEmpty()
   @MaxLength(100, { message: 'Email must be at most 100 characters long' })
+  //* NORMALIZED THE SAME WAY AS CreateUserDto.email SO A DIFFERENTLY-CASED
+  //* LOGIN ATTEMPT STILL MATCHES THE STORED (LOWERCASE) ROW.
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.toLowerCase().trim() : value,
+  )
   email!: string;
 
   @ApiProperty({

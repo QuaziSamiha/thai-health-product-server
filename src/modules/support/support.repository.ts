@@ -44,7 +44,7 @@ export class SupportRepository extends BaseRepository {
         status: true,
         role: true,
         profile: {
-          select: { name: true },
+          select: { firstName: true, lastName: true },
         },
       },
     },
@@ -55,7 +55,7 @@ export class SupportRepository extends BaseRepository {
         status: true,
         role: true,
         profile: {
-          select: { name: true },
+          select: { firstName: true, lastName: true },
         },
       },
     },

@@ -4,6 +4,7 @@ import { BlogStatus } from '../../../generated/prisma/browser';
 import { BlogModel } from '../../../generated/prisma/models';
 import { UserMinifiedResponseDto } from '../../user/dto/user-response.dto';
 import type { MinifiedUser } from '../../user/dto/user-response.dto';
+import { formatDisplayName } from '../../../common/utils/display-name.util';
 
 export class BlogResponseDto {
   @Expose()
@@ -232,6 +233,6 @@ export class BlogResponsePublicDto {
     this.metaTitle = blog.metaTitle ?? undefined;
     this.metaDescription = blog.metaDescription ?? undefined;
     this.publishedAt = blog.publishedAt ?? undefined;
-    this.authorName = blog.author?.profile?.name ?? undefined;
+    this.authorName = formatDisplayName(blog.author?.profile);
   }
 }

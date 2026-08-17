@@ -37,7 +37,11 @@ const makeFile = (name = 'test.jpg'): Express.Multer.File =>
     stream: null as never,
   }) as Express.Multer.File;
 
-const mockUser = { id: 1, role: UserRole.ADMIN, profile: { name: 'Admin' } };
+const mockUser = {
+  id: 1,
+  role: UserRole.ADMIN,
+  profile: { firstName: 'Admin', lastName: null },
+};
 
 const makeCategory = (overrides: Record<string, unknown> = {}) => ({
   id: 1,

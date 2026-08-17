@@ -182,7 +182,9 @@ export class AuthService {
     }
 
     return {
-      email: payload.email,
+      //* NORMALIZED — SEE UserRepository's email LOOKUPS FOR WHY EMAIL IS
+      //* ALWAYS LOWERCASED BEFORE IT TOUCHES A where/data CLAUSE.
+      email: payload.email.toLowerCase().trim(),
       firstName: payload.given_name ?? payload.name ?? 'User',
       lastName: payload.family_name,
       providerId: payload.sub,

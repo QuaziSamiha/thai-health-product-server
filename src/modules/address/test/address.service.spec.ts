@@ -155,11 +155,11 @@ describe('AddressService', () => {
       postalCode: dto.postalCode,
     };
 
-    it('defaults recipientName to profile.name and phone to the account phone when omitted', async () => {
+    it('defaults recipientName to firstName + lastName and phone to the account phone when omitted', async () => {
       repo.countByUserId.mockResolvedValue(1);
       repo.findUserContactInfo.mockResolvedValue({
         phone: '+66899999999',
-        profile: { name: 'Display Name', firstName: 'First', lastName: 'Last' },
+        profile: { firstName: 'First', lastName: 'Last' },
       });
       repo.createAddress.mockResolvedValue(makeAddress());
 
@@ -168,26 +168,9 @@ describe('AddressService', () => {
       expect(repo.createAddress).toHaveBeenCalledWith(
         userId,
         expect.objectContaining({
-          recipientName: 'Display Name',
+          recipientName: 'First Last',
           phone: '+66899999999',
         }),
-        undefined,
-      );
-    });
-
-    it('falls back to firstName + lastName when profile.name is not set', async () => {
-      repo.countByUserId.mockResolvedValue(1);
-      repo.findUserContactInfo.mockResolvedValue({
-        phone: '+66899999999',
-        profile: { name: null, firstName: 'First', lastName: 'Last' },
-      });
-      repo.createAddress.mockResolvedValue(makeAddress());
-
-      await service.createAddress(userId, addressFieldsOnly);
-
-      expect(repo.createAddress).toHaveBeenCalledWith(
-        userId,
-        expect.objectContaining({ recipientName: 'First Last' }),
         undefined,
       );
     });
@@ -209,7 +192,7 @@ describe('AddressService', () => {
       repo.countByUserId.mockResolvedValue(1);
       repo.findUserContactInfo.mockResolvedValue({
         phone: null,
-        profile: { name: 'Display Name', firstName: 'First', lastName: null },
+        profile: { firstName: 'First', lastName: null },
       });
 
       await expect(

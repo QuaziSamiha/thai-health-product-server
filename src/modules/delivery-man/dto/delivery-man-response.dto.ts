@@ -12,6 +12,7 @@ import {
   ProfileModel,
   UserModel,
 } from '../../../generated/prisma/models';
+import { formatDisplayName } from '../../../common/utils/display-name.util';
 
 //* nidDocumentUrl IS SERVED FROM THE SAME PUBLIC /uploads/** ROOT AS EVERY
 //* OTHER UPLOAD IN THIS APP FOR NOW — SEE docs/delivery-man.md "NID / KYC
@@ -120,7 +121,7 @@ export class DeliveryManResponseDto {
     this.status = row.status!;
     this.createdAt = row.createdAt!;
 
-    this.name = row.profile?.name ?? undefined;
+    this.name = formatDisplayName(row.profile);
     this.firstName = row.profile?.firstName ?? undefined;
     this.lastName = row.profile?.lastName ?? undefined;
     this.avatarUrl = row.profile?.avatarUrl

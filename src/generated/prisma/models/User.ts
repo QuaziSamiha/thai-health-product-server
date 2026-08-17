@@ -283,7 +283,6 @@ export type UserWhereInput = {
   profile?: Prisma.XOR<Prisma.ProfileNullableScalarRelationFilter, Prisma.ProfileWhereInput> | null
   security?: Prisma.XOR<Prisma.UserSecurityNullableScalarRelationFilter, Prisma.UserSecurityWhereInput> | null
   deliveryManProfile?: Prisma.XOR<Prisma.DeliveryManProfileNullableScalarRelationFilter, Prisma.DeliveryManProfileWhereInput> | null
-  sessions?: Prisma.SessionListRelationFilter
   otps?: Prisma.OTPListRelationFilter
   createdCategories?: Prisma.CategoryListRelationFilter
   updatedCategories?: Prisma.CategoryListRelationFilter
@@ -329,7 +328,6 @@ export type UserOrderByWithRelationInput = {
   profile?: Prisma.ProfileOrderByWithRelationInput
   security?: Prisma.UserSecurityOrderByWithRelationInput
   deliveryManProfile?: Prisma.DeliveryManProfileOrderByWithRelationInput
-  sessions?: Prisma.SessionOrderByRelationAggregateInput
   otps?: Prisma.OTPOrderByRelationAggregateInput
   createdCategories?: Prisma.CategoryOrderByRelationAggregateInput
   updatedCategories?: Prisma.CategoryOrderByRelationAggregateInput
@@ -379,7 +377,6 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   profile?: Prisma.XOR<Prisma.ProfileNullableScalarRelationFilter, Prisma.ProfileWhereInput> | null
   security?: Prisma.XOR<Prisma.UserSecurityNullableScalarRelationFilter, Prisma.UserSecurityWhereInput> | null
   deliveryManProfile?: Prisma.XOR<Prisma.DeliveryManProfileNullableScalarRelationFilter, Prisma.DeliveryManProfileWhereInput> | null
-  sessions?: Prisma.SessionListRelationFilter
   otps?: Prisma.OTPListRelationFilter
   createdCategories?: Prisma.CategoryListRelationFilter
   updatedCategories?: Prisma.CategoryListRelationFilter
@@ -464,7 +461,6 @@ export type UserCreateInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -510,7 +506,6 @@ export type UserUncheckedCreateInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -555,7 +550,6 @@ export type UserUpdateInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -601,7 +595,6 @@ export type UserUncheckedUpdateInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -1200,20 +1193,6 @@ export type UserUpdateOneRequiredWithoutSecurityNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSecurityInput, Prisma.UserUpdateWithoutSecurityInput>, Prisma.UserUncheckedUpdateWithoutSecurityInput>
 }
 
-export type UserCreateNestedOneWithoutSessionsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSessionsInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserUpdateOneRequiredWithoutSessionsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSessionsInput
-  upsert?: Prisma.UserUpsertWithoutSessionsInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSessionsInput, Prisma.UserUpdateWithoutSessionsInput>, Prisma.UserUncheckedUpdateWithoutSessionsInput>
-}
-
 export type UserCreateNestedOneWithoutOtpsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutOtpsInput, Prisma.UserUncheckedCreateWithoutOtpsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutOtpsInput
@@ -1246,7 +1225,6 @@ export type UserCreateWithoutAddressesInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -1291,7 +1269,6 @@ export type UserUncheckedCreateWithoutAddressesInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -1351,7 +1328,6 @@ export type UserUpdateWithoutAddressesInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -1396,7 +1372,6 @@ export type UserUncheckedUpdateWithoutAddressesInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -1440,7 +1415,6 @@ export type UserCreateWithoutAuditLogsInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -1485,7 +1459,6 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -1545,7 +1518,6 @@ export type UserUpdateWithoutAuditLogsInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -1590,7 +1562,6 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -1634,7 +1605,6 @@ export type UserCreateWithoutBlogsInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -1679,7 +1649,6 @@ export type UserUncheckedCreateWithoutBlogsInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -1739,7 +1708,6 @@ export type UserUpdateWithoutBlogsInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -1784,7 +1752,6 @@ export type UserUncheckedUpdateWithoutBlogsInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -1828,7 +1795,6 @@ export type UserCreateWithoutCartsInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -1873,7 +1839,6 @@ export type UserUncheckedCreateWithoutCartsInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -1933,7 +1898,6 @@ export type UserUpdateWithoutCartsInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -1978,7 +1942,6 @@ export type UserUncheckedUpdateWithoutCartsInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -2022,7 +1985,6 @@ export type UserCreateWithoutCreatedCategoriesInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
@@ -2067,7 +2029,6 @@ export type UserUncheckedCreateWithoutCreatedCategoriesInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -2116,7 +2077,6 @@ export type UserCreateWithoutUpdatedCategoriesInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
@@ -2161,7 +2121,6 @@ export type UserUncheckedCreateWithoutUpdatedCategoriesInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -2221,7 +2180,6 @@ export type UserUpdateWithoutCreatedCategoriesInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
@@ -2266,7 +2224,6 @@ export type UserUncheckedUpdateWithoutCreatedCategoriesInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -2321,7 +2278,6 @@ export type UserUpdateWithoutUpdatedCategoriesInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
@@ -2366,7 +2322,6 @@ export type UserUncheckedUpdateWithoutUpdatedCategoriesInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -2410,7 +2365,6 @@ export type UserCreateWithoutCreatedCombosInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -2455,7 +2409,6 @@ export type UserUncheckedCreateWithoutCreatedCombosInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -2504,7 +2457,6 @@ export type UserCreateWithoutUpdatedCombosInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -2549,7 +2501,6 @@ export type UserUncheckedCreateWithoutUpdatedCombosInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -2598,7 +2549,6 @@ export type UserCreateWithoutDeletedCombosInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -2643,7 +2593,6 @@ export type UserUncheckedCreateWithoutDeletedCombosInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -2703,7 +2652,6 @@ export type UserUpdateWithoutCreatedCombosInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -2748,7 +2696,6 @@ export type UserUncheckedUpdateWithoutCreatedCombosInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -2803,7 +2750,6 @@ export type UserUpdateWithoutUpdatedCombosInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -2848,7 +2794,6 @@ export type UserUncheckedUpdateWithoutUpdatedCombosInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -2903,7 +2848,6 @@ export type UserUpdateWithoutDeletedCombosInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -2948,7 +2892,6 @@ export type UserUncheckedUpdateWithoutDeletedCombosInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -2991,7 +2934,6 @@ export type UserCreateWithoutDeliveryManProfileInput = {
   deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -3036,7 +2978,6 @@ export type UserUncheckedCreateWithoutDeliveryManProfileInput = {
   deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -3086,7 +3027,6 @@ export type UserCreateWithoutVerifiedDeliveryMenInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -3131,7 +3071,6 @@ export type UserUncheckedCreateWithoutVerifiedDeliveryMenInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -3190,7 +3129,6 @@ export type UserUpdateWithoutDeliveryManProfileInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -3235,7 +3173,6 @@ export type UserUncheckedUpdateWithoutDeliveryManProfileInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -3291,7 +3228,6 @@ export type UserUpdateWithoutVerifiedDeliveryMenInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -3336,7 +3272,6 @@ export type UserUncheckedUpdateWithoutVerifiedDeliveryMenInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -3380,7 +3315,6 @@ export type UserCreateWithoutCreatedDeliveryProvidersInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -3425,7 +3359,6 @@ export type UserUncheckedCreateWithoutCreatedDeliveryProvidersInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -3474,7 +3407,6 @@ export type UserCreateWithoutUpdatedDeliveryProvidersInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -3519,7 +3451,6 @@ export type UserUncheckedCreateWithoutUpdatedDeliveryProvidersInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -3579,7 +3510,6 @@ export type UserUpdateWithoutCreatedDeliveryProvidersInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -3624,7 +3554,6 @@ export type UserUncheckedUpdateWithoutCreatedDeliveryProvidersInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -3679,7 +3608,6 @@ export type UserUpdateWithoutUpdatedDeliveryProvidersInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -3724,7 +3652,6 @@ export type UserUncheckedUpdateWithoutUpdatedDeliveryProvidersInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -3768,7 +3695,6 @@ export type UserCreateWithoutBookedDeliveryShipmentsInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -3813,7 +3739,6 @@ export type UserUncheckedCreateWithoutBookedDeliveryShipmentsInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -3873,7 +3798,6 @@ export type UserUpdateWithoutBookedDeliveryShipmentsInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -3918,7 +3842,6 @@ export type UserUncheckedUpdateWithoutBookedDeliveryShipmentsInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -3962,7 +3885,6 @@ export type UserCreateWithoutDeliveryStatusChangesInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -4007,7 +3929,6 @@ export type UserUncheckedCreateWithoutDeliveryStatusChangesInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -4067,7 +3988,6 @@ export type UserUpdateWithoutDeliveryStatusChangesInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -4112,7 +4032,6 @@ export type UserUncheckedUpdateWithoutDeliveryStatusChangesInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -4156,7 +4075,6 @@ export type UserCreateWithoutCreatedHomeContentsInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -4201,7 +4119,6 @@ export type UserUncheckedCreateWithoutCreatedHomeContentsInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -4250,7 +4167,6 @@ export type UserCreateWithoutUpdatedHomeContentsInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -4295,7 +4211,6 @@ export type UserUncheckedCreateWithoutUpdatedHomeContentsInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -4355,7 +4270,6 @@ export type UserUpdateWithoutCreatedHomeContentsInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -4400,7 +4314,6 @@ export type UserUncheckedUpdateWithoutCreatedHomeContentsInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -4455,7 +4368,6 @@ export type UserUpdateWithoutUpdatedHomeContentsInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -4500,7 +4412,6 @@ export type UserUncheckedUpdateWithoutUpdatedHomeContentsInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -4544,7 +4455,6 @@ export type UserCreateWithoutInventoriesInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -4589,7 +4499,6 @@ export type UserUncheckedCreateWithoutInventoriesInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -4649,7 +4558,6 @@ export type UserUpdateWithoutInventoriesInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -4694,7 +4602,6 @@ export type UserUncheckedUpdateWithoutInventoriesInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -4738,7 +4645,6 @@ export type UserCreateWithoutOrdersInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -4783,7 +4689,6 @@ export type UserUncheckedCreateWithoutOrdersInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -4843,7 +4748,6 @@ export type UserUpdateWithoutOrdersInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -4888,7 +4792,6 @@ export type UserUncheckedUpdateWithoutOrdersInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -4932,7 +4835,6 @@ export type UserCreateWithoutOrderStatusChangesInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -4977,7 +4879,6 @@ export type UserUncheckedCreateWithoutOrderStatusChangesInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -5037,7 +4938,6 @@ export type UserUpdateWithoutOrderStatusChangesInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -5082,7 +4982,6 @@ export type UserUncheckedUpdateWithoutOrderStatusChangesInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -5126,7 +5025,6 @@ export type UserCreateWithoutCreatedProductsInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -5171,7 +5069,6 @@ export type UserUncheckedCreateWithoutCreatedProductsInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -5220,7 +5117,6 @@ export type UserCreateWithoutUpdatedProductsInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -5265,7 +5161,6 @@ export type UserUncheckedCreateWithoutUpdatedProductsInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -5314,7 +5209,6 @@ export type UserCreateWithoutDeletedProductsInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -5359,7 +5253,6 @@ export type UserUncheckedCreateWithoutDeletedProductsInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -5419,7 +5312,6 @@ export type UserUpdateWithoutCreatedProductsInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -5464,7 +5356,6 @@ export type UserUncheckedUpdateWithoutCreatedProductsInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -5519,7 +5410,6 @@ export type UserUpdateWithoutUpdatedProductsInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -5564,7 +5454,6 @@ export type UserUncheckedUpdateWithoutUpdatedProductsInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -5619,7 +5508,6 @@ export type UserUpdateWithoutDeletedProductsInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -5664,7 +5552,6 @@ export type UserUncheckedUpdateWithoutDeletedProductsInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -5708,7 +5595,6 @@ export type UserCreateWithoutPromoCodeRedemptionsInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -5753,7 +5639,6 @@ export type UserUncheckedCreateWithoutPromoCodeRedemptionsInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -5813,7 +5698,6 @@ export type UserUpdateWithoutPromoCodeRedemptionsInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -5858,7 +5742,6 @@ export type UserUncheckedUpdateWithoutPromoCodeRedemptionsInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -5902,7 +5785,6 @@ export type UserCreateWithoutCreatedSupportsInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -5947,7 +5829,6 @@ export type UserUncheckedCreateWithoutCreatedSupportsInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -5996,7 +5877,6 @@ export type UserCreateWithoutUpdatedSupportsInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -6041,7 +5921,6 @@ export type UserUncheckedCreateWithoutUpdatedSupportsInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -6101,7 +5980,6 @@ export type UserUpdateWithoutCreatedSupportsInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -6146,7 +6024,6 @@ export type UserUncheckedUpdateWithoutCreatedSupportsInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -6201,7 +6078,6 @@ export type UserUpdateWithoutUpdatedSupportsInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -6246,7 +6122,6 @@ export type UserUncheckedUpdateWithoutUpdatedSupportsInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -6289,7 +6164,6 @@ export type UserCreateWithoutProfileInput = {
   deletedAt?: Date | string | null
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -6334,7 +6208,6 @@ export type UserUncheckedCreateWithoutProfileInput = {
   deletedAt?: Date | string | null
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -6394,7 +6267,6 @@ export type UserUpdateWithoutProfileInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -6439,7 +6311,6 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -6483,7 +6354,6 @@ export type UserCreateWithoutSecurityInput = {
   deletedAt?: Date | string | null
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
@@ -6528,7 +6398,6 @@ export type UserUncheckedCreateWithoutSecurityInput = {
   deletedAt?: Date | string | null
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -6588,7 +6457,6 @@ export type UserUpdateWithoutSecurityInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
@@ -6632,201 +6500,6 @@ export type UserUncheckedUpdateWithoutSecurityInput = {
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
-  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
-  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
-  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
-  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
-  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
-  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
-  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
-  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
-  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
-  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
-}
-
-export type UserCreateWithoutSessionsInput = {
-  sid?: string
-  email: string
-  password?: string | null
-  phone?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  authProvider?: $Enums.AuthProvider
-  providerId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  lastLoginAt?: Date | string | null
-  deletedAt?: Date | string | null
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
-  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
-  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
-  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
-  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
-  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
-  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
-  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
-  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
-  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
-  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
-  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
-  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
-  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
-  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
-  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
-  carts?: Prisma.CartCreateNestedManyWithoutUserInput
-  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
-  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
-  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
-  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
-  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
-  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
-  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
-  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
-  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
-}
-
-export type UserUncheckedCreateWithoutSessionsInput = {
-  id?: number
-  sid?: string
-  email: string
-  password?: string | null
-  phone?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  authProvider?: $Enums.AuthProvider
-  providerId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  lastLoginAt?: Date | string | null
-  deletedAt?: Date | string | null
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
-  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
-  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
-  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
-  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
-  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
-  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
-  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
-  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
-  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
-  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
-  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
-  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
-}
-
-export type UserCreateOrConnectWithoutSessionsInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>
-}
-
-export type UserUpsertWithoutSessionsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutSessionsInput, Prisma.UserUncheckedUpdateWithoutSessionsInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutSessionsInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutSessionsInput, Prisma.UserUncheckedUpdateWithoutSessionsInput>
-}
-
-export type UserUpdateWithoutSessionsInput = {
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
-  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
-  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
-  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
-  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
-  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
-  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
-  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
-  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
-  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
-  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
-  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
-  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
-  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
-  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
-  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
-  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
-  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
-  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
-  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
-  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
-  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
-  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
-  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
-  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
-  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
-  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
-}
-
-export type UserUncheckedUpdateWithoutSessionsInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
-  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
   otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -6872,7 +6545,6 @@ export type UserCreateWithoutOtpsInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
   createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
@@ -6917,7 +6589,6 @@ export type UserUncheckedCreateWithoutOtpsInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -6977,7 +6648,6 @@ export type UserUpdateWithoutOtpsInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
   createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
@@ -7022,7 +6692,6 @@ export type UserUncheckedUpdateWithoutOtpsInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
   deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -7056,7 +6725,6 @@ export type UserUncheckedUpdateWithoutOtpsInput = {
  */
 
 export type UserCountOutputType = {
-  sessions: number
   otps: number
   createdCategories: number
   updatedCategories: number
@@ -7086,7 +6754,6 @@ export type UserCountOutputType = {
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   otps?: boolean | UserCountOutputTypeCountOtpsArgs
   createdCategories?: boolean | UserCountOutputTypeCountCreatedCategoriesArgs
   updatedCategories?: boolean | UserCountOutputTypeCountUpdatedCategoriesArgs
@@ -7123,13 +6790,6 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
    * Select specific fields to fetch from the UserCountOutputType
    */
   select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null
-}
-
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.SessionWhereInput
 }
 
 /**
@@ -7332,7 +6992,6 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   profile?: boolean | Prisma.User$profileArgs<ExtArgs>
   security?: boolean | Prisma.User$securityArgs<ExtArgs>
   deliveryManProfile?: boolean | Prisma.User$deliveryManProfileArgs<ExtArgs>
-  sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   otps?: boolean | Prisma.User$otpsArgs<ExtArgs>
   createdCategories?: boolean | Prisma.User$createdCategoriesArgs<ExtArgs>
   updatedCategories?: boolean | Prisma.User$updatedCategoriesArgs<ExtArgs>
@@ -7415,7 +7074,6 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   profile?: boolean | Prisma.User$profileArgs<ExtArgs>
   security?: boolean | Prisma.User$securityArgs<ExtArgs>
   deliveryManProfile?: boolean | Prisma.User$deliveryManProfileArgs<ExtArgs>
-  sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   otps?: boolean | Prisma.User$otpsArgs<ExtArgs>
   createdCategories?: boolean | Prisma.User$createdCategoriesArgs<ExtArgs>
   updatedCategories?: boolean | Prisma.User$updatedCategoriesArgs<ExtArgs>
@@ -7453,7 +7111,6 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     profile: Prisma.$ProfilePayload<ExtArgs> | null
     security: Prisma.$UserSecurityPayload<ExtArgs> | null
     deliveryManProfile: Prisma.$DeliveryManProfilePayload<ExtArgs> | null
-    sessions: Prisma.$SessionPayload<ExtArgs>[]
     otps: Prisma.$OTPPayload<ExtArgs>[]
     createdCategories: Prisma.$CategoryPayload<ExtArgs>[]
     updatedCategories: Prisma.$CategoryPayload<ExtArgs>[]
@@ -7892,7 +7549,6 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   profile<T extends Prisma.User$profileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$profileArgs<ExtArgs>>): Prisma.Prisma__ProfileClient<runtime.Types.Result.GetResult<Prisma.$ProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   security<T extends Prisma.User$securityArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$securityArgs<ExtArgs>>): Prisma.Prisma__UserSecurityClient<runtime.Types.Result.GetResult<Prisma.$UserSecurityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   deliveryManProfile<T extends Prisma.User$deliveryManProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$deliveryManProfileArgs<ExtArgs>>): Prisma.Prisma__DeliveryManProfileClient<runtime.Types.Result.GetResult<Prisma.$DeliveryManProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   otps<T extends Prisma.User$otpsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$otpsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OTPPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   createdCategories<T extends Prisma.User$createdCategoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdCategoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   updatedCategories<T extends Prisma.User$updatedCategoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$updatedCategoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -8408,30 +8064,6 @@ export type User$deliveryManProfileArgs<ExtArgs extends runtime.Types.Extensions
    */
   include?: Prisma.DeliveryManProfileInclude<ExtArgs> | null
   where?: Prisma.DeliveryManProfileWhereInput
-}
-
-/**
- * User.sessions
- */
-export type User$sessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Session
-   */
-  select?: Prisma.SessionSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Session
-   */
-  omit?: Prisma.SessionOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.SessionInclude<ExtArgs> | null
-  where?: Prisma.SessionWhereInput
-  orderBy?: Prisma.SessionOrderByWithRelationInput | Prisma.SessionOrderByWithRelationInput[]
-  cursor?: Prisma.SessionWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.SessionScalarFieldEnum | Prisma.SessionScalarFieldEnum[]
 }
 
 /**

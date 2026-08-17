@@ -15,7 +15,7 @@ thai-health-product-server/
 │   ├── schema/                          # MULTI-FILE SCHEMA — Prisma merges every *.prisma file in this folder
 │   │   ├── schema.prisma                # Generator + datasource ONLY — no models/enums belong here
 │   │   ├── shared.prisma                # Cross-domain enums (e.g. CategoryProductStatus)
-│   │   ├── user.prisma                  # User, Profile, UserSecurity, Session, OTP + their enums
+│   │   ├── user.prisma                  # User, Profile, UserSecurity, OTP + their enums
 │   │   ├── category.prisma              # Category
 │   │   ├── product.prisma               # Product, ProductVariant, ProductImage + their enums
 │   │   └── inventory.prisma             # Inventory + InventoryExchangeType
@@ -122,7 +122,7 @@ datasource db {
 
 | File | Models | Enums |
 |---|---|---|
-| `user.prisma` | `User`, `Profile`, `UserSecurity`, `Session`, `OTP` | `UserRole`, `AuthProvider`, `UserStatus`, `OTPType` |
+| `user.prisma` | `User`, `Profile`, `UserSecurity`, `OTP` | `UserRole`, `AuthProvider`, `UserStatus`, `OTPType` |
 | `category.prisma` | `Category` | — |
 | `product.prisma` | `Product`, `ProductVariant`, `ProductImage` | `ProductType`, `DiscountType`, `StockStatus` |
 | `inventory.prisma` | `Inventory` | `InventoryExchangeType` |

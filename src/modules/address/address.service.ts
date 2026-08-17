@@ -8,12 +8,7 @@ import { AddressRepository } from './address.repository';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { AddressResponseDto } from './dto/address-response.dto';
-
-type ProfileNameSource = {
-  name: string | null;
-  firstName: string;
-  lastName: string | null;
-} | null;
+import { formatDisplayName } from '../../common/utils/display-name.util';
 
 @Injectable()
 export class AddressService {
@@ -23,17 +18,6 @@ export class AddressService {
     if (address.userId !== userId) {
       throw new ForbiddenException('You can only access your own addresses');
     }
-  }
-
-  private resolveNameFromProfile(
-    profile: ProfileNameSource,
-  ): string | undefined {
-    if (!profile) return undefined;
-    if (profile.name) return profile.name;
-    return (
-      [profile.firstName, profile.lastName].filter(Boolean).join(' ').trim() ||
-      undefined
-    );
   }
 
   //* recipientName/phone ARE OPTIONAL ON CreateAddressDto — WHEN OMITTED,
@@ -55,7 +39,7 @@ export class AddressService {
     const user = await this.addressRepository.findUserContactInfo(userId, tx);
 
     const recipientName =
-      dto.recipientName ?? this.resolveNameFromProfile(user?.profile ?? null);
+      dto.recipientName ?? formatDisplayName(user?.profile);
     const phone = dto.phone ?? user?.phone ?? undefined;
 
     if (!recipientName) {

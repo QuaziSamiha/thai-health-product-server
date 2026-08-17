@@ -8,6 +8,7 @@ import {
   PaymentTransactionType,
 } from '../../../generated/prisma/enums';
 import { toAbsoluteUrl } from '../../../common/utils/url.util';
+import { formatDisplayName } from '../../../common/utils/display-name.util';
 
 export class OrderItemResponseDto {
   @Expose()
@@ -265,14 +266,14 @@ export class OrderStatusHistoryResponseDto {
     createdAt: Date;
     changedByUser?: {
       email: string;
-      profile?: { name: string | null } | null;
+      profile?: { firstName: string | null; lastName: string | null } | null;
     } | null;
   }) {
     this.id = history.id;
     this.status = history.status;
     this.note = history.note;
     this.changedByName =
-      history.changedByUser?.profile?.name ??
+      formatDisplayName(history.changedByUser?.profile) ??
       history.changedByUser?.email ??
       null;
     this.createdAt = history.createdAt;

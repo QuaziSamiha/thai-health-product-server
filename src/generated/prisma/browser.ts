@@ -173,11 +173,6 @@ export type Profile = Prisma.ProfileModel
  */
 export type UserSecurity = Prisma.UserSecurityModel
 /**
- * Model Session
- * 
- */
-export type Session = Prisma.SessionModel
-/**
  * Model OTP
  * 
  */

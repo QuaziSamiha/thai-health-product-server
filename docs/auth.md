@@ -4,7 +4,7 @@ Stateless JWT authentication — login and access/refresh token issuance. Unlike
 
 Module source: `src/modules/auth/` (`auth.controller.ts`, `auth.service.ts`, `auth.module.ts`, `config/`, `dto/`, `guards/`, `interfaces/`, `strategies/`).
 
-> **Scope note:** `User`, `UserSecurity`, and `OTP` are documented in [`user.md`](./user.md) — they appear here only as the data Auth's two routes read or write. `SessionModule` (`src/modules/session/`) is a separate module; it is documented here only because it is the intended-but-unbuilt backing store for refresh tokens, which is directly relevant to understanding Auth's current security posture.
+> **Scope note:** `User`, `UserSecurity`, and `OTP` are documented in [`user.md`](./user.md) — they appear here only as the data Auth's two routes read or write. There is no DB-backed session store: a `Session` model and matching `src/modules/session/` scaffold were once declared for this purpose but never implemented (zero readers, zero writers), and both were removed — see [Known Gaps](#known-gaps--recommended-hardening) for the resulting tradeoff.
 
 ---
 
@@ -37,21 +37,11 @@ export interface ITokens {
 
 ---
 
-#### Data Dictionary — Session (declared, unused)
+#### Session store: deliberately absent
 
-**Table purpose (as designed, never realized):** the backing store that would let refresh tokens be revoked, rotated, and enumerated per-device. Schema source: `prisma/schema/user.prisma`, model `Session`, table `sessions`.
+A `Session` model and matching `src/modules/session/` scaffold (`SessionService`/`SessionController`/`SessionRepository`) previously existed in the schema and codebase as an intended-but-never-built backing store for refresh-token revocation. It had zero readers and zero writers — `AuthModule` never imported `SessionModule`, and `AuthService` never touched `PrismaService` for sessions — so it was removed outright rather than left as unused scaffolding.
 
-| Field                    | Type              | Constraints                                                         | Description                                                                 |
-| :------------------------ | :---------------- | :------------------------------------------------------------------ | :------------------------------------------------------------------------------ |
-| `id`                      | `INT`             | PK, AUTOINCREMENT                                                    | Internal key.                                                                |
-| `refreshToken`            | `TEXT`            | UNIQUE, NOT NULL                                                     | Would hold the issued refresh token (or its hash) for lookup/revocation.     |
-| `refreshTokenExpiresAt`   | `TIMESTAMPTZ(3)`  | NOT NULL                                                             | Mirrors the JWT's own `exp`, redundantly — needed for a DB-side cleanup query. |
-| `userAgent`               | `VARCHAR`         | NULLABLE                                                             | Per-device session identification.                                          |
-| `ipAddress`               | `VARCHAR`         | NULLABLE                                                             | Per-device session identification.                                          |
-| `createdAt`               | `TIMESTAMPTZ(3)`  | NOT NULL, DEFAULT `now()` — **no `@map`**, unlike every other `createdAt` in the schema | Minor inconsistency: every other model's `createdAt` is `@map("created_at")`; this one is bare `createdAt` in the `sessions` table. |
-| `userId`                  | `INT`             | FK → `users.id`, NOT NULL, **ON DELETE CASCADE**                     | Owning user.                                                                 |
-
-**As it stands today: this table has zero readers and zero writers.** `SessionService`/`SessionController`/`SessionRepository` (`src/modules/session/`) are empty stub classes — no methods, no routes. `AuthModule` does not import `SessionModule`, and `AuthService` never touches `PrismaService` for sessions (it doesn't inject `PrismaService` at all, despite `AuthModule` importing `PrismaModule` — a dead import). Refresh tokens are therefore **pure stateless JWTs**: nothing in the database ever represents "this token is currently valid" or "this token has been revoked." See [Known Gaps](#known-gaps--recommended-hardening) for the direct consequences.
+Refresh tokens are therefore **pure stateless JWTs, by design**: nothing in the database represents "this token is currently valid" or "this token has been revoked." See [Known Gaps](#known-gaps--recommended-hardening) for the direct consequences of that choice.
 
 ---
 
@@ -132,7 +122,7 @@ Boot fails fast (Zod `.parse(process.env)`) if either JWT secret is missing — 
 Ranked roughly by how much it matters to fix before this module is trusted with production traffic.
 
 1. **The refresh-token cookie's `secure` flag is always `false`, in every environment, including production.** `AuthController.login` computes `secure: authConfig?.nodeEnv === 'production'`, but `authConfig` (the `'auth'` namespace) has no `nodeEnv` key at all — that value lives under `'app'`. So the comparison is always `undefined === 'production'`, always `false`. The refresh token cookie can be sent over plain HTTP in production today. **Fix**: read `configService.get('app.nodeEnv')` instead.
-2. **No refresh-token rotation, revocation, or reuse detection.** Refresh tokens are stateless JWTs with no backing store — the `Session` table exists in the schema but `SessionService`/`SessionController`/`SessionRepository` are empty stubs, and `AuthModule` doesn't even import `SessionModule`. A leaked refresh token is valid for its full 30-day lifetime with no way to kill it short of rotating `JWT_REFRESH_SECRET` for every user at once.
+2. **No refresh-token rotation, revocation, or reuse detection.** Refresh tokens are stateless JWTs with no backing store — this is a deliberate choice (see [Session store: deliberately absent](#session-store-deliberately-absent)), not an oversight, but the consequence stands: a leaked refresh token is valid for its full 30-day lifetime with no way to kill it short of rotating `JWT_REFRESH_SECRET` for every user at once.
 3. **No logout endpoint exists.** Nothing revokes a session or refresh token server-side — there's nothing *to* revoke, since none are tracked. Even a "clear the cookie" no-op logout route doesn't currently exist.
 4. **Rate limiting is configured but not enforced.** `ThrottlerModule.forRoot([{ ttl: 60, limit: 100 }])` is registered in `app.module.ts`, but no `ThrottlerGuard` is ever applied — no `@Throttle()` decorator, no `APP_GUARD` registration — anywhere in the codebase. `/auth/login` has no brute-force protection at the framework level. The account-level `UserSecurity.loginAttempts` counter is incremented on every failed login but never read anywhere — it's a write-only counter with no lockout threshold.
 5. **Refresh token is exposed twice.** `AuthController.login` both sets `refreshToken` as an `httpOnly` cookie **and** returns it in the JSON response body (`TokensResponseDto.refresh_token`). If the intent is httpOnly-cookie-based refresh security (XSS-resistant storage), returning the same value in a JS-readable response body undermines that; `RefreshTokenDto` also accepts it back via request body, doubling the attack surface.
@@ -315,5 +305,4 @@ No response ever includes `password` — `AuthService.validateUser` manually con
 | :------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `UserModule`         | `AuthModule` imports it normally (no `forwardRef` — the dependency is one-directional). `AuthService` calls `findForAuth`, `updateLoginAttempts`, `updateLoginSuccess`, `updateLastLoginTime`, `getUserById`. See `user.md`'s [Auth & OTP Coupling](./user.md#auth--otp-coupling) for the reverse view of these same call points. |
 | `OtpModule`          | **No relationship.** `AuthModule` does not import `OtpModule` and `AuthService` never references `OtpService`. OTP verification (`OtpService.verifyOtp`) calls into `UserModule` directly (`activateUser`) — Auth is not involved in the signup-verification loop at all, only in login/refresh. |
-| `SessionModule`      | **No relationship**, despite `Session` existing specifically to back refresh tokens — see [Known Gaps](#known-gaps--recommended-hardening) #2–3. `AuthModule` does not import it, and `SessionService`/`SessionController` are empty stubs regardless. |
 | `HashModule`         | Imported for `HashService` (bcrypt `hash`/`compare`) — used in `validateUser`'s password comparison. Hashing itself (registration, password change) happens in `UserModule`; Auth only ever *compares*. |

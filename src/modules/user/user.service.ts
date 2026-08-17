@@ -79,9 +79,6 @@ export class UserService {
         {
           ...profile,
           userId: user.id,
-          name:
-            profile.name ||
-            `${profile.firstName} ${profile.lastName || ''}`.trim(),
           dateOfBirth: profile.dateOfBirth
             ? new Date(profile.dateOfBirth)
             : undefined,
@@ -257,11 +254,6 @@ export class UserService {
     if (dto.lastName !== undefined) {
       profileUpdateData.lastName = dto.lastName;
     }
-    if (dto.firstName !== undefined || dto.lastName !== undefined) {
-      const firstName = dto.firstName ?? existingUser.profile?.firstName ?? '';
-      const lastName = dto.lastName ?? existingUser.profile?.lastName ?? '';
-      profileUpdateData.name = `${firstName} ${lastName}`.trim();
-    }
 
     // * UPLOAD BEFORE THE DB WRITE SO A FAILED UPLOAD NEVER LEAVES A DANGLING
     // * avatarUrl; THE OLD FILE IS ONLY DELETED AFTER THE NEW ONE IS COMMITTED.
@@ -417,7 +409,6 @@ export class UserService {
             userId: user.id,
             firstName: dto.firstName,
             lastName: dto.lastName,
-            name: `${dto.firstName} ${dto.lastName ?? ''}`.trim(),
             avatarUrl: dto.image,
           },
           tx,

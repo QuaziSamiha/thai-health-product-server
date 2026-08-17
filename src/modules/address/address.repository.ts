@@ -62,7 +62,7 @@ export class AddressRepository extends BaseRepository {
       where: { id: userId },
       select: {
         phone: true,
-        profile: { select: { name: true, firstName: true, lastName: true } },
+        profile: { select: { firstName: true, lastName: true } },
       },
     });
   }

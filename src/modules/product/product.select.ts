@@ -34,7 +34,7 @@ export const USER_MINIFIED_SELECT = {
   status: true,
   role: true,
   profile: {
-    select: { name: true },
+    select: { firstName: true, lastName: true },
   },
 } as const;
 

@@ -62,7 +62,7 @@ export class CategoryRepository extends BaseRepository {
         id: true,
         role: true,
         profile: {
-          select: { name: true },
+          select: { firstName: true, lastName: true },
         },
       },
     },
@@ -71,7 +71,7 @@ export class CategoryRepository extends BaseRepository {
         id: true,
         role: true,
         profile: {
-          select: { name: true },
+          select: { firstName: true, lastName: true },
         },
       },
     },

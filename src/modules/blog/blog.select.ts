@@ -31,7 +31,7 @@ export const BLOG_SELECT_ADMIN = {
       status: true,
       role: true,
       profile: {
-        select: { name: true },
+        select: { firstName: true, lastName: true },
       },
     },
   },
@@ -55,7 +55,7 @@ export const BLOG_SELECT_PUBLIC = {
   author: {
     select: {
       profile: {
-        select: { name: true },
+        select: { firstName: true, lastName: true },
       },
     },
   },

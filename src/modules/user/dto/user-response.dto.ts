@@ -12,6 +12,7 @@ import {
   UserModel,
   UserSecurityModel,
 } from '../../../generated/prisma/models';
+import { formatDisplayName } from '../../../common/utils/display-name.util';
 
 export class UserResponseDtoWithDetails {
   @ApiProperty({ description: 'User ID', example: 1 })
@@ -172,7 +173,8 @@ export interface MinifiedUser {
   status?: UserStatus;
   role?: UserRole;
   profile?: {
-    name?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
   } | null;
 }
 
@@ -213,7 +215,7 @@ export class UserMinifiedResponseDto {
 
   constructor(user: MinifiedUser) {
     this.id = user.id!;
-    this.name = user?.profile?.name ?? '';
+    this.name = formatDisplayName(user?.profile) ?? '';
     this.email = user.email ?? '';
     this.role = user.role!;
     this.status = user.status ?? UserStatus.ACTIVE;

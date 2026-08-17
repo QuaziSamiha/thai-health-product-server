@@ -27,17 +27,6 @@ export class CreateProfileDto {
   @MaxLength(100, { message: 'Last name must be at most 100 characters long' })
   lastName?: string;
 
-  @ApiProperty({
-    description: 'Display name of the user',
-    example: 'Quazi Samiha Tasnim',
-  })
-  @IsString()
-  @IsOptional()
-  @MaxLength(200, {
-    message: 'Display name must be at most 200 characters long',
-  })
-  name?: string;
-
   @ApiPropertyOptional({
     description: 'URL of the user avatar',
     example: 'https://example.com/avatar.jpg',

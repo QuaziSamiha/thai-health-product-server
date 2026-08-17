@@ -16,7 +16,6 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { OtpModule } from './modules/otp/otp.module';
-import { SessionModule } from './modules/session/session.module';
 import { MailModule } from './modules/mail/mail.module';
 import { CategoryModule } from './modules/category/category.module';
 import { ProductModule } from './modules/product/product.module';
@@ -80,7 +79,6 @@ import {
     DeliveryManModule,
     AuthModule,
     OtpModule,
-    SessionModule,
     MailModule,
     CategoryModule,
     ProductModule,

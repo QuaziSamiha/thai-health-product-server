@@ -20,7 +20,6 @@ export class UserRepository extends BaseRepository {
   private readonly PROFILE_SELECT = {
     firstName: true,
     lastName: true,
-    name: true,
     avatarUrl: true,
     bio: true,
     dateOfBirth: true,
@@ -98,13 +97,18 @@ export class UserRepository extends BaseRepository {
   //* email IS ONLY UNIQUE AMONG NON-DELETED ROWS (SEE User.email COMMENT IN
   //* SCHEMA) — MUST USE findFirst + deletedAt: null, NOT findUnique, OR AN
   //* ARCHIVED ROW SHARING THE EMAIL COULD BE MATCHED NON-DETERMINISTICALLY.
+  //*
+  //* EVERY LOOKUP BELOW LOWERCASES ITS email ARGUMENT BEFORE QUERYING — THE
+  //* DEFENSIVE, SINGLE CHOKE POINT BEHIND CreateUserDto/LoginDto's OWN
+  //* @Transform NORMALIZATION, SO A CALLER THAT BYPASSES THOSE DTOS (E.G. AN
+  //* INTERNAL SERVICE CALL) CAN'T ACCIDENTALLY MISS A DIFFERENTLY-CASED ROW.
   async findUserByEmailWithDetails(
     email: string,
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx || this.prisma;
     return await client.user.findFirst({
-      where: { email, deletedAt: null },
+      where: { email: email.toLowerCase().trim(), deletedAt: null },
       select: this.FULL_USER_SELECT_CUSTOMER,
     });
   }
@@ -112,7 +116,7 @@ export class UserRepository extends BaseRepository {
   async findUserByEmail(email: string, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return await client.user.findFirst({
-      where: { email, deletedAt: null },
+      where: { email: email.toLowerCase().trim(), deletedAt: null },
       select: this.USER_SELECT,
     });
   }
@@ -124,7 +128,7 @@ export class UserRepository extends BaseRepository {
   ) {
     const client = tx || this.prisma;
     return client.user.findFirst({
-      where: { email, deletedAt: null },
+      where: { email: email.toLowerCase().trim(), deletedAt: null },
       select: {
         ...this.USER_SELECT,
         password: includePassword, // * Needed for bcrypt compare
@@ -231,7 +235,7 @@ export class UserRepository extends BaseRepository {
       typeof client.user
     >(client.user, params, {
       select: this.FULL_USER_SELECT_ADMIN,
-      searchableFields: ['email', 'profile.name'],
+      searchableFields: ['email', 'profile.firstName', 'profile.lastName'],
       defaultSortField: 'createdAt',
     });
   }

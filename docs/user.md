@@ -1,10 +1,10 @@
 # User Module
 
-Covers authentication, profile, security, sessions, and OTP — the identity domain every other module stamps as `createdBy`/`updatedBy`/`deletedBy`/`authorId`/`recordedBy`/`changedBy`. `Profile` and `UserSecurity` are kept as separate 1:1 tables rather than columns on `User` because they group by concern (public-facing profile vs. internal security state) and because `UserSecurity` carries fields (`loginAttempts`, `assignedIp`, verification/reset tokens) that must never be selected onto a customer-facing response by accident — splitting the table makes that a `select` omission instead of a field-by-field one.
+Covers authentication, profile, security, and OTP — the identity domain every other module stamps as `createdBy`/`updatedBy`/`deletedBy`/`authorId`/`recordedBy`/`changedBy`. `Profile` and `UserSecurity` are kept as separate 1:1 tables rather than columns on `User` because they group by concern (public-facing profile vs. internal security state) and because `UserSecurity` carries fields (`loginAttempts`, `assignedIp`, verification/reset tokens) that must never be selected onto a customer-facing response by accident — splitting the table makes that a `select` omission instead of a field-by-field one.
 
-Schema source: `prisma/schema/user.prisma` (models `User`, `Profile`, `UserSecurity`, `Session`, `OTP`).
+Schema source: `prisma/schema/user.prisma` (models `User`, `Profile`, `UserSecurity`, `OTP`).
 
-> **Scope note:** `Session` lives in its own `src/modules/session` module and is documented there — it appears here only as an owned child needed to understand the `User` relationship graph. Every other module that references `User` (`Product`, `ComboProduct`, `Order`, `Address`, `Cart`, etc.) is documented in its own reference — they appear here only as FK targets needed to understand cascading behavior.
+> **Scope note:** Every module that references `User` (`Product`, `ComboProduct`, `Order`, `Address`, `Cart`, etc.) is documented in its own reference — they appear here only as FK targets needed to understand cascading behavior. There is no `Session` model — refresh tokens are stateless JWTs with no DB-backed session store; see `auth.md`'s Known Gaps for the tradeoff.
 
 ---
 
@@ -215,7 +215,6 @@ None of the four enums below carry inline doc comments in `user.prisma` — only
 | :------------------------ | :------------------- | :----------- | :--------------------------------------------------------------------- |
 | `User` → `Profile`         | `Profile.userId`     | **CASCADE**  | Deleting a user removes their profile.                                |
 | `User` → `UserSecurity`    | `UserSecurity.userId`| **CASCADE**  | Deleting a user removes their security row.                           |
-| `User` → `Session`         | `Session.userId`     | **CASCADE**  | Deleting a user invalidates every session.                            |
 | `User` → `OTP`             | `OTP.userId`         | **CASCADE**  | Nullable — a guest OTP (`userId: null`) is unaffected by any user delete. |
 
 ##### Downstream references (other modules' FKs into `User`)
@@ -236,7 +235,7 @@ None of the four enums below carry inline doc comments in `user.prisma` — only
 | `PromoCodeRedemption`    | `userId`                          | **SET NULL** | Nullable — guest redemptions enforce `usageLimitPerUser` at the app layer only, by email.                 |
 | `AuditLog`               | `actorId`                          | **SET NULL** | The single generic audit-trail FK — see [`audit-log.md`](./audit-log.md). Nullable; `NULL` means the mutation ran with no authenticated request context. Deliberately **not** one more `createdBy`/`updatedBy` pair — this is the one relation field meant to cover every current and future tracked model. |
 
-**Pattern:** every audit-stamp FK (`createdBy`/`updatedBy`/`deletedBy`/`changedBy`/`authorId`/`recordedBy`) is `SET NULL` — deleting a staff account never blocks or cascades into content they touched. Every ownership FK to a genuine end-user record is `CASCADE` (`Profile`, `UserSecurity`, `Session`, `Cart`, `Address`, `OTP`) **except** `Order` and `PromoCodeRedemption`, which are `SET NULL` — deliberately, since both are historical financial records that must survive account deletion and both already support a guest `userId: null` as a first-class state.
+**Pattern:** every audit-stamp FK (`createdBy`/`updatedBy`/`deletedBy`/`changedBy`/`authorId`/`recordedBy`) is `SET NULL` — deleting a staff account never blocks or cascades into content they touched. Every ownership FK to a genuine end-user record is `CASCADE` (`Profile`, `UserSecurity`, `Cart`, `Address`, `OTP`) **except** `Order` and `PromoCodeRedemption`, which are `SET NULL` — deliberately, since both are historical financial records that must survive account deletion and both already support a guest `userId: null` as a first-class state.
 
 ---
 

@@ -37,7 +37,7 @@ const HOME_SELECT_ADMIN = {
       status: true,
       role: true,
       profile: {
-        select: { name: true },
+        select: { firstName: true, lastName: true },
       },
     },
   },
@@ -48,7 +48,7 @@ const HOME_SELECT_ADMIN = {
       status: true,
       role: true,
       profile: {
-        select: { name: true },
+        select: { firstName: true, lastName: true },
       },
     },
   },

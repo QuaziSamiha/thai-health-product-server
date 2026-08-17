@@ -1,5 +1,5 @@
 //* ============= USER DOMAIN =============
-//* COVERS: AUTHENTICATION, PROFILE, SECURITY, SESSIONS, OTP
+//* COVERS: AUTHENTICATION, PROFILE, SECURITY, OTP
 
 enum UserRole {
   ADMIN
@@ -62,7 +62,6 @@ model User {
   profile                  Profile?
   security                 UserSecurity?
   deliveryManProfile       DeliveryManProfile?
-  sessions                 Session[] // Replaces single refreshToken for multi-device support
   otps                     OTP[]
   createdCategories        Category[]              @relation("CategoryCreatedBy")
   updatedCategories        Category[]              @relation("CategoryUpdatedBy")
@@ -90,7 +89,6 @@ model User {
   verifiedDeliveryMen      DeliveryManProfile[]    @relation("DeliveryManNidVerifiedBy")
   auditLogs                AuditLog[]              @relation("AuditLogActor")
 
-  @@index([email, phone])
   //* PREVENTS TWO ROWS FROM CLAIMING THE SAME OAUTH IDENTITY. NULLs (EVERY
   //* EMAIL-AUTH USER) ARE NOT DISTINCT-CHECKED BY POSTGRES, SO THIS ONLY
   //* CONSTRAINS ROWS THAT ACTUALLY HAVE A providerId.
@@ -102,8 +100,14 @@ model Profile {
   id          Int       @id @default(autoincrement())
   firstName   String    @db.VarChar(100)
   lastName    String?   @db.VarChar(100)
-  name        String?   @db.VarChar(200)
-  avatarUrl   String? // One source of truth for the image
+  //* NO `name` COLUMN — A DISPLAY NAME IS ALWAYS DERIVED FROM
+  //* firstName/lastName AT READ TIME (src/common/utils/display-name.util.ts),
+  //* NEVER STORED. A PRIOR `name` COLUMN ALLOWED AN INDEPENDENT VALUE AT
+  //* CREATE TIME THAT EVERY SUBSEQUENT PROFILE UPDATE THEN SILENTLY
+  //* DISCARDED (OVERWRITTEN BY A firstName+lastName CONCATENATION) — REMOVED
+  //* IN MIGRATION 20260817120000_drop_profile_name_column RATHER THAN
+  //* DOCUMENTED, SINCE THERE WAS NOTHING WORTH KEEPING IN SYNC.
+  avatarUrl String? // One source of truth for the image
   bio         String?   @db.Text
   dateOfBirth DateTime?
   gender      String?   @db.VarChar(20)
@@ -111,7 +115,13 @@ model Profile {
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @unique @map("user_id")
 
-  @@index([firstName, lastName])
+  //* PLAIN BTREE ON (firstName, lastName) REPLACED BY TWO pg_trgm GIN
+  //* INDEXES — THE ADMIN USER-SEARCH ENDPOINTS (UserRepository.findAllUsers,
+  //* DeliveryManRepository.findAllDeliveryMen) RUN A `contains`/ILIKE
+  //* SUBSTRING SEARCH, WHICH A BTREE CANNOT SERVE. EXTENSION ENABLED AND
+  //* INDEXES CREATED IN MIGRATION 20260817130000_trigram_indexes_for_name_search.
+  @@index([firstName(ops: raw("gin_trgm_ops"))], type: Gin, map: "profiles_first_name_trgm_idx")
+  @@index([lastName(ops: raw("gin_trgm_ops"))], type: Gin, map: "profiles_last_name_trgm_idx")
   @@map("profiles")
 }
 
@@ -129,27 +139,16 @@ model UserSecurity {
 
   // Security Logs
   loginAttempts Int     @default(0)
-  lastLoginIp   String?
-  assignedIp    String? // For internal/vendor restricted access
+  //* NATIVE inet (NOT String) — VALIDATES ON WRITE AND KEEPS CIDR/RANGE
+  //* QUERIES AVAILABLE FOR FUTURE FRAUD/GEO RULES WITHOUT APP-LAYER PARSING.
+  //* CONVERTED IN MIGRATION 20260817140000_ip_fields_to_inet.
+  lastLoginIp String? @db.Inet
+  assignedIp  String? @db.Inet // For internal/vendor restricted access
 
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @unique @map("user_id")
 
   @@map("user_security")
-}
-
-model Session {
-  id                    Int      @id @default(autoincrement())
-  refreshToken          String   @unique @db.Text
-  refreshTokenExpiresAt DateTime @db.Timestamptz(3)
-  createdAt             DateTime @default(now()) @db.Timestamptz(3)
-  userAgent             String?
-  ipAddress             String?
-
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int
-
-  @@map("sessions")
 }
 
 model OTP {

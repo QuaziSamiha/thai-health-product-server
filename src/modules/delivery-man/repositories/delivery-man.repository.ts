@@ -17,7 +17,6 @@ export class DeliveryManRepository extends BaseRepository {
   }
 
   private readonly PROFILE_SELECT = {
-    name: true,
     firstName: true,
     lastName: true,
     avatarUrl: true,
@@ -118,7 +117,7 @@ export class DeliveryManRepository extends BaseRepository {
       {
         where: { role: UserRole.DELIVERY_PARTNER, deletedAt: null },
         select: this.DETAIL_SELECT,
-        searchableFields: ['email', 'phone', 'profile.name'],
+        searchableFields: ['email', 'phone', 'profile.firstName', 'profile.lastName'],
         defaultSortField: 'createdAt',
       },
     );

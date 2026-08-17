@@ -58,7 +58,7 @@ const COMBO_USER_MINIFIED_SELECT = {
   email: true,
   status: true,
   role: true,
-  profile: { select: { name: true } },
+  profile: { select: { firstName: true, lastName: true } },
 } as const;
 
 //* ═══════════════════════════════════════════════════════════════════════

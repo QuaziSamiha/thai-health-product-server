@@ -139,14 +139,18 @@ describe('PaginationService', () => {
       const source = makeSource();
 
       await service.paginate(source, makeParams({ search: 'bar' }), {
-        searchableFields: ['profile.name'],
+        searchableFields: ['profile.firstName'],
       });
 
       expect(source.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: {
             OR: [
-              { profile: { name: { contains: 'bar', mode: 'insensitive' } } },
+              {
+                profile: {
+                  firstName: { contains: 'bar', mode: 'insensitive' },
+                },
+              },
             ],
           },
         }),

@@ -1,0 +1,12 @@
+-- Email matching was case-sensitive (plain equality, no citext, no
+-- lowercasing anywhere) — two rows differing only by case could both
+-- register, and a login attempt cased differently than the stored value
+-- would silently fail to match. App-layer normalization now lowercases
+-- email on every write (CreateUserDto/LoginDto @Transform, AuthService's
+-- verified Google profile) and on every read (UserRepository's
+-- findUserByEmail* methods). This backfills existing rows to match.
+--
+-- Safe to run unconditionally: checked beforehand for rows that would
+-- collide once lowercased (`SELECT count(*) FROM (SELECT LOWER(email) FROM
+-- users GROUP BY LOWER(email) HAVING count(*) > 1) t`) and found zero.
+UPDATE "users" SET "email" = LOWER("email") WHERE "email" != LOWER("email");
