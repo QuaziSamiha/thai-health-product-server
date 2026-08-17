@@ -169,6 +169,24 @@ export class UserRepository extends BaseRepository {
     });
   }
 
+  //* DELIBERATELY THE NARROWEST SELECT IN THIS FILE — JwtStrategy RUNS IT ON
+  //* EVERY AUTHENTICATED REQUEST TO CONFIRM THE ACCOUNT BEHIND THE TOKEN IS
+  //* STILL ALLOWED IN, SO IT MUST STAY A SINGLE INDEXED PK READ WITH NO JOINS.
+  //* RETURNS deletedAt SO A HARD-SOFT-DELETED ROW IS REJECTED TOO.
+  async findAuthStateById(userId: number, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        status: true,
+        deletedAt: true,
+      },
+    });
+  }
+
   async findUserById(userId: number, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return await client.user.findUnique({

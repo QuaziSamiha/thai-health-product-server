@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Ip,
   NotFoundException,
   ForbiddenException,
@@ -34,6 +36,8 @@ import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdateUserSecurityDto } from './dto/update-user-security.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -46,6 +50,8 @@ import {
 import { UserResponseDtoWithDetails } from './dto/user-response.dto';
 import { ResponseMessage } from '../../common/decorators/response/response-message.decorator';
 import {
+  FORGOT_PASSWORD_THROTTLE,
+  RESET_PASSWORD_THROTTLE,
   SIGNUP_THROTTLE,
   THROTTLER_SHORT,
 } from '../../common/throttler/throttler.constants';
@@ -78,6 +84,62 @@ export class UserController {
   @ResponseMessage('User created successfully')
   async register(@Body() createUserDto: CreateUserDto, @Ip() ip: string) {
     return this.userService.registerUser(createUserDto, ip);
+  }
+
+  //* STEP 1 OF THE FORGOT-PASSWORD FLOW. PUBLIC, UNAUTHENTICATED, AND SENDS MAIL TO AN
+  //* ADDRESS THE CALLER CHOSE — SO IT CARRIES THE SAME 3-PER-HOUR BUDGET AS SIGNUP, AND
+  //* ALWAYS ANSWERS 200 WITH THE SAME MESSAGE. SEE UserService.requestPasswordReset FOR
+  //* WHY THE ANSWER CANNOT DEPEND ON WHETHER THE ACCOUNT EXISTS.
+  @Throttle({ [THROTTLER_SHORT]: FORGOT_PASSWORD_THROTTLE })
+  @Post('forgot-password')
+  @ApiConsumes('application/json')
+  @ApiOperation({
+    summary: 'Request a password reset code',
+    description:
+      'Emails a 6-digit PASSWORD_RESET code to the address if it belongs to an active email/password account. Always returns 200 with the same message regardless of whether the account exists, so the route cannot be used to discover registered addresses.',
+  })
+  @ApiBody({ type: ForgotPasswordDto })
+  @ApiResponse({ status: 200, description: 'Request accepted.' })
+  @ApiBadRequestResponse({ description: 'Invalid email address.' })
+  @ApiResponse({
+    status: 429,
+    description:
+      'Too many password reset requests from this IP. Limit is 3 per hour.',
+  })
+  @HttpCode(HttpStatus.OK)
+  @ResponseMessage(
+    'If an account exists for that email, a reset code has been sent.',
+  )
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.userService.requestPasswordReset(forgotPasswordDto);
+  }
+
+  //* STEP 2. THE CODE IS THE ONLY CREDENTIAL, SO THIS IS AN OTP-GUESSING SURFACE FIRST —
+  //* HENCE THE OTP-VERIFY-SHAPED BUDGET (5 PER 5 MINUTES, THEN A 15-MINUTE BLOCK) RATHER
+  //* THAN THE MAIL-COST-SHAPED ONE ABOVE.
+  @Throttle({ [THROTTLER_SHORT]: RESET_PASSWORD_THROTTLE })
+  @Post('reset-password')
+  @ApiConsumes('application/json')
+  @ApiOperation({
+    summary: 'Set a new password using a reset code',
+    description:
+      'Verifies the emailed PASSWORD_RESET code and writes the new password in one transaction. The code is single-use and expires 10 minutes after it was issued. No session is returned — the user signs in with the new password.',
+  })
+  @ApiBody({ type: ResetPasswordDto })
+  @ApiResponse({ status: 200, description: 'Password reset successfully.' })
+  @ApiBadRequestResponse({
+    description:
+      'Invalid input, an invalid/expired code, an ineligible account, or a new password identical to the current one.',
+  })
+  @ApiResponse({
+    status: 429,
+    description:
+      'Too many reset attempts from this IP. Limit is 5 per 5 minutes, then a 15-minute block.',
+  })
+  @HttpCode(HttpStatus.OK)
+  @ResponseMessage('Password reset successfully')
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.userService.resetPassword(resetPasswordDto);
   }
 
   @Get('all-user')

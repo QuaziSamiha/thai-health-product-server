@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  ForbiddenException,
   forwardRef,
   Inject,
   Injectable,
@@ -13,7 +12,8 @@ import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { HashService } from '../../shared/hash/hash.service';
-import { AuthProvider, UserStatus } from '../../generated/prisma/enums';
+import { AuthProvider } from '../../generated/prisma/enums';
+import { assertAccountCanAuthenticate } from '../../common/utils/account-status.util';
 import { UserResponseDto } from '../user/dto/user-response.dto';
 // import type { SignOptions } from 'jsonwebtoken';
 import { IJwtPayload, ITokens } from './interfaces/jwt-payload.interface';
@@ -54,18 +54,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    if (
-      user.status === UserStatus.BLOCKED ||
-      user.status === UserStatus.SUSPENDED
-    ) {
-      throw new ForbiddenException(`Account is ${user.status.toLowerCase()}`);
-    }
-
-    if (user.status === UserStatus.PENDING_VERIFICATION) {
-      throw new UnauthorizedException(
-        'Account is not active. Please verify your email before logging in',
-      );
-    }
+    //* STATUS GATE BEFORE THE PASSWORD COMPARE — A DEACTIVATED (SOFT-DELETED),
+    //* BLOCKED, SUSPENDED OR UNVERIFIED ACCOUNT IS REJECTED EVEN WITH THE
+    //* CORRECT CREDENTIALS. SEE assertAccountCanAuthenticate.
+    assertAccountCanAuthenticate(user.status);
 
     // * Check for password (OAuth users won't have one)
     if (!user.password) {
@@ -130,15 +122,7 @@ export class AuthService {
   ): Promise<TokensResponseDto> {
     const user = await this.userService.getUserById(userId);
 
-    if (
-      user.status === UserStatus.BLOCKED ||
-      user.status === UserStatus.SUSPENDED
-    ) {
-      throw new ForbiddenException(`Account is ${user.status.toLowerCase()}`);
-    }
-    if (user.status !== UserStatus.ACTIVE) {
-      throw new UnauthorizedException('Account is not active');
-    }
+    assertAccountCanAuthenticate(user.status);
 
     await this.userService.updateLoginSuccess(user.id, ip);
     await this.userService.updateLastLoginTime(user.id);
@@ -236,40 +220,41 @@ export class AuthService {
 
   async refreshToken(refreshToken: string): Promise<TokensResponseDto> {
     const authConfig = this.configService.get('auth');
+
+    //* ONLY THE SIGNATURE/EXPIRY CHECK LIVES IN THE try. THE STATUS GATE BELOW
+    //* USED TO SIT INSIDE IT, SO A DEACTIVATED ACCOUNT'S 403 WAS CAUGHT AND
+    //* FLATTENED INTO "invalid or expired refresh token" — MISLEADING FOR THE
+    //* CLIENT AND EASY TO MISREAD AS A TOKEN BUG DURING SUPPORT.
+    let payload: IJwtPayload;
     try {
-      const payload = await this.jwtService.verifyAsync<IJwtPayload>(
-        refreshToken,
-        {
-          secret: authConfig?.refreshSecret,
-        },
-      );
-
-      if (!payload || !payload.sub) {
-        throw new UnauthorizedException('Invalid token payload');
-      }
-
-      const user = await this.userService.getUserById(payload.sub);
-
-      if (!user) {
-        throw new UnauthorizedException('User not found');
-      }
-
-      if (user.status !== UserStatus.ACTIVE) {
-        throw new UnauthorizedException('Account is not active');
-      }
-
-      // 5. Generate new pair
-      const tokens = await this.generateTokens({
-        sub: user.id,
-        email: user.email,
-        role: user.role,
+      payload = await this.jwtService.verifyAsync<IJwtPayload>(refreshToken, {
+        secret: authConfig?.refreshSecret,
       });
-
-      return new TokensResponseDto(tokens);
     } catch (error: unknown) {
       this.logger.warn('Refresh token validation failed', error);
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
+
+    if (!payload?.sub) {
+      throw new UnauthorizedException('Invalid token payload');
+    }
+
+    //* getUserById THROWS NotFoundException FOR A MISSING ROW — A DELETED USER
+    //* PRESENTING AN OLD REFRESH TOKEN IS AN AUTH FAILURE (401), NOT A 404.
+    const user = await this.userService.getUserById(payload.sub).catch(() => {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    });
+
+    assertAccountCanAuthenticate(user.status);
+
+    // 5. Generate new pair
+    const tokens = await this.generateTokens({
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    });
+
+    return new TokensResponseDto(tokens);
   }
 
   private async generateTokens(payload: IJwtPayload): Promise<ITokens> {

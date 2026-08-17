@@ -121,8 +121,8 @@ None of the four enums below carry inline doc comments in `user.prisma` — only
 
 | Value            | Meaning                                                                                     |
 | :---------------- | :----------------------------------------------------------------------------------------------- |
-| `SIGNUP`          | **The only value this module actually branches on.** `OtpService.verifyOtp` calls `UserService.activateUser` only when `type === SIGNUP`. |
-| `PASSWORD_RESET`  | Declared; `UserSecurity.resetToken`/`resetTokenExpires` exist but no code path reads or writes them. |
+| `SIGNUP`          | Issued by `POST /create-user`, consumed by `POST /otp/verify-otp`. `OtpService.verifyOtp` calls `UserService.activateUser` — and mints a session — only for this type. |
+| `PASSWORD_RESET`  | **Implemented.** Issued by `POST /user/forgot-password`, consumed by `POST /user/reset-password` — see [Forgot Password](#forgot-password) and [Reset a Password](#reset-a-password). Never goes through `POST /otp/verify-otp`: verifying and spending the code are the same request, so no session or intermediate token is ever minted from it. |
 | `LOGIN_2FA`       | Declared; not wired to any login flow.                                                          |
 | `PHONE_CHANGE`    | Declared; not wired to any phone-change flow.                                                   |
 
@@ -174,15 +174,13 @@ None of the four enums below carry inline doc comments in `user.prisma` — only
 
 **Table purpose:** internal security/auth state, isolated from `Profile` specifically so an admin-facing `select` can expose `loginAttempts`/`lastLoginIp`/`assignedIp` without those fields ever being reachable from a customer-facing one. 1:1 via `userId @unique`. Maps to table `user_security`.
 
+> **There is no token column here, and that is deliberate.** A `verificationToken`/`verificationTokenExpires`/`resetToken`/`resetTokenExpires` quartet used to exist and was dropped by `20260813085902_drop_unused_user_security_tokens`: never read or written by any repository, and — unlike `OTP` — able to hold only one live token at a time with no record of prior requests. **Every** verification flow (signup, password reset, and any future 2FA/phone-change) issues an `OTP` row instead. Do not re-add a token column to implement one; see [Reset a Password](#reset-a-password) for what that buys.
+
 | Field                       | Type             | Constraints                                                         | Description                                                                                                          |
 | :-------------------------- | :--------------- | :---------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------- |
 | `id`                        | `INT`            | PK, AUTOINCREMENT                                                       | Internal key.                                                                                                        |
 | `isEmailVerified`           | `BOOLEAN`        | NOT NULL, DEFAULT `false`                                               | Flipped to `true` by `activateUser` on signup-OTP success, or set `true` immediately for OAuth signups.               |
 | `emailVerifiedAt`           | `TIMESTAMPTZ(3)` | NULLABLE                                                                | Paired with `isEmailVerified`; `NULL` exactly when unverified.                                                       |
-| `verificationToken`         | `VARCHAR`        | NULLABLE                                                                | **Declared, unused.** No repository method reads or writes this column — see [Known Gaps](#known-gaps--recommended-hardening). |
-| `verificationTokenExpires`  | `TIMESTAMPTZ(3)` | NULLABLE                                                                | Same — unused.                                                                                                       |
-| `resetToken`                | `VARCHAR`        | NULLABLE                                                                | Same — unused; password reset is not implemented through this column (`PASSWORD_RESET` `OTPType` also isn't wired).  |
-| `resetTokenExpires`         | `TIMESTAMPTZ(3)` | NULLABLE                                                                | Same — unused.                                                                                                       |
 | `loginAttempts`             | `INT`            | NOT NULL, DEFAULT `0`                                                   | Incremented on every failed login (`AuthService.validateUser` → `updateLoginAttempts`); reset to `0` on success.       |
 | `lastLoginIp`                | `VARCHAR`        | NULLABLE                                                                | Set from the request IP on successful login, and at registration.                                                    |
 | `assignedIp`                | `INET`           | NULLABLE                                                                | "For internal/vendor restricted access" per schema comment. **Admin-set only** — written exclusively by `PATCH /update-user-security/:id`; `CreateUserDto` has no `security` sub-object, so a self-registering caller cannot seed it. See [Update a User's Assigned IP](#update-a-users-assigned-ip). |
@@ -338,6 +336,8 @@ Every endpoint below is served by `UserController` → `UserService` → `UserRe
 | Method  | Path                        | Access                          | Purpose                                                                 |
 | :------ | :---------------------------- | :--------------------------------- | :--------------------------------------------------------------------------- |
 | `POST`  | `/create-user`               | Public, **rate limited 3/hour/IP** | [Register a new user](#register-a-user)                                     |
+| `POST`  | `/forgot-password`           | Public, **rate limited 3/hour/IP** | [Request a password reset code](#forgot-password)                           |
+| `POST`  | `/reset-password`            | Public, **rate limited 5/5min/IP** | [Set a new password with that code](#reset-a-password)                      |
 | `GET`   | `/all-user`                  | `ADMIN`                            | [Paginated admin user list](#get-all-users-admin)                           |
 | `GET`   | `/my-profile`                | Authenticated (self)               | [Get the caller's own account + profile + security summary](#get-my-profile) |
 | `PATCH` | `/update-user-role/:id`      | `ADMIN`                            | [Change a user's role](#update-a-users-role)                                |
@@ -345,6 +345,8 @@ Every endpoint below is served by `UserController` → `UserService` → `UserRe
 | `PATCH` | `/update-password/:id`       | Authenticated (self **or** `ADMIN`) | [Change a user's password](#update-a-password)                             |
 
 `GET /all-user`, `PATCH /update-user-role/:id`, and `PATCH /update-user-security/:id` use `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.ADMIN)`. `GET /my-profile` and `PATCH /update-password/:id` use `JwtAuthGuard` only — `update-password`'s self-or-admin check is a manual `if` in the controller, not `RolesGuard`, since any authenticated caller may hit the route but only self or `ADMIN` passes.
+
+`POST /forgot-password` and `POST /reset-password` are public and unauthenticated by necessity — the caller has, by definition, lost the ability to authenticate. Everything that would normally be a guard is therefore a rule inside the service; see [Password Reset Flow](#password-reset-flow).
 
 **Every route above also passes through the global rate limiter** (`AppThrottlerGuard`, registered as an `APP_GUARD` by `src/common/throttler/`). It runs *before* `JwtAuthGuard`, so it buckets by IP on every route including the authenticated ones. All routes get the global `short` (30 per 10s) and `long` (200 per 60s) tiers; `POST /create-user` narrows `short` to **3 per hour**. Exceeding a limit returns `429` with `errorCode: 'RATE_LIMIT_EXCEEDED'` — see [Rate Limiting](#rate-limiting).
 
@@ -408,6 +410,122 @@ Every endpoint below is served by `UserController` → `UserService` → `UserRe
 | `429`  | More than 3 signup attempts from this IP within the hour. Body carries `errorCode: 'RATE_LIMIT_EXCEEDED'`. |
 
 > **The `429` is charged before validation.** Guards run ahead of the `ValidationPipe`, so a request that would have failed with a `400` still consumes one of the three. That is deliberate — an attacker spraying malformed payloads costs the server the same connection and parse work as a well-formed one.
+
+---
+
+#### Password Reset Flow
+
+Two public endpoints and one `OTP` row. There is no third step, no reset link, and no intermediate token.
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant U as UserController
+    participant S as UserService
+    participant O as OtpService
+    participant M as Mail
+    participant DB as Postgres
+
+    C->>U: POST /user/forgot-password { email }
+    U->>S: requestPasswordReset(dto)
+    S->>DB: findUserByEmail
+    alt unknown / OAuth-only / not ACTIVE
+        S-->>C: 200 (same body, same message) — nothing sent
+    else eligible
+        S->>O: issueOtp(email, PASSWORD_RESET, userId)
+        O->>O: 60s per-identifier cooldown
+        O->>DB: create hashed OTP (10 min TTL)
+        O->>M: send "Reset Your Password" mail
+        S-->>C: 200 (same body, same message)
+    end
+
+    C->>U: POST /user/reset-password { email, code, newPassword }
+    U->>S: resetPassword(dto)
+    S->>DB: findUserByEmailWithPassword
+    S->>O: findMatchingOtp (bcrypt compare, no burn)
+    S->>S: reject if newPassword === current
+    S->>DB: TRANSACTION — markOtpUsed + updatePassword
+    S-->>C: 200 { success: true } (no tokens)
+```
+
+**The three design decisions worth knowing before touching this:**
+
+1. **The OTP is the only credential, and it is spent in the request that changes the password.** The obvious alternative — verify the code, hand back a short-lived reset token, accept that token on a third endpoint — was not built. It would need either a DB column (removed on purpose; see the [UserSecurity note](#data-dictionary--usersecurity)) or a second JWT flavour, and either way it puts a password-changing capability in the browser for a few minutes. Here nothing outlives the single request.
+2. **`POST /forgot-password` cannot fail in a way the caller can observe.** See [Forgot Password](#forgot-password).
+3. **A reset mints no session.** `OtpService.verifyOtp` does mint one for `SIGNUP` (`AuthService.issueTokensForVerifiedUser`), which is why `PASSWORD_RESET` deliberately does not route through `verify-otp` at all — a code entered on a password-reset screen must not become a logged-in session as a side effect.
+
+---
+
+#### Forgot Password
+
+**`POST /api/v1/user/forgot-password`**
+
+**Purpose**: Email a 6-digit `PASSWORD_RESET` code to an account.
+
+**Access**: None — public route. **Rate limited to 3 per hour per IP** (`@Throttle({ short: FORGOT_PASSWORD_THROTTLE })`) — same budget as signup, because it has the same cost profile with a worse twist: the mail lands in an address the *caller* chose, so an uncapped version is a mail-bombing tool aimed at a victim, not just a cost sink.
+
+| Layer      | What happens                                                                                          |
+| :--------- | :------------------------------------------------------------------------------------------------------ |
+| Guard      | `AppThrottlerGuard` (global `APP_GUARD`) — 3 per hour per IP.                                            |
+| Controller | `forgotPassword(dto)` — no logic; `@HttpCode(200)` and a fixed `@ResponseMessage`.                        |
+| Service    | `requestPasswordReset(dto)` — three eligibility checks, then delegate. Never throws.                     |
+| Repository | `findUserByEmail` → `OtpService.issueOtp(email, PASSWORD_RESET, userId)`.                                |
+
+**Business logic — in order:**
+
+1. **`findUserByEmail(dto.email)`** — the DTO lowercases/trims first, same as `CreateUserDto`.
+2. **Eligibility, three checks, all silent:**
+   - No such account → nothing sent.
+   - `authProvider !== EMAIL` → nothing sent. A Google account has `password: NULL`; a code would only lead to a dead end at `reset-password`.
+   - `status !== ACTIVE` → nothing sent. `PENDING_VERIFICATION` must finish signup verification instead; `BLOCKED`/`SUSPENDED`/`DEACTIVATED` must not be handed a way back in. Same allowlist as `assertAccountCanAuthenticate`, but *checked* rather than thrown.
+3. **`OtpService.issueOtp`** — the cooldown-aware issuance path (60 s per `identifier`+`type`), which creates the hashed OTP row (10-minute TTL) and sends the mail.
+4. **Any error from step 3 is caught and logged, not thrown** — including the cooldown rejection. Only a real account can be on cooldown, so surfacing it would answer "does this address exist?".
+5. **Response** — `new PasswordResetResponseDto({ success: true })`, always.
+
+**Response shape**: `PasswordResetResponseDto` — `{ success: true }`, with the envelope message `"If an account exists for that email, a reset code has been sent."`
+
+| Status | Cause                                                                                       |
+| :----- | :--------------------------------------------------------------------------------------------- |
+| `200`  | Request accepted. **Says nothing about whether an account exists or mail was sent.**          |
+| `400`  | `email` missing or not a valid email address — the only observable failure.                  |
+| `429`  | More than 3 requests from this IP within the hour.                                            |
+
+> **Why no 404 for an unknown address.** A route that answers differently for a registered and an unregistered email is a free account-enumeration oracle: it turns any leaked address list into a list of *this site's* users, which is the input to credential stuffing and to convincing targeted phishing. The real outcome is logged server-side (`UserService` logger) so support can still answer "did we send it?" without the endpoint answering it for everyone.
+
+---
+
+#### Reset a Password
+
+**`POST /api/v1/user/reset-password`**
+
+**Purpose**: Verify the emailed code and write the new password, in one transaction.
+
+**Access**: None — public route. **Rate limited to 5 per 5 minutes per IP, then a 15-minute block** (`RESET_PASSWORD_THROTTLE`) — the same budget as `POST /otp/verify-otp`, because it is the same threat: guessing a 6-digit code.
+
+| Layer      | What happens                                                                                                    |
+| :--------- | :---------------------------------------------------------------------------------------------------------------- |
+| Controller | `resetPassword(dto)` — no logic.                                                                                  |
+| Service    | `resetPassword(dto)` — eligibility, code match, same-password check, then one transaction.                        |
+| Repository | `findUserByEmailWithPassword(email, true)` → `OtpService.findMatchingOtp` → **tx**: `markOtpUsed` + `updatePassword`. |
+
+**Business logic — in order:**
+
+1. **Fetch with password** — `findUserByEmailWithPassword(dto.email, true)`; one of only three call sites in the codebase that pass `true`.
+2. **Eligibility** — missing account, `password: NULL`, `authProvider !== EMAIL`, or `status !== ACTIVE` all throw the **same** `400`: `"This reset code is invalid or has expired. Please request a new one."` One message for four causes, so this route can't be used to probe for accounts either.
+3. **`OtpService.findMatchingOtp(email, code, PASSWORD_RESET)`** — latest unused, unexpired row for that identifier+type, then `bcrypt.compare`. Throws `400` for missing/expired (`"OTP has expired or does not exist…"`) or mismatch (`"Invalid OTP code."`). **Deliberately does not burn the code** — see step 5.
+4. **Same-password check** — `hashService.compare(newPassword, user.password)` → `400` if unchanged. Same rule as `PATCH /update-password/:id`; someone who "forgot" their password and types the one they already have is better told so than silently no-opped.
+5. **One transaction: burn, then write.** `markOtpUsed(otpId, tx)` + `updatePassword(userId, hash, tx)`. They must commit together — a burn without the write strands the user (valid code gone, password unchanged); a write without the burn leaves a replayable code that could set the password again later. The bcrypt work in steps 3–4 happens *outside* the transaction, matching how `OtpService.verifyOtp` keeps its own compare out of its transaction.
+6. **Response** — `{ success: true }`. **No token pair**, unlike signup-OTP verification.
+
+**Response shape**: `PasswordResetResponseDto`.
+
+| Status | Cause                                                                                                                       |
+| :----- | :------------------------------------------------------------------------------------------------------------------------------ |
+| `200`  | Password updated. The user now signs in normally.                                                                            |
+| `400`  | DTO validation failed; **or** the code is wrong/expired/already used; **or** the account is unknown, OAuth-only, or not `ACTIVE`; **or** the new password matches the current one. |
+| `429`  | More than 5 attempts from this IP in 5 minutes — then blocked for 15.                                                        |
+
+> **Existing sessions survive a reset.** Refresh tokens are stateless JWTs with no DB-backed session store (see `auth.md`), so there is nothing to revoke: an attacker who already holds a valid refresh token keeps it until it expires, even after the victim resets. That is a property of the token design, not of this endpoint — see [Known Gaps](#known-gaps--recommended-hardening).
 
 ---
 

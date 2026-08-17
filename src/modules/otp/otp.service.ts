@@ -86,11 +86,16 @@ export class OtpService {
   //* TRANSACTION — PRISMA'S INTERACTIVE $transaction HAS A DEFAULT 5S TIMEOUT,
   //* AND HOLDING IT OPEN ACROSS AN SMTP ROUND-TRIP MEANS ANY MAIL-PROVIDER
   //* LATENCY SPIKE THROWS P2028 AND ROLLS BACK AN OTHERWISE-VALID DB WRITE.
-  async sendOtp(identifier: string, plainOtp: string) {
+  async sendOtp(
+    identifier: string,
+    plainOtp: string,
+    type: OTPType = OTPType.SIGNUP,
+  ) {
     // In development, we allow console-only OTP flow as a fallback.
     const isMailSent = await this.mailService.sendOtpEmail(
       identifier,
       plainOtp,
+      type,
     );
     const isDev =
       this.configService.get<string>('NODE_ENV') === 'development';
@@ -116,7 +121,62 @@ export class OtpService {
     tx?: Prisma.TransactionClient,
   ) {
     const plainOtp = await this.createOtp(identifier, type, userId, tx);
-    return this.sendOtp(identifier, plainOtp);
+    return this.sendOtp(identifier, plainOtp, type);
+  }
+
+  //* ISSUANCE WITH THE PER-IDENTITY COOLDOWN APPLIED — THE ENTRY POINT FOR ANY
+  //* FLOW WHERE THE *USER* ASKS FOR A CODE (RESEND, FORGOT PASSWORD), AS
+  //* OPPOSED TO ONE THE SERVER ISSUES AS PART OF ANOTHER ACTION (REGISTRATION).
+  //* THROWS BadRequestException WHILE THE COOLDOWN IS STILL RUNNING.
+  async issueOtp(identifier: string, type: OTPType, userId?: number) {
+    await this.assertResendCooldownElapsed(identifier, type);
+
+    const plainOtp = await this.createOtp(identifier, type, userId);
+    return this.sendOtp(identifier, plainOtp, type);
+  }
+
+  //* KEYED BY identifier+type, NOT BY IP — TWO DIFFERENT FLOWS FOR THE SAME
+  //* ADDRESS (E.G. A SIGNUP RESEND AND A PASSWORD RESET) DON'T BLOCK EACH
+  //* OTHER, BUT NEITHER CAN BE USED TO REPEATEDLY MAIL THE SAME INBOX.
+  private async assertResendCooldownElapsed(identifier: string, type: OTPType) {
+    const latestOtp = await this.otpRepo.findLatestValidOtp(identifier, type);
+    if (!latestOtp) return;
+
+    const elapsedSeconds = (Date.now() - latestOtp.createdAt.getTime()) / 1000;
+    if (elapsedSeconds < this.RESEND_COOLDOWN_SECONDS) {
+      const waitSeconds = Math.ceil(
+        this.RESEND_COOLDOWN_SECONDS - elapsedSeconds,
+      );
+      throw new BadRequestException(
+        `Please wait ${waitSeconds}s before requesting another OTP.`,
+      );
+    }
+  }
+
+  //* MATCH WITHOUT BURNING. SPLIT OUT OF verifyOtp SO A CALLER THAT MUST BURN
+  //* THE CODE INSIDE ITS *OWN* TRANSACTION (UserService.resetPassword — THE
+  //* BURN AND THE PASSWORD WRITE HAVE TO COMMIT TOGETHER) CAN STILL PAY THE
+  //* BCRYPT COMPARE OUTSIDE IT. NEVER CALL THIS WITHOUT CALLING markOtpUsed ON
+  //* THE RETURNED ROW — AN UNBURNED CODE IS A REPLAYABLE ONE.
+  async findMatchingOtp(identifier: string, code: string, type: OTPType) {
+    const otpRecord = await this.otpRepo.findLatestValidOtp(identifier, type);
+
+    if (!otpRecord) {
+      throw new BadRequestException(
+        'OTP has expired or does not exist. Please request a new one.',
+      );
+    }
+
+    const isMatch = await this.hashService.compare(code, otpRecord.code);
+    if (!isMatch) {
+      throw new BadRequestException('Invalid OTP code.');
+    }
+
+    return otpRecord;
+  }
+
+  async markOtpUsed(otpId: number, tx?: Prisma.TransactionClient) {
+    return this.otpRepo.markAsUsed(otpId, tx);
   }
 
   //* SELF-SERVE RECOVERY PATH FOR THE POST-COMMIT SEND IN
@@ -136,22 +196,7 @@ export class OtpService {
       );
     }
 
-    const latestOtp = await this.otpRepo.findLatestValidOtp(identifier, type);
-    if (latestOtp) {
-      const elapsedSeconds =
-        (Date.now() - latestOtp.createdAt.getTime()) / 1000;
-      if (elapsedSeconds < this.RESEND_COOLDOWN_SECONDS) {
-        const waitSeconds = Math.ceil(
-          this.RESEND_COOLDOWN_SECONDS - elapsedSeconds,
-        );
-        throw new BadRequestException(
-          `Please wait ${waitSeconds}s before requesting another OTP.`,
-        );
-      }
-    }
-
-    const plainOtp = await this.createOtp(identifier, type, user.id);
-    return this.sendOtp(identifier, plainOtp);
+    return this.issueOtp(identifier, type, user.id);
   }
 
   async verifyOtp(dto: VerifyOtpDto) {
@@ -165,20 +210,9 @@ export class OtpService {
       );
     }
 
-    // * Find the latest valid (unused & not expired) OTP for this user/type
-    const otpRecord = await this.otpRepo.findLatestValidOtp(identifier, type);
-
-    if (!otpRecord) {
-      throw new BadRequestException(
-        'OTP has expired or does not exist. Please request a new one.',
-      );
-    }
-
-    const isMatch = await this.hashService.compare(code, otpRecord.code);
-
-    if (!isMatch) {
-      throw new BadRequestException('Invalid OTP code.');
-    }
+    //* THROWS FOR AN EXPIRED/MISSING/NON-MATCHING CODE. THE BCRYPT COMPARE
+    //* DELIBERATELY HAPPENS HERE, BEFORE THE TRANSACTION BELOW OPENS.
+    const otpRecord = await this.findMatchingOtp(identifier, code, type);
 
     // * "Burn" the OTP so it cannot be used again (Atomic security)
     // await this.otpRepo.markAsUsed(otpRecord.id);
