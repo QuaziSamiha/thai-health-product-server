@@ -64,9 +64,9 @@ async function bootstrap() {
 
   // Swagger configuration
   const config = new DocumentBuilder()
-    .setTitle('NestJS Codebase API')
+    .setTitle('Thai Health Product API')
     .setDescription(
-      `API documentation for NestJS Codebase Backend. This documentation provides detailed information about all available endpoints, authentication methods, and data models used in the NestJS Codebase system.`,
+      `API documentation for Thai Health Product Backend. This documentation provides detailed information about all available endpoints, authentication methods, and data models used in the Thai Health Product system.`,
     )
     .setVersion('1.0.0')
     .addBearerAuth() // * For JWT headers
@@ -96,7 +96,7 @@ async function bootstrap() {
 
   // * ======= ROOT ENDPOINT =======
   app.getHttpAdapter().get('/', (req: Request, res: Response) => {
-    res.send('NestJS Codebase Server');
+    res.send('Thai Health Product Server');
   });
 
   // Enable shutdown hooks

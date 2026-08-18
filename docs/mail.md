@@ -30,7 +30,7 @@ Module source: `src/modules/mail/` (`mail.controller.ts`, `mail.service.ts`, `ma
 | `transport.auth.user`             | `config.get('MAIL_USERNAME')`                                       |                                                                                                                 |
 | `transport.auth.pass`             | `config.get('MAIL_PASSWORD')`                                       |                                                                                                                 |
 | `transport.tls.rejectUnauthorized`| **Hardcoded `false`**                                               | Comment: "Helps with local dev/testing" — but unconditional across **every** environment, including production. See [Known Gaps](#known-gaps--recommended-hardening). |
-| `defaults.from`                    | `` `"NestJS Codebase" <${config.get('MAIL_FROM')}>` ``               | Display name **hardcoded**; only the address is configurable (no `MAIL_FROM_NAME`).                             |
+| `defaults.from`                    | `` `"Thai Health Product" <${config.get('MAIL_FROM')}>` ``               | Display name **hardcoded**; only the address is configurable (no `MAIL_FROM_NAME`).                             |
 
 #### Template Dictionary — `otp.hbs`
 
@@ -42,10 +42,10 @@ Module source: `src/modules/mail/` (`mail.controller.ts`, `mail.service.ts`, `ma
 
 Everything else in the template is hardcoded, not templated — worth knowing before assuming any of it is configurable:
 
-- `<title>Email Verification</title>` and header/logo text `NestJS Codebase` (matches the hardcoded `from` display name above).
-- Body copy: *"Thank you for choosing NestJS Codebase. Use the following One-Time Password (OTP) to complete your verification process:"*
+- `<title>Email Verification</title>` and header/logo text `Thai Health Product` (matches the hardcoded `from` display name above).
+- Body copy: *"Thank you for choosing Thai Health Product. Use the following One-Time Password (OTP) to complete your verification process:"*
 - Validity claim: *"This code is valid for **10 minutes**."* — happens to agree with `OtpService`'s actual `expiresAt` (10 minutes, per `user.md`), but there is no `{{expiryMinutes}}` variable — it's a magic number duplicated independently in two files that would silently drift if the OTP TTL were ever changed in code without also editing this template.
-- Footer: `© 2026 NestJS Codebase. All rights reserved.` — hardcoded year, not templated.
+- Footer: `© 2026 Thai Health Product. All rights reserved.` — hardcoded year, not templated.
 
 **No live HTML-injection vector today**: `otpCode` is a server-generated 6-digit numeric string (`crypto.randomInt(100000, 999999)`, per `OtpService`), never user-supplied text; and the one live caller of `sendOtpEmail` (`MailController`) hardcodes its own `otpCode` argument rather than interpolating the caller-supplied `email` into the template context at all.
 
@@ -87,7 +87,7 @@ Ranked roughly by how much it matters before this module can be trusted to deliv
 7. **`tls.rejectUnauthorized: false` is unconditional across all environments**, including production — there's no `NODE_ENV`-gated branch the way the comment ("Helps with local dev/testing") implies there should be. This weakens TLS certificate validation on the production SMTP connection too.
 8. **No retry logic and no queue.** Dispatch is a single synchronous `await` inside the request/call path — a slow or hanging SMTP connection blocks whatever triggered it for as long as nodemailer takes to fail, with no explicit timeout configured on the transport.
 9. **No delivery/bounce tracking.** Nodemailer's `sendMail` resolves with a `SentMessageInfo` object (accepted/rejected recipients, message-id, etc.) that `sendOtpEmail` discards entirely, returning only a bare `boolean`.
-10. **Hardcoded branding** (`"NestJS Codebase"`) appears in three independent places — the `from` display name (`mail.module.ts`), the email subject (`mail.service.ts`), and the header/logo/footer text baked into `otp.hbs` — none configurable via env, and none reflecting the actual product name.
+10. **Hardcoded branding** (`"Thai Health Product"`) appears in three independent places — the `from` display name (`mail.module.ts`), the email subject (`mail.service.ts`), and the header/logo/footer text baked into `otp.hbs` — none configurable via env, and none reflecting the actual product name.
 11. **Stale code comment**: `sendOtpEmail`'s inline comment says the context "replaces `{{otp}}` in the Handlebars file," but the real placeholder is `{{otpCode}}`. Harmless (the property name used does match the template) but misleading to a future reader.
 12. **No meaningful test coverage.** Both `mail.controller.spec.ts` and `mail.service.spec.ts` are unmodified default Nest CLI stubs — neither supplies a mock for the class's own constructor dependency (`MailService`'s spec provides no `MailerService` mock; `MailController`'s spec provides no `MailService` mock), and each asserts only `toBeDefined()`. No test exercises a successful send, the `EAUTH` branch, the generic-failure branch, or the controller's `InternalServerErrorException` path.
 
@@ -133,7 +133,7 @@ There is no other Mail route — no generic "send email" endpoint, no "resend OT
 
 1. `EmailDto` validates the body has a well-formed `email`.
 2. Controller calls `mailService.sendOtpEmail(body.email, '222222')` — **`'222222'` is a hardcoded literal**, not a generated or persisted OTP; this route creates no `OTP` row and is unrelated to the real signup-verification flow beyond sharing the same template/service method.
-3. Inside the service: `mailerService.sendMail({ to: email, subject: 'Verify Your Email - NestJS Codebase', template: './otp', context: { otpCode } })`, wrapped in `try/catch`.
+3. Inside the service: `mailerService.sendMail({ to: email, subject: 'Verify Your Email - Thai Health Product', template: './otp', context: { otpCode } })`, wrapped in `try/catch`.
    - Success → returns `true`.
    - Failure → logs via `Logger.error` (a distinct message branch when `error.code === 'EAUTH'`, naming `MAIL_USERNAME`/`MAIL_PASSWORD` as the likely cause) and returns `false`. **No exception escapes the service.**
 4. Controller: `sendOtpEmail` returned `false` → throws `500 InternalServerErrorException('Failed to send test email')`. Returned `true` → responds `{ email: body.email }`.

@@ -1,6 +1,6 @@
-# NestJS Codebase Backend (`thai-health-product-server`)
+# Thai Health Product Backend (`thai-health-product-server`)
 
-NestJS backend for the Thai Health Product (NestJS Codebase) e-commerce platform — Prisma ORM on PostgreSQL via the `pg` driver adapter, JWT auth, and modular domain services.
+NestJS backend for the Thai Health Product (Thai Health Product) e-commerce platform — Prisma ORM on PostgreSQL via the `pg` driver adapter, JWT auth, and modular domain services.
 
 ## Documentation
 
@@ -15,6 +15,7 @@ NestJS backend for the Thai Health Product (NestJS Codebase) e-commerce platform
 | Shared pagination pattern | [documentations/PAGINATION.md](./documentations/PAGINATION.md) |
 | Delivery module — schema design + API plan | [docs/delivery.md](./docs/delivery.md) |
 | User module — identity schema, endpoints, security model | [docs/user.md](./docs/user.md) |
+| Support module — policy/info pages, schema + endpoints | [docs/support.md](./docs/support.md) |
 
 ## Environment & Running Commands
 
@@ -165,6 +166,32 @@ yarn start:prod      # .env.production
   - [Delete a Blog Post — `DELETE /blog/delete-blog/:id`](./docs/blog.md#delete-a-blog-post)
   - [Built but Not Yet Exposed](./docs/blog.md#built-but-not-yet-exposed)
 ### Support
+- [db schema](./docs/support.md#db-schema)
+  - [Entity-Relationship Diagram (ERD)](./docs/support.md#entity-relationship-diagram-erd)
+  - [Enum Definitions](./docs/support.md#enum-definitions)
+  - [Data Dictionary — Support](./docs/support.md#data-dictionary--support)
+  - [Relationships and Cascading Rules](./docs/support.md#relationships-and-cascading-rules)
+  - [Performance Optimizations (Indexes)](./docs/support.md#performance-optimizations-indexes)
+  - [Conventions](./docs/support.md#conventions)
+  - [Example Data](./docs/support.md#example-data)
+  - [Example Usage (JSON Response)](./docs/support.md#example-usage-json-response)
+  - [Implementation & Best Practices](./docs/support.md#implementation--best-practices)
+    - [The Singleton-by-Convention Rule](./docs/support.md#the-singleton-by-convention-rule)
+    - [Slug Handling](./docs/support.md#slug-handling)
+    - [Admin-Form UX (multipart/form-data)](./docs/support.md#admin-form-ux-multipartform-data)
+    - [Validation](./docs/support.md#validation)
+  - [Known Gaps / Recommended Hardening](./docs/support.md#known-gaps--recommended-hardening)
+- [api end point and business logic](./docs/support.md#api-end-point--business-logic)
+  - [Endpoint Overview](./docs/support.md#endpoint-overview)
+  - [Response Shapes & Select Projections](./docs/support.md#response-shapes--select-projections)
+  - [Create a Support Page — `POST /support/create-support-page`](./docs/support.md#create-a-support-page)
+  - [List All Support Pages (Admin) — `GET /support/all-support-pages`](./docs/support.md#list-all-support-pages-admin)
+  - [List Active Pages (Public) — `GET /support/active-tabs`](./docs/support.md#list-active-pages-public)
+  - [Get the Active Page for a Type (Public) — `GET /support/active-page/:type`](./docs/support.md#get-the-active-page-for-a-type-public)
+  - [Get an Active Page by Slug (Public) — `GET /support/page/:slug`](./docs/support.md#get-an-active-page-by-slug-public)
+  - [Update a Support Page — `PATCH /support/update-support-page/:id`](./docs/support.md#update-a-support-page)
+  - [Delete a Support Page — `DELETE /support/delete-support-page/:id`](./docs/support.md#delete-a-support-page)
+  - [Built but Not Yet Exposed](./docs/support.md#built-but-not-yet-exposed)
 ### Delivery (External Delivery Service) — schema design, not yet implemented
 - [db schema](./docs/delivery.md#db-schema)
   - [Entity-Relationship Diagram (ERD)](./docs/delivery.md#entity-relationship-diagram-erd)

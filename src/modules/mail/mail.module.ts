@@ -25,7 +25,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.ad
           },
         },
         defaults: {
-          from: `"NestJS Codebase" <${config.get('MAIL_FROM')}>`,
+          from: `"Thai Health Product" <${config.get('MAIL_FROM')}>`,
         },
         template: {
           // __dirname points to the folder containing this file

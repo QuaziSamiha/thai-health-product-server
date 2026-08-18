@@ -86,10 +86,6 @@ export class UserController {
     return this.userService.registerUser(createUserDto, ip);
   }
 
-  //* STEP 1 OF THE FORGOT-PASSWORD FLOW. PUBLIC, UNAUTHENTICATED, AND SENDS MAIL TO AN
-  //* ADDRESS THE CALLER CHOSE — SO IT CARRIES THE SAME 3-PER-HOUR BUDGET AS SIGNUP, AND
-  //* ALWAYS ANSWERS 200 WITH THE SAME MESSAGE. SEE UserService.requestPasswordReset FOR
-  //* WHY THE ANSWER CANNOT DEPEND ON WHETHER THE ACCOUNT EXISTS.
   @Throttle({ [THROTTLER_SHORT]: FORGOT_PASSWORD_THROTTLE })
   @Post('forgot-password')
   @ApiConsumes('application/json')
