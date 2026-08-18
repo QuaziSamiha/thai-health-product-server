@@ -14,6 +14,7 @@ NestJS backend for the Thai Health Product (NestJS Codebase) e-commerce platform
 | Product module | [documentations/PRODUCT.md](./documentations/PRODUCT.md) |
 | Shared pagination pattern | [documentations/PAGINATION.md](./documentations/PAGINATION.md) |
 | Delivery module — schema design + API plan | [docs/delivery.md](./docs/delivery.md) |
+| User module — identity schema, endpoints, security model | [docs/user.md](./docs/user.md) |
 
 ## Environment & Running Commands
 
@@ -43,6 +44,36 @@ yarn start:prod      # .env.production
 
 
 ### User
+- [db schema](./docs/user.md#db-schema)
+  - [Entity-Relationship Diagram (ERD)](./docs/user.md#entity-relationship-diagram-erd)
+  - [Enum Definitions](./docs/user.md#enum-definitions)
+  - [Data Dictionary — User](./docs/user.md#data-dictionary--user)
+  - [Data Dictionary — Profile](./docs/user.md#data-dictionary--profile)
+  - [Data Dictionary — UserSecurity](./docs/user.md#data-dictionary--usersecurity)
+  - [Data Dictionary — OTP](./docs/user.md#data-dictionary--otp)
+  - [Relationships and Cascading Rules](./docs/user.md#relationships-and-cascading-rules)
+  - [Indexes & Constraints](./docs/user.md#indexes--constraints)
+  - [Conventions](./docs/user.md#conventions)
+  - [Example Data](./docs/user.md#example-data)
+  - [Known Gaps / Recommended Hardening](./docs/user.md#known-gaps--recommended-hardening)
+- [api end point and business logic](./docs/user.md#api-end-point--business-logic)
+  - [Endpoint Overview](./docs/user.md#endpoint-overview)
+  - [Response Shapes & Select Projections](./docs/user.md#response-shapes--select-projections)
+  - [Register a User — `POST /user/create-user`](./docs/user.md#register-a-user)
+  - [Password Reset Flow](./docs/user.md#password-reset-flow)
+  - [Forgot Password — `POST /user/forgot-password`](./docs/user.md#forgot-password)
+  - [Reset a Password — `POST /user/reset-password`](./docs/user.md#reset-a-password)
+  - [Get All Users (Admin) — `GET /user/all-user`](./docs/user.md#get-all-users-admin)
+  - [Get My Profile — `GET /user/my-profile`](./docs/user.md#get-my-profile)
+  - [Update a Profile — `PATCH /user/update-profile/:id`](./docs/user.md#update-a-profile)
+  - [Update a User's Role — `PATCH /user/update-user-role/:id`](./docs/user.md#update-a-users-role)
+  - [Update a User's Assigned IP — `PATCH /user/update-user-security/:id`](./docs/user.md#update-a-users-assigned-ip)
+  - [Deactivate a User — `DELETE /user/deactivate-user/:id`](./docs/user.md#deactivate-a-user)
+  - [Update a Password — `PATCH /user/update-password/:id`](./docs/user.md#update-a-password)
+  - [Password/Security Handling](./docs/user.md#passwordsecurity-handling)
+  - [Rate Limiting](./docs/user.md#rate-limiting)
+  - [Internal Service API (Not HTTP-Exposed)](./docs/user.md#internal-service-api-not-http-exposed)
+  - [Auth & OTP Coupling](./docs/user.md#auth--otp-coupling)
 ### Auth
 ### Category
 ### Product
