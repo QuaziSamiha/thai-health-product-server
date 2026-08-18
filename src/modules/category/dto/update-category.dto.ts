@@ -120,6 +120,31 @@ export class UpdateCategoryDto {
   @IsOptional()
   bannerImage?: Express.Multer.File;
 
+  //* CLEARING AN IMAGE NEEDS ITS OWN SIGNAL. THE OTHER FIELDS FOLLOW
+  //* "ABSENT = UNCHANGED", WHICH LEAVES NO VALUE THAT CAN MEAN "REMOVE IT" —
+  //* AND A MULTIPART BODY CANNOT CARRY A JSON null ANYWAY, SO AN EMPTY
+  //* `bannerImage` PART WOULD BE INDISTINGUISHABLE FROM NOT SENDING ONE.
+  //* THE PRODUCT/COMBO MODULES SOLVE THE SAME PROBLEM WITH `deleteImageIds`;
+  //* THIS IS THE SINGLE-IMAGE EQUIVALENT.
+  //* IGNORED WHEN A NEW FILE IS ALSO UPLOADED — SEE CategoryService.updateCategory.
+  @ApiPropertyOptional({
+    description:
+      'Set true to clear the existing banner image and delete the stored file. Ignored if a new bannerImage/image file is uploaded in the same request, since that replaces the banner anyway.',
+    default: false,
+    example: true,
+  })
+  @IsOptional()
+  //* MULTIPART SENDS EVERY FIELD AS A STRING — SAME TRANSFORM AS isFeatured
+  //* ABOVE, WITHOUT WHICH "false" WOULD ARRIVE AS A TRUTHY STRING AND WIPE
+  //* THE BANNER ON EVERY SAVE.
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
+  })
+  @IsBoolean({ message: 'removeBannerImage must be either true or false' })
+  removeBannerImage?: boolean;
+
   @ApiPropertyOptional({ description: 'SEO Title in English', maxLength: 255 })
   @IsOptional()
   @IsString({ message: 'Meta title must be text' })

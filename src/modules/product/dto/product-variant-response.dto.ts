@@ -1,6 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { DiscountType, StockStatus } from '../../../generated/prisma/browser';
+import {
+  CategoryProductStatus,
+  DiscountType,
+  StockStatus,
+} from '../../../generated/prisma/browser';
 import { ProductVariantModel } from '../../../generated/prisma/models';
 import { toAttributes, toPrice } from './product-shared.dto';
 
@@ -176,6 +180,16 @@ export class ProductVariantDto {
   })
   isDefault!: boolean;
 
+  @Expose()
+  @ApiProperty({
+    enum: CategoryProductStatus,
+    enumName: 'CategoryProductStatus',
+    description:
+      "This variant's own visibility state, separate from the parent product's `status`. Only ACTIVE variants are shown on the storefront, orderable, counted toward the product's `totalStock`, or bundleable into a combo — so this is admin-only, and the public variant DTO below omits it (every variant a customer can see is ACTIVE by construction).",
+    example: CategoryProductStatus.ACTIVE,
+  })
+  variantStatus!: CategoryProductStatus;
+
   constructor(variant: Partial<ProductVariantModel>) {
     this.id = variant.id!;
     this.name = variant.name!;
@@ -187,6 +201,7 @@ export class ProductVariantDto {
     this.shortDescTh = variant.shortDescTh ?? undefined;
     this.sku = variant.sku ?? undefined;
     this.barcode = variant.barcode ?? undefined;
+    this.variantStatus = variant.variantStatus!;
     this.quantity = variant.quantity!;
     this.stockStatus = variant.stockStatus!;
     this.lowStockThreshold = variant.lowStockThreshold!;

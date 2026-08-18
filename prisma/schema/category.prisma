@@ -29,7 +29,7 @@ model Category {
   //* UI & SEO METADATA
   displayOrder Int     @default(0)
   isFeatured   Boolean @default(false)
-  productCount Int     @default(0) //* DENORMALIZED FOR PERFORMANCE
+  productCount Int     @default(0) //* LIVE, TRIGGER-MAINTAINED SUBTREE ROLLUP: COUNT OF EVERY SELLABLE PRODUCT (status = ACTIVE AND deletedAt IS NULL — ProductRepository.activeVisibilityWhere()) FILED UNDER THIS CATEGORY *OR ANY DESCENDANT OF IT*. A ROOT THEREFORE REPORTS ITS WHOLE BRANCH, WHICH IS THE ONLY USEFUL NUMBER FOR IT SINCE PRODUCTS MAY NEVER BE FILED ON A ROOT DIRECTLY. A DESCENDANT'S OWN status IS NOT CONSIDERED — THE ADMIN LISTING READS THIS COLUMN TOO AND NEEDS THE TRUE TALLY. NEVER WRITTEN BY APP CODE. SEE 20260818110000_maintain_category_product_count.
 
   metaTitle         String? @db.VarChar(255)
   metaDescription   String? @db.Text

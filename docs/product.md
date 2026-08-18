@@ -232,7 +232,7 @@ erDiagram
 | `nameTh` / `descriptionTh` / `shortDescTh` | `VARCHAR(255)`/`TEXT` | NULLABLE, each `@map`-ed to snake_case                                           | Thai counterparts.                                                                                                                                             |
 | `sku`                                      | `VARCHAR(100)`        | UNIQUE, NULLABLE                                                                 | Variant-level SKU.                                                                                                                                             |
 | `barcode`                                  | `VARCHAR(100)`        | UNIQUE, NULLABLE                                                                 | Variant-level barcode for POS/warehouse scanning. Admin-only.                                                                                                  |
-| `quantity`                                 | `INT`                 | NOT NULL, DEFAULT `0`, `CHECK >= 0`                                              | Stock count for this specific variant. Rolls up into `Product.totalStock`.                                                                                     |
+| `quantity`                                 | `INT`                 | NOT NULL, DEFAULT `0`, `CHECK >= 0`                                              | Stock count for this specific variant. Rolls up into `Product.totalStock` — but only while `variantStatus` is `ACTIVE`.                                       |
 | `stockStatus`                              | `ENUM(StockStatus)`   | NOT NULL, DEFAULT `OUT_OF_STOCK`, `@map("stock_status")`                         | Cached badge state, computed from this variant's own `quantity`.                                                                                               |
 | `lowStockThreshold`                        | `INT`                 | NOT NULL, DEFAULT `10`, `@map("low_stock_threshold")`                            | Same semantics as `Product.lowStockThreshold`, scoped to this variant's own `quantity`.                                                                        |
 | `weight`                                   | `DECIMAL(10,3)`       | NULLABLE                                                                         | Weight in kg (overrides parent for shipping calc, if set).                                                                                                     |
@@ -245,6 +245,7 @@ erDiagram
 | `attributes`                               | `JSONB`               | NOT NULL, DEFAULT `{}`                                                           | Free-form key/value pairs, e.g. `{"color": "Red", "size": "XL"}`. Defaults to `{}` when omitted.                                                               |
 | `isDefault`                                | `BOOLEAN`             | NOT NULL, DEFAULT `false`, `@map("is_default")`                                  | Marks the variant pre-selected on the PDP. **No DB constraint** prevents multiple defaults per product — see [Known Gaps](#known-gaps--recommended-hardening). |
 | `comboQuantity`                            | `INT`                 | NOT NULL, DEFAULT `0`, `@map("combo_quantity")`, `CHECK >= 0`                    | Same semantics as `Product.comboQuantity`, scoped to this variant — wins over the parent's value when a `ComboItem` pins this variant.                         |
+| `variantStatus`                            | `ENUM`                | NOT NULL, DEFAULT `ACTIVE`, `@map("variant_status")`                             | **This variant's own visibility gate** (`CategoryProductStatus`), independent of the parent `Product.status` — retire one size without taking the whole product down. Named `variantStatus` rather than `status` so a joined row, or a flattened product/variant dropdown option, can carry both without either shadowing the other. See [Variant Status](#variant-status--per-variant-retirement). |
 | `productId`                                | `INT`                 | FK → `products.id`, NOT NULL, **ON DELETE CASCADE**, `@map("product_id")`        | Parent product. Deleting the parent deletes all variants.                                                                                                      |
 
 > `ProductVariant` has **no timestamp columns of its own** — no `createdAt`, no `updatedAt`, no `deletedAt`. Anything needing a variant's "last modified" reads the parent product's `updatedAt`.
@@ -328,6 +329,7 @@ erDiagram
 | `@@index([productId])` (`ProductVariant`)                                                                                   | B-Tree                                     | FK lookup for `Product → variants` joins.                                                                                                                                                                                       |
 | `@@index([productId, isDefault])` (`ProductVariant`)                                                                        | B-Tree (composite)                         | Fetching the default variant without scanning all of a product's variants.                                                                                                                                                      |
 | `@@index([productId, stockStatus])` (`ProductVariant`)                                                                      | B-Tree (composite)                         | Admin dashboard: this product's low/out-of-stock variants.                                                                                                                                                                      |
+| `@@index([productId, variantStatus])` (`ProductVariant`)                                                                    | B-Tree (composite)                         | Storefront/PDP: narrowing a product's variants to the sellable ones — the variant-level twin of `Product`'s own `(status, …)` index family.                                                                                     |
 | `@@index([productId, isPrimary])` (`ProductImage`)                                                                          | B-Tree (composite)                         | Fetching a product's cover image without scanning the whole gallery.                                                                                                                                                            |
 | `@@index([variantId])` (`ProductImage`)                                                                                     | B-Tree                                     | FK lookup for filtering images by variant.                                                                                                                                                                                      |
 | `product_images_one_primary_per_product`                                                                                    | B-Tree (**partial** unique)                | `(product_id) WHERE is_primary = true` — hand-written migration; Prisma's DSL can't express a filtered index.                                                                                                                   |
@@ -510,9 +512,45 @@ None currently defined for this domain. If reporting needs (e.g. "products with 
 - DB `CHECK` constraints exist as defense-in-depth on both `products` and `product_variants` (`prisma/migrations/20260714200001_backfill_stock_price_check_constraints`, `20260715140000_add_discount_value_check_constraints`): `basePrice`/`quantity`/`total_stock` non-negative, `0 <= salePrice <= basePrice`, and `discountValue` bound to `discountType` (`NULL`, or `>= 0` and — `PERCENTAGE` → `<= 100`, `FIXED` → `<= basePrice`). These mirror, not replace, the app-level validation in `resolveSalePrice`/`resolvePricingUpdate` — the service checks first so the client gets a clean `400` instead of a raw DB error.
 - Never do price arithmetic in plain JS floating point — use `Decimal` consistently end-to-end (Prisma returns `Decimal.js`-backed values for these columns; don't coerce to `number` before doing math).
 
+##### Variant Status — Per-Variant Retirement
+
+`ProductVariant.variantStatus` (added in `prisma/migrations/20260818100000_add_product_variant_status`) is the variant-level twin of `Product.status`, using the same `CategoryProductStatus` enum. Before it existed a `VARIABLE` product was all-or-nothing: retiring one size meant either deleting the variant row — blocked outright whenever a combo bundled it, since `combo_items_variant_id_fkey` is `ON DELETE RESTRICT` — or taking the whole product down.
+
+**It only ever narrows.** The parent product's gate is applied first everywhere, so an `ACTIVE` variant of a `DRAFT` product is still invisible. `variantStatus` can subtract sellability, never add it.
+
+A variant that is not `ACTIVE` changes four things at once:
+
+| Surface                       | Effect                                                                                                                       | Enforced by                                                             |
+| :---------------------------- | :--------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------- |
+| Storefront / PDP              | Dropped from every public product read, so it disappears from the size picker rather than sitting there unbuyable.            | `VARIANTS_WHERE_PUBLIC` on `PRODUCT_SELECT_PUBLIC` (`product.select.ts`) |
+| Ordering                      | Refused at order placement, catching stale carts and hand-built requests.                                                     | `OrderService.buildOrderItems`                                           |
+| `Product.totalStock`          | Its stock stops counting. That column is **sellable** stock, not shelf stock — a retired variant's units are still in the warehouse but nobody can buy them, so counting them would leave the product reading `IN_STOCK` with nothing purchasable. | `sync_product_total_stock_from_variants` trigger, mirrored in `ProductService` |
+| Combos bundling it            | The bundle's scarcest-part rule reads its stock as `0`, so every combo pinning it falls to `quantity = 0` / `OUT_OF_STOCK`.  | `recompute_combo_quantity` trigger, mirrored in `ComboProductService`     |
+
+###### Invariants
+
+1. **A product must keep at least one `ACTIVE` variant.** Enforced at every write path — `buildStockAndVariants` (create), `buildVariantReconcilePlan` (bulk update), and `updateVariantStatus` (single toggle). Retiring the last one returns `409`: a product with nothing sellable should be retired at the product level, where it is one field and one place to reverse.
+2. **The default variant is always an `ACTIVE` one.** Retiring the default hands `isDefault` to the first surviving `ACTIVE` variant and re-mirrors that variant's pricing onto `Product.basePrice`/`salePrice` — the same contract the reconcile path already maintains, so the product row keeps matching what the storefront actually shows.
+
+###### The three combo rules
+
+A retired variant and a live combo cannot coexist. Three checks close the three moments that could otherwise produce that pair:
+
+| Moment      | Rule                                                                | Where                                                    |
+| :---------- | :------------------------------------------------------------------ | :-------------------------------------------------------- |
+| Bundle time | A non-`ACTIVE` variant cannot be put into a combo (`400`).           | `ComboProductService.resolveComboItems`                    |
+| Retire time | A variant a **live** combo bundles cannot be retired (`409`).        | `ProductService.assertVariantsNotInLiveCombo`             |
+| Publish time| A combo still pinning a retired variant cannot go `ACTIVE` (`400`). | `ComboProductService.assertNoInactiveBundledVariants`     |
+
+"Live" means `status = ACTIVE` and not soft-deleted. Retirement is blocked only by those, while **deletion** is still blocked by *any* combo — the two guards ask different questions because the FK does not care what status a combo is in, whereas the business rule does. Non-live combos are deliberately let through: they simply drop to 0 assemblable bundles, and the response names them in `affectedCombos` so the admin sees the consequence without being forced to unwind every draft that happens to mention the variant first.
+
+The DB is the backstop under all three. Even if a status change reached the column by some other path, `recompute_combo_quantity` reads a non-`ACTIVE` variant's stock as `0`, so no combo containing one can ever be sellable.
+
 ##### Inventory & Cache Sync Logic
 
 `hasVariants`, `totalStock`, and `stockStatus` on `Product` are **denormalized caches**. `totalStock` and `stockStatus` (on both `Product` and `ProductVariant`) _are_ kept in sync by DB triggers (`sync_variant_stock_status`, `sync_product_stock_fields`, `sync_product_total_stock_from_variants` — `prisma/migrations/20260714200002_backfill_stock_sync_triggers` and `20260715130000_add_low_stock_threshold`) as a safety net, but service code still sets them explicitly rather than relying on the trigger alone. **`hasVariants` has no trigger and must be set by application code.**
+
+**A product write also maintains a cache it does not own.** `Category.productCount` is a subtree rollup of every `ACTIVE`, non-soft-deleted product, kept current by a trigger on `products` that fires on `INSERT`, `DELETE`, and `UPDATE OF category_id, status, deleted_at` (`20260818110000_maintain_category_product_count`). Nothing is required of `ProductService` — creating a product, publishing it, moving it between categories or soft-deleting it re-tallies the whole ancestor chain in the database. See [category.md](./category.md#the-productcount-rollup).
 
 Any service method that creates/updates/deletes a `ProductVariant`, or writes an `Inventory` movement, should recompute the parent `Product`'s cached fields — inside the same transaction (see the `withTransaction` pattern in `docs/concepts/prisma.md`):
 
@@ -551,10 +589,11 @@ Schema-level issues worth fixing before the `product` module goes to production 
 
 - **`publishedAt` is written but never enforced.** Both create and update stamp it (and the service comments describe a `publishedAt <= now()` gate), but `ProductRepository.activeVisibilityWhere()` only checks `deletedAt IS NULL` and `status = ACTIVE`. A product scheduled to launch next month is publicly visible today the moment it's `ACTIVE`. Either add the condition to the gate or stop advertising scheduled launches.
 - **`ProductVariant.name`/`slug` are unique globally**, not scoped per product — two different products cannot both have a variant named `"Small"`. Flagged during schema review; kept as-is by deliberate product decision, not an open bug.
-- **No constraint enforces "exactly one `isDefault` variant" per product** — needs a partial unique index (raw migration), the same pattern already used for `isPrimary` images. The service compensates by forcing the first variant to `isDefault: true` when none is marked.
+- **No constraint enforces "exactly one `isDefault` variant" per product** — needs a partial unique index (raw migration), the same pattern already used for `isPrimary` images. The service compensates by forcing the first variant to `isDefault: true` when none is marked, and by never letting the flag land on a non-`ACTIVE` variant (see [Variant Status](#variant-status--per-variant-retirement)).
 - **No constraint ties a `ProductImage.variantId` to the variant's actual `productId`** — a variant image could theoretically be attached to an unrelated product row.
 - **Soft-deleted products permanently reserve their `slug`/`sku`/`barcode`/`name`** due to global (not partial) unique indexes, so a discontinued product can never be re-launched under the same identifiers.
-- **`ProductVariant` has no timestamps of its own** — there is no way to tell when an individual variant was last edited; every consumer falls back to the parent product's `updatedAt`.
+- **`ProductVariant` has no timestamps of its own** — there is no way to tell when an individual variant was last edited; every consumer falls back to the parent product's `updatedAt`. This is why `PATCH /update-variant-status/:variantId` stamps `updatedBy`/`updatedAt` on the **parent product** instead.
+- **Nothing stops `ProductVariant.variantStatus` from exceeding its parent's `Product.status`** at the column level — an `ACTIVE` variant of a `DRAFT` product is a representable state. It is harmless because every read applies the parent gate first (the variant gate can only narrow further), but a `CHECK` cannot express it and no trigger enforces it.
 - **Mixed `@map()` coverage** (see [Conventions](#conventions)) — camelCase and snake_case column names coexist in the same table, which makes hand-written SQL and migrations error-prone.
 
 ---
@@ -577,6 +616,7 @@ Every endpoint below is served by `ProductController` → `ProductService` → `
 | `GET`    | `/product-by-id/:id`              | `ADMIN`    | [Admin detail lookup](#get-product-by-id-admin)                                         |
 | `GET`    | `/product-by-slug/:slug`          | **Public** | [Storefront PDP lookup](#get-product-by-slug-public)                                    |
 | `PATCH`  | `/update-product/:id`             | `ADMIN`    | [Partial update + variant/image reconciliation](#update-a-product)                      |
+| `PATCH`  | `/update-variant-status/:variantId`| `ADMIN`    | [Retire or restore one variant](#update-a-single-variants-status)                       |
 | `DELETE` | `/soft-delete-product/:id`        | `ADMIN`    | [Reversible retire](#soft-delete-a-product)                                             |
 | `DELETE` | `/permanently-delete-product/:id` | `ADMIN`    | [Irreversible purge + file cleanup](#permanently-delete-a-product)                      |
 
@@ -730,7 +770,7 @@ The projections in `product.select.ts` each feed exactly one DTO and must be kep
 
 **`GET /api/v1/product/product-inventory`**
 
-**Purpose**: Flattened product/variant option list for admin dropdowns (order lines, discount-rule pickers, inventory forms).
+**Purpose**: Flattened product/variant option list for admin dropdowns (order lines, discount-rule pickers, inventory forms). It is also the inventory module's source list, which is why it applies no sellability filter of its own — see rule 2.
 
 **Access**: `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.ADMIN)`.
 
@@ -738,14 +778,14 @@ The projections in `product.select.ts` each feed exactly one DTO and must be kep
 | :--------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Controller | `getProductDropdownOptions()` — no params at all; the endpoint takes no pagination or filters.                                                                       |
 | Service    | `getProductDropdownOptions()` — `flatMap`s each product into one `ProductDropdownOptionDto` per variant, or a single option for the product itself when it has none. |
-| Repository | `findProductDropdownOptions()` — `product.findMany({ where: { deletedAt: null, status: ACTIVE }, orderBy: { name: 'asc' } })` with a lean select.                    |
+| Repository | `findProductDropdownOptions()` — `product.findMany({ where: { deletedAt: null }, orderBy: { name: 'asc' } })` with a lean select.                                   |
 
 **Business logic:**
 
 1. **One option per _selectable thing_, not per product row.** A product with no variants contributes itself; a product with variants contributes **one option per variant instead of its own row** (e.g. `"Colette Collins 23 July variant 200 ml"`, `"… variant 30 Capsules"`) — a variant is what an order line or discount rule actually needs to reference.
-2. **Only `ACTIVE`, non-deleted products** are included — the same visibility rule as the storefront, since you can't sell what isn't live.
-3. **Product-level values are shared across every option that product contributes.** `type`, `status`, `updatedAt`, and the image are always the _product's_ own, because `ProductVariant` has none of its own. `stockStatus` is the exception: a variant option carries the variant's own, a product option the product's.
-4. **`comboQuantity` rides along too** — the live, trigger-maintained total of stock currently committed to DRAFT/ACTIVE combos (see the field table above). Unlike `combo-inventory`'s `availableForCombo`, this endpoint applies no stock filter — every ACTIVE, non-deleted option is returned regardless of how much (or little) of its stock a combo has claimed.
+2. **Every non-deleted option is included, whatever its status** — `deletedAt` is the _only_ filter. Stock is physical: a `DRAFT` product and a retired variant both still occupy shelf space that has to be counted, corrected, batched, and audited, so hiding them here would make their stock unreachable rather than unsellable. **Sellability is the caller's filter**, and the callers deliberately disagree — the inventory table renders `status`/`variantStatus` as their own columns and shows everything, while the Add Stock picker narrows to `ACTIVE` + `ACTIVE`. Contrast [`combo-inventory`](#get-product-combo-inventory-options-admin), which _does_ filter server-side, because a combo can only ever bundle an `ACTIVE` variant.
+3. **Product-level values are shared across every option that product contributes.** `type`, `status`, `updatedAt`, and the image are always the _product's_ own, because `ProductVariant` has none of its own. Two fields are the exception: `stockStatus` (a variant option carries the variant's own, a product option the product's) and `variantStatus`, which is the variant's own gate and is **absent entirely on a product-level option** — a `SIMPLE` product has no variant row to have one. Consumers must read that `undefined` as "not applicable", never as "inactive". Note `status` and `variantStatus` are independent: a retired size of a live product is `status: ACTIVE` + `variantStatus: INACTIVE`.
+4. **`comboQuantity` rides along too** — the live, trigger-maintained total of stock currently committed to DRAFT/ACTIVE combos (see the field table above). Unlike `combo-inventory`'s `availableForCombo`, this endpoint applies no stock filter either — every non-deleted option is returned regardless of how much (or little) of its stock a combo has claimed.
 5. **Image selection is a single-row read** — `where: { variantId: null }` (product-level gallery only), ordered `isPrimary: 'desc'` then `displayOrder: 'asc'`, `take: 1`. That picks the primary image if one is flagged, otherwise the first in gallery order, without fetching the whole gallery.
 6. **No pagination.** The response is the complete list, sorted by product name ascending.
 
@@ -905,6 +945,52 @@ A product that's `DRAFT`, `ARCHIVED`, `HIDDEN`, `INACTIVE`, or soft-deleted retu
 | `403`  | Authenticated but not `ADMIN`.                                                                                                                                                                                                                                                                                 |
 | `404`  | Product doesn't exist; **or** `categoryId` doesn't exist; **or** a `variants[].id` doesn't belong to this product.                                                                                                                                                                                             |
 | `409`  | The new `name` (or its derived slug) collides with a _different_ product; **or** the update would delete a variant still bundled in a combo.                                                                                                                                                                   |
+
+---
+
+#### Update a Single Variant's Status
+
+`PATCH /product/update-variant-status/:variantId` — **Admin only.**
+
+Flips one variant's own `variantStatus` without touching its siblings. This is the per-variant counterpart to `PATCH /product/update-product/:id`, whose `variants` array reconciles the whole list at once: retiring one size out of five is a one-click admin action, and routing it through `variants` would mean re-sending — and risking clobbering — every sibling in order to change one column.
+
+**Request body**
+
+```json
+{ "variantStatus": "INACTIVE" }
+```
+
+**Response**
+
+```json
+{
+  "success": true,
+  "message": "Variant status updated successfully",
+  "data": {
+    "variantId": 4,
+    "variantName": "Organic Royal Jelly - 60 Capsules",
+    "variantStatus": "INACTIVE",
+    "isDefault": false,
+    "productId": 12,
+    "productName": "Organic Royal Jelly",
+    "activeVariantCount": 2,
+    "totalStock": 40,
+    "stockStatus": "IN_STOCK",
+    "affectedCombos": [{ "id": 7, "title": "Royal Jelly Starter Bundle", "status": "DRAFT" }]
+  }
+}
+```
+
+The response reports the three things the write actually moved rather than re-sending the whole product: the variant's own state (including `isDefault`, which can come back `false` on a variant that was `true` if retiring it handed the flag to a sibling), the parent's re-derived sellable stock, and the combos this change knocked out. `totalStock`/`stockStatus` are read back from the DB after the write rather than predicted, since the triggers own those columns.
+
+**Behaviour**
+
+- Re-sending the status a variant already has is a **no-op** — no write, no audit bump — so a double-clicked toggle can't trip the guards below.
+- `404` — variant not found. `409` — the product is soft-deleted, this is its last `ACTIVE` variant, or a live combo still bundles it (the message names the combos).
+- Only non-live combos reach `affectedCombos`; it is empty on reactivation and when the variant is in no combos.
+- `ProductVariant` has no audit columns of its own, so `updatedBy`/`updatedAt` are stamped on the **parent product** — the same place an admin looks after any other change to it.
+
+See [Variant Status](#variant-status--per-variant-retirement) for the full rule set.
 
 ---
 

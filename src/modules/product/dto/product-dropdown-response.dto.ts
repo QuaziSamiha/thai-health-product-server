@@ -73,10 +73,20 @@ export class ProductDropdownOptionDto {
     enum: CategoryProductStatus,
     enumName: 'CategoryProductStatus',
     description:
-      "The parent product's own status. Not a per-variant concept, so this is always the product's value regardless of which option this is.",
+      "The parent product's own status — always the product's value regardless of which option this is. Pair it with `variantStatus` below: a thing is only sellable when BOTH are ACTIVE.",
     example: CategoryProductStatus.ACTIVE,
   })
   status!: CategoryProductStatus;
+
+  @Expose()
+  @ApiPropertyOptional({
+    enum: CategoryProductStatus,
+    enumName: 'CategoryProductStatus',
+    description:
+      "This variant's OWN status — present only on a variant option, absent for a SIMPLE product option (which has no variant row to have one). Unlike the combo-inventory endpoint, this listing deliberately still returns retired variants: it backs stock adjustments and batches, and a retired variant still has physical stock to correct. Use this field to badge or filter them.",
+    example: CategoryProductStatus.ACTIVE,
+  })
+  variantStatus?: CategoryProductStatus;
 
   @Expose()
   @ApiProperty({
@@ -181,6 +191,7 @@ export class ProductDropdownOptionDto {
         basePrice: unknown;
         salePrice: unknown;
         stockStatus: StockStatus;
+        variantStatus: CategoryProductStatus;
       };
     },
     baseUrl?: string,
@@ -193,6 +204,10 @@ export class ProductDropdownOptionDto {
     this.barcode = input.variant?.barcode ?? input.product.barcode ?? undefined;
     this.type = input.product.type;
     this.status = input.product.status;
+    //* NOT `?? input.product.status` — A PRODUCT-LEVEL OPTION GENUINELY HAS
+    //* NO VARIANT STATUS, AND ECHOING THE PARENT'S HERE WOULD MAKE THE TWO
+    //* FIELDS LOOK LIKE INDEPENDENT AGREEMENT WHEN ONLY ONE WAS EVER READ.
+    this.variantStatus = input.variant?.variantStatus;
     this.quantity = input.variant?.quantity ?? input.product.quantity;
     this.comboQuantity =
       input.variant?.comboQuantity ?? input.product.comboQuantity;

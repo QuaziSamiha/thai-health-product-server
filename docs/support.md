@@ -7,7 +7,7 @@ Module source: `src/modules/support/` (`support.controller.ts`, `support.service
 
 > **Scope note:** `User` is documented in its own reference ([user.md](./user.md)) — it appears here only as the `createdBy`/`updatedBy` foreign-key target needed to understand Support's relationships.
 
-> **Two shapes of "a page".** The five named types are **singleton pages by convention** — one live row each, addressed by type. `OTHERS` is explicitly **not** a singleton and is addressed by slug. Nearly every design decision below follows from that split; see [The Singleton-by-Convention Rule](#the-singleton-by-convention-rule).
+> **Two shapes of "a page".** The five named types are **singletons** — at most one live row each, addressed by type and enforced by a partial unique index in Postgres. `OTHERS` is explicitly **not** a singleton: it may hold many live rows at once and is addressed by slug. Nearly every design decision below follows from that split; see [The One-Live-Page-Per-Type Rule](#the-one-live-page-per-type-rule).
 
 ---
 
@@ -52,12 +52,14 @@ erDiagram
 
 | Value                  | Meaning                                                                                                    |
 | :--------------------- | :--------------------------------------------------------------------------------------------------------- |
-| `DELIVERY_POLICY`      | Shipping/delivery terms. Singleton by convention.                                                           |
-| `TERMS_AND_CONDITIONS` | Site-wide T&C. Singleton by convention.                                                                     |
-| `PRIVACY_POLICY`       | Privacy/data-handling notice. Singleton by convention.                                                      |
-| `CANCELLATION_POLICY`  | Order-cancellation rules. Singleton by convention.                                                          |
-| `RETURN_POLICY`        | Returns/refunds rules. Singleton by convention.                                                             |
-| `OTHERS`               | **Catch-all.** Any policy/info page not covered above (FAQ, About Us, …). **May legitimately have many rows** — disambiguated by `slug`, never by type. |
+| `DELIVERY_POLICY`      | Shipping/delivery terms. Singleton — at most one `ACTIVE` row, enforced in the DB.                          |
+| `TERMS_AND_CONDITIONS` | Site-wide T&C. Singleton — at most one `ACTIVE` row, enforced in the DB.                                    |
+| `PRIVACY_POLICY`       | Privacy/data-handling notice. Singleton — at most one `ACTIVE` row, enforced in the DB.                     |
+| `CANCELLATION_POLICY`  | Order-cancellation rules. Singleton — at most one `ACTIVE` row, enforced in the DB.                         |
+| `RETURN_POLICY`        | Returns/refunds rules. Singleton — at most one `ACTIVE` row, enforced in the DB.                            |
+| `OTHERS`               | **Catch-all.** Any policy/info page not covered above (FAQ, About Us, …). **May legitimately have many `ACTIVE` rows** — excluded from the singleton constraint, disambiguated by `slug`, never by type. |
+
+> The singleton guarantee is the partial unique index `support_pages_active_type_key`; see [The One-Live-Page-Per-Type Rule](#the-one-live-page-per-type-rule). Adding a **new** named type to this enum therefore also brings it under that constraint automatically — no migration needed for the index itself, since it filters on `type <> 'OTHERS'` rather than listing the five values.
 
 > **Declaration order is load-bearing.** Postgres sorts an enum by the order its values were declared, and [List Active Pages (Public)](#list-active-pages-public) orders by `type ASC` — so the storefront tab list comes back in exactly the order above, with every `OTHERS` page trailing. Reordering the enum in the schema reorders the storefront tabs.
 
@@ -83,8 +85,8 @@ erDiagram
 | :---------- | :-------------------- | :-------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
 | `id`        | `INT`                 | PK, AUTOINCREMENT                                                      | Internal numeric key. Exposed in the admin `update`/`delete` route URLs.                                                                     |
 | `sid`       | `UUID`                | UNIQUE, NOT NULL, DEFAULT `uuid()`, `@db.Uuid`                         | Public-facing identifier. Returned by every response DTO, but **no route looks a page up by it** — see [Conventions](#conventions).           |
-| `type`      | `ENUM(SupportType)`   | NOT NULL                                                               | Which support tab this row belongs to. **Immutable after creation** — `UpdateSupportDto` has no field for it.                                |
-| `status`    | `ENUM(SupportStatus)` | NOT NULL, DEFAULT `ACTIVE`                                             | Lifecycle/visibility state. Note the default is `ACTIVE`, not `DRAFT` — an omitted status publishes immediately.                             |
+| `type`      | `ENUM(SupportType)`   | NOT NULL, **partially UNIQUE** (see below)                             | Which support tab this row belongs to. **Immutable after creation** — `UpdateSupportDto` has no field for it.                                |
+| `status`    | `ENUM(SupportStatus)` | NOT NULL, DEFAULT `ACTIVE`                                             | Lifecycle/visibility state. Note the default is `ACTIVE`, not `DRAFT` — an omitted status publishes immediately, and is therefore subject to the singleton constraint. |
 | `title`     | `VARCHAR(255)`        | NOT NULL                                                               | English page title. **Not uniquely constrained in the DB** — uniqueness is enforced indirectly, via the `slug` derived from it.               |
 | `slug`      | `VARCHAR(255)`        | UNIQUE, NOT NULL                                                       | URL/route identifier and the public lookup key. Derived from `title` by `generateSlug()`, never client-set. Also what disambiguates multiple `OTHERS` rows. |
 | `content`   | `TEXT`                | NOT NULL                                                               | English page body (HTML/Markdown — an editor convention, not a DB constraint).                                                               |
@@ -96,6 +98,8 @@ erDiagram
 | `updatedAt` | `TIMESTAMPTZ(3)`      | NOT NULL, `@updatedAt`                                                 | Last modification time, maintained by Prisma.                                                                                                |
 | `createdBy` | `INT`                 | FK → `users.id`, NULLABLE, **ON DELETE SET NULL**                      | Staff user who created the page — stamped by the service from the JWT, never accepted from the client.                                        |
 | `updatedBy` | `INT`                 | FK → `users.id`, NULLABLE, **ON DELETE SET NULL**                      | Staff user who last updated the page — restamped on every successful update.                                                                 |
+
+> **`type` is unique among live named pages.** `(type)` carries a **partial** unique index — `WHERE status = 'ACTIVE' AND type <> 'OTHERS'` — so the five named types can each have at most one live row, while `OTHERS` and every non-`ACTIVE` row are unconstrained. It exists only in the database, not in `support.prisma`; see [The One-Live-Page-Per-Type Rule](#the-one-live-page-per-type-rule).
 
 > **No `@map()` anywhere.** Only the table itself is mapped (`@@map("support_pages")`); every column lands in Postgres as a camelCase identifier (`"createdAt"`, `"titleTh"`, …), which hand-written SQL must double-quote. See [Conventions](#conventions).
 
@@ -128,6 +132,16 @@ erDiagram
 | `@@index([type, status])`      | B-Tree (composite) | The hot public query: `WHERE type = ? AND status = 'ACTIVE'` ([Get the Active Page for a Type](#get-the-active-page-for-a-type-public)), and the admin tab filter. Equality on both columns, so column order costs nothing here. |
 | `createdBy`, `updatedBy`       | B-Tree (implicit)  | Prisma auto-creates an index on each relation scalar field.                                                                        |
 
+##### DB-only index (not in `support.prisma`)
+
+| Index                            | Type                     | Purpose                                                                                             |
+| :------------------------------- | :----------------------- | :---------------------------------------------------------------------------------------------------- |
+| `support_pages_active_type_key`  | B-Tree (partial, unique) | `("type") WHERE status = 'ACTIVE' AND type <> 'OTHERS'` — enforces at most one live page per named type. Added by `20260818103000_support_one_active_page_per_type`. |
+
+Prisma's schema DSL cannot express a filtered unique index, so this one is created by hand-written SQL and has **no `@@unique` counterpart** in `support.prisma` — only a comment on `Support.status` pointing at it. The same trade-off is already accepted elsewhere in this schema for `users_email_active_key` (`20260813082256_soft_delete_user_email_unique`). Practical consequence: `prisma migrate dev` sees an index in the database that the schema does not declare and may report it as drift — expected, and the reason the constraint is documented in three places (schema comment, repository comment, here).
+
+Being a **unique** index it is also usable as a plain lookup index: the `WHERE type = ? AND status = 'ACTIVE'` query for a named type can be answered from it directly, making it narrower and cheaper than `[type, status]` for that specific path.
+
 ##### Not covered by an index
 
 - **`WHERE status = 'ACTIVE'` alone** — the [active-tabs](#list-active-pages-public) query cannot use `[type, status]` (its leading column is unconstrained). With one row per type this is a trivial scan of a table holding single-digit rows; it only becomes worth an index if `OTHERS` pages grow into the hundreds.
@@ -141,7 +155,8 @@ erDiagram
 - **English is the source of truth; Thai is display-only.** `slug` is always derived from `title`, never from `titleTh`, so the URL stays ASCII and stable regardless of the Thai copy. The Thai trio (`titleTh`/`contentTh`/`noteTh`) is independently optional — a page may ship with a Thai title but no Thai body; nothing validates that the three move together.
 - **Derived values are never client input.** `slug` comes from `generateSlug(title)`; `createdBy`/`updatedBy` come from the JWT. No DTO exposes a field for any of them.
 - **`sid` is the public identifier, `id` is internal** — the same convention as `Product`/`Blog`. Note `Support` follows it only in what it *returns*: public routes address a page by `slug` and admin routes by `id`, so `sid` is currently informational only.
-- **`type` is immutable.** `UpdateSupportDto` deliberately omits it (see the comment at the top of `dto/update-support.dto.ts`) — retyping a row would silently move it to a different storefront tab, and possibly create a second live page for that tab. Delete and re-create instead.
+- **`type` is immutable.** `UpdateSupportDto` deliberately omits it (see the comment at the top of `dto/update-support.dto.ts`) — retyping a row would silently move it to a different storefront tab, and would now also have to satisfy that tab's singleton constraint. Delete and re-create instead.
+- **Invariants that Prisma cannot express live in hand-written migrations, and are commented in the schema next to the field they constrain.** `Support.status` carries the pointer to `support_pages_active_type_key`; treat the schema comment as the index of DB-only objects, since `prisma db pull` / `migrate dev` will not surface them as declarations.
 - **No column mapping.** Unlike `Blog` (partial `@map()`) or the `user` schema (full snake_case), `Support` maps only the table name. It is internally consistent, just inconsistent with its neighbours — see [Known Gaps](#known-gaps--recommended-hardening).
 - **Changes are audited automatically.** `Support` is one of the eight models in `TRACKED_AUDIT_MODELS`, so every create/update/delete writes an `AuditLog` row with a field-level diff, without this module containing any audit code. See [audit-log.md](./audit-log.md#tracked-models).
 
@@ -159,8 +174,9 @@ erDiagram
 | 6   | `OTHERS`               | `ACTIVE`   | About Us                   | `about-us`                    | `null`             | `7`        | `7`        |
 
 > Row 2's slug is `terms-conditions`, not `terms-and-conditions` — `generateSlug()` strips `&` as a non-word character and collapses the resulting double hyphen. The slug is **not** derived from the enum name.
-> Row 4 is `INACTIVE`, so `GET /active-page/RETURN_POLICY` returns `404` even though a return-policy row exists.
+> Row 4 is `INACTIVE`, so `GET /active-page/RETURN_POLICY` returns `404` even though a return-policy row exists. It is also why a *second* `RETURN_POLICY` row could be published at all — the singleton constraint only counts `ACTIVE` rows.
 > Rows 5 and 6 are both `OTHERS` and both `ACTIVE` — legitimate, and exactly why `OTHERS` pages are fetched by slug. Their relative order inside [active-tabs](#list-active-pages-public) is not defined by the query.
+> A seventh row with `type: DELIVERY_POLICY, status: ACTIVE` **cannot exist** alongside row 1: the insert is rejected by `support_pages_active_type_key`. The same row with `status: DRAFT` or `INACTIVE` is accepted.
 > Row 2 has `updatedBy: null` because it has never been edited since creation; `createdBy`/`updatedBy` are independent, and nothing back-fills the latter.
 
 ---
@@ -216,12 +232,22 @@ Every response below is wrapped by the global `ResponseInterceptor` envelope (`{
 
 #### Implementation & Best Practices
 
-##### The Singleton-by-Convention Rule
+##### The One-Live-Page-Per-Type Rule
 
-- The five named types are meant to have **exactly one `ACTIVE` row each**. That is a *convention*, enforced nowhere: no partial unique index, no service-level check on create or update.
-- [Get the Active Page for a Type](#get-the-active-page-for-a-type-public) resolves that convention with `findFirst({ where: { type, status: ACTIVE } })` and **no `orderBy`** — so if a second `ACTIVE` row for a type is ever created, which one the storefront shows is decided by the query planner, and can change between deploys or after a `VACUUM`.
-- The safe editorial workflow is therefore **retire, then publish**: set the outgoing row to `INACTIVE` first, then set the incoming one to `ACTIVE`. Doing it the other way round leaves a window with two live rows for one tab.
-- `OTHERS` is the deliberate exception. Never fetch it by type; fetch it by [slug](#get-an-active-page-by-slug-public).
+The five named types hold **at most one `ACTIVE` row each**. This is a database guarantee, not a convention:
+
+```sql
+CREATE UNIQUE INDEX "support_pages_active_type_key"
+    ON "support_pages" ("type")
+    WHERE "status" = 'ACTIVE' AND "type" <> 'OTHERS';
+```
+
+- **What it constrains, precisely.** Only `ACTIVE` rows, and only non-`OTHERS` types. A type may hold any number of `DRAFT`/`INACTIVE` rows — old versions, work in progress — and `OTHERS` may hold any number of `ACTIVE` rows. Publishing is the only operation the constraint watches.
+- **`OTHERS` is the deliberate exception**, since it is the catch-all that legitimately backs many concurrent pages. Never fetch it by type; fetch it by [slug](#get-an-active-page-by-slug-public).
+- **The editorial workflow is retire-then-publish.** Set the outgoing row to `INACTIVE` first, then set the incoming one to `ACTIVE`. Doing it in the other order now fails loudly with a `409` instead of silently producing two live pages for one tab — the two steps are **not** wrapped in a transaction, so there is a brief window where the tab has no live page at all. For a policy page that is the safe direction to fail.
+- **Lookups are deterministic regardless.** `findActiveByType` orders by `[updatedAt desc, id desc]` as belt-and-braces, so the answer never depends on the query planner. This still matters after the constraint exists, for two cases it does not cover: `/active-page/OTHERS` (many live rows, newest edit wins) and any named-type duplicate that predates the migration.
+- **Pre-existing duplicates were retired, not deleted.** The migration keeps the most recently updated `ACTIVE` row per named type and demotes the rest to `INACTIVE` before building the index — reversible, and the demoted rows stay visible in the admin listing, which applies no status filter.
+- **The constraint is enforced only at the database.** There is no service-level pre-check, so a violation surfaces as Prisma `P2002` → `409` with `GlobalExceptionFilter`'s generic wording, naming the index rather than the situation. See [Known Gaps](#known-gaps--recommended-hardening).
 
 ##### Slug Handling
 
@@ -246,8 +272,7 @@ The global `ValidationPipe` runs with `whitelist: true` **and** `forbidNonWhitel
 
 Issues worth fixing before this module is considered production-hardened — none of them block understanding the current design:
 
-- **Nothing enforces one `ACTIVE` row per named type.** The whole public contract for the five named types rests on a convention the database does not know about. The fix is a partial unique index — `CREATE UNIQUE INDEX ... ON support_pages(type) WHERE status = 'ACTIVE' AND type <> 'OTHERS'` — which Prisma cannot express in the schema today and would need a hand-written migration.
-- **`findActiveByType` has no `orderBy`.** Even accepting the gap above, adding `orderBy: { updatedAt: 'desc' }` would make "which duplicate wins" deterministic (newest edit wins) instead of planner-dependent.
+- **The singleton constraint has no service-level counterpart, so its `409` is opaque.** Publishing a second live page for a named type is correctly rejected by `support_pages_active_type_key`, but the resulting Prisma `P2002` is mapped by `GlobalExceptionFilter` to the generic *"A record with this support_pages_active_type_key already exists"* — it names the index, not the problem. A pre-check in `SupportService` (or an auto-retire of the incumbent inside `withTransaction`, the pattern `HomeService` uses for `displayOrder`) would turn that into a message an admin can act on, and could offer publish-and-replace as one atomic operation.
 - **`findActiveTabs` has no tie-breaker.** Ordering is `type ASC` only, so the relative order of multiple `OTHERS` pages is undefined and can shift between calls. A secondary `title ASC` — or a dedicated `displayOrder` column — would stabilize the storefront tab list.
 - **A fully-Thai `title` derives to an empty slug** (see [Slug Handling](#slug-handling)). Rejecting it in the DTO, or adding a transliteration/fallback in `generateSlug()`, would turn a confusing `409` into a clear error.
 - **No soft delete.** `DELETE /delete-support-page/:id` destroys the row and frees its slug immediately — no recovery, no SEO redirect history. The `AuditLog` `DELETE` entry preserves the deleted row's *content* ([audit-log.md](./audit-log.md#diff-shape)), which is a genuine safety net, but restoring from it is a manual job.
@@ -316,7 +341,7 @@ Two projections live as private readonly constants on `SupportRepository`; each 
 1. **Slug derivation.** `generateSlug(title)` — from the English `title` only. `titleTh` never influences the slug.
 2. **Uniqueness check.** `findBySlug(slug)` → `409 Conflict` (`"A support page with this title already exists"`) if any row already owns that slug. The check is **table-wide and status-agnostic**: a `DRAFT` page, or a page of a completely different `type`, still blocks the slug. See [Slug Handling](#slug-handling).
 3. **One `support.create()`** with the DTO's remaining fields, the derived `slug`, and `createdBy: userId`. `updatedBy` is left `null` — it is only ever set by [update](#update-a-support-page).
-4. **`status` defaults to `ACTIVE` at the database level** when the DTO omits it. There is no separate publish step: creating a page without specifying a status puts it live immediately, and **without checking whether that type already has a live page** — see [The Singleton-by-Convention Rule](#the-singleton-by-convention-rule).
+4. **`status` defaults to `ACTIVE` at the database level** when the DTO omits it. There is no separate publish step: creating a page without specifying a status puts it live immediately — which means an omitted `status` on a named type is exactly the case `support_pages_active_type_key` rejects if that type is already live. The service performs no pre-check, so this surfaces as a `409` from the database. See [The One-Live-Page-Per-Type Rule](#the-one-live-page-per-type-rule). Pass `status: DRAFT` to stage a replacement without touching the live page.
 5. **No file handling, no rollback logic, no transaction.** Unlike `blog`/`product` create, nothing is written outside Postgres, so a failed insert leaves nothing behind to clean up. The write is separately recorded as a `CREATE` row in `audit_logs` by the Prisma extension ([audit-log.md](./audit-log.md#how-rows-get-written)).
 
 **Response shape**: `SupportResponseDto` (admin/full detail, with `createdByUser` resolved).
@@ -327,7 +352,7 @@ Two projections live as private readonly constants on `SupportRepository`; each 
 | `400`  | DTO validation failed — missing/invalid `type`, missing `title`/`content`, `title`/`titleTh` over 255 chars, invalid `status`, or an unknown field (`forbidNonWhitelisted`). |
 | `401`  | Missing/invalid JWT, or a token carrying no user id.                                                                       |
 | `403`  | Authenticated but not `ADMIN`/`MARKETING`/`SUPPORT`.                                                                       |
-| `409`  | A support page with this title (i.e. its derived slug) already exists. Also the mapped result of a lost slug race — Prisma `P2002` is normalized to `409` by `GlobalExceptionFilter`. |
+| `409`  | Two distinct causes, both `P2002` → `409` via `GlobalExceptionFilter`: (a) a support page with this title — i.e. its derived slug — already exists, caught by the service's own check; (b) the page is `ACTIVE` for a named type that already has a live page, caught by `support_pages_active_type_key`. Only (a) has a hand-written message. |
 
 ---
 
@@ -391,7 +416,7 @@ Two projections live as private readonly constants on `SupportRepository`; each 
 1. **The visibility gate is a single condition** — `status = ACTIVE`. `DRAFT` and `INACTIVE` rows are invisible here, and there is no timestamp gate to reason about (contrast `blog`/`product`, which additionally weigh `publishedAt`).
 2. **Ordering is `type ASC`, i.e. Postgres enum declaration order** — `DELIVERY_POLICY`, `TERMS_AND_CONDITIONS`, `PRIVACY_POLICY`, `CANCELLATION_POLICY`, `RETURN_POLICY`, then every `OTHERS` page. The storefront gets its tabs in the intended order without sorting client-side; reordering the enum in `support.prisma` reorders the UI. There is **no secondary sort key**, so multiple `OTHERS` rows come back in an undefined order — see [Known Gaps](#known-gaps--recommended-hardening).
 3. **Not paginated, and it returns full `content`.** The response carries every live page's entire body, which is what lets the storefront render a clicked tab with no second request. It also means the payload grows linearly with the number of `OTHERS` pages — fine for a handful, worth revisiting past a few dozen.
-4. **Duplicates are not collapsed.** If two `ACTIVE` rows exist for one named type, both appear here — while [active-page/:type](#get-the-active-page-for-a-type-public) picks arbitrarily between them. The two endpoints can therefore disagree; that is a symptom of the unenforced singleton rule, not of this query.
+4. **One row per named type is now structural.** `support_pages_active_type_key` makes it impossible for two live `DELIVERY_POLICY` rows to appear in this list, so the tab strip cannot show the same policy tab twice. Only `OTHERS` can contribute multiple entries — by design. Rows that predate the constraint were retired by its migration, so this endpoint and [active-page/:type](#get-the-active-page-for-a-type-public) can no longer disagree about which page is live for a named type.
 
 **Response shape**: `SupportResponsePublicDto[]` — a bare array under `data`, with **no `meta`** (this is not a paginated route).
 
@@ -413,14 +438,15 @@ Two projections live as private readonly constants on `SupportRepository`; each 
 | :--------- | :---------------------------------------------------------------------------------------------------------------------------------- |
 | Controller | `getActiveSupportByType(type)` — `new ParseEnumPipe(SupportType)` validates the path param, rejecting anything outside the enum with a `400`. |
 | Service    | `getActiveSupportByType(type)` — throws `NotFoundException` (`"No active support page found for type {type}"`) on a miss.            |
-| Repository | `findActiveByType(type)` — `findFirst({ where: { type, status: ACTIVE } })` on the public projection.                                 |
+| Repository | `findActiveByType(type)` — `findFirst({ where: { type, status: ACTIVE }, orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }] })` on the public projection. |
 
 **Business logic:**
 
 1. **`ParseEnumPipe` is the whole input contract** — the param must be an exact `SupportType` member (`DELIVERY_POLICY`, not `delivery-policy`), so no unknown type ever reaches the database.
-2. **`findFirst`, not `findUnique`** — there is no unique constraint on `(type, status)` that would make a unique lookup possible, and no `orderBy` to break a tie. With the intended one-live-row-per-type this is exact; with duplicates it is arbitrary. See [The Singleton-by-Convention Rule](#the-singleton-by-convention-rule).
-3. **`OTHERS` is a trap on this route.** It is a valid enum value, so `/active-page/OTHERS` returns `200` with *one arbitrary* `OTHERS` page. Fetch those by [slug](#get-an-active-page-by-slug-public) instead.
-4. **`404` covers both "no such page" and "the page exists but isn't live."** A `DRAFT` privacy policy is indistinguishable from a missing one here — which is the intended behaviour, unlike `blog`'s slug lookup, which leaks unpublished rows.
+2. **`findFirst`, not `findUnique`** — Prisma cannot target a partial unique index with `findUnique`, since it has no `@@unique` counterpart in the schema, so the constraint that makes the answer singular is invisible to the client API. For a named type the result is nonetheless exact: at most one row can satisfy the `where`. See [The One-Live-Page-Per-Type Rule](#the-one-live-page-per-type-rule).
+3. **The `orderBy` makes the two uncovered cases deterministic** — `OTHERS` (many live rows) and any named-type duplicate predating the constraint. Newest edit wins, with `id desc` breaking a same-millisecond tie, instead of the query planner deciding.
+4. **`OTHERS` is still a trap on this route.** It is a valid enum value, so `/active-page/OTHERS` returns `200` with the most recently updated `OTHERS` page — deterministic now, but arbitrary as an answer to "which one did you want". Fetch those by [slug](#get-an-active-page-by-slug-public) instead.
+5. **`404` covers both "no such page" and "the page exists but isn't live."** A `DRAFT` privacy policy is indistinguishable from a missing one here — which is the intended behaviour, unlike `blog`'s slug lookup, which leaks unpublished rows.
 
 **Response shape**: `SupportResponsePublicDto`.
 
@@ -482,7 +508,7 @@ Two projections live as private readonly constants on `SupportRepository`; each 
 3. **`type` cannot be changed.** It is absent from `UpdateSupportDto`, and `forbidNonWhitelisted` turns an attempt to send it into a `400` rather than a silent no-op. See [Conventions](#conventions).
 4. **`updatedBy` is always restamped** with the acting user on every successful update, regardless of which fields changed.
 5. **A single `support.update()`** applies everything at once. Fields absent from the DTO stay exactly as they were — Prisma ignores `undefined` keys — so this route cannot clear an optional field back to `null`: sending an empty string writes `""`, and sending nothing changes nothing. `updatedAt` is refreshed by Prisma's `@updatedAt`.
-6. **Publishing is just a status write.** Setting `status: ACTIVE` makes the page live immediately with **no check for an existing live page of the same type** — the ordering caveat in [The Singleton-by-Convention Rule](#the-singleton-by-convention-rule) applies here more than anywhere else.
+6. **Publishing is just a status write — and the one place the singleton constraint bites.** Setting `status: ACTIVE` on a named type whose live page is still `ACTIVE` is rejected by `support_pages_active_type_key` with a `409`; the service does not pre-check, so the message names the index rather than the conflict. Retire the incumbent first — see [The One-Live-Page-Per-Type Rule](#the-one-live-page-per-type-rule). Note the reverse direction is unconstrained: setting the only live page of a type to `INACTIVE` always succeeds and leaves that storefront tab with no page at all, returning `404` until something is published.
 7. **The change is diffed into `audit_logs`** as an `UPDATE` row carrying only the fields that actually moved; a no-op update writes no audit row at all ([audit-log.md](./audit-log.md#how-rows-get-written)).
 
 **Response shape**: `SupportResponseDto` (full admin detail), reflecting the row after the write.
@@ -494,7 +520,7 @@ Two projections live as private readonly constants on `SupportRepository`; each 
 | `401`  | Missing/invalid JWT, or a token carrying no user id.                                                        |
 | `403`  | Authenticated but not `ADMIN`/`MARKETING`/`SUPPORT`.                                                        |
 | `404`  | No support page with this `id`.                                                                            |
-| `409`  | The new title's derived slug already belongs to a *different* page.                                         |
+| `409`  | Either the new title's derived slug already belongs to a *different* page (hand-written message), or `status: ACTIVE` would give a named type a second live page (`support_pages_active_type_key`, generic message). |
 
 ---
 

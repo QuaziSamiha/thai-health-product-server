@@ -10,7 +10,8 @@ NestJS backend for the Thai Health Product (Thai Health Product) e-commerce plat
 | Prisma — CLI commands (migrate, studio, reset, deploy) | [docs/commands/prisma.md](./docs/commands/prisma.md) |
 | Prisma — concepts, conventions, developer guide | [docs/concepts/prisma.md](./docs/concepts/prisma.md) |
 | Project setup from scratch | [documentations/PROJECT_SETUP.md](./documentations/PROJECT_SETUP.md) |
-| Category module | [documentations/CATEGORY.md](./documentations/CATEGORY.md) |
+| Category module — taxonomy tree, schema + endpoints | [docs/category.md](./docs/category.md) |
+| Category module (legacy schema notes) | [documentations/CATEGORY.md](./documentations/CATEGORY.md) |
 | Product module | [documentations/PRODUCT.md](./documentations/PRODUCT.md) |
 | Shared pagination pattern | [documentations/PAGINATION.md](./documentations/PAGINATION.md) |
 | Delivery module — schema design + API plan | [docs/delivery.md](./docs/delivery.md) |
@@ -77,6 +78,33 @@ yarn start:prod      # .env.production
   - [Auth & OTP Coupling](./docs/user.md#auth--otp-coupling)
 ### Auth
 ### Category
+- [db schema](./docs/category.md#db-schema)
+  - [Entity-Relationship Diagram (ERD)](./docs/category.md#entity-relationship-diagram-erd)
+  - [Enum Definitions](./docs/category.md#enum-definitions)
+  - [Data Dictionary — Category](./docs/category.md#data-dictionary--category)
+  - [Relationships and Cascading Rules](./docs/category.md#relationships-and-cascading-rules)
+  - [Performance Optimizations (Indexes)](./docs/category.md#performance-optimizations-indexes)
+  - [Conventions](./docs/category.md#conventions)
+  - [Example Data](./docs/category.md#example-data)
+  - [Example Usage (JSON Response)](./docs/category.md#example-usage-json-response)
+  - [Implementation & Best Practices](./docs/category.md#implementation--best-practices)
+    - [The Hierarchy Model](./docs/category.md#the-hierarchy-model)
+    - [Slug Handling](./docs/category.md#slug-handling)
+    - [Image Upload & Rollback](./docs/category.md#image-upload--rollback)
+    - [Admin-Form UX (multipart/form-data)](./docs/category.md#admin-form-ux-multipartform-data)
+    - [Validation](./docs/category.md#validation)
+  - [Known Gaps / Recommended Hardening](./docs/category.md#known-gaps--recommended-hardening)
+- [api end point and business logic](./docs/category.md#api-end-point--business-logic)
+  - [Endpoint Overview](./docs/category.md#endpoint-overview)
+  - [Response Shapes & Select Projections](./docs/category.md#response-shapes--select-projections)
+  - [Create a Category — `POST /category/create-category`](./docs/category.md#create-a-category)
+  - [List All Categories (Admin) — `GET /category/all-categories`](./docs/category.md#list-all-categories-admin)
+  - [List All Active Categories (Public) — `GET /category/all-active-categories`](./docs/category.md#list-all-active-categories-public)
+  - [List Active Root Categories (Public) — `GET /category/active-root-categories`](./docs/category.md#list-active-root-categories-public)
+  - [List Product-Assignable Categories (Admin) — `GET /category/product-categories`](./docs/category.md#list-product-assignable-categories-admin)
+  - [Get a Category by Slug (Public) — `GET /category/category-by-slug/:slug`](./docs/category.md#get-a-category-by-slug-public)
+  - [Update a Category — `PATCH /category/update-category/:id`](./docs/category.md#update-a-category)
+  - [Built but Not Yet Exposed](./docs/category.md#built-but-not-yet-exposed)
 ### Product
 - [db schema](./docs/product.md#db-schema)
   - [Entity-Relationship Diagram (ERD)](./docs/product.md#entity-relationship-diagram-erd)
@@ -176,7 +204,7 @@ yarn start:prod      # .env.production
   - [Example Data](./docs/support.md#example-data)
   - [Example Usage (JSON Response)](./docs/support.md#example-usage-json-response)
   - [Implementation & Best Practices](./docs/support.md#implementation--best-practices)
-    - [The Singleton-by-Convention Rule](./docs/support.md#the-singleton-by-convention-rule)
+    - [The One-Live-Page-Per-Type Rule](./docs/support.md#the-one-live-page-per-type-rule)
     - [Slug Handling](./docs/support.md#slug-handling)
     - [Admin-Form UX (multipart/form-data)](./docs/support.md#admin-form-ux-multipartform-data)
     - [Validation](./docs/support.md#validation)

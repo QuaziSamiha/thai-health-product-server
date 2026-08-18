@@ -102,14 +102,21 @@ export class SupportRepository extends BaseRepository {
     });
   }
 
-  //* THE FIVE NAMED POLICY TYPES ARE SINGLETON PAGES BY CONVENTION (SEE
-  //* support.prisma), SO "THE ACTIVE ROW FOR A TYPE" IS WELL-DEFINED. `OTHERS`
-  //* CAN HAVE MULTIPLE ROWS — LOOK THOSE UP BY slug VIA findActiveBySlug INSTEAD.
+  //* THE FIVE NAMED POLICY TYPES HOLD AT MOST ONE ACTIVE ROW EACH — ENFORCED BY
+  //* THE PARTIAL UNIQUE INDEX support_pages_active_type_key (SEE support.prisma),
+  //* SO "THE ACTIVE ROW FOR A TYPE" IS WELL-DEFINED FOR THEM. `OTHERS` IS EXCLUDED
+  //* FROM THAT INDEX AND CAN HAVE MANY ACTIVE ROWS — LOOK THOSE UP BY slug VIA
+  //* findActiveBySlug INSTEAD.
+  //*
+  //* THE orderBy IS BELT-AND-BRACES: IT MAKES THE RESULT DETERMINISTIC (NEWEST
+  //* EDIT WINS) FOR `OTHERS`, AND FOR ANY NAMED-TYPE DUPLICATE THAT PREDATES THE
+  //* INDEX, INSTEAD OF LEAVING THE CHOICE TO THE QUERY PLANNER.
   async findActiveByType(type: SupportType, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return await client.support.findFirst({
       where: { type, status: SupportStatus.ACTIVE },
       select: this.SUPPORT_SELECT_PUBLIC,
+      orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
     });
   }
 

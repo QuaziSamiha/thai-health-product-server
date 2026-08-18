@@ -48,7 +48,7 @@ model Product {
 
   //* STOCK
   quantity          Int         @default(0) // * TOTAL QUANTITY OF A PRODUCT WITHOUT VARIANTS
-  totalStock        Int         @default(0) @map("total_stock") // * TOTAL QUANTITY ACROSS ALL VARIANTS -- Denormalized cache: Represents sum of all variant stock. Must be kept in sync via application logic or DB trigger.
+  totalStock        Int         @default(0) @map("total_stock") // * TOTAL *SELLABLE* QUANTITY ACROSS VARIANTS -- Denormalized cache: sum of the quantity of every variant whose variantStatus = ACTIVE (a retired variant's shelf stock is still in the warehouse but cannot be bought, so it must not prop this product up to IN_STOCK -- see 20260818100000_add_product_variant_status). Kept in sync by sync_product_total_stock_from_variants and mirrored in app code at write time.
   stockStatus       StockStatus @default(OUT_OF_STOCK) @map("stock_status")
   lowStockThreshold Int         @default(10) @map("low_stock_threshold") //* stockStatus BECOMES LOW_STOCK ONCE THE EFFECTIVE COUNT (quantity FOR SIMPLE, totalStock FOR VARIABLE) DROPS TO/BELOW THIS, DOWN TO 1. KEPT IN SYNC VIA THE SAME DB TRIGGERS AS stockStatus.
 
@@ -142,6 +142,24 @@ model ProductVariant {
   isDefault     Boolean @default(false) @map("is_default")
   comboQuantity Int     @default(0) @map("combo_quantity") //* SAME SEMANTICS AS Product.comboQuantity, SCOPED TO THIS VARIANT — WINS OVER THE PARENT PRODUCT'S VALUE WHEN A ComboItem PINS A VARIANT.
 
+  //* CONFIGURATION
+  //* PER-VARIANT VISIBILITY GATE — SAME ENUM AS Product.status BUT SCOPED TO
+  //* THIS ONE SIZE/FLAVOUR, SO A SINGLE VARIANT CAN BE RETIRED WITHOUT TAKING
+  //* THE WHOLE PRODUCT DOWN. NAMED variantStatus (NOT status) SO A JOINED ROW
+  //* OR A FLATTENED PRODUCT/VARIANT DROPDOWN OPTION CAN CARRY BOTH THE
+  //* PARENT'S status AND THIS ONE WITHOUT EITHER SHADOWING THE OTHER. IT ONLY
+  //* NARROWS, NEVER WIDENS: AN ACTIVE VARIANT OF A NON-ACTIVE PRODUCT STAYS
+  //* INVISIBLE, BECAUSE THE PARENT GATE IS APPLIED FIRST.
+  //* WHAT A NON-ACTIVE VARIANT MEANS — SEE MIGRATION
+  //* 20260818100000_add_product_variant_status:
+  //*  1. IT IS DROPPED FROM EVERY PUBLIC PRODUCT READ (PRODUCT_SELECT_PUBLIC).
+  //*  2. IT CANNOT BE ORDERED (OrderService.buildOrderItems).
+  //*  3. ITS quantity STOPS COUNTING TOWARD Product.totalStock — THAT COLUMN
+  //*     IS SELLABLE STOCK, NOT SHELF STOCK.
+  //*  4. EVERY COMBO PINNING IT FALLS TO quantity 0 / OUT_OF_STOCK, BECAUSE
+  //*     THE BUNDLE'S SCARCEST-PART RULE READS ITS STOCK AS 0.
+  variantStatus CategoryProductStatus @default(ACTIVE) @map("variant_status")
+
   // * RELATIONS
   productId     Int            @map("product_id")
   product       Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -155,6 +173,7 @@ model ProductVariant {
   @@index([productId])
   @@index([productId, isDefault]) //* FETCH THE DEFAULT VARIANT FAST
   @@index([productId, stockStatus]) //* Admin dashboard: this product's low/out-of-stock variants
+  @@index([productId, variantStatus]) //* PDP/storefront: this product's sellable variants only
   @@map("product_variants")
 }
 

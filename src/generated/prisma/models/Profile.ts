@@ -40,7 +40,6 @@ export type ProfileMinAggregateOutputType = {
   id: number | null
   firstName: string | null
   lastName: string | null
-  name: string | null
   avatarUrl: string | null
   bio: string | null
   dateOfBirth: Date | null
@@ -52,7 +51,6 @@ export type ProfileMaxAggregateOutputType = {
   id: number | null
   firstName: string | null
   lastName: string | null
-  name: string | null
   avatarUrl: string | null
   bio: string | null
   dateOfBirth: Date | null
@@ -64,7 +62,6 @@ export type ProfileCountAggregateOutputType = {
   id: number
   firstName: number
   lastName: number
-  name: number
   avatarUrl: number
   bio: number
   dateOfBirth: number
@@ -89,7 +86,6 @@ export type ProfileMinAggregateInputType = {
   id?: true
   firstName?: true
   lastName?: true
-  name?: true
   avatarUrl?: true
   bio?: true
   dateOfBirth?: true
@@ -101,7 +97,6 @@ export type ProfileMaxAggregateInputType = {
   id?: true
   firstName?: true
   lastName?: true
-  name?: true
   avatarUrl?: true
   bio?: true
   dateOfBirth?: true
@@ -113,7 +108,6 @@ export type ProfileCountAggregateInputType = {
   id?: true
   firstName?: true
   lastName?: true
-  name?: true
   avatarUrl?: true
   bio?: true
   dateOfBirth?: true
@@ -213,7 +207,6 @@ export type ProfileGroupByOutputType = {
   id: number
   firstName: string
   lastName: string | null
-  name: string | null
   avatarUrl: string | null
   bio: string | null
   dateOfBirth: Date | null
@@ -249,7 +242,6 @@ export type ProfileWhereInput = {
   id?: Prisma.IntFilter<"Profile"> | number
   firstName?: Prisma.StringFilter<"Profile"> | string
   lastName?: Prisma.StringNullableFilter<"Profile"> | string | null
-  name?: Prisma.StringNullableFilter<"Profile"> | string | null
   avatarUrl?: Prisma.StringNullableFilter<"Profile"> | string | null
   bio?: Prisma.StringNullableFilter<"Profile"> | string | null
   dateOfBirth?: Prisma.DateTimeNullableFilter<"Profile"> | Date | string | null
@@ -263,7 +255,6 @@ export type ProfileOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrderInput | Prisma.SortOrder
-  name?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -281,7 +272,6 @@ export type ProfileWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ProfileWhereInput | Prisma.ProfileWhereInput[]
   firstName?: Prisma.StringFilter<"Profile"> | string
   lastName?: Prisma.StringNullableFilter<"Profile"> | string | null
-  name?: Prisma.StringNullableFilter<"Profile"> | string | null
   avatarUrl?: Prisma.StringNullableFilter<"Profile"> | string | null
   bio?: Prisma.StringNullableFilter<"Profile"> | string | null
   dateOfBirth?: Prisma.DateTimeNullableFilter<"Profile"> | Date | string | null
@@ -294,7 +284,6 @@ export type ProfileOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrderInput | Prisma.SortOrder
-  name?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -315,7 +304,6 @@ export type ProfileScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"Profile"> | number
   firstName?: Prisma.StringWithAggregatesFilter<"Profile"> | string
   lastName?: Prisma.StringNullableWithAggregatesFilter<"Profile"> | string | null
-  name?: Prisma.StringNullableWithAggregatesFilter<"Profile"> | string | null
   avatarUrl?: Prisma.StringNullableWithAggregatesFilter<"Profile"> | string | null
   bio?: Prisma.StringNullableWithAggregatesFilter<"Profile"> | string | null
   dateOfBirth?: Prisma.DateTimeNullableWithAggregatesFilter<"Profile"> | Date | string | null
@@ -327,7 +315,6 @@ export type ProfileScalarWhereWithAggregatesInput = {
 export type ProfileCreateInput = {
   firstName: string
   lastName?: string | null
-  name?: string | null
   avatarUrl?: string | null
   bio?: string | null
   dateOfBirth?: Date | string | null
@@ -340,7 +327,6 @@ export type ProfileUncheckedCreateInput = {
   id?: number
   firstName: string
   lastName?: string | null
-  name?: string | null
   avatarUrl?: string | null
   bio?: string | null
   dateOfBirth?: Date | string | null
@@ -352,7 +338,6 @@ export type ProfileUncheckedCreateInput = {
 export type ProfileUpdateInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -365,7 +350,6 @@ export type ProfileUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -378,7 +362,6 @@ export type ProfileCreateManyInput = {
   id?: number
   firstName: string
   lastName?: string | null
-  name?: string | null
   avatarUrl?: string | null
   bio?: string | null
   dateOfBirth?: Date | string | null
@@ -390,7 +373,6 @@ export type ProfileCreateManyInput = {
 export type ProfileUpdateManyMutationInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -402,7 +384,6 @@ export type ProfileUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -420,7 +401,6 @@ export type ProfileCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
-  name?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
   bio?: Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrder
@@ -438,7 +418,6 @@ export type ProfileMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
-  name?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
   bio?: Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrder
@@ -450,7 +429,6 @@ export type ProfileMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
-  name?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
   bio?: Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrder
@@ -498,7 +476,6 @@ export type ProfileUncheckedUpdateOneWithoutUserNestedInput = {
 export type ProfileCreateWithoutUserInput = {
   firstName: string
   lastName?: string | null
-  name?: string | null
   avatarUrl?: string | null
   bio?: string | null
   dateOfBirth?: Date | string | null
@@ -510,7 +487,6 @@ export type ProfileUncheckedCreateWithoutUserInput = {
   id?: number
   firstName: string
   lastName?: string | null
-  name?: string | null
   avatarUrl?: string | null
   bio?: string | null
   dateOfBirth?: Date | string | null
@@ -537,7 +513,6 @@ export type ProfileUpdateToOneWithWhereWithoutUserInput = {
 export type ProfileUpdateWithoutUserInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -549,7 +524,6 @@ export type ProfileUncheckedUpdateWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -563,7 +537,6 @@ export type ProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   id?: boolean
   firstName?: boolean
   lastName?: boolean
-  name?: boolean
   avatarUrl?: boolean
   bio?: boolean
   dateOfBirth?: boolean
@@ -577,7 +550,6 @@ export type ProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   firstName?: boolean
   lastName?: boolean
-  name?: boolean
   avatarUrl?: boolean
   bio?: boolean
   dateOfBirth?: boolean
@@ -591,7 +563,6 @@ export type ProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   firstName?: boolean
   lastName?: boolean
-  name?: boolean
   avatarUrl?: boolean
   bio?: boolean
   dateOfBirth?: boolean
@@ -605,7 +576,6 @@ export type ProfileSelectScalar = {
   id?: boolean
   firstName?: boolean
   lastName?: boolean
-  name?: boolean
   avatarUrl?: boolean
   bio?: boolean
   dateOfBirth?: boolean
@@ -614,7 +584,7 @@ export type ProfileSelectScalar = {
   userId?: boolean
 }
 
-export type ProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "firstName" | "lastName" | "name" | "avatarUrl" | "bio" | "dateOfBirth" | "gender" | "metadata" | "userId", ExtArgs["result"]["profile"]>
+export type ProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "firstName" | "lastName" | "avatarUrl" | "bio" | "dateOfBirth" | "gender" | "metadata" | "userId", ExtArgs["result"]["profile"]>
 export type ProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -634,7 +604,6 @@ export type $ProfilePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     id: number
     firstName: string
     lastName: string | null
-    name: string | null
     avatarUrl: string | null
     bio: string | null
     dateOfBirth: Date | null
@@ -1068,7 +1037,6 @@ export interface ProfileFieldRefs {
   readonly id: Prisma.FieldRef<"Profile", 'Int'>
   readonly firstName: Prisma.FieldRef<"Profile", 'String'>
   readonly lastName: Prisma.FieldRef<"Profile", 'String'>
-  readonly name: Prisma.FieldRef<"Profile", 'String'>
   readonly avatarUrl: Prisma.FieldRef<"Profile", 'String'>
   readonly bio: Prisma.FieldRef<"Profile", 'String'>
   readonly dateOfBirth: Prisma.FieldRef<"Profile", 'DateTime'>

@@ -204,8 +204,11 @@ This is a **`MIN`, not a `SUM`** — the opposite of `Product.totalStock`. Patte
 | 10 units in stock, combo needs 3 per bundle            | `floor(10/3)` = **3** bundles (leftover ignored) |
 | Any single item at 0 stock                             | **0** bundles → `OUT_OF_STOCK`                   |
 | Combo with no items                                    | **0** bundles → `OUT_OF_STOCK`                   |
+| Any pinned variant not `ACTIVE`                        | **0** bundles → `OUT_OF_STOCK`                   |
 
 **Item stock source:** a pinned row reads `product_variants.quantity`; an unpinned row reads `products.quantity`. That is only correct because the [Bundling Rules](#bundling-rules) guarantee unpinned ⇒ `SIMPLE`. **If that type rule is ever relaxed, this formula breaks** — an unpinned `VARIABLE` product would read `products.quantity`, which is `0` for variable products.
+
+**A pinned variant that is not `ACTIVE` contributes `0`, whatever its shelf stock says** (migration `20260818100000_add_product_variant_status`). Retiring a variant is a business statement that it cannot be sold, so the `MIN` forces the whole bundle to `0` — see [Variant Status and Combos](#variant-status-and-combos) below. The unpinned branch deliberately does *not* test the product's own `status`: gating a bundle on the parent product's workflow state is a separate rule, and an admin may legitimately stage a `DRAFT` combo around a `DRAFT` product.
 
 The rule is written down in two places that must stay in sync:
 
@@ -221,7 +224,7 @@ The rule is written down in two places that must stay in sync:
 | `trg_sync_combo_stock_status`          | `combo_products`   | `BEFORE INSERT OR UPDATE OF quantity, low_stock_threshold` — derives `stock_status`. |
 | `trg_sync_combo_quantity_from_items`   | `combo_items`      | `AFTER INSERT OR DELETE OR UPDATE OF quantity, product_id, variant_id, combo_id`     |
 | `trg_sync_combo_quantity_from_product` | `products`         | `AFTER UPDATE OF quantity` — recomputes every combo holding it unpinned.             |
-| `trg_sync_combo_quantity_from_variant` | `product_variants` | `AFTER UPDATE OF quantity` — recomputes every combo that pinned it.                  |
+| `trg_sync_combo_quantity_from_variant` | `product_variants` | `AFTER UPDATE OF quantity, variant_status` — recomputes every combo that pinned it. `variant_status` is in the column list because retiring a variant moves the ceiling without touching `quantity`. |
 
 The `OF <columns>` lists keep these off the hot path: a price edit or a rename never fires them. Because `trg_sync_combo_stock_status` is `BEFORE`-row, the `UPDATE` issued by `recompute_combo_quantity` derives `stock_status` in the same pass — no second statement anywhere.
 
@@ -246,6 +249,26 @@ A combo may legitimately contain:
 - multiple `SIMPLE` products,
 - a mix of `SIMPLE` and `VARIABLE` products,
 - **the same `VARIABLE` product more than once, pinned to different variants** — which is why `@@unique([comboId, productId])` would be wrong.
+
+---
+
+#### Variant Status and Combos
+
+`ProductVariant.variantStatus` lets one size be retired without taking its product down (see `docs/product.md` → **Variant Status**). A retired variant and a **live** combo cannot coexist: the bundle would be permanently unassemblable, since `recompute_combo_quantity` reads its stock as `0`.
+
+Three checks close the three moments that could otherwise produce that pair. Each is necessary — none of the three subsumes another, because they fire at different times:
+
+| Moment           | Rule                                                                              | Where                                                | Status |
+| :--------------- | :--------------------------------------------------------------------------------- | :---------------------------------------------------- | :----- |
+| **Bundle time**  | A non-`ACTIVE` variant cannot be added to a combo.                                  | `ComboProductService.resolveComboItems`                | `400`  |
+| **Retire time**  | A variant that a **live** combo bundles cannot be retired.                          | `ProductService.assertVariantsNotInLiveCombo`          | `409`  |
+| **Publish time** | A combo that still pins a retired variant cannot be switched to `ACTIVE`.           | `ComboProductService.assertNoInactiveBundledVariants`  | `400`  |
+
+The publish-time check exists precisely because the other two leave a gap: a `DRAFT` combo assembled *before* a variant was retired was legal when it was built, and retiring that variant was legal because no live combo depended on it. Without the third check, publishing that draft would put a card on the storefront that can only ever read "out of stock". It only has to cover the case where `items` is **not** re-sent — when it is, `resolveComboItems` has already rejected any such row.
+
+**"Live" means `status = ACTIVE` and not soft-deleted.** Retirement is blocked only by live combos; **deletion** of a variant is still blocked by *any* combo, because `combo_items_variant_id_fkey` is `ON DELETE RESTRICT` and the FK does not care what status a combo is in. Non-live combos are deliberately allowed through a retirement: they simply fall to 0 assemblable bundles, and the variant-status endpoint returns them in `affectedCombos` so the admin sees the consequence — rather than being forced to unwind every draft that happens to mention the variant before taking it off the shelf.
+
+Underneath all three, the DB is the backstop: no combo containing a non-`ACTIVE` variant can ever be sellable, whichever path wrote the column.
 
 ---
 

@@ -268,6 +268,19 @@ export class ComboProductService {
       resolved?.limitingItemName ?? 'a bundled product',
     );
 
+    //* PUBLISHING WITHOUT RE-SENDING `items` IS THE ONE WAY A COMBO CAN GO
+    //* LIVE AROUND A VARIANT THAT WAS RETIRED AFTER IT WAS BUNDLED — SEE
+    //* ComboProductRepository.findInactiveBundledVariants. WHEN `items` *IS*
+    //* PRESENT, resolveComboItems ABOVE HAS ALREADY REJECTED ANY SUCH ROW,
+    //* SO THIS ONLY HAS TO COVER THE UNTOUCHED-ITEMS CASE.
+    if (
+      dto.status === CategoryProductStatus.ACTIVE &&
+      existing.status !== CategoryProductStatus.ACTIVE &&
+      !resolved
+    ) {
+      await this.assertNoInactiveBundledVariants(id);
+    }
+
     //* SCOPED TO THIS COMBO SO A FOREIGN IMAGE ID CANNOT BE DELETED THROUGH
     //* ANOTHER COMBO'S PAYLOAD — AND AN UNKNOWN ID FAILS THE WHOLE REQUEST
     //* BEFORE ANY FILE IS UPLOADED, SAME AS ProductService.updateProduct.
@@ -520,9 +533,9 @@ export class ComboProductService {
 
   /**
    * Validates every bundled product/variant exists, that a pinned variant
-   * actually belongs to the product it's paired with, and that the pin
-   * matches the product's type (VARIABLE requires a variant, SIMPLE forbids
-   * one) — then
+   * actually belongs to the product it's paired with, that the pin matches
+   * the product's type (VARIABLE requires a variant, SIMPLE forbids one),
+   * and that the pinned variant is ACTIVE — then
    * resolves each item's `unitPrice` snapshot (the client-supplied value
    * wins; otherwise falls back to the variant's/product's current
    * `salePrice ?? basePrice` at bundling time, per ComboItem's documented
@@ -592,6 +605,19 @@ export class ComboProductService {
             `Variant ${item.variantId} does not belong to product ${item.productId}`,
           );
         }
+        //* A RETIRED VARIANT CONTRIBUTES 0 STOCK TO THE BUNDLE (SEE
+        //* resolveComboAvailability AND recompute_combo_quantity), SO
+        //* BUNDLING ONE COULD ONLY EVER PRODUCE A COMBO THAT IS PERMANENTLY
+        //* 0-ASSEMBLABLE. REJECT IT AT THE BOUNDARY INSTEAD OF SILENTLY
+        //* CREATING AN UNSELLABLE OFFER. THE COMPLEMENTARY RULE LIVES IN
+        //* ProductService.assertVariantsNotInLiveCombo, WHICH STOPS AN
+        //* ALREADY-BUNDLED VARIANT FROM BEING RETIRED OUT FROM UNDER A LIVE
+        //* COMBO.
+        if (variant.variantStatus !== CategoryProductStatus.ACTIVE) {
+          throw new BadRequestException(
+            `"${product.name} - ${variant.name}" is ${variant.variantStatus.toLowerCase()}, not active, so it cannot be bundled — reactivate the variant or pick another one`,
+          );
+        }
       }
 
       const priceSource = variant ?? product;
@@ -610,7 +636,17 @@ export class ComboProductService {
         //* AN UNPINNED ROW IS ALWAYS A SIMPLE PRODUCT (ENFORCED ABOVE), SO ITS
         //* OWN quantity IS THE STOCK THAT LIMITS THE BUNDLE — NOT total_stock,
         //* WHICH IS THE VARIANTS ROLL-UP AND IS 0 FOR A SIMPLE PRODUCT'S PARTS.
-        sourceStock: variant ? variant.quantity : product.quantity,
+        //* A NON-ACTIVE VARIANT READS AS 0 REGARDLESS OF ITS SHELF STOCK,
+        //* MIRRORING recompute_combo_quantity. UNREACHABLE FROM THIS PATH
+        //* TODAY (THE GUARD ABOVE ALREADY REJECTED IT) — IT IS HERE BECAUSE
+        //* THIS FORMULA MUST READ IDENTICALLY TO THE SQL IT MIRRORS, WHICH
+        //* *IS* REACHED THAT WAY: A VARIANT CAN BE RETIRED LONG AFTER IT WAS
+        //* BUNDLED INTO A DRAFT COMBO.
+        sourceStock: variant
+          ? variant.variantStatus === CategoryProductStatus.ACTIVE
+            ? variant.quantity
+            : 0
+          : product.quantity,
         //* CARRIED SO A REJECTED offeredQuantity CAN NAME THE BOTTLENECK
         name: product.name,
       };
@@ -633,6 +669,36 @@ export class ComboProductService {
       quantity,
       limitingItemName: limiting?.name ?? 'a bundled product',
     };
+  }
+
+  /**
+   * Refuses to publish a combo that still pins a retired variant. Such a
+   * bundle can never be assembled — `recompute_combo_quantity` reads a
+   * non-ACTIVE variant's stock as 0, so its `quantity` is pinned at 0 and
+   * its `stockStatus` at OUT_OF_STOCK for as long as the variant stays
+   * retired. Letting it go live would put a card on the storefront that can
+   * only ever say "out of stock".
+   *
+   * Third and last of the three rules that keep combos and variant status
+   * consistent, each closing a different moment:
+   *   1. bundle time   — `resolveComboItems` (cannot add a retired variant)
+   *   2. retire time   — `ProductService.assertVariantsNotInLiveCombo`
+   *                      (cannot retire a variant a LIVE combo needs)
+   *   3. publish time  — here (cannot go live around one retired in between)
+   */
+  private async assertNoInactiveBundledVariants(
+    comboId: number,
+  ): Promise<void> {
+    const inactive =
+      await this.comboProductRepository.findInactiveBundledVariants(comboId);
+    if (inactive.length === 0) return;
+
+    const blockers = inactive
+      .map((item) => `"${item.variant!.name}"`)
+      .join(', ');
+    throw new BadRequestException(
+      `This combo cannot be published while it bundles a variant that is not active: ${blockers}. Reactivate the variant, or swap it out of the combo, first.`,
+    );
   }
 
   /**

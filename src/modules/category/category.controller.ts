@@ -18,6 +18,7 @@ import {
   CategoryResponseDto,
   RootActiveCategoryResponseDto,
 } from './dto/category-response.dto';
+import { CategoryDeletionResponseDto } from './dto/category-deletion-response.dto';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -31,6 +32,7 @@ import {
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Post,
   Query,
@@ -247,5 +249,37 @@ export class CategoryController {
         bannerImage: files?.bannerImage?.[0],
       },
     );
+  }
+
+  @Delete('delete-category/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Remove a category (archives it when it has products)',
+    description:
+      'Removes a category, choosing the safe path automatically. A category with **sub-categories** is rejected with a `409` — re-parent or remove them first. A category that has (or has ever had) **products** filed under it is **archived** (`status = ARCHIVED`) rather than destroyed, because its products hold a RESTRICT foreign key and because retiring it keeps the slug resolvable and the change reversible. Only an empty, never-used category is hard-deleted, along with its image files. The `action` field on the response says which path ran. Admin only.',
+  })
+  @ApiOkResponse({
+    description: 'Category deleted or archived successfully.',
+    type: CategoryDeletionResponseDto,
+  })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
+  @ApiForbiddenResponse({ description: 'Admin role required.' })
+  @ApiNotFoundResponse({ description: 'Category not found.' })
+  @ApiConflictResponse({
+    description:
+      'The category still has sub-categories (`CATEGORY_HAS_CHILDREN`), or it is already archived and cannot be destroyed because products remain under it (`CATEGORY_ALREADY_ARCHIVED`).',
+  })
+  @ResponseMessage('Category removed successfully')
+  async deleteCategory(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request & { user?: { id: number } },
+  ) {
+    if (!req.user?.id) {
+      throw new UnauthorizedException('User identity missing from request');
+    }
+
+    return this.categoryService.deleteCategory(id, req.user.id);
   }
 }

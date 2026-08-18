@@ -11,6 +11,7 @@ import {
   CategoryResponseDto,
   RootActiveCategoryResponseDto,
 } from '../dto/category-response.dto';
+import { CategoryDeletionAction } from '../dto/category-deletion-response.dto';
 import { CategoryProductStatus } from '../../../generated/prisma/enums';
 
 // ---------------------------------------------------------------------------
@@ -69,6 +70,7 @@ const mockCategoryService = () => ({
   getActiveRootCategories: jest.fn(),
   getCategoryBySlug: jest.fn(),
   updateCategory: jest.fn(),
+  deleteCategory: jest.fn(),
 });
 
 // ---------------------------------------------------------------------------
@@ -360,6 +362,54 @@ describe('CategoryController', () => {
       await expect(
         controller.updateCategory(1, {}, {}, makeAuthReq()),
       ).rejects.toThrow('Unexpected');
+    });
+  });
+
+  describe('deleteCategory', () => {
+    it('passes the parsed id and the acting user through to the service', async () => {
+      const outcome = {
+        id: 7,
+        name: 'Serums',
+        slug: 'serums',
+        action: CategoryDeletionAction.ARCHIVED,
+        status: CategoryProductStatus.ARCHIVED,
+        childrenCount: 0,
+        productCount: 3,
+        activeProductCount: 3,
+      };
+      service.deleteCategory.mockResolvedValue(outcome);
+
+      const result = await controller.deleteCategory(7, makeAuthReq(42));
+
+      expect(service.deleteCategory).toHaveBeenCalledWith(7, 42);
+      expect(result).toBe(outcome);
+    });
+
+    it('throws UnauthorizedException when user identity is missing', async () => {
+      await expect(
+        controller.deleteCategory(7, {} as never),
+      ).rejects.toThrow(UnauthorizedException);
+      expect(service.deleteCategory).not.toHaveBeenCalled();
+    });
+
+    it('propagates the conflict raised for a category with sub-categories', async () => {
+      service.deleteCategory.mockRejectedValue(
+        new ConflictException('still has 2 sub-categories'),
+      );
+
+      await expect(
+        controller.deleteCategory(7, makeAuthReq()),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('propagates a not-found from the service', async () => {
+      service.deleteCategory.mockRejectedValue(
+        new NotFoundException('Category with ID 7 not found'),
+      );
+
+      await expect(controller.deleteCategory(7, makeAuthReq())).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

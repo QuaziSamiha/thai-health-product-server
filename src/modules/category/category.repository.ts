@@ -208,6 +208,59 @@ export class CategoryRepository extends BaseRepository {
     });
   }
 
+  /**
+   * Everything `CategoryService.deleteCategory` needs to decide — and carry
+   * out — a removal, in one query: identity for the response, the three image
+   * paths to clean up on a hard delete, and the two counts that gate it.
+   *
+   * `_count.products` is deliberately **unfiltered** — it counts soft-deleted
+   * rows too. Those rows still hold `Product.categoryId`, whose FK is
+   * `RESTRICT`, so they block a hard delete exactly as live ones do.
+   *
+   * `activeProductCount` is a second query rather than a filtered `_count`,
+   * because a single `_count` block cannot count the same relation twice
+   * under two different predicates. It narrows to what is actually on the
+   * storefront, using the same predicate as
+   * `ProductRepository.activeVisibilityWhere()`. Returns `null` — not a
+   * zero-filled shell — when the category does not exist, so the caller's
+   * 404 stays a single check.
+   */
+  async findForDeletion(id: number, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+
+    const [category, activeProductCount] = await Promise.all([
+      client.category.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          status: true,
+          thumbnailUrl: true,
+          bannerUrl: true,
+          iconUrl: true,
+          _count: { select: { children: true, products: true } },
+        },
+      }),
+      client.product.count({
+        where: {
+          categoryId: id,
+          status: CategoryProductStatus.ACTIVE,
+          deletedAt: null,
+        },
+      }),
+    ]);
+
+    if (!category) return null;
+
+    return {
+      ...category,
+      childrenCount: category._count.children,
+      productCount: category._count.products,
+      activeProductCount,
+    };
+  }
+
   async deleteCategory(id: number, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return await client.category.delete({ where: { id } });
@@ -219,7 +272,10 @@ export class CategoryRepository extends BaseRepository {
       userId: number;
       slug?: string;
       level?: number;
-      bannerUrl?: string;
+      //* null IS A REAL, DISTINCT INSTRUCTION HERE — "CLEAR THIS COLUMN" —
+      //* WHEREAS undefined STILL MEANS "LEAVE IT ALONE" (PRISMA SKIPS IT).
+      //* THE CALLER ONLY EVER PASSES null AFTER IT HAS DELETED THE FILE.
+      bannerUrl?: string | null;
       iconUrl?: string;
       thumbnailUrl?: string;
     },

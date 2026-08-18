@@ -189,7 +189,6 @@ export class UserService {
           userId: user.id,
           firstName: dto.firstName,
           lastName: dto.lastName,
-          name: `${dto.firstName} ${dto.lastName ?? ''}`.trim(),
           avatarUrl: dto.avatarUrl,
         },
         tx,
@@ -221,7 +220,6 @@ export class UserService {
     data: {
       firstName?: string;
       lastName?: string;
-      name?: string;
       phone?: string;
       avatarUrl?: string | null;
     },
@@ -239,9 +237,6 @@ export class UserService {
       }
       if (data.lastName !== undefined) {
         profileUpdateData.lastName = data.lastName;
-      }
-      if (data.name !== undefined) {
-        profileUpdateData.name = data.name;
       }
       if (data.avatarUrl !== undefined) {
         profileUpdateData.avatarUrl = data.avatarUrl;

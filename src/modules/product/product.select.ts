@@ -4,6 +4,8 @@
 //* (see src/modules/product/dto/*.dto.ts).
 //* ═══════════════════════════════════════════════════════════════════════
 
+import { CategoryProductStatus } from '../../generated/prisma/enums';
+
 //* SUB-SELECTS — SHARED BUILDING BLOCKS FOR THE ROLE-BASED SELECTS BELOW
 
 //* MATCHES ProductCategoryMinifiedDto (dto/product-shared.dto.ts)
@@ -61,6 +63,7 @@ const VARIANT_SELECT_COMMON = {
 //* MATCHES ProductVariantDto (admin) — adds barcode/quantity/discountType/discountValue/costPrice
 export const VARIANT_SELECT_ADMIN = {
   ...VARIANT_SELECT_COMMON,
+  variantStatus: true,
   barcode: true,
   quantity: true,
   lowStockThreshold: true,
@@ -69,8 +72,24 @@ export const VARIANT_SELECT_ADMIN = {
   costPrice: true,
 } as const;
 
-//* MATCHES ProductVariantPublicDto — excludes barcode/costPrice/quantity/discountType/discountValue
+//* MATCHES ProductVariantPublicDto — excludes barcode/costPrice/quantity/discountType/discountValue.
+//* variantStatus IS LEFT OUT TOO, BUT FOR A DIFFERENT REASON THAN THE REST:
+//* IT ISN'T WITHHELD, IT'S REDUNDANT — VARIANTS_WHERE_PUBLIC BELOW ALREADY
+//* GUARANTEES EVERY VARIANT IN A PUBLIC RESPONSE IS ACTIVE, SO THE COLUMN
+//* COULD ONLY EVER SAY "ACTIVE".
 export const VARIANT_SELECT_PUBLIC = VARIANT_SELECT_COMMON;
+
+//* THE STOREFRONT'S PER-VARIANT VISIBILITY GATE — THE VARIANT-LEVEL TWIN OF
+//* ProductRepository.activeVisibilityWhere(). A RETIRED SIZE MUST DISAPPEAR
+//* FROM THE PDP'S SIZE PICKER RATHER THAN SIT THERE UNBUYABLE, SO IT IS
+//* APPLIED AS A RELATION FILTER ON EVERY PUBLIC PRODUCT READ. IT ONLY EVER
+//* NARROWS: THE PARENT PRODUCT'S OWN GATE IS APPLIED FIRST, SO AN ACTIVE
+//* VARIANT OF A DRAFT PRODUCT IS STILL INVISIBLE. ProductVariant HAS NO
+//* deletedAt OF ITS OWN — A VARIANT OF A SOFT-DELETED PRODUCT IS ALREADY
+//* UNREACHABLE BECAUSE ITS PARENT IS.
+export const VARIANTS_WHERE_PUBLIC = {
+  variantStatus: CategoryProductStatus.ACTIVE,
+} as const;
 
 //* ═══════════════════════════════════════════════════════════════════════
 //* ROLE-BASED PRODUCT SELECTS
@@ -153,7 +172,7 @@ export const PRODUCT_SELECT_ADMIN = {
 //* (stockStatus only). Health/compliance labeling fields ARE included.
 export const PRODUCT_SELECT_PUBLIC = {
   ...PRODUCT_SELECT_COMMON,
-  variants: { select: VARIANT_SELECT_PUBLIC },
+  variants: { select: VARIANT_SELECT_PUBLIC, where: VARIANTS_WHERE_PUBLIC },
 } as const;
 
 //* MINIFIED — feeds ProductMinifiedResponseDto. Cart items, order lines,

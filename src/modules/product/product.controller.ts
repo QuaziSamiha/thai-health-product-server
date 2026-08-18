@@ -35,6 +35,8 @@ import type { Request } from 'express';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { UpdateVariantStatusDto } from './dto/update-variant-status.dto';
+import { VariantStatusChangeResponseDto } from './dto/variant-status-response.dto';
 import { ActiveProductsQueryDto } from './dto/active-products-query.dto';
 import {
   ProductResponseDto,
@@ -134,7 +136,7 @@ export class ProductController {
   @ApiOperation({
     summary: 'Get flattened product/variant options for admin dropdowns',
     description:
-      'Returns one option per selectable thing rather than one per product row: a product with no variants appears as itself, while a product with variants contributes one option per variant instead of its own row (e.g. "Colette Collins 23 July variant 200 ml", "Colette Collins 23 July variant 30 Capsules"). Each option includes stockStatus (variant\'s own for a variant option, otherwise the product\'s), the product\'s primary/default gallery image if any, and updatedAt (always the parent product\'s own timestamp — ProductVariant has none of its own). Only ACTIVE, non-deleted products are included. Admin only.',
+      'Returns one option per selectable thing rather than one per product row: a product with no variants appears as itself, while a product with variants contributes one option per variant instead of its own row (e.g. "Colette Collins 23 July variant 200 ml", "Colette Collins 23 July variant 30 Capsules"). Each option includes stockStatus (variant\'s own for a variant option, otherwise the product\'s), the parent product\'s own `status`, the variant\'s own `variantStatus` (absent on a product-level option), the product\'s primary/default gallery image if any, and updatedAt (always the parent product\'s own timestamp — ProductVariant has none of its own). Every non-deleted product is included regardless of status — this backs the inventory module, where a DRAFT or retired item still holds physical stock that must be counted and corrected. Callers that may only offer sellable things filter on `status`/`variantStatus` themselves. Admin only.',
   })
   @ApiOkResponse({
     description: 'Dropdown options retrieved successfully.',
@@ -242,6 +244,44 @@ export class ProductController {
       req.user.id,
       updateProductDto,
       images ?? [],
+    );
+  }
+
+  @Patch('update-variant-status/:variantId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Update a single variant's status",
+    description:
+      "Flips one variant's own `variantStatus` without touching its siblings — the per-variant counterpart to `update-product`, whose `variants` array reconciles the whole list at once. Only an ACTIVE variant is shown on the storefront, orderable, counted toward its product's `totalStock`, or usable in a combo, so retiring one narrows all four at the same time. Rejected with 409 when it would leave the product with no ACTIVE variant, or when a live (published) combo still bundles the variant — deactivate or re-compose that combo first. Combos that are not live are allowed through and returned in `affectedCombos`, since this change drops each of them to 0 assemblable bundles. Re-sending the status a variant already has is a no-op. Admin only.",
+  })
+  @ApiBody({ type: UpdateVariantStatusDto })
+  @ApiOkResponse({
+    description: 'Variant status updated successfully.',
+    type: VariantStatusChangeResponseDto,
+  })
+  @ApiBadRequestResponse({ description: 'Invalid input data.' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
+  @ApiForbiddenResponse({ description: 'Admin role required.' })
+  @ApiNotFoundResponse({ description: 'Variant not found.' })
+  @ApiConflictResponse({
+    description:
+      'This is the last active variant of its product, or a live combo still bundles it.',
+  })
+  @ResponseMessage('Variant status updated successfully')
+  async updateVariantStatus(
+    @Param('variantId', ParseIntPipe) variantId: number,
+    @Body() updateVariantStatusDto: UpdateVariantStatusDto,
+    @Req() req: Request & { user?: { id: number } },
+  ) {
+    if (!req.user?.id) {
+      throw new UnauthorizedException('User identity missing from request');
+    }
+    return this.productService.updateVariantStatus(
+      variantId,
+      req.user.id,
+      updateVariantStatusDto,
     );
   }
 

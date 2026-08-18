@@ -241,14 +241,46 @@ export class ComboProductRepository extends BaseRepository {
     if (ids.length === 0) return [];
     return await client.productVariant.findMany({
       where: { id: { in: ids } },
-      //* quantity FEEDS resolveComboAvailability — SEE findProductsByIds
+      //* quantity FEEDS resolveComboAvailability — SEE findProductsByIds.
+      //* variantStatus GATES BUNDLING (ONLY AN ACTIVE VARIANT MAY BE PUT IN A
+      //* COMBO) AND ALSO FEEDS THAT SAME AVAILABILITY MIRROR, WHICH READS A
+      //* NON-ACTIVE VARIANT'S STOCK AS 0. name IS FOR THE REJECTION MESSAGE —
+      //* "variant 41 is inactive" IS NOT SOMETHING AN ADMIN CAN ACT ON.
       select: {
         id: true,
+        name: true,
         productId: true,
         quantity: true,
+        variantStatus: true,
         basePrice: true,
         salePrice: true,
       },
+    });
+  }
+
+  /**
+   * The variants a stored combo pins that are NOT ACTIVE. Publishing is the
+   * one moment the item list has to be re-validated without being re-sent:
+   * `resolveComboItems` already refuses to bundle a retired variant, and
+   * `ProductService` refuses to retire one a live combo depends on — but a
+   * DRAFT combo assembled before a variant was retired sits outside both
+   * rules until someone tries to publish it. Without this, that publish would
+   * succeed and put a permanently 0-stock bundle on the storefront.
+   */
+  async findInactiveBundledVariants(
+    comboId: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return await client.comboItem.findMany({
+      where: {
+        comboId,
+        variant: { variantStatus: { not: CategoryProductStatus.ACTIVE } },
+      },
+      select: {
+        variant: { select: { name: true, variantStatus: true } },
+      },
+      orderBy: { displayOrder: 'asc' },
     });
   }
 

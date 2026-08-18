@@ -12,6 +12,7 @@ import { STORAGE_SERVICE_TOKEN } from '../../../shared/storage/storage.constants
 import type { IStorageService } from '../../../shared/storage/interfaces/storage.interface';
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
+import { CategoryDeletionAction } from '../dto/category-deletion-response.dto';
 import {
   CategoryProductStatus,
   UserRole,
@@ -78,9 +79,25 @@ const makeCategory = (overrides: Record<string, unknown> = {}) => ({
 // Mocks
 // ---------------------------------------------------------------------------
 
+const makeDeletionTarget = (overrides: Record<string, unknown> = {}) => ({
+  id: 1,
+  name: 'Electronics',
+  slug: 'electronics',
+  status: CategoryProductStatus.ACTIVE,
+  thumbnailUrl: null,
+  bannerUrl: null,
+  iconUrl: null,
+  _count: { children: 0, products: 0 },
+  childrenCount: 0,
+  productCount: 0,
+  activeProductCount: 0,
+  ...overrides,
+});
+
 const mockCategoryRepository = () => ({
   findById: jest.fn(),
   findBySlug: jest.fn(),
+  findForDeletion: jest.fn(),
   createCategory: jest.fn(),
   deleteCategory: jest.fn(),
   updateCategory: jest.fn(),
@@ -454,6 +471,116 @@ describe('CategoryService', () => {
       ).rejects.toThrow('A category cannot be its own parent');
     });
 
+    //* REGRESSION: REMOVING A BANNER USED TO RETURN 200 WITH THE IMAGE STILL
+    //* ATTACHED. THERE WAS NO REMOVAL PATH AT ALL — updateCategory ONLY EVER
+    //* HANDLED THE REPLACE CASE (`if (primaryImage)`), SO A REQUEST CARRYING
+    //* NO FILE WAS INDISTINGUISHABLE FROM "DON'T TOUCH THE IMAGE".
+    describe('banner removal', () => {
+      it('clears bannerUrl and deletes the stored file when removeBannerImage is set', async () => {
+        const existing = makeCategory({
+          bannerUrl: '/uploads/categories/banner-images/old.png',
+        });
+        repo.findById.mockResolvedValue(existing);
+        repo.updateCategory.mockResolvedValue(
+          makeCategory({ bannerUrl: null }),
+        );
+        storage.deleteFile.mockResolvedValue(undefined as never);
+
+        await service.updateCategory(
+          categoryId,
+          userId,
+          { removeBannerImage: true },
+          noImages,
+        );
+
+        //* null, NOT undefined — PRISMA SKIPS undefined KEYS, SO undefined
+        //* HERE WOULD SILENTLY LEAVE THE OLD URL IN PLACE. THAT DISTINCTION
+        //* IS THE ENTIRE FIX.
+        const call = repo.updateCategory.mock.calls[0][1] as Record<
+          string,
+          unknown
+        >;
+        expect(call.bannerUrl).toBeNull();
+        expect(storage.deleteFile).toHaveBeenCalledTimes(1);
+      });
+
+      it('never forwards removeBannerImage to the repository', async () => {
+        const existing = makeCategory({
+          bannerUrl: '/uploads/categories/banner-images/old.png',
+        });
+        repo.findById.mockResolvedValue(existing);
+        repo.updateCategory.mockResolvedValue(makeCategory());
+        storage.deleteFile.mockResolvedValue(undefined as never);
+
+        await service.updateCategory(
+          categoryId,
+          userId,
+          { removeBannerImage: true },
+          noImages,
+        );
+
+        //* IT IS A TRANSPORT-ONLY INSTRUCTION, NOT A COLUMN. THE REPOSITORY
+        //* SPREADS WHAT IT IS HANDED STRAIGHT INTO category.update({ data }),
+        //* SO LEAKING IT WOULD FAIL THE WRITE WITH A RAW PRISMA
+        //* "Unknown argument" RATHER THAN DOING ANYTHING USEFUL.
+        const call = repo.updateCategory.mock.calls[0][1] as Record<
+          string,
+          unknown
+        >;
+        expect(call).not.toHaveProperty('removeBannerImage');
+      });
+
+      it('is a no-op when the category has no banner to begin with', async () => {
+        repo.findById.mockResolvedValue(makeCategory({ bannerUrl: null }));
+        repo.updateCategory.mockResolvedValue(makeCategory());
+
+        await service.updateCategory(
+          categoryId,
+          userId,
+          { removeBannerImage: true },
+          noImages,
+        );
+
+        //* IDEMPOTENT: REMOVING AN ALREADY-EMPTY BANNER MUST NOT TRY TO DELETE
+        //* A FILE, AND MUST NOT WRITE A REDUNDANT null.
+        expect(storage.deleteFile).not.toHaveBeenCalled();
+        const call = repo.updateCategory.mock.calls[0][1] as Record<
+          string,
+          unknown
+        >;
+        expect(call.bannerUrl).toBeUndefined();
+      });
+
+      it('lets an uploaded file win over the removal flag', async () => {
+        const existing = makeCategory({
+          bannerUrl: '/uploads/categories/banner-images/old.png',
+        });
+        repo.findById.mockResolvedValue(existing);
+        repo.updateCategory.mockResolvedValue(makeCategory());
+        storage.saveFile.mockResolvedValue({
+          path: '/uploads/categories/banner-images/new.png',
+        } as never);
+        storage.deleteFile.mockResolvedValue(undefined as never);
+
+        await service.updateCategory(
+          categoryId,
+          userId,
+          { removeBannerImage: true },
+          { ...noImages, bannerImage: {} as Express.Multer.File },
+        );
+
+        //* HONOURING BOTH WOULD NULL THE COLUMN THE UPLOAD JUST SET AND ORPHAN
+        //* THE FILE IT JUST WROTE.
+        const call = repo.updateCategory.mock.calls[0][1] as Record<
+          string,
+          unknown
+        >;
+        expect(call.bannerUrl).toBe(
+          '/uploads/categories/banner-images/new.png',
+        );
+      });
+    });
+
     it('generates a new slug when name changes', async () => {
       const existing = makeCategory();
       repo.findById.mockResolvedValue(existing);
@@ -579,9 +706,13 @@ describe('CategoryService', () => {
     });
 
     it('throws NotFoundException when new parentId does not exist', async () => {
-      repo.findById
-        .mockResolvedValueOnce(makeCategory())
-        .mockResolvedValueOnce(null);
+      //* Keyed on the id rather than a `...Once` chain: the service calls
+      //* findById twice per invocation (the row, then the new parent), and
+      //* this test invokes it twice — a four-deep Once chain would run dry
+      //* and make the second assertion fail on the wrong error.
+      repo.findById.mockImplementation((lookupId: number) =>
+        Promise.resolve(lookupId === categoryId ? makeCategory() : null),
+      );
 
       await expect(
         service.updateCategory(categoryId, userId, { parentId: 999 }, noImages),
@@ -739,6 +870,175 @@ describe('CategoryService', () => {
 
       expect(result.name).toBe('Updated Name');
       expect(result.slug).toBe('updated-name');
+    });
+  });
+
+  describe('deleteCategory', () => {
+    const categoryId = 1;
+    const userId = 99;
+
+    it('throws NotFoundException when the category does not exist', async () => {
+      repo.findForDeletion.mockResolvedValue(null);
+
+      await expect(service.deleteCategory(categoryId, userId)).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(repo.deleteCategory).not.toHaveBeenCalled();
+      expect(repo.updateCategory).not.toHaveBeenCalled();
+    });
+
+    it('rejects a category that still has sub-categories, naming the count', async () => {
+      repo.findForDeletion.mockResolvedValue(
+        makeDeletionTarget({ name: 'Skincare', childrenCount: 3 }),
+      );
+
+      await expect(service.deleteCategory(categoryId, userId)).rejects.toThrow(
+        ConflictException,
+      );
+      await expect(service.deleteCategory(categoryId, userId)).rejects.toThrow(
+        /3 sub-categories/,
+      );
+      expect(repo.deleteCategory).not.toHaveBeenCalled();
+      expect(repo.updateCategory).not.toHaveBeenCalled();
+    });
+
+    it('singularises the sub-category message for exactly one child', async () => {
+      repo.findForDeletion.mockResolvedValue(
+        makeDeletionTarget({ childrenCount: 1 }),
+      );
+
+      await expect(service.deleteCategory(categoryId, userId)).rejects.toThrow(
+        /1 sub-category\./,
+      );
+    });
+
+    it('checks children before products — a node with both is a children conflict', async () => {
+      repo.findForDeletion.mockResolvedValue(
+        makeDeletionTarget({ childrenCount: 2, productCount: 5 }),
+      );
+
+      await expect(service.deleteCategory(categoryId, userId)).rejects.toThrow(
+        /sub-categor/,
+      );
+      expect(repo.updateCategory).not.toHaveBeenCalled();
+    });
+
+    it('archives instead of deleting when products are filed under it', async () => {
+      repo.findForDeletion.mockResolvedValue(
+        makeDeletionTarget({ productCount: 14, activeProductCount: 11 }),
+      );
+      repo.updateCategory.mockResolvedValue(
+        makeCategory({ status: CategoryProductStatus.ARCHIVED }),
+      );
+
+      const result = await service.deleteCategory(categoryId, userId);
+
+      expect(repo.deleteCategory).not.toHaveBeenCalled();
+      expect(repo.updateCategory).toHaveBeenCalledWith(categoryId, {
+        status: CategoryProductStatus.ARCHIVED,
+        userId,
+      });
+      expect(result.action).toBe(CategoryDeletionAction.ARCHIVED);
+      expect(result.status).toBe(CategoryProductStatus.ARCHIVED);
+      expect(result.productCount).toBe(14);
+      expect(result.activeProductCount).toBe(11);
+    });
+
+    it('archives on the strength of soft-deleted products alone', async () => {
+      //* Every product under it is retired (activeProductCount 0), but the
+      //* rows still hold the RESTRICT FK — a hard delete would be a raw 500.
+      repo.findForDeletion.mockResolvedValue(
+        makeDeletionTarget({ productCount: 4, activeProductCount: 0 }),
+      );
+      repo.updateCategory.mockResolvedValue(
+        makeCategory({ status: CategoryProductStatus.ARCHIVED }),
+      );
+
+      const result = await service.deleteCategory(categoryId, userId);
+
+      expect(result.action).toBe(CategoryDeletionAction.ARCHIVED);
+      expect(repo.deleteCategory).not.toHaveBeenCalled();
+    });
+
+    it('rejects re-archiving a category that is already ARCHIVED', async () => {
+      repo.findForDeletion.mockResolvedValue(
+        makeDeletionTarget({
+          status: CategoryProductStatus.ARCHIVED,
+          productCount: 2,
+        }),
+      );
+
+      await expect(service.deleteCategory(categoryId, userId)).rejects.toThrow(
+        ConflictException,
+      );
+      expect(repo.updateCategory).not.toHaveBeenCalled();
+      expect(repo.deleteCategory).not.toHaveBeenCalled();
+    });
+
+    it('hard-deletes an empty, never-used category', async () => {
+      repo.findForDeletion.mockResolvedValue(makeDeletionTarget());
+      repo.deleteCategory.mockResolvedValue(undefined);
+
+      const result = await service.deleteCategory(categoryId, userId);
+
+      expect(repo.deleteCategory).toHaveBeenCalledWith(categoryId);
+      expect(repo.updateCategory).not.toHaveBeenCalled();
+      expect(result.action).toBe(CategoryDeletionAction.DELETED);
+      expect(result.status).toBeNull();
+    });
+
+    it('removes every stored image file after a hard delete', async () => {
+      repo.findForDeletion.mockResolvedValue(
+        makeDeletionTarget({
+          bannerUrl: '/uploads/categories/banner-images/b.webp',
+          iconUrl: '/uploads/categories/icon-images/i.webp',
+          thumbnailUrl: null,
+        }),
+      );
+      repo.deleteCategory.mockResolvedValue(undefined);
+      storage.deleteFile.mockResolvedValue(undefined);
+
+      await service.deleteCategory(categoryId, userId);
+
+      expect(storage.deleteFile).toHaveBeenCalledTimes(2);
+      expect(storage.deleteFile).toHaveBeenCalledWith(
+        'b.webp',
+        'categories/banner-images',
+      );
+      expect(storage.deleteFile).toHaveBeenCalledWith(
+        'i.webp',
+        'categories/icon-images',
+      );
+    });
+
+    it('still reports success when file cleanup fails', async () => {
+      repo.findForDeletion.mockResolvedValue(
+        makeDeletionTarget({
+          bannerUrl: '/uploads/categories/banner-images/b.webp',
+        }),
+      );
+      repo.deleteCategory.mockResolvedValue(undefined);
+      storage.deleteFile.mockRejectedValue(new Error('disk unavailable'));
+
+      const result = await service.deleteCategory(categoryId, userId);
+
+      expect(result.action).toBe(CategoryDeletionAction.DELETED);
+    });
+
+    it('leaves image files alone on the archive path', async () => {
+      repo.findForDeletion.mockResolvedValue(
+        makeDeletionTarget({
+          productCount: 1,
+          bannerUrl: '/uploads/categories/banner-images/b.webp',
+        }),
+      );
+      repo.updateCategory.mockResolvedValue(
+        makeCategory({ status: CategoryProductStatus.ARCHIVED }),
+      );
+
+      await service.deleteCategory(categoryId, userId);
+
+      expect(storage.deleteFile).not.toHaveBeenCalled();
     });
   });
 });

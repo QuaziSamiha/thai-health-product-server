@@ -14,9 +14,16 @@ enum SupportType {
 }
 
 model Support {
-  id     Int           @id @default(autoincrement())
-  sid    String        @unique @default(uuid()) @db.Uuid //* USE NATIVE UUID TYPE FOR PERFORMANCE
+  id     Int         @id @default(autoincrement())
+  sid    String      @unique @default(uuid()) @db.Uuid //* USE NATIVE UUID TYPE FOR PERFORMANCE
   type   SupportType
+
+  //* AT MOST ONE ACTIVE ROW PER NAMED TYPE IS ENFORCED BY THE DB-ONLY PARTIAL
+  //* UNIQUE INDEX `support_pages_active_type_key` (`type` WHERE status = ACTIVE
+  //* AND type <> OTHERS), ADDED IN 20260818103000_support_one_active_page_per_type.
+  //* PRISMA'S DSL CANNOT EXPRESS A FILTERED UNIQUE INDEX, SO THERE IS DELIBERATELY
+  //* NO @@unique HERE — SAME TRADE-OFF AS users_email_active_key. `OTHERS` IS
+  //* EXCLUDED: IT IS THE CATCH-ALL TYPE AND MAY HOLD MANY ACTIVE ROWS AT ONCE.
   status SupportStatus @default(ACTIVE)
 
   //* PRIMARY CONTENT (ENGLISH & GLOBAL SLUG)

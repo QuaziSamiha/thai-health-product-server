@@ -11,7 +11,10 @@ import {
   MaxLength,
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
-import { DiscountType } from '../../../generated/prisma/enums';
+import {
+  CategoryProductStatus,
+  DiscountType,
+} from '../../../generated/prisma/enums';
 import { emptyStringToUndefined } from '../../../common/utils/json-transform.util';
 
 export class CreateProductVariantDto {
@@ -168,4 +171,18 @@ export class CreateProductVariantDto {
   })
   @IsBoolean({ message: 'isDefault must be true or false' })
   isDefault?: boolean;
+
+  @ApiPropertyOptional({
+    description:
+      "This variant's own visibility state, independent of the parent product's `status` — lets one size be retired without taking the whole product down. Only an ACTIVE variant is shown on the storefront, orderable, counted toward the product's `totalStock`, or bundleable into a combo. Defaults to ACTIVE.",
+    enum: CategoryProductStatus,
+    enumName: 'CategoryProductStatus',
+    default: CategoryProductStatus.ACTIVE,
+    example: CategoryProductStatus.ACTIVE,
+  })
+  @IsOptional()
+  @IsEnum(CategoryProductStatus, {
+    message: 'Please select a valid variant status',
+  })
+  variantStatus?: CategoryProductStatus;
 }

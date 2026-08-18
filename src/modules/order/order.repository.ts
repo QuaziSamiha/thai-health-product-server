@@ -59,6 +59,11 @@ export class OrderRepository extends BaseRepository {
         quantity: true,
         salePrice: true,
         attributes: true,
+        //* THE VARIANT'S OWN SALEABILITY GATE, CHECKED ALONGSIDE THE PARENT
+        //* PRODUCT'S status IN buildOrderItems — A RETIRED SIZE OF AN
+        //* OTHERWISE-ACTIVE PRODUCT MUST NOT BE ORDERABLE THROUGH A STALE
+        //* CART OR A HAND-BUILT REQUEST.
+        variantStatus: true,
         product: {
           select: {
             id: true,
@@ -103,7 +108,17 @@ export class OrderRepository extends BaseRepository {
           take: 1,
         },
         items: {
-          select: { productId: true, variantId: true, quantity: true },
+          select: {
+            productId: true,
+            variantId: true,
+            quantity: true,
+            //* A COMBO PINNING A RETIRED VARIANT ALREADY HAS quantity 0 (THE
+            //* TRIGGER READS ITS STOCK AS 0), SO THE SELLABLE CHECK IN
+            //* buildOrderItems WOULD CATCH IT ANYWAY — BUT AS "OUT OF STOCK",
+            //* WHICH SENDS THE CUSTOMER BACK TO WAIT FOR A RESTOCK THAT WILL
+            //* NEVER HELP. THIS SELECT LETS THAT CASE SAY WHAT IT ACTUALLY IS.
+            variant: { select: { name: true, variantStatus: true } },
+          },
         },
       },
     });

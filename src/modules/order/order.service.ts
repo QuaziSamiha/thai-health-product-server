@@ -407,6 +407,20 @@ export class OrderService {
           );
         }
 
+        //* CHECKED BEFORE THE STOCK TEST BELOW ON PURPOSE: A RETIRED PART
+        //* PINS THE BUNDLE AT 0 ASSEMBLABLE, SO THE STOCK TEST WOULD FIRE
+        //* FIRST AND BLAME STOCK FOR SOMETHING RESTOCKING CANNOT FIX.
+        const retired = combo.items.find(
+          (comboItem) =>
+            comboItem.variant &&
+            comboItem.variant.variantStatus !== CategoryProductStatus.ACTIVE,
+        );
+        if (retired) {
+          throw new BadRequestException(
+            `"${combo.title}" is no longer available — it includes "${retired.variant!.name}", which has been discontinued`,
+          );
+        }
+
         const sellable = Math.min(
           combo.quantity,
           combo.offeredQuantity ?? Infinity,
@@ -464,6 +478,15 @@ export class OrderService {
         ) {
           throw new BadRequestException(
             `"${variant.product?.name ?? 'Product'}" is not currently available`,
+          );
+        }
+        //* THE PRODUCT-LEVEL GATE ABOVE ONLY NARROWS TO "THIS PRODUCT IS ON
+        //* SALE" — THE VARIANT CAN STILL HAVE BEEN RETIRED ON ITS OWN, IN
+        //* WHICH CASE IT IS ALREADY GONE FROM THE PDP AND MUST BE REFUSED
+        //* HERE TOO (STALE CART, STALE TAB, OR A HAND-BUILT REQUEST).
+        if (variant.variantStatus !== CategoryProductStatus.ACTIVE) {
+          throw new BadRequestException(
+            `"${variant.product.name} - ${variant.name}" is no longer available`,
           );
         }
         if (item.quantity > variant.quantity) {

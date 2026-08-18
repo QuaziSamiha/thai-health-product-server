@@ -226,15 +226,30 @@ export class ProductRepository extends BaseRepository {
    * Lightweight source rows for the admin dropdown list: id/slug/name/sku/
    * quantity/costPrice/barcode/basePrice/salePrice for the product itself
    * plus the same for each of its variants, plus the product's own
-   * type/status (variants have neither — both are product-level concepts).
-   * The service flattens this into one option per variant (falling back to
-   * the product row itself when it has none) — this query only fetches
-   * what that flattening needs.
+   * type/status and each variant's own `variantStatus`. The service flattens
+   * this into one option per variant (falling back to the product row itself
+   * when it has none) — this query only fetches what that flattening needs.
+   *
+   * Deliberately filters on NOTHING but `deletedAt` — not the product's
+   * `status`, not the variant's `variantStatus`. This is the inventory
+   * module's source list, and stock is physical: a DRAFT product and a
+   * retired size both still occupy shelf space that has to be counted,
+   * corrected, batched, and audited. Hiding them here would make their stock
+   * unreachable rather than unsellable.
+   *
+   * Sellability is therefore the *caller's* filter to apply, and the two
+   * callers disagree on purpose:
+   *  - The inventory table shows everything and renders `status` /
+   *    `variantStatus` as their own columns.
+   *  - Add Stock narrows to ACTIVE + ACTIVE, since adding stock to something
+   *    nobody can buy is almost always a mis-selection.
+   * Contrast `findProductComboInventoryOptions` below, which filters
+   * server-side because a combo can only ever bundle an ACTIVE variant.
    */
   async findProductDropdownOptions(tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return await client.product.findMany({
-      where: { deletedAt: null, status: CategoryProductStatus.ACTIVE },
+      where: { deletedAt: null },
       orderBy: { name: 'asc' },
       select: {
         id: true,
@@ -280,6 +295,7 @@ export class ProductRepository extends BaseRepository {
             basePrice: true,
             salePrice: true,
             stockStatus: true,
+            variantStatus: true,
           },
           orderBy: { id: 'asc' },
         },
@@ -297,6 +313,14 @@ export class ProductRepository extends BaseRepository {
    * `where` filter (Prisma has no field-to-field comparison operator here),
    * so it's applied by `ProductService.getProductComboInventoryOptions`
    * after the DTO — and its computed `availableForCombo` — is built.
+   *
+   * Unlike `findProductDropdownOptions`, non-ACTIVE variants ARE filtered
+   * out here: `ComboProductService.resolveComboItems` refuses to bundle one,
+   * so offering it in the combo builder could only produce a 400 on save.
+   * A VARIABLE product left with no ACTIVE variant therefore comes back with
+   * an empty `variants` array — the service drops it entirely rather than
+   * falling back to an unpinned product-level option, which that same rule
+   * would reject too.
    */
   async findProductComboInventoryOptions(tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
@@ -325,6 +349,7 @@ export class ProductRepository extends BaseRepository {
           take: 1,
         },
         variants: {
+          where: { variantStatus: CategoryProductStatus.ACTIVE },
           select: {
             id: true,
             name: true,
@@ -563,6 +588,156 @@ export class ProductRepository extends BaseRepository {
     });
   }
 
+  /**
+   * Everything the single-variant status endpoint needs in one read: the
+   * variant itself, its parent product's own gate/audit state, and every
+   * sibling variant. The siblings are what make the two invariants
+   * checkable — "a VARIABLE product must keep at least one ACTIVE variant"
+   * and "the default variant must be one of the ACTIVE ones" are both
+   * statements about the set, not about the row being edited. Their pricing
+   * comes along because promoting a new default also re-mirrors
+   * `Product.basePrice`/`salePrice` (see `ProductService.updateVariantStatus`).
+   */
+  async findVariantForStatusUpdate(id: number, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.productVariant.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        variantStatus: true,
+        isDefault: true,
+        productId: true,
+        product: {
+          select: {
+            id: true,
+            name: true,
+            type: true,
+            status: true,
+            deletedAt: true,
+            variants: {
+              select: {
+                id: true,
+                name: true,
+                variantStatus: true,
+                isDefault: true,
+                basePrice: true,
+                discountType: true,
+                discountValue: true,
+              },
+              orderBy: { id: 'asc' },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * The post-write read behind the single-variant status response. Separate
+   * from `findVariantForStatusUpdate` above because it answers a different
+   * question: that one loads the whole sibling set to *decide* the write,
+   * this one loads the handful of columns needed to *report* it, plus the
+   * two trigger-derived product columns (`totalStock`/`stockStatus`) that
+   * only exist correctly after the transaction commits.
+   *
+   * `product.variants` is filtered to ACTIVE here and used purely as a
+   * count — a `_count` with a filter would do the same work, but reusing
+   * the relation keeps the shape identical to every other select in this
+   * file.
+   */
+  async findVariantForStatusResponse(
+    id: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return await client.productVariant.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        variantStatus: true,
+        isDefault: true,
+        product: {
+          select: {
+            id: true,
+            name: true,
+            totalStock: true,
+            stockStatus: true,
+            variants: {
+              where: { variantStatus: CategoryProductStatus.ACTIVE },
+              select: { id: true },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * The deactivation counterpart to `findCombosUsingVariants`, narrowed to
+   * combos that are actually on sale. The two guards protect different
+   * things and so ask different questions:
+   *
+   * - Deleting a variant is blocked by ANY combo row, because the FK
+   *   (`combo_items_variant_id_fkey`, ON DELETE RESTRICT) does not care what
+   *   status the combo is in — a DRAFT combo still holds the reference.
+   * - Retiring a variant is blocked only by a LIVE combo, because that is a
+   *   bundle customers can buy right now. A DRAFT/INACTIVE/ARCHIVED combo
+   *   simply goes to 0 assemblable bundles and is reported back as a warning
+   *   — nothing customer-facing breaks, and the admin keeps the ability to
+   *   pull a variant off the shelf without first unwinding every draft that
+   *   happens to mention it.
+   */
+  async findLiveCombosUsingVariants(
+    variantIds: number[],
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    if (variantIds.length === 0) return [];
+    return await client.comboItem.findMany({
+      where: {
+        variantId: { in: variantIds },
+        combo: { deletedAt: null, status: CategoryProductStatus.ACTIVE },
+      },
+      select: {
+        variantId: true,
+        variant: { select: { name: true } },
+        combo: { select: { id: true, title: true } },
+      },
+    });
+  }
+
+  /**
+   * Every combo that bundles any of these variants and is NOT live — the
+   * complement of `findLiveCombosUsingVariants`. Retiring a variant drops
+   * each of these to 0 assemblable bundles (the DB does that on its own, via
+   * `recompute_combo_quantity`); this read exists only so the response can
+   * name them instead of leaving the admin to discover it later.
+   */
+  async findDormantCombosUsingVariants(
+    variantIds: number[],
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    if (variantIds.length === 0) return [];
+    return await client.comboItem.findMany({
+      where: {
+        variantId: { in: variantIds },
+        combo: {
+          OR: [
+            { deletedAt: { not: null } },
+            { status: { not: CategoryProductStatus.ACTIVE } },
+          ],
+        },
+      },
+      select: {
+        combo: { select: { id: true, title: true, status: true } },
+      },
+      orderBy: { comboId: 'asc' },
+    });
+  }
+
   // ─── Mutations — Variants ────────────────────────────────────────────────────
 
   /**
@@ -572,6 +747,63 @@ export class ProductRepository extends BaseRepository {
    * transaction when the caller doesn't already supply one, so the plan is
    * never left half-applied.
    */
+  /**
+   * Writes one variant's `variantStatus`, optionally moving the `isDefault`
+   * flag at the same time (retiring the default variant has to hand that
+   * flag to a surviving ACTIVE one, or the PDP would pre-select a variant it
+   * no longer renders).
+   *
+   * The clear-then-set order matters for the same reason it does in
+   * `reorderImages`: both statements run on one connection inside the
+   * transaction, so the old default is always cleared before the new one is
+   * set. There is no partial unique index on `is_default` today, but the
+   * "exactly one default" rule is relied on everywhere and is cheapest to
+   * keep true at every instant rather than only at commit.
+   *
+   * Nothing here touches `Product.totalStock`/`stockStatus`: the
+   * `variant_status` write fires `trg_sync_product_total_stock_from_variants`,
+   * which re-sums the ACTIVE variants, and that UPDATE in turn fires
+   * `trg_sync_product_stock_fields` to re-derive the badge — same
+   * DB-owns-the-derived-columns contract as a plain quantity edit.
+   */
+  async setVariantStatus(
+    variantId: number,
+    productId: number,
+    variantStatus: CategoryProductStatus,
+    promoteDefaultVariantId: number | undefined,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const run = async (client: Prisma.TransactionClient) => {
+      if (promoteDefaultVariantId !== undefined) {
+        await client.productVariant.updateMany({
+          where: { productId, isDefault: true },
+          data: { isDefault: false },
+        });
+      }
+      await client.productVariant.update({
+        //* SCOPED BY productId FOR THE SAME REASON AS reconcileVariants —
+        //* THE CALLER RESOLVED BOTH IDS FROM ONE ROW, SO A MISMATCH HERE
+        //* MEANS THE ROW MOVED UNDER US AND THE WRITE SHOULD FAIL.
+        where: { id: variantId, productId },
+        data: {
+          variantStatus,
+          ...(promoteDefaultVariantId === variantId ? { isDefault: true } : {}),
+        },
+      });
+      if (
+        promoteDefaultVariantId !== undefined &&
+        promoteDefaultVariantId !== variantId
+      ) {
+        await client.productVariant.update({
+          where: { id: promoteDefaultVariantId, productId },
+          data: { isDefault: true },
+        });
+      }
+    };
+
+    return tx ? run(tx) : this.withTransaction(run);
+  }
+
   async reconcileVariants(
     productId: number,
     plan: VariantReconcilePlan,

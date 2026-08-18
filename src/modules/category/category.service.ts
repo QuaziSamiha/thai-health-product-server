@@ -15,6 +15,11 @@ import {
   RootActiveCategoryResponseDto,
   CategoryHomeResponseDto,
 } from './dto/category-response.dto';
+import {
+  CategoryDeletionAction,
+  CategoryDeletionResponseDto,
+} from './dto/category-deletion-response.dto';
+import { parseStoragePath } from '../../common/utils/storage-path.util';
 import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
 import type { IStorageService } from '../../shared/storage/interfaces/storage.interface';
 import { PaginationQueryDto, IPaginatedResult } from '../../shared/pagination';
@@ -237,6 +242,115 @@ export class CategoryService {
     }
   }
 
+  /**
+   * Removes a category — by destroying it when that is safe, and by retiring
+   * it when it is not. The caller does not choose between the two; the data
+   * does.
+   *
+   * The database already refuses the unsafe cases, but only as raw FK
+   * violations (`Category.parentId` is `NO ACTION`, `Product.categoryId` is
+   * `RESTRICT`), which surface as opaque `500`s. This method pre-checks both
+   * so every outcome is a deliberate, explainable response:
+   *
+   * 1. **Has sub-categories → `409`.** The only real fix is to re-parent or
+   *    remove them first, and doing that implicitly would either orphan a
+   *    subtree or silently cascade a delete across it. Archiving instead is
+   *    not a safe substitute either: the children would stay `ACTIVE` and
+   *    keep appearing in `all-active-categories`, which lists every depth
+   *    flat — the tree would look intact on the storefront while its parent
+   *    was gone from the nav. The count is in the message so the admin knows
+   *    how much work that is.
+   *
+   * 2. **Has (or ever had) products → archive, not delete.** Any product row
+   *    still pointing here — including a soft-deleted one — holds the
+   *    `RESTRICT` FK, so a hard delete is impossible regardless of intent.
+   *    `status = ARCHIVED` is the module's documented retirement path: the
+   *    row survives, its slug stays resolvable so old links do not 404 into
+   *    nothing, its images are left on disk, and an admin can undo it from
+   *    the ordinary edit form. Re-archiving an already-`ARCHIVED` category is
+   *    a `409` rather than a silent no-op, mirroring
+   *    `ProductService.softDeleteProduct`.
+   *
+   * 3. **Neither → hard delete.** An empty, never-used category is a mistake
+   *    to be erased, not history to be kept. Its three image files go with
+   *    it, best-effort, *after* the row is gone — the reverse of
+   *    `updateCategory`'s ordering, so a failed delete never leaves a
+   *    surviving row pointing at files that no longer exist.
+   *
+   * Both write paths are audited automatically: `Category` is a tracked audit
+   * model, so the archive lands as an `UPDATE` diff and the hard delete as a
+   * `DELETE` row, with no audit code here.
+   */
+  async deleteCategory(
+    id: number,
+    userId: number,
+  ): Promise<CategoryDeletionResponseDto> {
+    const category = await this.categoryRepository.findForDeletion(id);
+    if (!category) {
+      throw new NotFoundException(`Category with ID ${id} not found`);
+    }
+
+    const { childrenCount, productCount, activeProductCount } = category;
+
+    if (childrenCount > 0) {
+      throw new ConflictException({
+        message: `Cannot remove "${category.name}" — it still has ${childrenCount} sub-categor${
+          childrenCount === 1 ? 'y' : 'ies'
+        }. Move them under another parent, or remove them first.`,
+        error: 'Conflict',
+        errorCode: 'CATEGORY_HAS_CHILDREN',
+      });
+    }
+
+    if (productCount > 0) {
+      if (category.status === CategoryProductStatus.ARCHIVED) {
+        throw new ConflictException({
+          message: `"${category.name}" is already archived. It cannot be deleted outright because ${productCount} product${
+            productCount === 1 ? ' is' : 's are'
+          } still filed under it.`,
+          error: 'Conflict',
+          errorCode: 'CATEGORY_ALREADY_ARCHIVED',
+        });
+      }
+
+      const archived = await this.categoryRepository.updateCategory(id, {
+        status: CategoryProductStatus.ARCHIVED,
+        userId,
+      });
+
+      return new CategoryDeletionResponseDto({
+        id: archived.id,
+        name: archived.name,
+        slug: archived.slug,
+        action: CategoryDeletionAction.ARCHIVED,
+        status: archived.status,
+        childrenCount,
+        productCount,
+        activeProductCount,
+      });
+    }
+
+    await this.categoryRepository.deleteCategory(id);
+
+    const imagePaths = [
+      category.bannerUrl,
+      category.iconUrl,
+      category.thumbnailUrl,
+    ].filter((path): path is string => Boolean(path));
+    await Promise.all(imagePaths.map((path) => this.deleteStoredFile(path)));
+
+    return new CategoryDeletionResponseDto({
+      id: category.id,
+      name: category.name,
+      slug: category.slug,
+      action: CategoryDeletionAction.DELETED,
+      status: null,
+      childrenCount,
+      productCount,
+      activeProductCount,
+    });
+  }
+
   async updateCategory(
     id: number,
     userId: number,
@@ -253,13 +367,22 @@ export class CategoryService {
       throw new NotFoundException(`Category with ID ${id} not found`);
     }
 
+    //* removeBannerImage IS A TRANSPORT-ONLY INSTRUCTION, NOT A COLUMN. IT
+    //* MUST BE DESTRUCTURED OFF *HERE* RATHER THAN IGNORED LATER: the
+    //* repository spreads whatever it is handed straight into
+    //* `category.update({ data })`, so leaving it in would fail the write with
+    //* a raw Prisma "Unknown argument" instead of doing anything useful.
+    const { removeBannerImage, ...categoryFields } = updateCategoryDto;
+
     const updateData: Partial<UpdateCategoryDto> & {
       slug?: string;
       level?: number;
-      bannerUrl?: string;
+      //* null = CLEAR THE COLUMN, undefined = LEAVE IT ALONE (PRISMA SKIPS
+      //* undefined KEYS). THAT DISTINCTION IS THE WHOLE REMOVAL MECHANISM.
+      bannerUrl?: string | null;
       iconUrl?: string;
       thumbnailUrl?: string;
-    } = { ...updateCategoryDto };
+    } = { ...categoryFields };
 
     if (updateCategoryDto.name && updateCategoryDto.name !== category.name) {
       const newSlug = generateSlug(updateCategoryDto.name);
@@ -306,6 +429,18 @@ export class CategoryService {
             );
         }
       }
+    } else if (removeBannerImage && category.bannerUrl) {
+      //* ONLY REACHABLE WHEN NO REPLACEMENT WAS UPLOADED — AN UPLOAD ALREADY
+      //* REPLACES THE BANNER AND DELETES THE OLD FILE ABOVE, SO HONOURING THE
+      //* FLAG TOO WOULD NULL THE COLUMN THE UPLOAD JUST SET AND ORPHAN THE
+      //* FILE IT JUST WROTE. THE `category.bannerUrl` GUARD MAKES THE FLAG
+      //* IDEMPOTENT: REMOVING AN ALREADY-EMPTY BANNER IS A NO-OP, NOT AN ERROR.
+      //* THE COLUMN IS CLEARED WHETHER OR NOT THE FILE DELETE SUCCEEDS —
+      //* deleteStoredFile IS BEST-EFFORT BY DESIGN, AND AN ORPHANED FILE ON
+      //* DISK IS A FAR SMALLER PROBLEM THAN A ROW STILL POINTING AT AN IMAGE
+      //* THE ADMIN ASKED TO REMOVE.
+      updateData.bannerUrl = null;
+      await this.deleteStoredFile(category.bannerUrl);
     }
 
     if (images.iconImage) {
@@ -359,5 +494,24 @@ export class CategoryService {
   ): Promise<string> {
     const savedFile = await this.storageService.saveFile(file, folder);
     return savedFile.path;
+  }
+
+  /**
+   * Best-effort file removal. Splits the stored path back into
+   * `{ filename, folder }` with `parseStoragePath` — which reverses what
+   * `saveFile` produced, at any folder depth — rather than guessing the
+   * folder from substrings of the path the way the create-rollback still
+   * does. A cleanup failure is logged, never thrown: the DB row is already
+   * gone by this point, and failing the request would tell the admin their
+   * delete did not happen when it did.
+   */
+  private async deleteStoredFile(path: string): Promise<void> {
+    const { filename, folder } = parseStoragePath(path);
+    await this.storageService
+      .deleteFile(filename, folder)
+      .catch((e: unknown) => {
+        const message = e instanceof Error ? e.message : String(e);
+        this.logger.warn(`Could not delete category file ${path}: ${message}`);
+      });
   }
 }

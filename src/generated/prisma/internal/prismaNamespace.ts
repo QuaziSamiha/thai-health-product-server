@@ -3381,6 +3381,7 @@ export const ProductVariantScalarFieldEnum = {
   attributes: 'attributes',
   isDefault: 'isDefault',
   comboQuantity: 'comboQuantity',
+  variantStatus: 'variantStatus',
   productId: 'productId'
 } as const
 
@@ -3482,7 +3483,6 @@ export const ProfileScalarFieldEnum = {
   id: 'id',
   firstName: 'firstName',
   lastName: 'lastName',
-  name: 'name',
   avatarUrl: 'avatarUrl',
   bio: 'bio',
   dateOfBirth: 'dateOfBirth',

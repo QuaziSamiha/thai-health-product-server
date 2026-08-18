@@ -114,7 +114,8 @@ export class CategoryResponseDto {
 
   @Expose()
   @ApiProperty({
-    description: 'Denormalized count of products assigned to this category',
+    description:
+      'Live count of every purchasable product in this category and all of its sub-categories. Trigger-maintained; a root category reports its whole branch, since products are only ever filed on its children.',
     example: 25,
   })
   productCount!: number;
@@ -366,7 +367,8 @@ export class CategoryResponseCustomerDto {
 
   @Expose()
   @ApiProperty({
-    description: 'Number of products in this category',
+    description:
+      'Live count of every purchasable product in this category and all of its sub-categories. Trigger-maintained; a root category reports its whole branch, since products are only ever filed on its children.',
     example: 25,
   })
   productCount!: number;
@@ -491,7 +493,8 @@ export class CategoryHomeResponseDto {
 
   @Expose()
   @ApiProperty({
-    description: 'Denormalized count of products assigned to this category',
+    description:
+      'Live count of every purchasable product in this category and all of its sub-categories. Trigger-maintained; a root category reports its whole branch, since products are only ever filed on its children.',
     example: 25,
   })
   productCount!: number;
