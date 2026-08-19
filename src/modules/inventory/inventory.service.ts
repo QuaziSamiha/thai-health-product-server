@@ -16,6 +16,16 @@ import { InventoryResponseDto } from './dto/inventory-response.dto';
 import { InventoryExchangeType } from '../../generated/prisma/enums';
 import { PaginationQueryDto, IPaginatedResult } from '../../shared/pagination';
 
+//* ONE STOCK-BEARING THING AND HOW MANY OF IT: EXACTLY ONE OF
+//* productId/variantId IS SET, THE SAME XOR deductStockForSale AND
+//* restoreStockForSale HAVE ALWAYS TAKEN INLINE. NAMED HERE SO
+//* restoreStockForOrder CAN BUILD THE LIST IT HANDS BACK TO THEM.
+type StockMovementLine = {
+  productId?: number;
+  variantId?: number;
+  quantity: number;
+};
+
 //* PREFIX FOR A GENERATED BATCH NUMBER — SKU WHEN SET (ALREADY GUARANTEED
 //* UNIQUE/STABLE), ELSE THE PRODUCT NAME UPPERCASED WITH EVERY
 //* NON-ALPHANUMERIC CHARACTER STRIPPED (SPACES, HYPHENS, ETC.)
@@ -778,10 +788,97 @@ export class InventoryService {
   }
 
   /**
+   * Gives an order back every unit its placement took, by **reading the
+   * movements that placement wrote** rather than re-deriving them from the
+   * order's line items.
+   *
+   * That distinction is the whole point. `deductStockForSale` is called with a
+   * plan in which a combo line has already been expanded into its component
+   * products/variants (`OrderService.resolveComboLine`), and merged with any
+   * of the same products bought directly. The `OrderItem` rows record no such
+   * thing — a combo line stores `comboId` with `productId`/`variantId` both
+   * `null`. Reversing from the line items therefore restored **nothing** for a
+   * combo, silently losing that stock on every cancellation.
+   *
+   * The ledger has no such gap, and two further properties come free:
+   *
+   * - **It cannot drift.** If an admin edits the combo's contents between
+   *   placement and cancellation, re-expanding it today would return
+   *   quantities that were never taken. The movement rows are what actually
+   *   happened.
+   * - **It is idempotent.** A `RETURN` already standing against this reference
+   *   means the restore has run; a second call is a no-op. The order status
+   *   machine also forbids leaving `CANCELLED`/`FAILED`, so this is belt and
+   *   braces — but it keeps the guarantee if those transitions ever change.
+   *
+   * Returns the number of stock lines actually restored (`0` when there is
+   * nothing to do), so the caller can log the outcome.
+   *
+   * A product hard-deleted since placement takes its movement rows with it
+   * (`Inventory.productId` is `onDelete: Cascade`), which is the correct
+   * outcome: there is no row left to give the stock back to.
+   */
+  async restoreStockForOrder(
+    orderId: number,
+    reason: string,
+    userId: number | undefined,
+    tx: Prisma.TransactionClient,
+  ): Promise<number> {
+    const referenceId = `order:${orderId}`;
+    const movements =
+      await this.inventoryRepository.findStockMovementsByReference(
+        referenceId,
+        tx,
+      );
+
+    if (
+      movements.some(
+        (movement) => movement.changeType === InventoryExchangeType.RETURN,
+      )
+    ) {
+      return 0;
+    }
+
+    //* SALE quantities are stored negative. Merge by product/variant so the
+    //* RETURN ledger mirrors the shape of the SALE side even if a future
+    //* caller ever deducts the same item across two movements.
+    const restoreMap = new Map<string, StockMovementLine>();
+    for (const movement of movements) {
+      if (!movement.productId && !movement.variantId) continue;
+
+      const key = movement.variantId
+        ? `variant-${movement.variantId}`
+        : `product-${movement.productId}`;
+      const quantity = Math.abs(movement.quantity);
+      const existing = restoreMap.get(key);
+      if (existing) {
+        existing.quantity += quantity;
+      } else {
+        restoreMap.set(key, {
+          productId: movement.variantId
+            ? undefined
+            : (movement.productId ?? undefined),
+          variantId: movement.variantId ?? undefined,
+          quantity,
+        });
+      }
+    }
+
+    if (restoreMap.size === 0) return 0;
+
+    const lines = Array.from(restoreMap.values());
+    await this.restoreStockForSale(lines, referenceId, reason, userId, tx);
+    return lines.length;
+  }
+
+  /**
    * The inverse of deductStockForSale — restores stock when an order is
    * cancelled, and logs a RETURN movement per line (not RESTOCK, which
    * implies a fresh vendor intake rather than stock coming back from a
    * cancelled sale).
+   *
+   * Prefer `restoreStockForOrder` for anything order-shaped: it works out the
+   * lines from the sale ledger, which this method cannot do for combos.
    */
   async restoreStockForSale(
     items: { productId?: number; variantId?: number; quantity: number }[],

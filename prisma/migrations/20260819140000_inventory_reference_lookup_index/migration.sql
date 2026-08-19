@@ -1,0 +1,22 @@
+-- Cancelling (or failing) an order now restores its stock by reversing the
+-- SALE movements that placement wrote, looked up as:
+--
+--   WHERE "reference_id" = 'order:<id>' AND "change_type" IN ('SALE','RETURN')
+--
+-- (InventoryService.restoreStockForOrder — it reads the ledger rather than
+-- re-deriving the lines from order_items, which cannot describe a combo's
+-- component deductions.)
+--
+-- `reference_id` was indexed nowhere, so that lookup was a sequential scan of
+-- the entire inventory ledger — a table that gains a row for every stock
+-- movement the business ever makes, and is therefore the one table guaranteed
+-- to keep growing. Leading with `reference_id` (the equality predicate with
+-- by far the highest selectivity — it matches one order's handful of rows)
+-- and following with `change_type` lets the whole WHERE clause be satisfied by
+-- one index scan.
+--
+-- The existing standalone `inventory_change_type_idx` is left in place: it
+-- still serves the admin ledger filters that select by movement type alone,
+-- which this composite cannot answer without its leading column.
+CREATE INDEX "inventory_reference_id_change_type_idx"
+  ON "public"."inventory" ("reference_id", "change_type");

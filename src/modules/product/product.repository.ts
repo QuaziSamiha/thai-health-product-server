@@ -307,12 +307,11 @@ export class ProductRepository extends BaseRepository {
    * Same flattening source as `findProductDropdownOptions`, plus
    * `comboQuantity` on the product and each variant — needed by the
    * combo-inventory endpoint to compute `availableForCombo`
-   * (quantity - comboQuantity) per option. No stock filter here: the
-   * "usable for a combo" condition compares two columns
-   * (`quantity > comboQuantity`), which the query API can't express as a
-   * `where` filter (Prisma has no field-to-field comparison operator here),
-   * so it's applied by `ProductService.getProductComboInventoryOptions`
-   * after the DTO — and its computed `availableForCombo` — is built.
+   * (quantity - comboQuantity) per option. No stock filter here *or*
+   * downstream: membership in this list is decided by status alone, and
+   * `availableForCombo` is reported for the caller to cap quantities
+   * against rather than used to hide rows. See
+   * `ProductService.getProductComboInventoryOptions`.
    *
    * Unlike `findProductDropdownOptions`, non-ACTIVE variants ARE filtered
    * out here: `ComboProductService.resolveComboItems` refuses to bundle one,
@@ -614,6 +613,10 @@ export class ProductRepository extends BaseRepository {
             name: true,
             type: true,
             status: true,
+            //* NEEDED BECAUSE RETIRING/RESTORING A VARIANT CAN MOVE THE
+            //* PRODUCT'S OWN status, AND status MUST NEVER GO ACTIVE WITHOUT A
+            //* LAUNCH STAMP — SEE ProductService.updateVariantStatus.
+            publishedAt: true,
             deletedAt: true,
             variants: {
               select: {

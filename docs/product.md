@@ -512,6 +512,25 @@ None currently defined for this domain. If reporting needs (e.g. "products with 
 - DB `CHECK` constraints exist as defense-in-depth on both `products` and `product_variants` (`prisma/migrations/20260714200001_backfill_stock_price_check_constraints`, `20260715140000_add_discount_value_check_constraints`): `basePrice`/`quantity`/`total_stock` non-negative, `0 <= salePrice <= basePrice`, and `discountValue` bound to `discountType` (`NULL`, or `>= 0` and — `PERCENTAGE` → `<= 100`, `FIXED` → `<= basePrice`). These mirror, not replace, the app-level validation in `resolveSalePrice`/`resolvePricingUpdate` — the service checks first so the client gets a clean `400` instead of a raw DB error.
 - Never do price arithmetic in plain JS floating point — use `Decimal` consistently end-to-end (Prisma returns `Decimal.js`-backed values for these columns; don't coerce to `number` before doing math).
 
+##### Product Status vs. Variant Status
+
+`Product.status` is owned by the admin for a `SIMPLE` product and **derived** for a `VARIABLE` one. A simple product has no variants, so there is nothing to derive it from; a variable product's sellability was already expressed one level down, and two sources of truth for "is this on sale" would inevitably disagree.
+
+The rule lives in `ProductService.resolveVariableProductStatus`:
+
+| Variant set | Product status |
+| :---------- | :------------- |
+| Any variant `ACTIVE` | Forced `ACTIVE`. A request to deactivate is **overridden, not rejected** — something is still on sale, and `INACTIVE` would hide a live variant behind a dead product page. |
+| No variant `ACTIVE` | Forced `INACTIVE`, automatically. This is what retiring the last variant does, and it is why doing so is allowed at all. |
+
+`DRAFT` / `ARCHIVED` / `HIDDEN` **pass through untouched.** They are explicit lifecycle positions, not the sellability toggle this rule governs — `ARCHIVED` is what `softDeleteProduct` writes, and forcing a `DRAFT` product to `ACTIVE` the moment a variant went live would publish it out from under the admin. All three already read as not-sellable, so leaving them alone costs no safety.
+
+Applied at every path where the pair can move: `createProduct`, `updateProduct` (both when `variants` is reconciled and when only `status` is sent), and `updateVariantStatus`. `publishedAt` follows the **resolved** status, never the requested one — a product the rule forces `ACTIVE` still needs its launch stamp, or it stays invisible behind the public `publishedAt` gate.
+
+> **Deliberately not a DB trigger**, unlike `totalStock`/`stockStatus`. Those are pure caches; `status` is coupled to `publishedAt`, and a trigger could move the status but not that pairing — which is precisely how the two would drift.
+
+> **Supersedes an earlier invariant.** A previous revision returned `409` when you tried to retire a product's last `ACTIVE` variant. That constrained variants by product status; the rule now runs the other way. Retiring every variant is the supported way to take a variable product off sale.
+
 ##### Variant Status — Per-Variant Retirement
 
 `ProductVariant.variantStatus` (added in `prisma/migrations/20260818100000_add_product_variant_status`) is the variant-level twin of `Product.status`, using the same `CategoryProductStatus` enum. Before it existed a `VARIABLE` product was all-or-nothing: retiring one size meant either deleting the variant row — blocked outright whenever a combo bundled it, since `combo_items_variant_id_fkey` is `ON DELETE RESTRICT` — or taking the whole product down.
@@ -529,7 +548,7 @@ A variant that is not `ACTIVE` changes four things at once:
 
 ###### Invariants
 
-1. **A product must keep at least one `ACTIVE` variant.** Enforced at every write path — `buildStockAndVariants` (create), `buildVariantReconcilePlan` (bulk update), and `updateVariantStatus` (single toggle). Retiring the last one returns `409`: a product with nothing sellable should be retired at the product level, where it is one field and one place to reverse.
+1. **Retiring every variant deactivates the product** — there is no floor on how many stay active, because the product follows its variants rather than constraining them (see [Product Status vs. Variant Status](#product-status-vs-variant-status)). Exactly one variant always holds `isDefault`, preferring an `ACTIVE` one and falling back to the first row when none are, so reactivating later still has something to show.
 2. **The default variant is always an `ACTIVE` one.** Retiring the default hands `isDefault` to the first surviving `ACTIVE` variant and re-mirrors that variant's pricing onto `Product.basePrice`/`salePrice` — the same contract the reconcile path already maintains, so the product row keeps matching what the storefront actually shows.
 
 ###### The three combo rules
@@ -810,15 +829,18 @@ The projections in `product.select.ts` each feed exactly one DTO and must be kep
 | Layer      | What happens                                                                                                                                                                     |
 | :--------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Controller | `getProductComboInventoryOptions()` — no params at all, same as `product-inventory`.                                                                                             |
-| Service    | `getProductComboInventoryOptions()` — `flatMap`s each product into one `ProductComboInventoryOptionDto` per variant, or a single option for the product itself when it has none. |
-| Repository | `findProductComboInventoryOptions()` — same shape/filter as `findProductDropdownOptions` (both now select `comboQuantity`), plus the extra `availableForCombo` computation below.                   |
+| Service    | `getProductComboInventoryOptions()` — `flatMap`s each product into one `ProductComboInventoryOptionDto` per variant, or a single option for the product itself when it has none. No filtering of its own beyond dropping an all-retired `VARIABLE` product. |
+| Repository | `findProductComboInventoryOptions()` — same shape as `findProductDropdownOptions` (both select `comboQuantity`), but filtered to `status: ACTIVE` products and `variantStatus: ACTIVE` variants.                   |
 
 **Business logic:**
 
-Mostly the same flattening/visibility/image-selection rules as [Get Product Dropdown Options](#get-product-dropdown-options-admin) (one option per selectable thing, `ACTIVE` + non-deleted only, product-level values shared across every option that product contributes, `comboQuantity` — the live total committed to other combos), plus one difference:
+Mostly the same flattening/image-selection rules as [Get Product Dropdown Options](#get-product-dropdown-options-admin) (one option per selectable thing, product-level values shared across every option that product contributes, `comboQuantity` — the live total committed to other combos), plus these differences:
 
-- `availableForCombo` — `quantity - comboQuantity`: stock still free to commit to a *new* combo, on top of what's already committed elsewhere.
-- **An option that can't cover even one more combo is excluded outright**, unlike `product-inventory` (which has no stock filter at all): any option whose `availableForCombo < 1` (zero, or stock at/below its own `comboQuantity`) is dropped, not returned with a non-positive number. This comparison is between two columns (`quantity` vs. `comboQuantity`), so it's applied in `ProductService` after each option's DTO is built — it isn't expressible as a single-column Prisma `where` filter.
+- `availableForCombo` — `quantity - comboQuantity`: stock still free to commit to a *new* combo, on top of what's already committed elsewhere. It is **reported, never used to filter**: the caller caps each row's Qty against it and blocks submit above it.
+- **Membership is decided by status alone** — every `ACTIVE` `SIMPLE` product and every `ACTIVE` variant of an `ACTIVE` product, at any stock level. This is the one filter `product-inventory` does *not* apply, and it is here because `ComboProductService.resolveComboItems` refuses to bundle a non-`ACTIVE` variant: offering one could only ever produce a `400` on save.
+- A `VARIABLE` product whose every variant is retired contributes **nothing**, rather than falling back to a product-level option — an unpinned `VARIABLE` row is rejected by that same rule.
+
+> **Superseded:** an earlier revision also dropped any option with `availableForCombo < 1`. That hid a live product from the combo builder for the entirely temporary reason that it was out of stock, and read to the admin as "my product is missing" rather than "my product has no free stock". Stock is a *quantity* question, answered per row; presence in this list is a *sellability* question, answered by `status`.
 
 **Response shape**: `ProductComboInventoryOptionDto[]` (a bare array, not paginated).
 

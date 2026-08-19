@@ -386,9 +386,9 @@ describe('CategoryController', () => {
     });
 
     it('throws UnauthorizedException when user identity is missing', async () => {
-      await expect(
-        controller.deleteCategory(7, {} as never),
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(controller.deleteCategory(7, {} as never)).rejects.toThrow(
+        UnauthorizedException,
+      );
       expect(service.deleteCategory).not.toHaveBeenCalled();
     });
 
@@ -397,9 +397,9 @@ describe('CategoryController', () => {
         new ConflictException('still has 2 sub-categories'),
       );
 
-      await expect(
-        controller.deleteCategory(7, makeAuthReq()),
-      ).rejects.toThrow(ConflictException);
+      await expect(controller.deleteCategory(7, makeAuthReq())).rejects.toThrow(
+        ConflictException,
+      );
     });
 
     it('propagates a not-found from the service', async () => {

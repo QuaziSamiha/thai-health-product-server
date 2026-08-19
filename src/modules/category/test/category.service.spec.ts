@@ -98,6 +98,7 @@ const mockCategoryRepository = () => ({
   findById: jest.fn(),
   findBySlug: jest.fn(),
   findForDeletion: jest.fn(),
+  findAncestorChain: jest.fn().mockResolvedValue([]),
   createCategory: jest.fn(),
   deleteCategory: jest.fn(),
   updateCategory: jest.fn(),
@@ -720,6 +721,120 @@ describe('CategoryService', () => {
       await expect(
         service.updateCategory(categoryId, userId, { parentId: 999 }, noImages),
       ).rejects.toThrow('Parent category not found');
+    });
+
+    describe('cycle prevention', () => {
+      //* The moved category is id 1 ("Electronics"); it is being re-parented
+      //* under id 9, whose ancestry the repository reports.
+      const parentId = 9;
+
+      const arrangeMove = () => {
+        repo.findById.mockImplementation((lookupId: number) =>
+          Promise.resolve(
+            lookupId === categoryId
+              ? makeCategory()
+              : makeCategory({ id: parentId, name: 'Deep Child', level: 3 }),
+          ),
+        );
+        repo.updateCategory.mockResolvedValue(makeCategory());
+      };
+
+      it('rejects a move under the category own descendant', async () => {
+        arrangeMove();
+        //* Chain reads new-parent-first: 9 -> 5 -> 1(the moved node) -> root.
+        repo.findAncestorChain.mockResolvedValue([
+          { id: parentId, name: 'Deep Child', depth: 0 },
+          { id: 5, name: 'Mid', depth: 1 },
+          { id: categoryId, name: 'Electronics', depth: 2 },
+          { id: 42, name: 'Top', depth: 3 },
+        ]);
+
+        await expect(
+          service.updateCategory(categoryId, userId, { parentId }, noImages),
+        ).rejects.toThrow(BadRequestException);
+        expect(repo.updateCategory).not.toHaveBeenCalled();
+      });
+
+      it('names the offending path top-down in the error message', async () => {
+        arrangeMove();
+        repo.findAncestorChain.mockResolvedValue([
+          { id: parentId, name: 'Deep Child', depth: 0 },
+          { id: 5, name: 'Mid', depth: 1 },
+          { id: categoryId, name: 'Electronics', depth: 2 },
+          { id: 42, name: 'Top', depth: 3 },
+        ]);
+
+        await expect(
+          service.updateCategory(categoryId, userId, { parentId }, noImages),
+        ).rejects.toThrow(/Electronics → Mid → Deep Child/);
+      });
+
+      it('stops the path at the moved category, not at the tree root', async () => {
+        arrangeMove();
+        repo.findAncestorChain.mockResolvedValue([
+          { id: parentId, name: 'Deep Child', depth: 0 },
+          { id: categoryId, name: 'Electronics', depth: 1 },
+          { id: 42, name: 'Top', depth: 2 },
+        ]);
+
+        await expect(
+          service.updateCategory(categoryId, userId, { parentId }, noImages),
+        ).rejects.toThrow(/\(Electronics → Deep Child\)/);
+      });
+
+      it('allows a move under an unrelated branch', async () => {
+        arrangeMove();
+        repo.findAncestorChain.mockResolvedValue([
+          { id: parentId, name: 'Deep Child', depth: 0 },
+          { id: 7, name: 'Another Root', depth: 1 },
+        ]);
+
+        await service.updateCategory(
+          categoryId,
+          userId,
+          { parentId },
+          noImages,
+        );
+
+        expect(repo.findAncestorChain).toHaveBeenCalledWith(parentId);
+        expect(repo.updateCategory).toHaveBeenCalledWith(
+          categoryId,
+          expect.objectContaining({ level: 4 }),
+        );
+      });
+
+      it('does not walk the tree when promoting to root', async () => {
+        repo.findById.mockResolvedValue(makeCategory());
+        repo.updateCategory.mockResolvedValue(makeCategory());
+
+        await service.updateCategory(
+          categoryId,
+          userId,
+          { parentId: null },
+          noImages,
+        );
+
+        expect(repo.findAncestorChain).not.toHaveBeenCalled();
+        expect(repo.updateCategory).toHaveBeenCalledWith(
+          categoryId,
+          expect.objectContaining({ level: 0 }),
+        );
+      });
+
+      it('does not walk the tree when parentId is absent from the DTO', async () => {
+        repo.findById.mockResolvedValue(makeCategory());
+        repo.findBySlug.mockResolvedValue(null);
+        repo.updateCategory.mockResolvedValue(makeCategory());
+
+        await service.updateCategory(
+          categoryId,
+          userId,
+          { displayOrder: 3 },
+          noImages,
+        );
+
+        expect(repo.findAncestorChain).not.toHaveBeenCalled();
+      });
     });
 
     it('uploads new bannerImage, saves URL, and deletes the old file', async () => {

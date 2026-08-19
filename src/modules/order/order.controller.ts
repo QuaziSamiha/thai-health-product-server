@@ -3,6 +3,8 @@ import {
   Controller,
   ForbiddenException,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   ParseUUIDPipe,
@@ -34,6 +36,10 @@ import {
   UpdatePaymentStatusDto,
 } from './dto/update-order.dto';
 import { OrderResponseDto } from './dto/order-response.dto';
+import {
+  ValidateCartDto,
+  ValidateCartResponseDto,
+} from './dto/validate-cart.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/auth/roles.decorator';
@@ -89,6 +95,25 @@ export class OrderController {
       );
     }
     return this.orderService.placeOrder(dto, req.user?.id);
+  }
+
+  @Post('validate-cart')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Check a cart against live availability (guest or logged-in)',
+    description:
+      'Read-only dry run of the placement rules. Returns a per-line verdict so the storefront can clamp an over-quantity line and disable checkout *before* the customer fills in an address, instead of failing at the final submit. Exists because the public product endpoints deliberately withhold exact stock counts — the only figures disclosed here are for lines the caller already holds. Advisory only: nothing is reserved, and stock can still move before the order is placed.',
+  })
+  @ApiBody({ type: ValidateCartDto })
+  @ApiOkResponse({
+    description: 'Per-line availability verdict.',
+    type: ValidateCartResponseDto,
+  })
+  @ApiBadRequestResponse({ description: 'Malformed cart payload.' })
+  @ResponseMessage('Cart validated')
+  async validateCart(@Body() dto: ValidateCartDto) {
+    return this.orderService.validateCart(dto);
   }
 
   @Get('my-orders')
@@ -178,7 +203,9 @@ export class OrderController {
   @Get(':id/invoice')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Download the PDF invoice for an order (owner or Admin)' })
+  @ApiOperation({
+    summary: 'Download the PDF invoice for an order (owner or Admin)',
+  })
   @ApiOkResponse({ description: 'PDF invoice stream.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
   @ApiForbiddenResponse({

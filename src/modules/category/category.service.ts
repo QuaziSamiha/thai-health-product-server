@@ -409,6 +409,9 @@ export class CategoryService {
         if (!parent) {
           throw new NotFoundException('Parent category not found');
         }
+
+        await this.assertNoCycle(id, category.name, updateCategoryDto.parentId);
+
         updateData.level = parent.level + 1;
       }
     }
@@ -485,6 +488,52 @@ export class CategoryService {
     return new CategoryResponseDto(
       updatedCategory,
       this.configService.get<string>('app.baseUrl'),
+    );
+  }
+
+  /**
+   * Refuses a re-parent that would close a loop in the hierarchy.
+   *
+   * `parentId === id` is the one-node case and is rejected by the caller with
+   * its own message. This handles every longer one: **A → B → A**, and any
+   * depth beyond it. The test is simple once stated correctly — a move is a
+   * cycle exactly when the category being moved is already an *ancestor of*
+   * (or is) its prospective parent, because the new edge would then point from
+   * the branch back into its own root.
+   *
+   * Walking **up** from the new parent, rather than down from the moved
+   * category, is deliberate: an ancestry chain is at most the tree's depth,
+   * while a subtree can be the entire table. Both answer the same question.
+   *
+   * Why this matters more than a tidy data model: `CategoryResponseDto`
+   * recurses `parent` and `children`, the storefront builds breadcrumbs by
+   * walking `parentId` upward, and the `productCount` rollup walks the tree in
+   * both directions. A loop turns every one of those into a non-terminating
+   * walk, and nothing downstream re-checks — so this is the last place a cycle
+   * can be stopped in application code. (`categories_no_hierarchy_cycle`, the
+   * database trigger added in `20260819120000_prevent_category_hierarchy_cycles`,
+   * is the backstop underneath it — see the migration for why both exist.)
+   */
+  private async assertNoCycle(
+    id: number,
+    name: string,
+    newParentId: number,
+  ): Promise<void> {
+    const chain = await this.categoryRepository.findAncestorChain(newParentId);
+    const hit = chain.find((ancestor) => ancestor.id === id);
+    if (!hit) return;
+
+    //* `chain` runs new-parent-first; the slice up to and including the moved
+    //* category, reversed, is the existing top-down path from it to the
+    //* proposed parent — the loop the admin is about to close, spelled out.
+    const path = chain
+      .slice(0, hit.depth + 1)
+      .reverse()
+      .map((node) => node.name)
+      .join(' → ');
+
+    throw new BadRequestException(
+      `Cannot move "${name}" here — that would create a loop in the category tree, because the chosen parent already sits inside its own branch (${path}). Move the sub-branch out first, or pick a parent outside it.`,
     );
   }
 

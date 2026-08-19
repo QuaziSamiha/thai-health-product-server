@@ -131,7 +131,7 @@ erDiagram
 - **`NO ACTION` is not `RESTRICT`.** Postgres defers a `NO ACTION` check to the end of the statement, so a single statement that deletes a parent *and* re-parents its children can succeed where `RESTRICT` would abort immediately. Nothing in this module does that today; the practical behaviour is identical.
 - **The `SET NULL` direction is `User → Category` only.** Deleting a category has no effect on the staff users referenced by it, and both FKs are nullable — every consumer must handle `createdByUser: null` / `updatedByUser: null`.
 - **There is no soft-delete field** (contrast `Product`, which carries `deletedAt`/`deletedBy` — see [product.md](./product.md#relationships-and-cascading-rules)).
-- **Nothing enforces acyclicity.** The self-relation is a plain nullable FK; the database will happily store `A → B → A`. Only the direct self-parent case is checked, in the service. See [Known Gaps](#known-gaps--recommended-hardening).
+- **Acyclicity is enforced, but not by the FK.** The self-relation is a plain nullable FK — Postgres itself would happily store `A → B → A`. What stops it is a `BEFORE UPDATE OF "parentId"` trigger (`trg_assert_category_hierarchy_acyclic`), backing an ancestry check in the service. See [Cycle Prevention](#cycle-prevention).
 
 ---
 
@@ -294,8 +294,34 @@ Every response below is wrapped by the global `ResponseInterceptor` envelope (`{
 
   The first and third rows disagree: the dropdown lists level 1, but the validator accepts *any* non-root level. A `level = 2` category is invisible in the UI yet perfectly valid if a client sends its id directly. See [Known Gaps](#known-gaps--recommended-hardening).
 - **Re-parenting does not cascade.** Moving category *B* under a new parent recomputes `B.level` only — every descendant of *B* keeps its stale `level`. There is no recursive fix-up and no trigger.
-- **The only cycle guard is `parentId === id`** (`400 Bad Request`, `"A category cannot be its own parent"`). Setting *A*'s parent to its own child *B* creates a real cycle that nothing detects; subsequent `parent`/`children` reads simply return the loop one level at a time.
+- **A category can never become its own ancestor.** Two independent guards enforce it — an ancestry walk in the service and a trigger on the table. See [Cycle Prevention](#cycle-prevention).
 - **Promoting to root uses `parentId: null`**, which the service maps to `level = 0` and the repository maps to `parent: { disconnect: true }`. Sending `parentId` as the *multipart string* `"null"` does **not** work — see [Admin-Form UX](#admin-form-ux-multipartform-data).
+
+##### Cycle Prevention
+
+`parentId` is a plain nullable self-FK, so the database was always willing to store `A → B → A`. Nothing detected it beyond the one-node case, and a loop is not a cosmetic problem: the storefront walks `parentId` upward for breadcrumbs, `CategoryResponseDto` recurses `parent`/`children`, and the [`productCount` rollup](#the-productcount-rollup) walks the tree in both directions. On a cyclic tree those are non-terminating walks.
+
+**The rule, stated correctly:** a move is a cycle exactly when the category being moved **is already an ancestor of (or is) its prospective parent** — the new edge would then point from inside a branch back to its own root. That single test covers `A → A`, `A → B → A`, and any depth beyond.
+
+Two layers enforce it.
+
+**1. `CategoryService.assertNoCycle` — the one an admin should ever hit.** Before writing, it walks **up** from the proposed parent via `CategoryRepository.findAncestorChain` and rejects with `400 Bad Request` if the moved category appears in that chain. The message spells out the existing path, so the admin can see *why*:
+
+> Cannot move "Beauty & Anti-Aging" here — that would create a loop in the category tree, because the chosen parent already sits inside its own branch (Beauty & Anti-Aging → Skincare → Serums). Move the sub-branch out first, or pick a parent outside it.
+
+- **Walking up, not down**, is deliberate: an ancestry chain is at most the tree's depth, while a subtree can be the whole table. Both answer the same question.
+- **`parentId === id` keeps its own earlier check** (`"A category cannot be its own parent"`) purely for the clearer message; `assertNoCycle` would catch it anyway.
+- **Promoting to root skips the walk entirely** — `parentId: null` cannot close a loop.
+- `findAncestorChain` is a recursive CTE, so any depth is one round trip. It **carries a `path` array and refuses to revisit an id already in it**, because it must be safe on a tree that is *already* cyclic. Note that plain `UNION` dedup would not save it here: the `depth` column increments every hop, so no row ever repeats exactly and the recursion would never end. This is the opposite trade-off from the `productCount` walks, which have no per-hop column and can rely on dedup.
+
+**2. `trg_assert_category_hierarchy_acyclic` — the backstop** (`20260819120000_prevent_category_hierarchy_cycles`). A `BEFORE UPDATE OF "parentId"` trigger running the same ancestry test, raising a `check_violation`. It exists for what application code cannot cover:
+
+- **The race.** The service checks and writes in two statements. Two admins re-parenting concurrently — X under Y while Y is moved under X — each pass their own check against a snapshot lacking the other's edge, and the loop closes on commit. **This was measured, not assumed:** with the trigger present but its advisory lock removed, that race reliably produces a cycle, because the two statements write *different* rows and take no conflicting row locks. `pg_advisory_xact_lock(hashtext('category_hierarchy_reparent'))` at the top of the trigger serializes re-parenting against itself; the loser resumes after the winner commits, re-reads (a `VOLATILE` function takes a fresh snapshot per query under `READ COMMITTED`), and is rejected. The lock is taken only when `parentId` is actually written — never on an ordinary category edit, never on a product write.
+- **Everything that is not the service** — seeds, data fixes, a future bulk-move endpoint, a `psql` session.
+
+`INSERT` is deliberately not covered: a new row's id cannot already appear in any existing ancestry, so a new category can only attach to a chain, never close one. **Cycles are created by moves.**
+
+> If the trigger ever fires, the request fails as a database error rather than the tidy `400` — by design. Reaching it means the service check was bypassed or lost a race, and a failed write is strictly better than a tree no reader can walk.
 
 ##### The `productCount` Rollup
 
@@ -331,7 +357,7 @@ Worked from the [Example Data](#example-data) above: Serums holds 3, Skincare ho
 `recompute_category_product_count(int[])` takes the categories whose own tally may have moved, walks **up** to collect every ancestor, then walks **down** from each of those to re-count its whole subtree from scratch.
 
 - **It recomputes, it does not increment.** A `+1`/`-1` counter is only correct if applied exactly once per event — impossible to guarantee across re-parenting, cascades and one-off SQL. A full re-count is idempotent, so running it twice, or after arbitrary drift, still lands on the right answer. That also makes repair trivial (below).
-- **Both walks use `UNION`, not `UNION ALL`.** The dedup is what makes them terminate if a parent cycle is ever stored — [nothing prevents `A → B → A`](#known-gaps--recommended-hardening) today. A cycle makes the numbers meaningless, but it cannot hang a product write.
+- **Both walks use `UNION`, not `UNION ALL`.** The dedup is what makes them terminate if a parent cycle is ever stored. [Cycle Prevention](#cycle-prevention) now stops new ones from being written, but this query predates that guard and still has to survive a loop that slipped in before it — a cycle makes the numbers meaningless, and this is what keeps it from hanging a product write as well.
 - **It keys off `parentId`, never `level`** — so the [`level` drift on re-parenting](#known-gaps--recommended-hardening) cannot corrupt the tally.
 - **Row locks are taken up front in ascending `id` order.** Two product writes in different branches of the same tree recompute overlapping ancestor sets; a fixed acquisition order is what stops them deadlocking on a shared ancestor. They still serialize on it — brief, and this is an admin-only write path.
 - **No `INSERT` trigger on `categories` is needed**: a brand-new category has no products and no children, so it contributes `0` to every ancestor, which is what they already hold. Children only ever arrive by a later re-parent, i.e. through the move trigger.
@@ -405,7 +431,7 @@ The global `ValidationPipe` runs with `whitelist: true` **and** `forbidNonWhitel
 Issues worth fixing before this module is considered production-hardened — none of them block understanding the current design:
 
 - **`level` drifts on re-parenting.** Moving a subtree updates only the moved node's `level`; its descendants keep stale depths. Since `findProductCategories` filters on `level = 1`, a stale value silently adds or removes categories from the admin dropdown. Fix with a recursive `UPDATE` (CTE) on move, or derive depth on read and drop the column.
-- **Nothing prevents a cycle.** Only `parentId === id` is rejected. Setting a category's parent to one of its own descendants produces a loop the database accepts and every tree-walking consumer must defend against. An ancestry walk before the update — or a materialized path with a `CHECK` — closes this. A cycle also makes every `productCount` in the loop meaningless (each node ends up rolling up the others); the [rollup](#the-productcount-rollup) is built to terminate rather than hang on one, but it cannot produce a sensible answer for a tree that is not a tree.
+- **Cycles are prevented for new writes, but a pre-existing loop is not repaired.** The migration that installs the guard reports any loop already in the table as a `WARNING` and stops there — which node's parent is the wrong one is an editorial decision, not something a migration can pick. If that warning ever appears, fix one edge per loop by hand and re-run the [`productCount` recompute](#the-productcount-rollup). See [Cycle Prevention](#cycle-prevention).
 - **`productCount` can over-promise across a hidden sub-category.** By design it weighs each product's status, not the category's, so a root's total includes products filed under a `DRAFT`/`INACTIVE` child that the storefront will not render a link to. The number is right for the admin screens that share the column, and slightly generous for a public "7 products" badge. If the storefront ever needs the strictly-reachable figure, that is a second, separately-maintained column — not a change to this one, which the admin listing depends on.
 - **The assignable-category rule is defined twice, inconsistently.** `assertCategoryAssignableToProduct` accepts any `ACTIVE` non-root category; `findProductCategories` lists only `ACTIVE`, `level = 1` ones. A `level = 2` category is therefore unreachable through the UI but accepted by the API. Pick one definition and share it.
 - **Public routes return the admin projection.** `GET /all-active-categories` and `GET /category-by-slug/:slug` are unauthenticated but respond with `CategoryResponseDto`, which embeds `createdByUser`/`updatedByUser` — leaking staff **names, internal user ids and roles** to anonymous visitors, alongside internal `id`s, `displayOrder` and `status`. `CategoryResponseCustomerDto` — a purpose-built public shape that excludes exactly those fields — **already exists in `dto/category-response.dto.ts` and is imported by nothing.** Wiring it up is the single highest-value fix in this module.
@@ -683,9 +709,9 @@ Three projections live as private readonly constants on `CategoryRepository`, fe
 1. **Existence check.** `findById(id)` → `404 Not Found` (`"Category with ID {id} not found"`). Note this pulls the **full** `CATEGORY_SELECT` — both user relations and both tree sides — just to answer "does this row exist"; the current `name` and the three old image URLs are the only fields actually used afterwards.
 2. **Conditional slug re-derivation.** Only when `name` is present **and** differs from the stored one. The new slug is checked with `findBySlug`, ignoring a hit on the row itself → `409 Conflict` (`"New category name results in a duplicate name"`) otherwise. Renaming to the identical name skips the check entirely.
 3. **Conditional re-parenting**, triggered by `parentId !== undefined`:
-   - `parentId === id` → `400 Bad Request` (`"A category cannot be its own parent"`). This is the **only** cycle check.
-   - `parentId === null` → `level = 0`, and the repository issues `parent: { disconnect: true }`. (Unreachable over multipart — see [Admin-Form UX](#admin-form-ux-multipartform-data).)
-   - Otherwise `findById(parentId)` → `404` if missing, else `level = parent.level + 1`.
+   - `parentId === id` → `400 Bad Request` (`"A category cannot be its own parent"`).
+   - `parentId === null` → `level = 0`, and the repository issues `parent: { disconnect: true }`. (Unreachable over multipart — see [Admin-Form UX](#admin-form-ux-multipartform-data).) No ancestry walk — promoting to root cannot close a loop.
+   - Otherwise `findById(parentId)` → `404` if missing; then **`assertNoCycle`** walks up from the new parent and returns `400` if this category is already in that chain, naming the path ([Cycle Prevention](#cycle-prevention)); then `level = parent.level + 1`.
    - **Descendants are not touched.** Their `level` values go stale — see [The Hierarchy Model](#the-hierarchy-model). Their `productCount` contribution, by contrast, *is* handled: the move re-tallies the ancestor chain the node left and the one it joined, in the database, inside the same statement. See [The `productCount` Rollup](#the-productcount-rollup).
 4. **Image replacement**, one slot at a time: upload the new file, record its path, then delete the old file (best-effort, `.catch()`-logged; skipped when the column was `null`). `bannerImage` and the legacy `image` alias share the banner slot, `bannerImage` winning. **All of this happens before the DB write, with no rollback** — see [Image Upload & Rollback](#image-upload--rollback).
 5. **One `category.update()`** with the merged data plus `updatedByUser: { connect: { id: userId } }`. Fields absent from the DTO are left untouched — this is a true PATCH, not a replace.
@@ -696,7 +722,7 @@ Three projections live as private readonly constants on `CategoryRepository`, fe
 | Status | Cause                                                                                                                                      |
 | :----- | :-------------------------------------------------------------------------------------------------------------------------------------------- |
 | `200`  | Category updated successfully.                                                                                                              |
-| `400`  | DTO validation failed; **or** `parentId` equals the category's own id; **or** `parentId` was sent as the multipart string `"null"`.            |
+| `400`  | DTO validation failed; **or** `parentId` equals the category's own id; **or** the new parent sits inside this category's own branch ([a cycle](#cycle-prevention)); **or** `parentId` was sent as the multipart string `"null"`. |
 | `401`  | Missing/invalid JWT, or a token carrying no user id.                                                                                          |
 | `403`  | Authenticated but not `ADMIN`.                                                                                                                |
 | `404`  | The category does not exist, **or** the new `parentId` does not exist.                                                                        |

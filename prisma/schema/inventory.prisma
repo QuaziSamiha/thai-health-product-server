@@ -65,5 +65,10 @@ model Inventory {
   @@index([productId])
   @@index([variantId])
   @@index([changeType])
+  //* CANCELLING/FAILING AN ORDER REVERSES ITS SALE MOVEMENTS BY LOOKING THEM
+  //* UP AS (referenceId = "order:<id>", changeType IN (SALE, RETURN)) — SEE
+  //* InventoryService.restoreStockForOrder. WITHOUT THIS THAT IS A SEQ SCAN
+  //* OVER THE WHOLE LEDGER, WHICH GROWS WITH EVERY STOCK MOVEMENT EVER MADE.
+  @@index([referenceId, changeType])
   @@map("inventory")
 }

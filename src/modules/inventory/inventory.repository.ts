@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { BaseRepository } from '../../prisma/base.repository';
 import { Prisma } from '../../generated/prisma/client';
+import { InventoryExchangeType } from '../../generated/prisma/enums';
 import { PaginationService, PaginationQueryDto } from '../../shared/pagination';
 import { UpdateBatchDto } from './dto/update-batch.dto';
 
@@ -134,6 +135,38 @@ export class InventoryRepository extends BaseRepository {
     return await client.inventory.create({
       data,
       select: this.INVENTORY_SELECT,
+    });
+  }
+
+  /**
+   * Every `SALE`/`RETURN` movement written against one reference (an order,
+   * today — see `deductStockForSale`/`restoreStockForSale`, which both stamp
+   * `referenceId`).
+   *
+   * This is the ledger read that lets a cancellation reverse exactly what the
+   * sale took, instead of re-deriving it from the order's line items. The two
+   * are not the same thing: a combo line deducts its *component* products, and
+   * the `OrderItem` row records only the combo. Served by
+   * `@@index([referenceId, changeType])`.
+   */
+  async findStockMovementsByReference(
+    referenceId: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return await client.inventory.findMany({
+      where: {
+        referenceId,
+        changeType: {
+          in: [InventoryExchangeType.SALE, InventoryExchangeType.RETURN],
+        },
+      },
+      select: {
+        productId: true,
+        variantId: true,
+        quantity: true,
+        changeType: true,
+      },
     });
   }
 

@@ -114,7 +114,7 @@ erDiagram
 - **No delivery-pricing module.** `deliveryCharge` is a flat constant (`FLAT_DELIVERY_CHARGE` in `order.service.ts`), not a configurable rule engine. `Order.deliveryCharge` is its own column, so swapping the constant for a real computation later doesn't touch the total formula.
 - **No payment gateway.** Only `CASH_ON_DELIVERY` is accepted (see [Conventions](#conventions)). `Payment.provider`/`transactionId`/`gatewayResponse` exist on the schema for when one is added; nothing populates them yet.
 - **No courier/delivery-partner integration.** `OrderStatus` has no delivery-partner assignment concept. Status is entirely admin-driven today.
-- **No partial (line-item) editing of a placed order.** Only whole-order cancellation is implemented (full stock restoration via `restoreStockForCancelledOrder`). Removing/adjusting individual lines from an already-placed order (natura's `itemsToRemove`/`itemsToUpdate` reconciliation) is a deferred admin power-tool, not core v1.
+- **No partial (line-item) editing of a placed order.** Only whole-order cancellation is implemented (full stock restoration via `restoreStockForOrder`). Removing/adjusting individual lines from an already-placed order (natura's `itemsToRemove`/`itemsToUpdate` reconciliation) is a deferred admin power-tool, not core v1.
 - **No batch/FIFO attribution for a sale.** `InventoryService.deductStockForSale` decrements the product's/variant's own running `quantity` directly — it does not draw from specific `Batch` rows the way admin-driven `removeStock` does. Precise expiry-accurate COGS per order line is a documented future enhancement.
 - **No guest post-purchase order lookup.** A guest receives their full order in the `POST /order/place-order` response; there is no `GET /order/track/:sid` (or similar) for a guest to look up an order later without an account.
 - **`isDefault`-style race safety aside, the guarded stock decrement is the only concurrency protection.** `decrementProductQuantityGuarded`/`decrementVariantQuantityGuarded` (`InventoryRepository`) use a `WHERE quantity >= amount` guard so a race can't push stock negative, but there is no optimistic-locking/retry — a losing request simply gets a `400`.
@@ -207,7 +207,23 @@ Not a separate endpoint — internal to `placeOrder`, but documented on its own 
 `OrderModule` imports `InventoryModule` and calls two new `InventoryService` methods added specifically for this module (`inventory.service.ts`, "Sales (order fulfillment)" section) — no stock math is duplicated in `OrderRepository`:
 
 - **`deductStockForSale(items, referenceId, userId, tx)`** — called once per placed order with every merged product/variant deduction line. Internally: `InventoryRepository.decrementProductQuantityGuarded`/`decrementVariantQuantityGuarded` (new repository methods — `UPDATE ... WHERE quantity >= amount`, so a race that's already sold the last unit updates zero rows instead of going negative) followed by one `InventoryRepository.createMovement` per line (`changeType: SALE`, `referenceId: "order:{id}"`).
-- **`restoreStockForSale(items, referenceId, reason, userId, tx)`** — the inverse, called on whole-order cancellation. Increments stock via the existing `incrementProductQuantity`/`incrementVariantQuantity` and logs `changeType: RETURN` (not `RESTOCK`, which implies a fresh vendor intake rather than stock coming back from a cancelled sale).
+- **`restoreStockForSale(items, referenceId, reason, userId, tx)`** — the inverse, given an explicit line list. Increments stock via the existing `incrementProductQuantity`/`incrementVariantQuantity` and logs `changeType: RETURN` (not `RESTOCK`, which implies a fresh vendor intake rather than stock coming back from a cancelled sale).
+- **`restoreStockForOrder(orderId, reason, userId, tx)`** — what the status endpoint actually calls. It works out the lines itself by **reading back the `SALE` movements placement wrote** for `referenceId: "order:{id}"`, then hands them to `restoreStockForSale`. See [Restoring Stock Reads the Ledger](#restoring-stock-reads-the-ledger-not-the-line-items).
+
+##### Restoring Stock Reads the Ledger, Not the Line Items
+
+Reversing a sale from the order's own `OrderItem` rows looks obvious and is wrong. `deductStockForSale` is called with a plan in which **a combo line has already been expanded into its component products/variants** (`resolveComboLine`) and merged with any of the same products bought directly. An `OrderItem` records no such thing: a combo line stores `comboId` with `productId` **and** `variantId` both `null`.
+
+So the earlier implementation — which iterated `OrderItem` rows and skipped any with neither id — restored **nothing at all for a combo order**. Every cancelled combo permanently consumed its components' stock, silently, with no error anywhere.
+
+Reading the ledger fixes that and buys two further properties:
+
+- **It cannot drift.** If an admin edits the combo's contents between placement and cancellation, re-expanding it at cancel time would return quantities that were never taken. The movement rows are what actually happened.
+- **It is idempotent.** A `RETURN` already standing against the reference means the restore has run, so a second call is a no-op. `ALLOWED_TRANSITIONS` already forbids leaving `CANCELLED`/`FAILED`, making this belt-and-braces — but it keeps the guarantee if those transitions ever change.
+
+A product hard-deleted since placement takes its movement rows with it (`Inventory.productId` is `onDelete: Cascade`), which is the correct outcome: there is no row left to give the stock back to.
+
+The lookup is `WHERE reference_id = 'order:{id}' AND change_type IN ('SALE','RETURN')`, served by `@@index([referenceId, changeType])` (`20260819140000_inventory_reference_lookup_index`). Without it that is a sequential scan of the whole ledger — the one table guaranteed to grow with every stock movement the business ever makes.
 
 Neither method touches `Batch` rows — a sale draws down the product's/variant's own running `quantity` directly, with no per-batch/FIFO attribution. That precision (which specific batch a given order line came from, for expiry-accurate COGS) belongs to the admin-driven `removeStock` flow and is a deferred enhancement here — see [Known Gaps](#known-gaps--deferred-features). The `sync_product_stock_fields`/`sync_variant_stock_status` DB triggers still recompute `stockStatus`/`totalStock` automatically from the `quantity` change either way — nothing extra is written for that.
 
@@ -232,7 +248,10 @@ Neither method touches `Batch` rows — a sale draws down the product's/variant'
 | `→ CONFIRMED` | Stamps `confirmedAt`. |
 | `→ SHIPPED` | Stamps `shippedAt`. |
 | `→ DELIVERED` | Stamps `deliveredAt`. **If `paymentMethod` is `CASH_ON_DELIVERY` and `paymentStatus` is still `PENDING`, also flips `paymentStatus` to `PAID`** — for COD, delivery confirmation *is* the moment payment happens. A future card/QR gateway would move `paymentStatus` via its own webhook instead, not this transition. |
-| `→ CANCELLED` | Requires `cancelReason` (validated on `UpdateOrderStatusDto`). Stamps `cancelledAt`. Restores stock for every order line (`restoreStockForCancelledOrder` — whole-order only, see [Known Gaps](#known-gaps--deferred-features)). If `paymentStatus` was still `PENDING`, also flips it to `CANCELLED`; an already-`PAID` order is left alone — reversing collected money is a refund, a separate decision from "stop fulfilling this order". |
+| `→ CANCELLED` | Requires `cancelReason` (validated on `UpdateOrderStatusDto`). Stamps `cancelledAt`. **Restores stock** (`restoreStockForOrder` — whole-order only, see [Known Gaps](#known-gaps--deferred-features)). If `paymentStatus` was still `PENDING`, also flips it to `CANCELLED`; an already-`PAID` order is left alone — reversing collected money is a refund, a separate decision from "stop fulfilling this order". |
+| `→ FAILED` | **Restores stock**, by the same call as `CANCELLED`. Reachable only from `PENDING`, so nothing has shipped and every unit placement claimed is still on the shelf. This previously restored nothing: a payment that never completed consumed inventory forever. |
+
+**Which statuses give stock back** is one list, `STOCK_RESTORING_STATUSES` in `order.service.ts`: `CANCELLED` and `FAILED`. `RETURNED`/`REFUNDED` are deliberately excluded — those goods have physically left and come back, and whether they are resellable is an inspection decision, not a status transition. An admin puts them back through the inventory module, which records who did it and why.
 
 Every transition writes one `OrderStatusHistory` row (`changedBy` = the acting admin's user id).
 

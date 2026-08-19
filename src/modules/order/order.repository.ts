@@ -25,6 +25,17 @@ export class OrderRepository extends BaseRepository {
   //* ALREADY USES FOR ITS OWN "STOCK TARGET" LOOKUPS (findProductStockInfo/
   //* findVariantStockInfo).
 
+  /**
+   * The plain, non-transactional client typed as a TransactionClient, so the
+   * read helpers below can be reused outside a transaction. Only for pure
+   * reads that claim nothing — OrderService.validateCart's dry run is the
+   * intended caller. Anything that mutates stock must still go through
+   * withTransaction.
+   */
+  get readClient(): Prisma.TransactionClient {
+    return this.prisma;
+  }
+
   async findProductForOrder(id: number, tx: Prisma.TransactionClient) {
     return tx.product.findUnique({
       where: { id },
@@ -219,14 +230,6 @@ export class OrderRepository extends BaseRepository {
   }
 
   /** Line-level snapshot used to restore stock on cancellation. */
-  async findOrderItemsForRestock(id: number, tx?: Prisma.TransactionClient) {
-    const client = tx || this.prisma;
-    return client.orderItem.findMany({
-      where: { orderId: id },
-      select: { productId: true, variantId: true, quantity: true },
-    });
-  }
-
   async findOrdersForCustomer(
     userId: number,
     params: PaginationQueryDto,

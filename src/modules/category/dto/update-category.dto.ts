@@ -55,14 +55,24 @@ export class UpdateCategoryDto {
   descriptionTh?: string;
 
   @ApiPropertyOptional({
-    description: 'The ID of the parent category for nested hierarchy',
+    description:
+      'The ID of the parent category for nested hierarchy. Send `null` to promote this category to a root (level 0); omit the field entirely to leave the current parent alone.',
     example: 1,
+    nullable: true,
   })
+  //* null IS A REAL, SUPPORTED VALUE HERE, NOT AN OVERSIGHT — IT IS HOW A
+  //* CATEGORY IS PROMOTED TO A ROOT, AND updateCategory BRANCHES ON IT
+  //* EXPLICITLY (`parentId === null` → level 0). IT FOLLOWS THE SAME
+  //* "null CLEARS THE COLUMN, undefined LEAVES IT ALONE" CONVENTION THE
+  //* SERVICE DOCUMENTS FOR bannerUrl, WHICH PRISMA IMPLEMENTS BY SKIPPING
+  //* undefined KEYS. @IsOptional() ALREADY WAIVES THE @IsInt/@Min CHECKS FOR
+  //* null AND @Type(() => Number) PASSES IT THROUGH UNCONVERTED, SO ONLY THE
+  //* TYPE NEEDED WIDENING — THE RUNTIME ALWAYS ACCEPTED IT.
   @IsOptional()
   @Type(() => Number)
   @IsInt({ message: 'Parent ID must be a whole number' })
   @Min(1, { message: 'Parent ID must be a valid positive number' })
-  parentId?: number;
+  parentId?: number | null;
 
   @ApiPropertyOptional({
     description: 'Manual sort order for menus',

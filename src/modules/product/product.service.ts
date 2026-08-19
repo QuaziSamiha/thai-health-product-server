@@ -251,12 +251,18 @@ export class ProductService {
    * `comboQuantity`/`availableForCombo` (quantity - comboQuantity) per
    * option — how much of this product/variant's current stock is still
    * free to allocate to a combo, given the amount already earmarked as its
-   * own per-bundle prefill. An option that can't cover even one more combo
-   * (`availableForCombo < 1` — including zero/negative stock) is dropped
-   * entirely rather than returned with a non-positive number: the filter
-   * runs here, after each DTO's `availableForCombo` is computed, because it
-   * compares two columns (`quantity` vs. `comboQuantity`) — not something a
-   * single-column Prisma `where` filter can express.
+   * own per-bundle prefill.
+   *
+   * **Membership is decided by status alone**: every ACTIVE SIMPLE product
+   * and every ACTIVE variant of an ACTIVE product, whatever their stock.
+   * `availableForCombo` is *reported*, never used to filter — an earlier
+   * revision dropped any option below 1, which silently hid a live product
+   * from the combo builder for the entirely temporary reason that it
+   * happened to be out of stock, and read to the admin as "my product is
+   * missing" rather than "my product has no free stock". Stock is a
+   * quantity question the caller answers per row (the forms cap Qty at
+   * `availableForCombo` and block submit above it); presence in the list is
+   * a sellability question, and sellability is `status`.
    *
    * The repository has already dropped non-ACTIVE variants (a combo cannot
    * bundle one), which leaves one case the flattening rule would otherwise
@@ -271,18 +277,16 @@ export class ProductService {
     const products =
       await this.productRepository.findProductComboInventoryOptions();
     const baseUrl = this.configService.get<string>('app.baseUrl');
-    return products
-      .flatMap((product) => {
-        if (product.variants.length) {
-          return product.variants.map(
-            (variant) =>
-              new ProductComboInventoryOptionDto({ product, variant }, baseUrl),
-          );
-        }
-        if (product.type === ProductType.VARIABLE) return [];
-        return [new ProductComboInventoryOptionDto({ product }, baseUrl)];
-      })
-      .filter((option) => option.availableForCombo >= 1);
+    return products.flatMap((product) => {
+      if (product.variants.length) {
+        return product.variants.map(
+          (variant) =>
+            new ProductComboInventoryOptionDto({ product, variant }, baseUrl),
+        );
+      }
+      if (product.type === ProductType.VARIABLE) return [];
+      return [new ProductComboInventoryOptionDto({ product }, baseUrl)];
+    });
   }
 
   /**
@@ -357,6 +361,24 @@ export class ProductService {
       //* SILENTLY ENDS UP "0% OFF" REGARDLESS OF WHAT THE VARIANT ACTUALLY
       //* HAS CONFIGURED, WHICH IS WRONG FOR ANY LISTING/SORT THAT READS THE
       //* PRODUCT ROW DIRECTLY INSTEAD OF THE VARIANT.
+      //* A VARIABLE PRODUCT'S status IS DERIVED FROM ITS VARIANTS, NOT TAKEN
+      //* FROM THE PAYLOAD — SEE resolveVariableProductStatus. `current` IS THE
+      //* VALUE THE ROW WOULD OTHERWISE BE CREATED WITH, SO THE HELPER'S
+      //* "undefined = ALREADY CORRECT" ANSWER STILL YIELDS THE RIGHT COLUMN.
+      //* A SIMPLE PRODUCT KEEPS WHATEVER THE ADMIN CHOSE.
+      const requestedStatus = dto.status ?? CategoryProductStatus.ACTIVE;
+      const status =
+        (dto.type ?? ProductType.VARIABLE) === ProductType.VARIABLE &&
+        variants.length > 0
+          ? (this.resolveVariableProductStatus(
+              dto.status,
+              requestedStatus,
+              variants.map(
+                (v) => v.variantStatus ?? CategoryProductStatus.ACTIVE,
+              ),
+            ) ?? requestedStatus)
+          : requestedStatus;
+
       const defaultVariant = variants.find((v) => v.isDefault) ?? variants[0];
       const basePrice = dto.basePrice ?? Number(defaultVariant?.basePrice ?? 0);
       const defaultVariantDiscountValue =
@@ -384,7 +406,7 @@ export class ProductService {
         //* OWN COLUMN DEFAULT HERE WOULD SILENTLY CREATE A SIMPLE PRODUCT INSTEAD
         //* WHENEVER `dto.type` IS OMITTED.
         type: dto.type ?? ProductType.VARIABLE,
-        status: dto.status,
+        status,
         isFeatured: dto.isFeatured,
         //* THE PUBLIC VISIBILITY GATE IS status = ACTIVE AND publishedAt <=
         //* now(), AND A null publishedAt NEVER MATCHES — SO AN ACTIVE
@@ -392,10 +414,12 @@ export class ProductService {
         //* IMMEDIATELY, OTHERWISE EVERY DASHBOARD-CREATED PRODUCT 404s ON
         //* THE STOREFRONT. AN EXPLICIT dto.publishedAt (SCHEDULED LAUNCH)
         //* ALWAYS WINS.
+        //* READS THE *RESOLVED* status, NOT dto.status — A VARIABLE PRODUCT
+        //* WHOSE VARIANTS FORCED IT ACTIVE STILL NEEDS ITS LAUNCH STAMP, AND
+        //* ONE THEY FORCED INACTIVE MUST NOT GET ONE.
         publishedAt: dto.publishedAt
           ? new Date(dto.publishedAt)
-          : (dto.status ?? CategoryProductStatus.ACTIVE) ===
-              CategoryProductStatus.ACTIVE
+          : status === CategoryProductStatus.ACTIVE
             ? new Date()
             : undefined,
         basePrice,
@@ -499,20 +523,18 @@ export class ProductService {
       this.buildVariantInput(productName, productSlug, variant, index),
     );
 
-    //* A PRODUCT WHOSE EVERY VARIANT ARRIVES RETIRED HAS NOTHING TO SELL AND
-    //* NOTHING TO PRE-SELECT ON THE PDP — REJECT IT AT THE BOUNDARY RATHER
-    //* THAN CREATING A ROW THAT VIOLATES THE INVARIANT THE REST OF THIS FILE
-    //* (AND updateVariantStatus) MAINTAINS.
+    //* CREATING A VARIABLE PRODUCT WITH EVERY VARIANT RETIRED IS ALLOWED —
+    //* IT SIMPLY LANDS INACTIVE (SEE resolveVariableProductStatus, APPLIED BY
+    //* createProduct). AN EARLIER REVISION REJECTED IT; THAT CONTRADICTED THE
+    //* RULE THAT PRODUCT STATUS *FOLLOWS* ITS VARIANTS RATHER THAN
+    //* CONSTRAINING THEM.
     const firstActive = variants.findIndex(
       (v) => v.variantStatus === CategoryProductStatus.ACTIVE,
     );
-    if (firstActive === -1) {
-      throw new BadRequestException(
-        'At least one variant must be ACTIVE — a product with no active variant has nothing to show or sell',
-      );
-    }
-    //* THE DEFAULT MUST BE A VARIANT THE STOREFRONT ACTUALLY RENDERS, SO AN
-    //* isDefault FLAG ON A RETIRED VARIANT IS OVERRIDDEN RATHER THAN HONOURED.
+    //* THE DEFAULT SHOULD BE A VARIANT THE STOREFRONT ACTUALLY RENDERS, SO AN
+    //* isDefault FLAG ON A RETIRED VARIANT IS OVERRIDDEN RATHER THAN HONOURED
+    //* — UNLESS NOTHING IS ACTIVE AT ALL, IN WHICH CASE THE FIRST ROW TAKES IT
+    //* SO THE PRODUCT STILL HAS EXACTLY ONE DEFAULT TO RESTORE LATER.
     if (
       !variants.some(
         (v) => v.isDefault && v.variantStatus === CategoryProductStatus.ACTIVE,
@@ -521,7 +543,7 @@ export class ProductService {
       variants.forEach((v) => {
         v.isDefault = false;
       });
-      variants[firstActive].isDefault = true;
+      variants[firstActive === -1 ? 0 : firstActive].isDefault = true;
     }
 
     const totalStock = variants.reduce(
@@ -586,6 +608,65 @@ export class ProductService {
       //* OBJECT INSTEAD OF RE-DERIVING THE DEFAULT AT EVERY CALL SITE.
       variantStatus: variant.variantStatus ?? CategoryProductStatus.ACTIVE,
     };
+  }
+
+  /**
+   * The VARIABLE-product status rule: **a variable product is ACTIVE exactly
+   * when at least one of its variants is.**
+   *
+   * A SIMPLE product's `status` is what the admin typed — it has no variants,
+   * so there is nothing to derive it from and this helper is never consulted.
+   * A VARIABLE product's is derived instead, because the admin already
+   * expressed the same intent one level down and two sources of truth for
+   * "is this on sale" would inevitably disagree:
+   *
+   * - **Any variant ACTIVE ⇒ the product is ACTIVE.** A request to deactivate
+   *   it is overridden rather than rejected: something IS still on sale, so
+   *   INACTIVE would hide a live variant behind a dead product page.
+   * - **No variant ACTIVE ⇒ the product is INACTIVE**, automatically. This is
+   *   what retiring the last variant does, and it is why doing so is allowed
+   *   at all (an earlier revision returned 409 here instead).
+   *
+   * `DRAFT` / `ARCHIVED` / `HIDDEN` pass through untouched. They are explicit
+   * lifecycle positions, not the "is it sellable" toggle this rule governs —
+   * `ARCHIVED` is what `softDeleteProduct` writes, and forcing a DRAFT product
+   * to ACTIVE the moment a variant went live would publish it out from under
+   * the admin. All three already read as not-sellable, so leaving them alone
+   * loses no safety.
+   *
+   * Returns `undefined` when the stored value already satisfies the rule, so
+   * a no-op never lands in the update payload.
+   *
+   * Deliberately NOT a DB trigger, unlike `totalStock`/`stockStatus`: those
+   * are pure caches, whereas `status` is coupled to `publishedAt` (a product
+   * that becomes ACTIVE with no launch date on record must be stamped, or it
+   * 404s on the storefront — see `createProduct`). A trigger could move the
+   * status but not that pairing, which is exactly how the two would drift.
+   */
+  private resolveVariableProductStatus(
+    requested: CategoryProductStatus | undefined,
+    current: CategoryProductStatus,
+    variantStatuses: CategoryProductStatus[],
+  ): CategoryProductStatus | undefined {
+    const effective = requested ?? current;
+    if (
+      effective !== CategoryProductStatus.ACTIVE &&
+      effective !== CategoryProductStatus.INACTIVE
+    ) {
+      return requested;
+    }
+
+    //* AN EMPTY SET CANNOT SATISFY "SOME VARIANT IS ACTIVE", SO A VARIABLE
+    //* PRODUCT MID-CREATE (ROW INSERTED, VARIANTS NOT YET) WOULD DERIVE
+    //* INACTIVE. EVERY CALLER PASSES THE FINAL SET, SO THAT STATE IS NEVER
+    //* OBSERVED — BUT KEEP IT IN MIND BEFORE CALLING THIS FROM A NEW PATH.
+    const desired = variantStatuses.some(
+      (status) => status === CategoryProductStatus.ACTIVE,
+    )
+      ? CategoryProductStatus.ACTIVE
+      : CategoryProductStatus.INACTIVE;
+
+    return desired === current ? undefined : desired;
   }
 
   private computeStockStatus(
@@ -857,12 +938,29 @@ export class ProductService {
         fields: stockFields,
         variantPlan,
         deactivatedVariantIds,
+        finalVariantStatuses,
       } = this.resolveStockUpdate(
         existing,
         dto,
         dto.name ?? existing.name,
         slug,
       );
+
+      //* A VARIABLE PRODUCT'S status FOLLOWS ITS VARIANTS — SEE
+      //* resolveVariableProductStatus. THIS COVERS BOTH WAYS THE PAIR CAN MOVE
+      //* IN ONE REQUEST: `variants` WAS RECONCILED (USE THE POST-PLAN
+      //* STATUSES), OR ONLY `status` WAS TOUCHED (USE THE STORED ONES). A
+      //* SIMPLE PRODUCT SKIPS THE RULE ENTIRELY AND KEEPS dto.status.
+      const effectiveType = dto.type ?? existing.type;
+      const resolvedStatus =
+        effectiveType === ProductType.VARIABLE
+          ? this.resolveVariableProductStatus(
+              dto.status,
+              existing.status,
+              finalVariantStatuses ??
+                existing.variants.map((v) => v.variantStatus),
+            )
+          : dto.status;
 
       const pricingFields = this.resolvePricingUpdate(existing, dto);
 
@@ -928,15 +1026,19 @@ export class ProductService {
               shortDescription: dto.shortDescription,
               shortDescTh: dto.shortDescTh,
               type: dto.type,
-              status: dto.status,
+              status: resolvedStatus,
               isFeatured: dto.isFeatured,
               //* SAME RULE AS CREATE: A PRODUCT THAT IS (OR BECOMES) ACTIVE
               //* WITH NO LAUNCH DATE ON RECORD IS PUBLISHED IMMEDIATELY —
               //* null NEVER PASSES THE PUBLIC publishedAt <= now() GATE.
               //* ALSO BACKFILLS PRE-FIX ROWS ON THEIR NEXT SAVE.
+              //* READS THE *RESOLVED* STATUS, NOT dto.status — A VARIABLE
+              //* PRODUCT THE RULE JUST FORCED ACTIVE (E.G. A VARIANT WAS
+              //* REACTIVATED) STILL NEEDS ITS FIRST LAUNCH STAMP, OR IT STAYS
+              //* INVISIBLE BEHIND THE publishedAt GATE.
               publishedAt: dto.publishedAt
                 ? new Date(dto.publishedAt)
-                : (dto.status ?? existing.status) ===
+                : (resolvedStatus ?? existing.status) ===
                       CategoryProductStatus.ACTIVE && !existing.publishedAt
                   ? new Date()
                   : undefined,
@@ -1092,6 +1194,10 @@ export class ProductService {
     //* EXECUTES VariantReconcilePlan VERBATIM, AND THIS IS A PRE-COMMIT
     //* *CHECK* THE SERVICE OWNS, NOT A WRITE. SEE buildVariantReconcilePlan.
     deactivatedVariantIds?: number[];
+    //* EVERY SURVIVING VARIANT'S variantStatus AFTER THE PLAN APPLIES — FEEDS
+    //* THE PRODUCT'S OWN status. PRESENT ONLY WHEN `variants` WAS SENT; THE
+    //* CALLER FALLS BACK TO THE STORED SET OTHERWISE.
+    finalVariantStatuses?: CategoryProductStatus[];
   } {
     const touchesStock =
       dto.type !== undefined ||
@@ -1108,13 +1214,18 @@ export class ProductService {
 
     if (effectiveType === ProductType.VARIABLE) {
       if (dto.variants !== undefined) {
-        const { plan, totalStock, deactivatedIds, defaultPricing } =
-          this.buildVariantReconcilePlan(
-            productName,
-            productSlug,
-            current.variants,
-            dto.variants,
-          );
+        const {
+          plan,
+          totalStock,
+          deactivatedIds,
+          finalStatuses,
+          defaultPricing,
+        } = this.buildVariantReconcilePlan(
+          productName,
+          productSlug,
+          current.variants,
+          dto.variants,
+        );
         //* MIRROR THE DEFAULT VARIANT'S OWN PRICING ONTO Product — SAME
         //* RATIONALE AS createProduct: dto.basePrice CAN STILL OVERRIDE (RARE/
         //* MANUAL), BUT discountType/discountValue ALWAYS COME FROM THE
@@ -1142,6 +1253,7 @@ export class ProductService {
           },
           variantPlan: plan,
           deactivatedVariantIds: deactivatedIds,
+          finalVariantStatuses: finalStatuses,
         };
       }
       if (current.variants.length === 0) {
@@ -1197,14 +1309,15 @@ export class ProductService {
    * - An existing variant **absent from the list** is deleted.
    *
    * Guards: an `id` that doesn't belong to this product is a 404, a
-   * duplicated `id` is a 400, the DTO's `@ArrayMinSize(1)` upstream
-   * guarantees the final set is never empty, and at least one survivor must
-   * end up ACTIVE — the same invariant `buildStockAndVariants` enforces at
-   * create time and `updateVariantStatus` at toggle time, since a product
-   * with no active variant has nothing to render or sell. Exactly one variant
-   * ends up `isDefault`, and it is always an ACTIVE one: an explicit flag in
-   * the payload wins, an existing default that survives *and stays active* is
-   * kept, otherwise the first active entry is promoted.
+   * duplicated `id` is a 400, and the DTO's `@ArrayMinSize(1)` upstream
+   * guarantees the final set is never empty. Retiring every variant IS
+   * allowed — it deactivates the product instead (see
+   * `resolveVariableProductStatus`). Exactly one variant ends up
+   * `isDefault`, preferring an ACTIVE one: an explicit flag in the payload
+   * wins, an existing default that survives *and stays active* is kept,
+   * otherwise the first active entry is promoted — or the first entry
+   * outright when nothing is active, so there is still exactly one default to
+   * restore later.
    *
    * Also returns `totalStock` for the final set — the payload quantity when
    * given, the variant's current quantity otherwise, counting ACTIVE variants
@@ -1221,6 +1334,13 @@ export class ProductService {
    * ACTIVE. The caller guards those against live combos before committing,
    * exactly as it already guards `deleteIds` — retiring a bundled variant and
    * deleting one break a live bundle the same way.
+   *
+   * `finalStatuses` is every surviving variant's `variantStatus` *as it ends
+   * up after this plan applies* — the caller feeds it to
+   * `resolveVariableProductStatus` to re-derive the product's own status.
+   * It cannot be read off the payload alone (an omitted `variantStatus` means
+   * "keep the stored one") nor off the DB alone (this request may be changing
+   * several at once).
    */
   private buildVariantReconcilePlan(
     productName: string,
@@ -1231,6 +1351,7 @@ export class ProductService {
     plan: VariantReconcilePlan;
     totalStock: number;
     deactivatedIds: number[];
+    finalStatuses: CategoryProductStatus[];
     defaultPricing: {
       basePrice: number;
       discountType: DiscountType | undefined;
@@ -1272,12 +1393,11 @@ export class ProductService {
           : CategoryProductStatus.ACTIVE),
     );
 
+    //* NO LONGER A REJECTION: RETIRING EVERY VARIANT IS THE SUPPORTED WAY TO
+    //* TAKE A VARIABLE PRODUCT OFF SALE, AND THE CALLER TURNS IT INTO
+    //* status = INACTIVE. -1 HERE JUST MEANS "NOTHING ACTIVE TO PREFER AS
+    //* THE DEFAULT", HANDLED WHERE defaultIndex IS PICKED BELOW.
     const firstActive = intendedStatuses.indexOf(CategoryProductStatus.ACTIVE);
-    if (firstActive === -1) {
-      throw new BadRequestException(
-        'At least one variant must remain ACTIVE — retire the product itself instead of every one of its variants',
-      );
-    }
 
     //* SURVIVING VARIANTS THIS REQUEST TAKES *OUT OF* ACTIVE. NEW ENTRIES
     //* CANNOT APPEAR HERE (NO id, AND NOTHING BUNDLES THEM YET), AND NEITHER
@@ -1309,7 +1429,15 @@ export class ProductService {
             : false)),
     );
     const firstDefault = intendedDefaults.indexOf(true);
-    const defaultIndex = firstDefault === -1 ? firstActive : firstDefault;
+    //* FALLS BACK PAST firstActive TO INDEX 0 WHEN THE WHOLE SET IS RETIRED —
+    //* THE PRODUCT IS ABOUT TO GO INACTIVE, BUT IT MUST STILL CARRY EXACTLY
+    //* ONE DEFAULT SO REACTIVATING A VARIANT LATER HAS SOMETHING TO SHOW.
+    const defaultIndex =
+      firstDefault === -1
+        ? firstActive === -1
+          ? 0
+          : firstActive
+        : firstDefault;
 
     const updates: VariantReconcilePlan['updates'] = [];
     const creates: VariantReconcilePlan['creates'] = [];
@@ -1401,6 +1529,7 @@ export class ProductService {
       plan: { deleteIds, updates, creates },
       totalStock,
       deactivatedIds,
+      finalStatuses: intendedStatuses,
       defaultPricing,
     };
   }
@@ -1417,10 +1546,12 @@ export class ProductService {
    * 1. **No-op short-circuits.** Re-sending the status a variant already has
    *    returns the current state without a write — so a double-clicked toggle
    *    cannot trip the guards below or bump the product's audit trail.
-   * 2. **The product must keep an ACTIVE variant.** Retiring the last one is
-   *    a 409: a VARIABLE product with nothing sellable should be retired at
-   *    the product level (`status`), which is one field away and reversible
-   *    in one place, not emulated by hollowing out its variant list.
+   * 2. **The product's own status follows.** Retiring the last ACTIVE variant
+   *    deactivates the product automatically, and reactivating any variant
+   *    brings it back — see `resolveVariableProductStatus`. This used to be a
+   *    409 refusing to retire the final variant; the rule now runs the other
+   *    way, with product status derived from its variants rather than
+   *    constraining them.
    * 3. **A live combo's parts may not be retired.** See
    *    `assertVariantsNotInLiveCombo`. Non-live combos are allowed through
    *    and reported back in `affectedCombos` instead.
@@ -1472,14 +1603,14 @@ export class ProductService {
     let promotedPricing: (typeof siblings)[number] | undefined;
 
     if (isRetiring) {
-      if (otherActive.length === 0) {
-        throw new ConflictException(
-          `"${variant.name}" is the last active variant of "${variant.product.name}" — retire the product itself instead of its final variant`,
-        );
-      }
       await this.assertVariantsNotInLiveCombo([variantId]);
 
-      if (variant.isDefault) {
+      //* RETIRING THE DEFAULT HANDS THE FLAG TO A SURVIVING ACTIVE SIBLING —
+      //* BUT ONLY IF THERE IS ONE. RETIRING THE *LAST* ACTIVE VARIANT IS
+      //* ALLOWED (IT DEACTIVATES THE PRODUCT, SEE BELOW), AND THE DEFAULT FLAG
+      //* SIMPLY STAYS PUT: THERE IS NO BETTER HOLDER, AND MOVING IT WOULD LOSE
+      //* THE ADMIN'S CHOICE FOR WHEN THE PRODUCT COMES BACK.
+      if (variant.isDefault && otherActive.length > 0) {
         promotedPricing = otherActive[0];
         promoteDefaultVariantId = promotedPricing.id;
       }
@@ -1509,10 +1640,32 @@ export class ProductService {
       //* VARIANT-LEVEL EDIT LIVES ON THE PARENT — SAME PLACE AN ADMIN LOOKS
       //* AFTER ANY OTHER CHANGE TO THIS PRODUCT. THE PRICING RE-MIRROR RIDES
       //* ALONG IN THE SAME STATEMENT WHEN THE DEFAULT MOVED.
+      //* THE VARIANT SET *AFTER* THIS WRITE — THE ROW BEING EDITED TAKES ITS
+      //* NEW STATUS, EVERY SIBLING KEEPS ITS STORED ONE. BUILT HERE RATHER
+      //* THAN RE-READ SO THE STATUS LANDS IN THE SAME STATEMENT AS THE AUDIT
+      //* STAMP, IN THE SAME TRANSACTION AS THE VARIANT WRITE.
+      const nextStatuses = siblings.map((sibling) =>
+        sibling.id === variantId ? target : sibling.variantStatus,
+      );
+      const resolvedStatus = this.resolveVariableProductStatus(
+        undefined,
+        variant.product.status,
+        nextStatuses,
+      );
+
       await this.productRepository.updateProduct(
         variant.productId,
         {
           updatedBy: userId,
+          status: resolvedStatus,
+          //* SAME PAIRING RULE AS createProduct/updateProduct: A PRODUCT THE
+          //* RULE JUST FORCED ACTIVE NEEDS A LAUNCH STAMP OR IT STAYS INVISIBLE
+          //* BEHIND THE publishedAt GATE.
+          publishedAt:
+            resolvedStatus === CategoryProductStatus.ACTIVE &&
+            !variant.product.publishedAt
+              ? new Date()
+              : undefined,
           ...this.mirrorDefaultVariantPricing(promotedPricing),
         },
         tx,

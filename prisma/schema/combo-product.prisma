@@ -40,17 +40,7 @@ model ComboProduct {
   quantity          Int         @default(0) //* HOW MANY COMPLETE BUNDLES CAN BE ASSEMBLED RIGHT NOW = MIN OVER ITEMS OF floor(ITEM STOCK / ITEM QUANTITY)
   stockStatus       StockStatus @default(OUT_OF_STOCK) @map("stock_status")
   lowStockThreshold Int         @default(10) @map("low_stock_threshold") //* stockStatus BECOMES LOW_STOCK ONCE quantity DROPS TO/BELOW THIS, DOWN TO 1
-
-  //* HOW MANY BUNDLES THE ADMIN CHOSE TO PUT ON SALE — *ADMIN INTENT*, THE ONE
-  //* AVAILABILITY FIELD THAT IS NOT DERIVED. IT IS A CAP UNDERNEATH THE
-  //* DERIVED CEILING ABOVE: EFFECTIVE SELLABLE BUNDLES = MIN(quantity,
-  //* offeredQuantity). KEPT AS ITS OWN COLUMN PRECISELY BECAUSE THE TRIGGERS
-  //* OVERWRITE quantity ON EVERY STOCK/ITEM CHANGE AND WOULD ERASE THE
-  //* ADMIN'S NUMBER. null = NO CAP, SELL EVERYTHING STOCK ALLOWS.
-  //* VALIDATED AT THE API BOUNDARY TO BE <= quantity AT CREATE/UPDATE TIME;
-  //* IT MAY LEGITIMATELY EXCEED quantity LATER IF STOCK DROPS, WHICH IS WHY
-  //* THERE IS NO CROSS-COLUMN CHECK CONSTRAINT.
-  offeredQuantity Int? @map("offered_quantity")
+  offeredQuantity   Int?        @map("offered_quantity")
 
   //* SEO METADATA
   seoMetadata Json? @default("{}") @map("seo_metadata") //* metaTitle, metaDescription, metaTitleTh, metaDescriptionTh
@@ -74,16 +64,6 @@ model ComboProduct {
   deletedBy     Int?  @map("deleted_by")
   deletedByUser User? @relation("ComboDeletedBy", fields: [deletedBy], references: [id], onDelete: SetNull)
 
-  //* INDEXING STRATEGY — THIS MODEL DECLARES NO @@index ON PURPOSE:
-  //*  1. slug/title/sku/barcode ARE @unique, WHICH ALREADY CREATES A B-TREE INDEX EACH.
-  //*  2. THE STOREFRONT LISTING IS SERVED BY THE PARTIAL INDEX
-  //*     combo_products_live_idx ON (status, is_featured, starts_at, ends_at)
-  //*     WHERE deleted_at IS NULL — PRISMA'S DSL CANNOT EXPRESS A FILTERED
-  //*     INDEX, SO IT LIVES IN MIGRATION 20260802200000. IT REPLACED
-  //*     @@index([status, isFeatured]) + @@index([startsAt, endsAt]): THE
-  //*     FIRST IGNORED deleted_at, THE SECOND COULD ONLY RANGE-SCAN starts_at
-  //*     BEFORE RECHECKING ends_at OFF THE HEAP. EQUALITY COLUMNS LEAD,
-  //*     RANGES TRAIL — THAT ORDER MATTERS FOR A TWO-SIDED WINDOW.
   @@map("combo_products")
 }
 
@@ -102,18 +82,9 @@ model ComboItem {
 
   quantity     Int       @default(1)
   unitPrice    Decimal?  @map("unit_price") @db.Decimal(12, 2) //* SNAPSHOT PRICE AT TIME OF BUNDLING (PROTECTS HISTORICAL COMBO PRICING)
-  //* WHEN unitPrice WAS CAPTURED — WITHOUT IT, A PRICE DISPUTE CANNOT TELL A
-  //* TWO-DAY-OLD SNAPSHOT FROM A TWO-YEAR-OLD ONE. FULLY DERIVED, NEVER CLIENT
-  //* INPUT: THE TRIGGER trg_sync_combo_item_priced_at (MIGRATION
-  //* 20260803000000_combo_item_priced_at) STAMPS IT ON INSERT AND ON EVERY
-  //* UPDATE WHERE unitPrice ACTUALLY CHANGES VALUE — AND ONLY THEN, WHICH IS
-  //* WHY THIS IS NOT updatedAt. NULL EXACTLY WHEN unitPrice IS NULL.
   pricedAt     DateTime? @map("priced_at") @db.Timestamptz(3)
   displayOrder Int       @default(0) @map("display_order")
 
-  //* COVERS PINNED ROWS ONLY — POSTGRES TREATS NULLS AS DISTINCT, SO ROWS WITH
-  //* variantId = null ARE GUARDED BY THE PARTIAL UNIQUE INDEX
-  //* combo_items_unique_without_variant, NOT BY THIS.
   @@unique([comboId, productId, variantId]) //* PREVENT DUPLICATE ROWS PER (COMBO, PRODUCT, VARIANT)
   @@index([productId])
   @@index([variantId])
