@@ -260,7 +260,6 @@ export class ProductRepository extends BaseRepository {
         type: true,
         status: true,
         quantity: true,
-        comboQuantity: true,
         costPrice: true,
         basePrice: true,
         salePrice: true,
@@ -290,7 +289,6 @@ export class ProductRepository extends BaseRepository {
             sku: true,
             barcode: true,
             quantity: true,
-            comboQuantity: true,
             costPrice: true,
             basePrice: true,
             salePrice: true,
@@ -304,14 +302,19 @@ export class ProductRepository extends BaseRepository {
   }
 
   /**
-   * Same flattening source as `findProductDropdownOptions`, plus
-   * `comboQuantity` on the product and each variant — needed by the
-   * combo-inventory endpoint to compute `availableForCombo`
-   * (quantity - comboQuantity) per option. No stock filter here *or*
-   * downstream: membership in this list is decided by status alone, and
-   * `availableForCombo` is reported for the caller to cap quantities
-   * against rather than used to hide rows. See
+   * Same flattening source as `findProductDropdownOptions`, narrowed to what
+   * a combo builder may pick from. No stock filter here *or* downstream:
+   * membership in this list is decided by status alone, and each option's
+   * `quantity` is reported for the caller to cap per-bundle amounts against
+   * rather than used to hide rows. See
    * `ProductService.getProductComboInventoryOptions`.
+   *
+   * There is no separate "free to bundle" figure any more. A combo reserves
+   * nothing — it draws from the same pool a direct sale draws from, at
+   * checkout — so `quantity` IS what is available to bundle (migration
+   * 20260819160000_combo_available_sold_quantity, which dropped the
+   * `comboQuantity` counter and the `availableForCombo` figure derived from
+   * it).
    *
    * Unlike `findProductDropdownOptions`, non-ACTIVE variants ARE filtered
    * out here: `ComboProductService.resolveComboItems` refuses to bundle one,
@@ -335,7 +338,6 @@ export class ProductRepository extends BaseRepository {
         type: true,
         status: true,
         quantity: true,
-        comboQuantity: true,
         costPrice: true,
         basePrice: true,
         salePrice: true,
@@ -356,7 +358,6 @@ export class ProductRepository extends BaseRepository {
             sku: true,
             barcode: true,
             quantity: true,
-            comboQuantity: true,
             costPrice: true,
             basePrice: true,
             salePrice: true,

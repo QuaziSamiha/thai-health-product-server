@@ -21,6 +21,7 @@ import { AddressService } from '../address/address.service';
 import { CreateAddressDto } from '../address/dto/create-address.dto';
 import { InventoryService } from '../inventory/inventory.service';
 import { PromotionService } from '../promotion/promotion.service';
+import { ComboProductRepository } from '../combo-product/combo-product.repository';
 import { IPaginatedResult, PaginationQueryDto } from '../../shared/pagination';
 import { CreateOrderDto, OrderItemDto } from './dto/create-order.dto';
 import {
@@ -174,6 +175,7 @@ export class OrderService {
     private readonly addressService: AddressService,
     private readonly inventoryService: InventoryService,
     private readonly promotionService: PromotionService,
+    private readonly comboProductRepository: ComboProductRepository,
     private readonly configService: ConfigService,
   ) {}
 
@@ -182,6 +184,71 @@ export class OrderService {
   //* app.baseUrl CONVENTION AS ProductService.
   private getBaseUrl(): string | undefined {
     return this.configService.get<string>('app.baseUrl');
+  }
+
+  /**
+   * Moves `ComboProduct.soldQuantity` for every combo line in `orderItems`.
+   * `sign` is `1` at placement and `-1` when an order is handed back.
+   *
+   * Lines are summed per combo first: one order can legitimately carry the
+   * same combo twice, and two separate `+n` adjustments would be two
+   * statements racing for the same row lock for no reason.
+   *
+   * The write itself fires `trg_sync_combo_offer_exhaustion`, so a combo that
+   * just sold its last offered bundle goes INACTIVE inside this transaction —
+   * there is no window where it is buyable past its cap.
+   */
+  private async applyComboSoldQuantity(
+    orderItems: OrderItemInsert[],
+    sign: 1 | -1,
+    tx: Prisma.TransactionClient,
+  ): Promise<void> {
+    const perCombo = new Map<number, number>();
+    for (const item of orderItems) {
+      if (item.comboId == null) continue;
+      perCombo.set(
+        item.comboId,
+        (perCombo.get(item.comboId) ?? 0) + item.quantity,
+      );
+    }
+
+    for (const [comboId, quantity] of perCombo) {
+      await this.comboProductRepository.adjustSoldQuantity(
+        comboId,
+        sign * quantity,
+        tx,
+      );
+    }
+  }
+
+  /**
+   * Gives back every bundle an order claimed. Returns the total released so
+   * the status-change log can report a real number.
+   *
+   * Reads the combo lines back from the order rather than trusting a caller
+   * to pass them, which also means it is naturally a no-op for an order that
+   * contained no combos.
+   */
+  private async releaseComboSoldQuantity(
+    orderId: number,
+    tx: Prisma.TransactionClient,
+  ): Promise<number> {
+    const comboLines = await this.orderRepository.findComboLinesForOrder(
+      orderId,
+      tx,
+    );
+
+    let released = 0;
+    for (const line of comboLines) {
+      if (line.quantity <= 0) continue;
+      await this.comboProductRepository.adjustSoldQuantity(
+        line.comboId,
+        -line.quantity,
+        tx,
+      );
+      released += line.quantity;
+    }
+    return released;
   }
 
   // ─── Place Order ──────────────────────────────────────────────────────────
@@ -300,6 +367,13 @@ export class OrderService {
         userId,
         tx,
       );
+
+      //* A COMBO HOLDS NO STOCK OF ITS OWN, SO THE DEDUCTION ABOVE — WHICH
+      //* TOUCHES ITS COMPONENTS — CANNOT RECORD THAT A *BUNDLE* WAS SOLD. THIS
+      //* IS WHAT CONSUMES A CAPPED OFFER, AND IT RUNS IN THE SAME TRANSACTION
+      //* SO THE CAP AND THE STOCK CAN NEVER DISAGREE ABOUT WHETHER THIS ORDER
+      //* HAPPENED.
+      await this.applyComboSoldQuantity(orderItems, 1, tx);
 
       await this.orderRepository.createStatusHistory(
         {
@@ -625,6 +699,30 @@ export class OrderService {
       };
     }
 
+    //* THE PROMOTION WINDOW IS TESTED LIVE, NOT INFERRED FROM `status`. THE
+    //* SWEEP THAT FLIPS AN EXPIRED COMBO TO INACTIVE RUNS HOURLY
+    //* (ComboExpiryService), SO BETWEEN ITS RUNS AN ENDED PROMOTION IS STILL
+    //* SITTING AT ACTIVE — AND HONOURING AN EXPIRED PRICE IS A REAL LOSS, NOT
+    //* A COSMETIC ONE. SAME RULE THE STOREFRONT GATE APPLIES; CHECKOUT MUST
+    //* NOT BE THE LOOSER OF THE TWO.
+    const now = Date.now();
+    if (combo.startsAt && combo.startsAt.getTime() > now) {
+      return {
+        ...base,
+        status: CartLineStatus.UNAVAILABLE,
+        available: 0,
+        message: `"${combo.title}" is not on sale yet`,
+      };
+    }
+    if (combo.endsAt && combo.endsAt.getTime() <= now) {
+      return {
+        ...base,
+        status: CartLineStatus.UNAVAILABLE,
+        available: 0,
+        message: `The offer on "${combo.title}" has ended`,
+      };
+    }
+
     //* CHECKED BEFORE THE STOCK TEST BELOW ON PURPOSE: A RETIRED PART PINS THE
     //* BUNDLE AT 0 ASSEMBLABLE, SO THE STOCK TEST WOULD FIRE FIRST AND BLAME
     //* STOCK FOR SOMETHING RESTOCKING CANNOT FIX.
@@ -642,16 +740,33 @@ export class OrderService {
       };
     }
 
+    //* WHAT IS STILL BUYABLE, NOT WHAT IS ASSEMBLABLE. AN UNCAPPED COMBO IS
+    //* LIMITED ONLY BY ITS COMPONENTS; A CAPPED ONE IS ALSO LIMITED BY HOW
+    //* MUCH OF THE CAP IS LEFT. soldQuantity IS NOT SUBTRACTED IN THE UNCAPPED
+    //* CASE — EVERY PAST SALE ALREADY PULLED availableQuantity DOWN THROUGH
+    //* THE COMPONENT STOCK IT CONSUMED, SO SUBTRACTING AGAIN WOULD COUNT IT
+    //* TWICE. MIRRORS combo_sellable_quantity() AND
+    //* ComboProductService.computeSellableQuantity — ALL THREE MUST AGREE.
+    const remainingOffer =
+      combo.offeredQuantity === null
+        ? Infinity
+        : Math.max(combo.offeredQuantity - combo.soldQuantity, 0);
     const available = Math.min(
-      combo.quantity,
-      combo.offeredQuantity ?? Infinity,
+      Math.max(combo.availableQuantity, 0),
+      remainingOffer,
     );
     if (available === 0) {
       return {
         ...base,
         status: CartLineStatus.OUT_OF_STOCK,
         available: 0,
-        message: `"${combo.title}" cannot be assembled right now — out of stock`,
+        //* THE TWO ZEROES HAVE DIFFERENT CURES — RESTOCKING FIXES ONE AND
+        //* NOTHING FIXES THE OTHER — SO THEY MUST NOT SHARE A MESSAGE THAT
+        //* SENDS THE CUSTOMER BACK TO WAIT FOR A RESTOCK THAT CANNOT HELP.
+        message:
+          remainingOffer === 0
+            ? `"${combo.title}" is sold out — every offered bundle has been claimed`
+            : `"${combo.title}" cannot be assembled right now — out of stock`,
       };
     }
     if (item.quantity > available) {
@@ -1012,8 +1127,16 @@ export class OrderService {
           changedBy,
           tx,
         );
+
+        //* THE OTHER HALF OF THE GIVE-BACK. RESTORING COMPONENT STOCK WITHOUT
+        //* THIS WOULD LEAVE A CAPPED OFFER PERMANENTLY CONSUMED BY A SALE THAT
+        //* WAS UNDONE — THE BUNDLES WOULD BE ON THE SHELF AGAIN BUT THE COMBO
+        //* WOULD STAY RETIRED. THE COMBO LINES ARE READ FRESH RATHER THAN
+        //* CARRIED FORWARD BECAUSE THIS IS A DIFFERENT REQUEST FROM PLACEMENT.
+        const releasedBundles = await this.releaseComboSoldQuantity(id, tx);
+
         this.logger.log(
-          `Order ${order.orderNumber} moved to ${dto.status}; restored stock for ${restoredLines} line(s)`,
+          `Order ${order.orderNumber} moved to ${dto.status}; restored stock for ${restoredLines} line(s)${releasedBundles ? ` and released ${releasedBundles} combo bundle(s)` : ''}`,
         );
       }
 

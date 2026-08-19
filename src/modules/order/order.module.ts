@@ -7,6 +7,7 @@ import { PaginationModule } from '../../shared/pagination';
 import { AddressModule } from '../address/address.module';
 import { InventoryModule } from '../inventory/inventory.module';
 import { PromotionModule } from '../promotion/promotion.module';
+import { ComboProductModule } from '../combo-product/combo-product.module';
 
 @Module({
   imports: [
@@ -15,6 +16,9 @@ import { PromotionModule } from '../promotion/promotion.module';
     AddressModule,
     InventoryModule,
     PromotionModule,
+    //* FOR ComboProductRepository.adjustSoldQuantity — PLACEMENT CLAIMS A
+    //* BUNDLE AGAINST A CAPPED OFFER AND CANCELLATION GIVES IT BACK.
+    ComboProductModule,
   ],
   controllers: [OrderController],
   providers: [OrderService, OrderRepository],

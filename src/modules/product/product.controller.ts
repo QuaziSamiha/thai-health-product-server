@@ -157,7 +157,7 @@ export class ProductController {
     summary:
       'Get flattened product/variant options with combo availability for admin dropdowns',
     description:
-      'Same flattening rule as `product-inventory` — a product with no variants appears as itself, while a product with variants contributes one option per variant instead of its own row. Each option additionally carries `comboQuantity` (units per bundle prefill) and `availableForCombo` (quantity - comboQuantity), so a combo builder can see how much stock is still free to bundle. Only ACTIVE, non-deleted products are included. Admin only.',
+      'Same flattening rule as `product-inventory` — a product with no variants appears as itself, while a product with variants contributes one option per variant instead of its own row. Each option carries its current `quantity`, which is exactly how much is available to bundle: a combo reserves nothing, so no part of that stock is spoken for by another combo. Only ACTIVE, non-deleted products (and ACTIVE variants) are included. Admin only.',
   })
   @ApiOkResponse({
     description: 'Combo inventory options retrieved successfully.',

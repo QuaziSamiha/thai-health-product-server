@@ -28,19 +28,49 @@ model ComboProduct {
   status     CategoryProductStatus @default(DRAFT)
   isFeatured Boolean               @default(false) @map("is_featured")
 
-  //* AVAILABILITY (FULLY DERIVED — NEVER CLIENT INPUT, NEVER HAND-EDITED)
-  //* A COMBO IS SELLABLE ONLY IF *EVERY* ITEM HAS ENOUGH STOCK, SO THE BUNDLE
-  //* IS LIMITED BY ITS SCARCEST PART: quantity IS A MIN OVER ITEMS, NOT A SUM
-  //* (UNLIKE Product.totalStock). DENORMALIZED SO A STOREFRONT LISTING READS
-  //* ONE COLUMN INSTEAD OF JOINING combo_items → products/variants AND
+  //* AVAILABILITY — THREE DISTINCT NUMBERS, SEE MIGRATION
+  //* 20260819160000_combo_available_sold_quantity. A COMBO OWNS NO INVENTORY
+  //* OF ITS OWN: IT DRAWS FROM ITS COMPONENTS' STOCK AT CHECKOUT, THE SAME
+  //* POOL A DIRECT PRODUCT SALE DRAWS FROM. NOTHING IS EVER RESERVED.
+  //*
+  //*   sellable = offeredQuantity IS NULL
+  //*                ? availableQuantity
+  //*                : MIN(availableQuantity, MAX(offeredQuantity - soldQuantity, 0))
+  //*
+  //* THAT RULE LIVES ONCE, IN THE SQL FUNCTION combo_sellable_quantity(), AND
+  //* IS MIRRORED IN ComboProductService — stockStatus, THE STOREFRONT GATE
+  //* AND THE ORDER VALIDATOR ALL HAVE TO AGREE ON IT.
+
+  //* FULLY DERIVED — NEVER CLIENT INPUT, NEVER HAND-EDITED. A COMBO IS
+  //* ASSEMBLABLE ONLY IF *EVERY* ITEM HAS ENOUGH STOCK, SO THE BUNDLE IS
+  //* LIMITED BY ITS SCARCEST PART: A MIN OVER ITEMS, NOT A SUM (UNLIKE
+  //* Product.totalStock). DENORMALIZED SO A STOREFRONT LISTING READS ONE
+  //* COLUMN INSTEAD OF JOINING combo_items → products/variants AND
   //* AGGREGATING PER CARD. MAINTAINED BY THE TRIGGER FAMILY IN MIGRATION
-  //* 20260802140000_add_combo_stock_availability AND MIRRORED IN APP CODE AT
-  //* CREATE TIME (ComboProductService.resolveComboAvailability) — THE TWO
-  //* RULES MUST BE KEPT IN SYNC, SAME CONTRACT AS Product.stockStatus.
-  quantity          Int         @default(0) //* HOW MANY COMPLETE BUNDLES CAN BE ASSEMBLED RIGHT NOW = MIN OVER ITEMS OF floor(ITEM STOCK / ITEM QUANTITY)
+  //* 20260819160000 AND MIRRORED IN APP CODE AT CREATE TIME
+  //* (ComboProductService.resolveComboAvailability) — THE TWO RULES MUST BE
+  //* KEPT IN SYNC, SAME CONTRACT AS Product.stockStatus.
+  availableQuantity Int @default(0) @map("available_quantity") //* HOW MANY COMPLETE BUNDLES CAN BE ASSEMBLED RIGHT NOW = MIN OVER ITEMS OF floor(ITEM STOCK / ITEM QUANTITY)
+
+  //* THE ADMIN'S CAP ON HOW MANY BUNDLES THIS PROMOTION WILL EVER SELL.
+  //* NULL = NO CAP, SELL WHATEVER COMPONENT STOCK ALLOWS.
+  offeredQuantity Int? @map("offered_quantity")
+
+  //* BUNDLES CLAIMED BY ORDERS. INCREMENTED IN THE SAME TRANSACTION AS THE
+  //* COMPONENT STOCK DEDUCTION AT ORDER PLACEMENT AND DECREMENTED WHEREVER
+  //* THAT DEDUCTION IS GIVEN BACK (CANCELLED/FAILED/RETURNED) — SEE
+  //* OrderService. BECAUSE THE COMBO HOLDS NO STOCK, THIS IS THE ONLY RECORD
+  //* OF HOW FAR A CAPPED OFFER HAS BEEN CONSUMED. ONCE
+  //* soldQuantity >= offeredQuantity THE COMBO IS FORCED TO INACTIVE BY
+  //* trg_sync_combo_offer_exhaustion.
+  soldQuantity Int @default(0) @map("sold_quantity")
+
+  //* DERIVED FROM THE *SELLABLE* NUMBER ABOVE, NOT FROM availableQuantity
+  //* ALONE — A SOLD-OUT CAPPED OFFER SITTING ON PLENTY OF COMPONENT STOCK
+  //* MUST STILL READ OUT_OF_STOCK, SINCE THIS IS THE ONLY AVAILABILITY SIGNAL
+  //* THE PUBLIC SELECT EXPOSES.
   stockStatus       StockStatus @default(OUT_OF_STOCK) @map("stock_status")
-  lowStockThreshold Int         @default(10) @map("low_stock_threshold") //* stockStatus BECOMES LOW_STOCK ONCE quantity DROPS TO/BELOW THIS, DOWN TO 1
-  offeredQuantity   Int?        @map("offered_quantity")
+  lowStockThreshold Int         @default(10) @map("low_stock_threshold") //* stockStatus BECOMES LOW_STOCK ONCE THE SELLABLE COUNT DROPS TO/BELOW THIS, DOWN TO 1
 
   //* SEO METADATA
   seoMetadata Json? @default("{}") @map("seo_metadata") //* metaTitle, metaDescription, metaTitleTh, metaDescriptionTh

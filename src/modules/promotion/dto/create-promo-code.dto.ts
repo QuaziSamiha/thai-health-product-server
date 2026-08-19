@@ -130,6 +130,18 @@ export class CreatePromoCodeDto {
   isActive?: boolean;
 
   @ApiPropertyOptional({
+    description:
+      'Whether this code is listed on the storefront for customers to browse. ' +
+      'Independent of isActive: a code can work perfectly and still be unlisted, ' +
+      'which is the default and the right choice for any code handed out ' +
+      'deliberately (email campaign, influencer, win-back).',
+    default: false,
+  })
+  @IsOptional()
+  @IsBoolean({ message: 'isPublic must be a boolean' })
+  isPublic?: boolean;
+
+  @ApiPropertyOptional({
     description: 'When the code becomes valid. Omit for immediately valid.',
     example: '2026-01-01T00:00:00.000Z',
   })

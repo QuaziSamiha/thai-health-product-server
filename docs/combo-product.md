@@ -35,8 +35,10 @@ erDiagram
         datetime endsAt "nullable"
         enum status "DRAFT default"
         boolean isFeatured
-        int quantity "DERIVED - assemblable bundles"
-        enum stockStatus "DERIVED"
+        int availableQuantity "DERIVED - assemblable bundles"
+        int offeredQuantity "nullable - admin cap"
+        int soldQuantity "bundles claimed by orders"
+        enum stockStatus "DERIVED from sellable"
         int lowStockThreshold
         datetime deletedAt "soft delete"
         int deletedBy FK "nullable"
@@ -100,13 +102,13 @@ erDiagram
 
 ##### `StockStatus` (shared with `Product`/`ProductVariant`, defined in `product.prisma`)
 
-| Value          | Meaning                                                |
-| :------------- | :----------------------------------------------------- |
-| `IN_STOCK`     | Assemblable bundle count is above `lowStockThreshold`. |
-| `LOW_STOCK`    | Between 1 and `lowStockThreshold` inclusive.           |
-| `OUT_OF_STOCK` | Zero assemblable bundles. Default on creation.         |
+| Value          | Meaning                                             |
+| :------------- | :--------------------------------------------------- |
+| `IN_STOCK`     | Sellable bundle count is above `lowStockThreshold`. |
+| `LOW_STOCK`    | Between 1 and `lowStockThreshold` inclusive.        |
+| `OUT_OF_STOCK` | Zero sellable bundles. Default on creation.         |
 
-> For a combo these describe **bundles**, not units of any one product. See [Availability Model](#availability-model-the-bottleneck-rule).
+> For a combo these describe **bundles**, not units of any one product. And they describe the **sellable** count, not the assemblable one — a capped offer that has sold out reads `OUT_OF_STOCK` even with plenty of component stock behind it. See [Availability Model](#availability-model-three-numbers).
 
 ---
 
@@ -134,9 +136,11 @@ erDiagram
 | `endsAt`            | `TIMESTAMPTZ(3)`              | NULLABLE, `@map("ends_at")`, `CHECK` window valid                                 | Promotion window end. `null` = no end restriction.                                                                                                                                              |
 | `status`            | `ENUM(CategoryProductStatus)` | NOT NULL, DEFAULT `DRAFT`                                                         | Lifecycle/visibility state.                                                                                                                                                                     |
 | `isFeatured`        | `BOOLEAN`                     | NOT NULL, DEFAULT `false`, `@map("is_featured")`                                  | Drives homepage/featured combo sections.                                                                                                                                                        |
-| `quantity`          | `INT`                         | NOT NULL, DEFAULT `0`, `CHECK >= 0`                                               | **Fully derived, never client input.** How many complete bundles current stock can assemble — a `MIN` over items, not a sum. See [Availability Model](#availability-model-the-bottleneck-rule). |
-| `stockStatus`       | `ENUM(StockStatus)`           | NOT NULL, DEFAULT `OUT_OF_STOCK`, `@map("stock_status")`                          | **Fully derived** from `quantity` vs `lowStockThreshold`.                                                                                                                                       |
-| `lowStockThreshold` | `INT`                         | NOT NULL, DEFAULT `10`, `@map("low_stock_threshold")`                             | Bundle count at or below which `stockStatus` reports `LOW_STOCK`, down to 1.                                                                                                                    |
+| `availableQuantity` | `INT`                         | NOT NULL, DEFAULT `0`, `@map("available_quantity")`, `CHECK >= 0`                 | **Fully derived, never client input.** How many complete bundles current component stock can assemble — a `MIN` over items, not a sum. See [Availability Model](#availability-model-three-numbers). |
+| `offeredQuantity`   | `INT`                         | NULLABLE, `@map("offered_quantity")`, `CHECK NULL OR >= 1`                        | **The only admin-set availability field.** The cap on how many bundles this promotion will ever sell. `NULL` = no cap.                                                                          |
+| `soldQuantity`      | `INT`                         | NOT NULL, DEFAULT `0`, `@map("sold_quantity")`, `CHECK >= 0`                      | **Owned by the order path.** Bundles claimed by orders — incremented at placement, given back on cancel/fail/return. Reaching `offeredQuantity` forces `status` to `INACTIVE`.                  |
+| `stockStatus`       | `ENUM(StockStatus)`           | NOT NULL, DEFAULT `OUT_OF_STOCK`, `@map("stock_status")`                          | **Fully derived** from the *sellable* count (all three columns above) vs `lowStockThreshold`.                                                                                                   |
+| `lowStockThreshold` | `INT`                         | NOT NULL, DEFAULT `10`, `@map("low_stock_threshold")`                             | Sellable bundle count at or below which `stockStatus` reports `LOW_STOCK`, down to 1.                                                                                                          |
 | `seoMetadata`       | `JSONB`                       | DEFAULT `{}`, `@map("seo_metadata")`                                              | `metaTitle`/`metaDescription` (EN + TH) — same convention as `Product.seoMetadata`.                                                                                                             |
 | `createdAt`         | `TIMESTAMPTZ(3)`              | NOT NULL, DEFAULT `now()`, `@map("created_at")`                                   | Row creation time.                                                                                                                                                                              |
 | `updatedAt`         | `TIMESTAMPTZ(3)`              | NOT NULL, auto-updated, `@map("updated_at")`                                      | Last modification time.                                                                                                                                                                         |
@@ -188,12 +192,32 @@ erDiagram
 
 ---
 
-#### Availability Model (The Bottleneck Rule)
+#### Availability Model (Three Numbers)
 
-A combo is sellable only if **every** item has enough stock, so the bundle is capped by its scarcest part:
+**A combo owns no inventory.** It draws from its components' stock at checkout — the same pool a direct product sale draws from — and reserves nothing. A unit on the shelf is available to both channels until one of them sells it. That single fact is why "how many are left" takes three columns rather than one:
+
+| Column              | Owned by       | Answers                                                     |
+| :------------------ | :------------- | :---------------------------------------------------------- |
+| `availableQuantity` | DB triggers    | How many bundles current component stock could assemble.    |
+| `offeredQuantity`   | the admin      | How many bundles this promotion promised to sell. `NULL` = no cap. |
+| `soldQuantity`      | the order path | How many bundles have actually been claimed.                |
+
+The number a customer cares about is none of them alone:
 
 ```
-combo.quantity = MIN over items of  floor(item stock / item per-bundle quantity)
+sellable = offeredQuantity IS NULL
+             ? availableQuantity
+             : MIN(availableQuantity, MAX(offeredQuantity - soldQuantity, 0))
+```
+
+> **Why an uncapped combo does not subtract `soldQuantity`.** With no cap, every past sale has *already* pulled `availableQuantity` down through the component stock it consumed. Subtracting again would count the same sale twice. `soldQuantity` only constrains availability when there is a cap to consume.
+
+##### The bottleneck rule (`availableQuantity`)
+
+A combo is assemblable only if **every** item has enough stock, so the bundle is capped by its scarcest part:
+
+```
+availableQuantity = MIN over items of  floor(item stock / item per-bundle quantity)
 ```
 
 This is a **`MIN`, not a `SUM`** — the opposite of `Product.totalStock`. Pattern-matching on the product roll-up will get this backwards.
@@ -210,25 +234,65 @@ This is a **`MIN`, not a `SUM`** — the opposite of `Product.totalStock`. Patte
 
 **A pinned variant that is not `ACTIVE` contributes `0`, whatever its shelf stock says** (migration `20260818100000_add_product_variant_status`). Retiring a variant is a business statement that it cannot be sold, so the `MIN` forces the whole bundle to `0` — see [Variant Status and Combos](#variant-status-and-combos) below. The unpinned branch deliberately does *not* test the product's own `status`: gating a bundle on the parent product's workflow state is a separate rule, and an admin may legitimately stage a `DRAFT` combo around a `DRAFT` product.
 
-The rule is written down in two places that must stay in sync:
+##### Where each rule lives
 
-| Where                                            | Role                                                                                                                                            |
-| :----------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `recompute_combo_quantity(int[])` (SQL function) | **Authoritative** once rows exist. Every trigger funnels into it, so the formula lives once.                                                    |
-| `ComboProductService.resolveComboAvailability`   | Mirror, used only at create time — the trigger fires after the `combo_items` rows land, which is after the `combo_products` row Prisma returns. |
+| Where                                                       | Role                                                                                                                                            |
+| :---------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `recompute_combo_available_quantity(int[])` (SQL function)   | **Authoritative** for the bottleneck rule once rows exist. Every trigger funnels into it, so the formula lives once.                            |
+| `ComboProductService.resolveComboAvailability`               | Mirror of the above, used only at create time — the trigger fires after the `combo_items` rows land, which is after the `combo_products` row Prisma returns. |
+| `combo_sellable_quantity(int, int, int)` (SQL function)      | **Authoritative** for the sellable rule. `IMMUTABLE`, so it inlines into the read gates that call it.                                           |
+| `ComboProductService.computeSellableQuantity`                | App-side mirror of the sellable rule.                                                                                                          |
+| `OrderService.resolveComboLine`                              | Third copy of the sellable rule, at checkout. **All three must agree.**                                                                        |
 
 ##### Trigger fan-in
 
-| Trigger                                | Table              | Fires on                                                                             |
-| :------------------------------------- | :----------------- | :----------------------------------------------------------------------------------- |
-| `trg_sync_combo_stock_status`          | `combo_products`   | `BEFORE INSERT OR UPDATE OF quantity, low_stock_threshold` — derives `stock_status`. |
-| `trg_sync_combo_quantity_from_items`   | `combo_items`      | `AFTER INSERT OR DELETE OR UPDATE OF quantity, product_id, variant_id, combo_id`     |
-| `trg_sync_combo_quantity_from_product` | `products`         | `AFTER UPDATE OF quantity` — recomputes every combo holding it unpinned.             |
-| `trg_sync_combo_quantity_from_variant` | `product_variants` | `AFTER UPDATE OF quantity, variant_status` — recomputes every combo that pinned it. `variant_status` is in the column list because retiring a variant moves the ceiling without touching `quantity`. |
+| Trigger                                          | Table              | Fires on                                                                             |
+| :----------------------------------------------- | :----------------- | :----------------------------------------------------------------------------------- |
+| `trg_sync_combo_stock_status`                    | `combo_products`   | `BEFORE INSERT OR UPDATE OF available_quantity, low_stock_threshold, offered_quantity, sold_quantity` — derives `stock_status` from the **sellable** count. |
+| `trg_sync_combo_offer_exhaustion`                | `combo_products`   | `BEFORE INSERT OR UPDATE OF sold_quantity, offered_quantity, status` — forces `INACTIVE` when a capped offer is spent. See [Offer Lifecycle](#offer-lifecycle-sold-out-and-expired). |
+| `trg_sync_combo_available_quantity_from_items`   | `combo_items`      | `AFTER INSERT OR DELETE OR UPDATE OF quantity, product_id, variant_id, combo_id`     |
+| `trg_sync_combo_available_quantity_from_product` | `products`         | `AFTER UPDATE OF quantity` — recomputes every combo holding it unpinned.             |
+| `trg_sync_combo_available_quantity_from_variant` | `product_variants` | `AFTER UPDATE OF quantity, variant_status` — recomputes every combo that pinned it. `variant_status` is in the column list because retiring a variant moves the ceiling without touching `quantity`. |
 
-The `OF <columns>` lists keep these off the hot path: a price edit or a rename never fires them. Because `trg_sync_combo_stock_status` is `BEFORE`-row, the `UPDATE` issued by `recompute_combo_quantity` derives `stock_status` in the same pass — no second statement anywhere.
+The `OF <columns>` lists keep these off the hot path: a price edit or a rename never fires them. Because `trg_sync_combo_stock_status` is `BEFORE`-row, the `UPDATE` issued by `recompute_combo_available_quantity` derives `stock_status` in the same pass — no second statement anywhere.
 
-> **Event-driven, not lazy.** Nothing recomputes at read time; the value is written the moment stock or items change. A stock change made outside those `OF` column lists would not propagate.
+> **Event-driven, not lazy.** Nothing recomputes at read time; the value is written the moment stock, items, the cap, or the sold counter change. A stock change made outside those `OF` column lists would not propagate.
+
+---
+
+#### Offer Lifecycle (Sold Out and Expired)
+
+Two rules retire a combo without an admin touching it. They look similar and are implemented in completely different places, for one reason: **one is event-driven and one is time-driven.**
+
+##### Sold out — a trigger owns it
+
+When `offeredQuantity` is set and `soldQuantity` reaches it, the offer is spent. `trg_sync_combo_offer_exhaustion` is `BEFORE`-row on `combo_products`, so the flip to `INACTIVE` lands in the very same `UPDATE` that moved `soldQuantity` — there is no window in which an exhausted combo is readable as `ACTIVE`.
+
+| Action                                          | Result                                                       |
+| :---------------------------------------------- | :----------------------------------------------------------- |
+| `soldQuantity` reaches `offeredQuantity`        | `status` → `INACTIVE`, `stockStatus` → `OUT_OF_STOCK`        |
+| Raising `offeredQuantity` on a sold-out combo   | **Does not reactivate it.** Stays `INACTIVE`.                |
+| Setting `status = ACTIVE` while still exhausted | Bounced straight back to `INACTIVE` by the trigger.          |
+| Setting `status = ACTIVE` after raising the cap | Allowed — this is the intended way to relaunch.              |
+| Setting `offeredQuantity` = `soldQuantity`      | Allowed. This is how you close an offer early.               |
+| Setting `offeredQuantity` < `soldQuantity`      | `400` from `ComboProductService` — cannot promise fewer bundles than have shipped. |
+
+The one-way behaviour is deliberate. Republishing a promotion is an editorial decision; silently putting a card back on the storefront because a number moved is exactly the surprise the DRAFT-by-default rule exists to prevent. `ComboProductService.assertOfferNotExhausted` rejects the publish attempt first with a `400` that explains why — the trigger is the backstop for seeds and manual SQL.
+
+##### Expired — a sweep owns the column, the read gate owns the truth
+
+No trigger can fire when a clock passes `endsAt`; nothing writes the row. So expiry is handled in two layers, and it is important not to confuse them:
+
+| Layer                                                          | Responsibility                                                                                   |
+| :------------------------------------------------------------- | :----------------------------------------------------------------------------------------------- |
+| **Read gates** — `publicVisibilityWhere()`, `OrderService.resolveComboLine` | **Correctness.** The `startsAt`/`endsAt` window is tested live, per request, so an expired combo is unbuyable the *instant* it expires. |
+| **`ComboExpiryService`** — hourly `@Cron`                      | **Bookkeeping.** Flips `status` `ACTIVE` → `INACTIVE` for rows past `endsAt`, so the admin table and the stored `status` stay honest. |
+
+A missed sweep therefore costs a stale badge in the admin table, never a sale at an expired price. The sweep is an idempotent `UPDATE ... WHERE status = 'ACTIVE' AND deleted_at IS NULL AND ends_at < now()`, backed by the partial index `combo_products_expiry_sweep_idx` built over exactly that predicate.
+
+`ComboProductService` additionally refuses to *leave a combo `ACTIVE`* past its window (`assertOfferWindowNotClosed`), gated on the **resulting** status so the rule cannot be dodged by moving `endsAt` into the past on an already-live combo. A `DRAFT`/`INACTIVE`/`ARCHIVED` combo stays fully editable — nothing about an ended promotion should block fixing its copy.
+
+> **Multi-instance note:** `ScheduleModule` is per-process, so N replicas run N copies of the sweep. Harmless here (the second runner matches no rows), but any future job with side effects needs a lock.
 
 ---
 
@@ -254,7 +318,7 @@ A combo may legitimately contain:
 
 #### Variant Status and Combos
 
-`ProductVariant.variantStatus` lets one size be retired without taking its product down (see `docs/product.md` → **Variant Status**). A retired variant and a **live** combo cannot coexist: the bundle would be permanently unassemblable, since `recompute_combo_quantity` reads its stock as `0`.
+`ProductVariant.variantStatus` lets one size be retired without taking its product down (see `docs/product.md` → **Variant Status**). A retired variant and a **live** combo cannot coexist: the bundle would be permanently unassemblable, since `recompute_combo_available_quantity` reads its stock as `0`.
 
 Three checks close the three moments that could otherwise produce that pair. Each is necessary — none of the three subsumes another, because they fire at different times:
 
@@ -336,7 +400,9 @@ Underneath all three, the DB is the backstop: no combo containing a non-`ACTIVE`
 | `combo_products_combo_price_non_negative` | `combo_price >= 0`                                            |
 | `combo_products_price_valid`              | `combo_price <= total_price`                                  |
 | `combo_products_cost_price_non_negative`  | `cost_price IS NULL OR cost_price >= 0`                       |
-| `combo_products_quantity_non_negative`    | `quantity >= 0`                                               |
+| `combo_products_available_quantity_non_negative` | `available_quantity >= 0`                                |
+| `combo_products_sold_quantity_non_negative`      | `sold_quantity >= 0`                                     |
+| `combo_products_offered_quantity_positive`       | `offered_quantity IS NULL OR offered_quantity >= 1`      |
 | `combo_products_window_valid`             | `starts_at IS NULL OR ends_at IS NULL OR ends_at > starts_at` |
 
 `combo_products_price_valid` is the DB backstop for the service rule _"Combo price cannot be greater than the sum of its bundled items."_ Note the consequence for any future update endpoint: `comboPrice` and `totalPrice` must be written in the **same statement**, since lowering `totalPrice` first would trip the constraint.
@@ -347,7 +413,8 @@ Underneath all three, the DB is the backstop: no combo containing a non-`ACTIVE`
 
 - **All `DateTime` columns are `@db.Timestamptz(3)`.** Prisma's default mapping is timezone-naive, and comparing a naive column against SQL `now()` casts through the _server's_ `TimeZone` setting — so a promotion set to end at "midnight" would end at a different real instant depending on where the query runs. Any new `DateTime` field must carry `@db.Timestamptz(3)`.
 - **All columns are `snake_case`** via `@map()`. Prisma field names stay camelCase; only the database identifiers are mapped.
-- **Derived columns are never client input.** `quantity`, `stockStatus` (combo) and `pricedAt` (item) are written by triggers; DTOs deliberately expose no field for them.
+- **Derived columns are never client input.** `availableQuantity`, `stockStatus` (combo) and `pricedAt` (item) are written by triggers; `soldQuantity` is written only by the order path. DTOs deliberately expose no field for any of them. `offeredQuantity` is the single availability column an admin sets.
+- **A combo reserves nothing.** It draws from its components' stock at checkout, exactly as a direct product sale does. No column anywhere splits a product's stock into "product stock" and "combo stock" — see the note under [Delete a Combo Product](#delete-a-combo-product) for the counter that used to imply otherwise and why it was removed.
 - **`costPrice` and `barcode` are admin-only**; `sku` is public (customers quote it in support tickets), matching the `Product` visibility tiers.
 
 ---
@@ -356,11 +423,16 @@ Underneath all three, the DB is the backstop: no combo containing a non-`ACTIVE`
 
 **ComboProduct**
 
-| title                       | status     | sku           | totalPrice | comboPrice | quantity | stockStatus    | startsAt               | endsAt                 | isFeatured |
-| :-------------------------- | :--------- | :------------ | :--------- | :--------- | :------- | :------------- | :--------------------- | :--------------------- | :--------- |
-| **Wellness Starter Bundle** | `ACTIVE`   | `CMB-WELL-01` | `1850.00`  | `1499.00`  | `7`      | `LOW_STOCK`    | `2026-07-01T00:00:00Z` | `2026-07-31T23:59:59Z` | `true`     |
-| **Immune Boost Duo**        | `DRAFT`    | `null`        | `620.00`   | `499.00`   | `0`      | `OUT_OF_STOCK` | `null`                 | `null`                 | `false`    |
-| **Back-to-School Kit**      | `ARCHIVED` | `CMB-BTS-26`  | `990.00`   | `799.00`   | `0`      | `OUT_OF_STOCK` | `2026-05-01T00:00:00Z` | `2026-05-31T23:59:59Z` | `false`    |
+| title                       | status     | sku           | totalPrice | comboPrice | availableQuantity | offeredQuantity | soldQuantity | stockStatus    | startsAt               | endsAt                 |
+| :-------------------------- | :--------- | :------------ | :--------- | :--------- | :---------------- | :-------------- | :----------- | :------------- | :--------------------- | :--------------------- |
+| **Wellness Starter Bundle** | `ACTIVE`   | `CMB-WELL-01` | `1850.00`  | `1499.00`  | `7`               | `null`          | `12`         | `LOW_STOCK`    | `2026-07-01T00:00:00Z` | `2026-07-31T23:59:59Z` |
+| **Immune Boost Duo**        | `DRAFT`    | `null`        | `620.00`   | `499.00`   | `0`               | `null`          | `0`          | `OUT_OF_STOCK` | `null`                 | `null`                 |
+| **Songkran Flash Bundle**   | `INACTIVE` | `CMB-SKR-26`  | `1200.00`  | `899.00`   | `40`              | `25`            | `25`         | `OUT_OF_STOCK` | `2026-04-01T00:00:00Z` | `2026-04-20T23:59:59Z` |
+| **Back-to-School Kit**      | `ARCHIVED` | `CMB-BTS-26`  | `990.00`   | `799.00`   | `0`               | `null`          | `31`         | `OUT_OF_STOCK` | `2026-05-01T00:00:00Z` | `2026-05-31T23:59:59Z` |
+
+> **Read the Songkran row carefully — it is the whole model in one line.** It has 40 assemblable bundles' worth of component stock sitting in the warehouse and still reads `OUT_OF_STOCK`, because its offer of 25 is fully sold. That is also why its `status` is `INACTIVE` without an admin having touched it: `trg_sync_combo_offer_exhaustion` flipped it the moment `soldQuantity` hit 25. Those 40 bundles' worth of stock are not stranded — every unit is still on sale individually and still bundleable into a different combo.
+>
+> The Wellness row shows the uncapped case: `soldQuantity` of 12 is a lifetime counter that does **not** reduce the 7 still sellable. Those 12 sales already pulled the components down to what supports 7.
 
 **ComboItem** (for `Wellness Starter Bundle`, `comboId = 1`)
 
@@ -380,6 +452,9 @@ Underneath all three, the DB is the backstop: no combo containing a non-`ACTIVE`
 - **"At least one primary image" is not enforced.** The partial unique index only constrains "at most one". The service covers it by flagging the first uploaded image; a future delete-image path must promote a survivor, as `Product` does via `hasSurvivingPrimaryImage`.
 - **`lowStockThreshold` is not settable per combo.** The column defaults to `10` and the create DTO has no field for it.
 - **`pricedAt` is not exposed through the API.** `COMBO_ITEM_SELECT` is shared by the admin and public response shapes, so surfacing it would leak an audit field to the storefront; it needs the select split into admin/public variants first.
+- **`soldQuantity` is claimed at placement, not at payment.** A `PENDING` order holds its bundles against the cap and only releases them if it moves to `CANCELLED`/`FAILED`. That is deliberate — it is the same "claim now, give back on failure" shape the component stock deduction already uses, and it is what stops a capped offer being oversold by orders in flight. The cost is that abandoned unpaid orders hold a capped offer down until someone cancels them; if that becomes a real problem the fix is an expiry job on stale `PENDING` orders, not a change to this rule.
+- **The expiry sweep runs per process.** `ScheduleModule` has no distributed lock, so N replicas run N sweeps. Harmless for this idempotent `UPDATE`, but it is the constraint to remember before adding any scheduled job with side effects.
+- **Nothing reactivates a combo when its window reopens.** `startsAt` in the future plus `status: ACTIVE` works correctly (the read gate hides it until the window opens), but a combo the sweep took `INACTIVE` stays that way even if an admin later extends `endsAt` — reactivation is deliberately a manual, editorial act. Same one-way rule as the sold-out flip.
 
 ---
 
@@ -408,8 +483,8 @@ Every route except `/published-combos` and `/slug/:slug` uses `JwtAuthGuard` + `
 
 | Select                      | Fed to                        | Contains                                                                                                                                                                                    |
 | :--------------------------- | :----------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `COMBO_PRODUCT_SELECT_ADMIN`  | `ComboProductResponseDto`     | Everything: raw workflow `status`, `barcode`, `costPrice`, exact `quantity`/`offeredQuantity`, soft-delete state, and the full `createdByUser`/`updatedByUser`/`deletedByUser` audit trail. **Never reuse on an unauthenticated route.** Every read/write endpoint on this page uses this select (the delete route returns no body). |
-| `COMBO_PRODUCT_SELECT_PUBLIC` | `ComboProductResponsePublicDto` | No `status`, no `barcode`/`costPrice`, no raw `quantity` (`stockStatus` only), no audit trail. Fed by [`GET /published-combos`](#get-published-combos-public) and [`GET /slug/:slug`](#get-combo-details-by-slug-public). |
+| `COMBO_PRODUCT_SELECT_ADMIN`  | `ComboProductResponseDto`     | Everything: raw workflow `status`, `barcode`, `costPrice`, exact `availableQuantity`/`offeredQuantity`/`soldQuantity`, soft-delete state, and the full `createdByUser`/`updatedByUser`/`deletedByUser` audit trail. **Never reuse on an unauthenticated route.** Every read/write endpoint on this page uses this select (the delete route returns no body). |
+| `COMBO_PRODUCT_SELECT_PUBLIC` | `ComboProductResponsePublicDto` | No `status`, no `barcode`/`costPrice`, no raw availability counts (`stockStatus` only), no audit trail. Fed by [`GET /published-combos`](#get-published-combos-public) and [`GET /slug/:slug`](#get-combo-details-by-slug-public). |
 | `COMBO_ITEM_SELECT`           | `ComboItemResponseDto`        | Same shape for every role — no sensitive fields. Nests `COMBO_ITEM_PRODUCT_SELECT`/`COMBO_ITEM_VARIANT_SELECT` (name/slug/price, not cost/quantity internals).                             |
 | `COMBO_IMAGE_SELECT`          | `ComboImageResponseDto`       | Same shape for every role — no sensitive fields.                                                                                                                                            |
 
@@ -433,12 +508,12 @@ Every route except `/published-combos` and `/slug/:slug` uses `JwtAuthGuard` + `
 
 **Business logic:**
 
-1. **`AllCombosQueryDto` extends the shared `PaginationQueryDto`** (`page`, `limit`, `sortOrder`, `search`, `cursor`) with three admin-only filters — `status`, `stockStatus`, `isFeatured` — plus `sortBy`, whitelisted against `COMBO_SORT_FIELDS` (`createdAt`, `updatedAt`, `title`, `comboPrice`, `totalPrice`, `quantity`, `startsAt`, `endsAt`) via `@IsIn`. **This whitelist is a hard security boundary, not documentation**: the value is interpolated directly into a Prisma `orderBy` key, so only columns validated here may ever reach it. Note `quantity` here sorts by the *derived* assemblable-bundle count, not `offeredQuantity` — sorting by what is actually sellable is what an admin scanning for problems wants.
+1. **`AllCombosQueryDto` extends the shared `PaginationQueryDto`** (`page`, `limit`, `sortOrder`, `search`, `cursor`) with three admin-only filters — `status`, `stockStatus`, `isFeatured` — plus `sortBy`, whitelisted against `COMBO_SORT_FIELDS` (`createdAt`, `updatedAt`, `title`, `comboPrice`, `totalPrice`, `availableQuantity`, `offeredQuantity`, `soldQuantity`, `startsAt`, `endsAt`) via `@IsIn`. **This whitelist is a hard security boundary, not documentation**: the value is interpolated directly into a Prisma `orderBy` key, so only columns validated here may ever reach it. All three availability numbers are sortable because they answer different questions: `availableQuantity` finds bundles about to break on stock, `offeredQuantity` the size of each promise, and `soldQuantity` the offers about to retire themselves.
 2. **No visibility filtering beyond soft-delete.** Unlike the (unexposed) public list, none of `DRAFT`/`ACTIVE`/`INACTIVE`/`ARCHIVED`/`HIDDEN` are excluded — a management dashboard needs to see everything a customer cannot. Only `deletedAt IS NOT NULL` rows are always excluded, same rationale as `ProductRepository.findAllProductsAdmin`.
 3. **Filters are additive and all optional.** `status`/`stockStatus` are plain equality when present. `isFeatured` uses an explicit `!== undefined` check, not truthiness — `isFeatured=false` is a real filter ("show me the non-featured ones"), not an absent one. All three are `AND`-composed with the base `deletedAt: null` gate (never spread-merged), so a filter key can only narrow the result, never accidentally resurrect a deleted row.
 4. **Search** — matches `title`, `titleTh`, `slug`, `sku`, `barcode`. Unlike the product module, `sku`/`barcode` are searchable here even though this is the admin-only list (an admin pastes them straight off a support ticket or packing slip).
 5. **Sorting/pagination** — offset (`page`/`limit`) or cursor-based; sort column from `sortBy` (default `createdAt`), direction from `sortOrder` (default `desc`).
-6. **Response mapping** — every row wrapped in `new ComboProductResponseDto(combo, baseUrl)`: full admin shape, including `costPrice`, exact `quantity`/`offeredQuantity`, and the complete audit trail.
+6. **Response mapping** — every row wrapped in `new ComboProductResponseDto(combo, baseUrl)`: full admin shape, including `costPrice`, exact `availableQuantity`/`offeredQuantity`/`soldQuantity`, and the complete audit trail.
 
 **Response shape**: `{ data: ComboProductResponseDto[], meta: IPaginationMeta }`.
 
@@ -467,12 +542,12 @@ Every route except `/published-combos` and `/slug/:slug` uses `JwtAuthGuard` + `
 
 **Business logic:**
 
-1. **`PublishedCombosQueryDto` extends the shared `PaginationQueryDto`** (`page`, `limit`, `sortOrder`, `search`, `cursor`) with one storefront-safe filter, `isFeatured` (boolean, same `parseBooleanInput` transform as the admin DTO), plus `sortBy`, whitelisted against `PUBLIC_COMBO_SORT_FIELDS` (`createdAt`, `comboPrice`, `title`) via `@IsIn`. **This whitelist is a hard security boundary**, same contract as `COMBO_SORT_FIELDS` for the admin list. It is deliberately narrower than the admin whitelist: `quantity`/`updatedAt`/`startsAt`/`endsAt` are admin concerns with no storefront meaning, and `totalPrice` is the pre-discount sum, not what a customer sorting "by price" wants — `comboPrice` is the price they actually pay.
-2. **Visibility is not a query param.** Every row goes through `publicVisibilityWhere()` (`deletedAt: null`, `status: ACTIVE`, `publishedAt <= now()`) unconditionally — same gate as [`GET /slug/:slug`](#get-combo-details-by-slug-public). Unlike `getAllCombos`, there is no `status`/`stockStatus` filter that could be used to leak a non-visible row through.
+1. **`PublishedCombosQueryDto` extends the shared `PaginationQueryDto`** (`page`, `limit`, `sortOrder`, `search`, `cursor`) with one storefront-safe filter, `isFeatured` (boolean, same `parseBooleanInput` transform as the admin DTO), plus `sortBy`, whitelisted against `PUBLIC_COMBO_SORT_FIELDS` (`createdAt`, `comboPrice`, `title`) via `@IsIn`. **This whitelist is a hard security boundary**, same contract as `COMBO_SORT_FIELDS` for the admin list. It is deliberately narrower than the admin whitelist: `availableQuantity`/`soldQuantity`/`updatedAt`/`startsAt`/`endsAt` are admin concerns with no storefront meaning, and `totalPrice` is the pre-discount sum, not what a customer sorting "by price" wants — `comboPrice` is the price they actually pay.
+2. **Visibility is not a query param.** Every row goes through `publicVisibilityWhere()` (`deletedAt: null`, `status: ACTIVE`, `publishedAt <= now()`, and inside the `startsAt`/`endsAt` window) unconditionally — same gate as [`GET /slug/:slug`](#get-combo-details-by-slug-public). Unlike `getAllCombos`, there is no `status`/`stockStatus` filter that could be used to leak a non-visible row through.
 3. **Search** — matches `title`, `titleTh`, `slug` only. Unlike the admin list, `sku`/`barcode` are **not** searchable here (an anonymous storefront visitor has no legitimate reason to probe by SKU).
 4. **Sorting/pagination** — offset (`page`/`limit`) or cursor-based; sort column from `sortBy` (default `createdAt`), direction from `sortOrder` (default `desc`).
-5. **Response mapping** — every row wrapped in `new ComboProductResponsePublicDto(combo, baseUrl)`: no `status`, no `barcode`/`costPrice`, no raw `quantity` (`stockStatus` only), no audit trail.
-6. **Why the `/product` page's "Combo" filter redirects here instead of filtering in place**: `Product.type` was reduced to `SIMPLE`/`VARIABLE` only (migration `20260714200004_remove_combo_product_type`) — a combo was never a `Product` row to begin with, it is a separate `ComboProduct`/`ComboItem` bundle (see [Availability Model](#availability-model-the-bottleneck-rule)). `GET /product/active-products?productType=COMBO` is rejected with `400` by `@IsEnum(ProductType)`, since `COMBO` no longer exists in that enum. The client's product-type checkbox for "Combo" therefore navigates to the dedicated combo listing (backed by this endpoint) instead of setting a `productType` query param on the product page.
+5. **Response mapping** — every row wrapped in `new ComboProductResponsePublicDto(combo, baseUrl)`: no `status`, no `barcode`/`costPrice`, no raw availability counts (`stockStatus` only), no audit trail.
+6. **Why the `/product` page's "Combo" filter redirects here instead of filtering in place**: `Product.type` was reduced to `SIMPLE`/`VARIABLE` only (migration `20260714200004_remove_combo_product_type`) — a combo was never a `Product` row to begin with, it is a separate `ComboProduct`/`ComboItem` bundle (see [Availability Model](#availability-model-three-numbers)). `GET /product/active-products?productType=COMBO` is rejected with `400` by `@IsEnum(ProductType)`, since `COMBO` no longer exists in that enum. The client's product-type checkbox for "Combo" therefore navigates to the dedicated combo listing (backed by this endpoint) instead of setting a `productType` query param on the product page.
 
 **Response shape**: `{ data: ComboProductResponsePublicDto[], meta: IPaginationMeta }`.
 
@@ -499,9 +574,9 @@ Every route except `/published-combos` and `/slug/:slug` uses `JwtAuthGuard` + `
 
 **Business logic:**
 
-1. **Visibility gate — `publicVisibilityWhere()`**: `deletedAt: null` AND `status: ACTIVE` AND `publishedAt: { lte: now() }`. Unlike `ProductRepository.activeVisibilityWhere()`, `publishedAt` **is** part of the gate here — a combo defaults to `DRAFT` and must be explicitly published (see [Conventions](#conventions)), so an `ACTIVE` combo whose `publishedAt` is still in the future (a scheduled launch) is correctly invisible until that moment. A draft, archived, hidden, inactive, soft-deleted, or not-yet-published combo all resolve to the same `404` — the route never distinguishes "doesn't exist" from "not visible yet", same as `Product`'s public routes.
+1. **Visibility gate — `publicVisibilityWhere()`**: `deletedAt: null` AND `status: ACTIVE` AND `publishedAt: { lte: now() }` AND inside the promotion window (`startsAt IS NULL OR startsAt <= now()`, `endsAt IS NULL OR endsAt > now()`). The window is tested **live** rather than trusted to `status`, because `status` is only corrected on a schedule — see [Offer Lifecycle](#offer-lifecycle-sold-out-and-expired). Unlike `ProductRepository.activeVisibilityWhere()`, `publishedAt` **is** part of the gate here — a combo defaults to `DRAFT` and must be explicitly published (see [Conventions](#conventions)), so an `ACTIVE` combo whose `publishedAt` is still in the future (a scheduled launch) is correctly invisible until that moment. A draft, archived, hidden, inactive, soft-deleted, or not-yet-published combo all resolve to the same `404` — the route never distinguishes "doesn't exist" from "not visible yet", same as `Product`'s public routes.
 2. **`findFirst`, not `findUnique`**, because the lookup is no longer on `slug` alone — the visibility gate is `AND`-composed into the same `where`, exactly mirroring `ProductRepository.findBySlugPublic`.
-3. **Response mapping** — `new ComboProductResponsePublicDto(combo, baseUrl)`: no `status`, no `barcode`/`costPrice`, no raw `quantity` (`stockStatus` only), no audit trail. See [Response Shapes & Select Projections](#response-shapes--select-projections).
+3. **Response mapping** — `new ComboProductResponsePublicDto(combo, baseUrl)`: no `status`, no `barcode`/`costPrice`, no raw availability counts (`stockStatus` only), no audit trail. See [Response Shapes & Select Projections](#response-shapes--select-projections).
 4. **Same repository method backs the home-section listing.** `ComboProductRepository.findActiveCombosForHome` now shares `publicVisibilityWhere()` too, so a combo scheduled for a future `publishedAt` no longer leaks into the "Combo Deals" home section either — previously that query only checked `status: ACTIVE`, not `publishedAt`.
 
 **Response shape**: `{ data: ComboProductResponsePublicDto }`.
@@ -532,23 +607,24 @@ Every route except `/published-combos` and `/slug/:slug` uses `JwtAuthGuard` + `
 1. **Title uniqueness** — `findByTitle(dto.title)` → `409` if taken.
 2. **Slug uniqueness** — `generateSlug(dto.title)`, then `findBySlugAdmin(slug)` → `409` (only reachable when two different titles happen to sanitize to the same slug, since `title` itself is already unique).
 3. **SKU/barcode uniqueness**, only when supplied — `findBySku`/`findByBarcode` → `409` each. Checked up front so a clash returns a named `409` instead of a raw Prisma `P2002` from the insert, matching how `title`/`slug` are already handled.
-4. **`resolveComboItems(dto.items)`** — the core bundling logic, shared verbatim with update. For each item:
+4. **`assertOfferWindowNotClosed(dto.endsAt)`** — a combo cannot be *created* already expired. Unconditional here (unlike update, which only applies it to a combo that would end up `ACTIVE`), because a promotion whose window has already closed is never a deliberate act. The DTO cannot catch this: `@IsAfter('startsAt')` only orders the two endpoints against each other, never against `now()`.
+5. **`resolveComboItems(dto.items)`** — the core bundling logic, shared verbatim with update. For each item:
    - The product must exist (`404` otherwise).
    - **Bundling Rule 1–2 enforced here**: a `VARIABLE` product requires `variantId` (`400`, names the product); a `SIMPLE` product must not receive one (`400`, names the product). See [Bundling Rules](#bundling-rules) for why this is pinned to the product's `type` rather than expressed as a unique index.
    - If `variantId` is given, the variant must exist (`404`) and must belong to the given `productId` (`400`).
    - **`unitPrice` price-snapshot resolution**: the client-supplied value wins; otherwise it falls back to the variant's (or product's, if unpinned) current `salePrice ?? basePrice` at bundling time — see [Price Snapshot Dating](#price-snapshot-dating).
    - **`sourceStock` for the availability calc**: an unpinned row is always a `SIMPLE` product (enforced above), so its own `quantity` is the limiting stock — *not* `totalStock`, which is the variant roll-up and is `0` for a `SIMPLE` product's parts. A pinned row reads the variant's own `quantity`.
-   - The combo's `quantity` (how many bundles current stock can assemble) is then computed by `resolveComboAvailability` — `MIN` over items of `floor(sourceStock / max(item.quantity, 1))`, `0` for an empty set. See [Availability Model](#availability-model-the-bottleneck-rule) — **this app-side computation and the DB's `recompute_combo_quantity` function must stay in sync**; this one exists only because the DB trigger fires *after* the `combo_items` rows land, which is after this create's own response is built.
+   - The combo's `availableQuantity` (how many bundles current stock can assemble) is then computed by `resolveComboAvailability` — `MIN` over items of `floor(sourceStock / max(item.quantity, 1))`, `0` for an empty set. See [Availability Model](#availability-model-three-numbers) — **this app-side computation and the DB's `recompute_combo_available_quantity` function must stay in sync**; this one exists only because the DB trigger fires *after* the `combo_items` rows land, which is after this create's own response is built.
    - The item whose own `floor(stock/qty)` equals that overall minimum is recorded as `limitingItemName`, for use in the `offeredQuantity` error message below (falls back to the first item for a degenerate set).
-5. **`assertOfferedQuantityFits(dto.offeredQuantity, quantity, limitingItemName)`** — if `offeredQuantity` is supplied and exceeds what stock can actually assemble, `400`, naming the scarce item (a distinct message when the ceiling is `0`: *"cannot be assembled at all right now"*). Skipped entirely when `offeredQuantity` is omitted.
-6. **`totalPrice`** = `Σ (item.unitPrice × item.quantity)` over the resolved items — never client input.
-7. **`assertComboPriceBelowParts(dto.comboPrice, totalPrice)`** — `comboPrice` must sit *strictly below* `totalPrice`; equality is rejected too (paying exactly the sum-of-parts is not an offer). A distinct message when `totalPrice <= 0` (*"bundled items have no value to discount"*). This is the strict authority; the DB's `combo_products_price_valid` check constraint is the looser `<=` backstop.
-8. **Images are uploaded to disk *before* the DB write** (same reasoning as `product`) — the nested `images` create needs each file's final path. A failed upload rolls back whatever succeeded so far.
-9. **One atomic `comboProduct.create()`** with nested `images: { createMany }` and `items: { createMany }`. `quantity`/`stockStatus`/`totalPrice` are written directly from the app-side computation above (not left to the DB trigger) so the create's own response is already correct.
-10. **`status` defaults to `DRAFT`, unlike `Product` (defaults `ACTIVE`)** — a combo must be *explicitly* published. `publishedAt`: an explicit `dto.publishedAt` always wins (scheduled launch); otherwise stamped `now()` only when `dto.status === ACTIVE`; otherwise left unset.
-11. **Rollback on DB failure**: if the create throws (e.g. a uniqueness race that slipped past the pre-checks in steps 1–3), every file uploaded in step 8 is deleted before the error propagates.
+6. **`assertOfferedQuantityFits(dto.offeredQuantity, availableQuantity, limitingItemName)`** — if `offeredQuantity` is supplied and exceeds what stock can actually assemble, `400`, naming the scarce item (a distinct message when the ceiling is `0`: *"cannot be assembled at all right now"*). Skipped entirely when `offeredQuantity` is omitted.
+7. **`totalPrice`** = `Σ (item.unitPrice × item.quantity)` over the resolved items — never client input.
+8. **`assertComboPriceBelowParts(dto.comboPrice, totalPrice)`** — `comboPrice` must sit *strictly below* `totalPrice`; equality is rejected too (paying exactly the sum-of-parts is not an offer). A distinct message when `totalPrice <= 0` (*"bundled items have no value to discount"*). This is the strict authority; the DB's `combo_products_price_valid` check constraint is the looser `<=` backstop.
+9. **Images are uploaded to disk *before* the DB write** (same reasoning as `product`) — the nested `images` create needs each file's final path. A failed upload rolls back whatever succeeded so far.
+10. **One atomic `comboProduct.create()`** with nested `images: { createMany }` and `items: { createMany }`. `availableQuantity`/`stockStatus`/`totalPrice` are written directly from the app-side computation above (`stockStatus` from the *sellable* count, which at create time is just the cap or the ceiling since `soldQuantity` is 0) (not left to the DB trigger) so the create's own response is already correct.
+11. **`status` defaults to `DRAFT`, unlike `Product` (defaults `ACTIVE`)** — a combo must be *explicitly* published. `publishedAt`: an explicit `dto.publishedAt` always wins (scheduled launch); otherwise stamped `now()` only when `dto.status === ACTIVE`; otherwise left unset.
+12. **Rollback on DB failure**: if the create throws (e.g. a uniqueness race that slipped past the pre-checks in steps 1–3), every file uploaded in step 9 is deleted before the error propagates.
 
-**Response shape**: `ComboProductResponseDto` (full admin detail, including `costPrice`, exact `quantity`/`offeredQuantity`, and the new `images`/`items` nested in).
+**Response shape**: `ComboProductResponseDto` (full admin detail, including `costPrice`, exact `availableQuantity`/`offeredQuantity`/`soldQuantity`, and the new `images`/`items` nested in).
 
 | Status | Cause                                                                                                                                                                                          |
 | :----- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -583,22 +659,25 @@ Every route except `/published-combos` and `/slug/:slug` uses `JwtAuthGuard` + `
 4. **Items — conditional recompute.** `dto.items` omitted ⇒ the bundle is untouched: `totalPrice` and the assemblable ceiling are read from the *existing* row. `dto.items` present ⇒ `resolveComboItems` runs again (identical validation/pricing/availability logic as create, see steps 4–4's sub-bullets above), and its result supersedes the stored values for every check that follows.
 5. **Price rule re-checked against whichever side actually moved**: `effectiveComboPrice = dto.comboPrice ?? existing.comboPrice`, compared against the (possibly just-recomputed) `totalPrice` via the same `assertComboPriceBelowParts`. A patch that only lowers `comboPrice` still compares against the *stored* `totalPrice`; a patch that only swaps `items` re-checks the *stored* `comboPrice`.
 6. **`offeredQuantity` re-validated on every patch**, not only at create — `assertOfferedQuantityFits` runs against the (possibly new) ceiling, since the ceiling itself moves as stock and items change over the combo's lifetime.
-7. **`deleteImageIds` scoped to this combo** — `findComboImagesByIds(id, ids)`; any id that doesn't actually belong to this combo fails the **whole** request with `400`, before any file is uploaded (a foreign image ID can't be deleted through another combo's payload).
-8. **`lowStockThreshold`** falls back to the *existing stored* value when omitted (not the create-time default constant).
-9. **Images uploaded to disk before the transaction** — same rollback discipline as create (delete whatever succeeded if the upload loop itself fails partway).
-10. **Everything else runs inside one transaction** (`withTransaction`), so a failure part-way can never leave items swapped but prices stale, or the gallery half-updated:
+7. **`assertOfferedQuantityCoversSold(dto.offeredQuantity, existing.soldQuantity)`** — the cap cannot be moved *below* what the offer has already sold (`400`). Equality is allowed on purpose: setting `offeredQuantity` to `soldQuantity` is how an admin closes a promotion early, and the exhaustion trigger takes it `INACTIVE` from there.
+8. **Window and cap gate *being active*.** When the **resulting** status is `ACTIVE` (`dto.status ?? existing.status`), two more checks run: `assertOfferWindowNotClosed` (`400` if `endsAt` — the patched one if sent, otherwise the stored one — is in the past) and `assertOfferNotExhausted` (`400` if the cap is already spent). Gating on the *resulting* status rather than on `dto.status` alone is what stops the same bad pair being reached by moving `endsAt` into the past on an already-live combo. A `DRAFT`/`INACTIVE`/`ARCHIVED` combo is left fully editable — nothing about an ended promotion should block fixing its copy. See [Offer Lifecycle](#offer-lifecycle-sold-out-and-expired).
+9. **`deleteImageIds` scoped to this combo** — `findComboImagesByIds(id, ids)`; any id that doesn't actually belong to this combo fails the **whole** request with `400`, before any file is uploaded (a foreign image ID can't be deleted through another combo's payload).
+10. **`lowStockThreshold`** falls back to the *existing stored* value when omitted (not the create-time default constant).
+11. **Images uploaded to disk before the transaction** — same rollback discipline as create (delete whatever succeeded if the upload loop itself fails partway).
+12. **Everything else runs inside one transaction** (`withTransaction`), so a failure part-way can never leave items swapped but prices stale, or the gallery half-updated:
     - **`replaceComboItems`** — delete-then-recreate the entire `combo_items` set for this combo, not a per-row merge (see the repository doc comment: two unique indexes plus the price-snapshot trigger make in-place reconciliation not worth it when the admin UI submits the bundle as one unit anyway).
     - **Image deletion happens before new-image creation** in the same request, so promoting a newly uploaded file to cover image is decided using the **post-deletion** primary count (`countPrimaryImages`) — a deletion that removes the current cover promotes the first new upload (`isPrimary: survivingPrimaries === 0 && index === 0`). New images append after the gallery's current max `displayOrder + 1` (`findMaxImageDisplayOrder`).
-    - **`quantity`/`stockStatus` are only written when `items` actually changed** (`resolved ? … : undefined`) — Prisma skips an `undefined` key entirely, so an items-untouched patch leaves the trigger-maintained column exactly as it was rather than overwriting it from stale input.
-11. **`publishedAt`**: an explicit `dto.publishedAt` always wins. Otherwise it's stamped `now()` **only** when this patch sets `status` to `ACTIVE` **and** the combo has never been published before (`!existing.publishedAt`) — a one-time backfill for a combo going live for the first time, not a re-stamp on every subsequent edit.
-12. **File cleanup is split by which side of the transaction it's on**: images removed via `deleteImageIds` are unlinked from disk **after** the transaction commits (best-effort — a failed unlink must not roll back a committed edit); images uploaded in step 9 are deleted only if the transaction itself throws.
+    - **`availableQuantity` is only written when `items` actually changed** (`resolved ? … : undefined`) — Prisma skips an `undefined` key entirely, so an items-untouched patch leaves the trigger-maintained column exactly as it was rather than overwriting it from stale input.
+    - **`stockStatus` is written when `items` *or* `offeredQuantity` changed** — it tracks the *sellable* count, so a cap lowered to what has already sold takes the combo to `OUT_OF_STOCK` with no item having moved. (Writing `offered_quantity` also fires `trg_sync_combo_stock_status`, which recomputes it from the final row, so the two can only agree.)
+13. **`publishedAt`**: an explicit `dto.publishedAt` always wins. Otherwise it's stamped `now()` **only** when this patch sets `status` to `ACTIVE` **and** the combo has never been published before (`!existing.publishedAt`) — a one-time backfill for a combo going live for the first time, not a re-stamp on every subsequent edit.
+14. **File cleanup is split by which side of the transaction it's on**: images removed via `deleteImageIds` are unlinked from disk **after** the transaction commits (best-effort — a failed unlink must not roll back a committed edit); images uploaded in step 11 are deleted only if the transaction itself throws.
 
 **Response shape**: `ComboProductResponseDto` (same full admin detail as create).
 
 | Status | Cause                                                                                                                                                                                              |
 | :----- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `200`  | Combo updated successfully.                                                                                                                                                                        |
-| `400`  | DTO validation failed; **or** an image ID in `deleteImageIds` doesn't belong to this combo; **or** (when `items` is sent) the same bundling-rule/price/availability failures as create; **or** `comboPrice`/`offeredQuantity` fails its check against the current (or just-recomputed) `totalPrice`/ceiling. |
+| `400`  | DTO validation failed; **or** an image ID in `deleteImageIds` doesn't belong to this combo; **or** (when `items` is sent) the same bundling-rule/price/availability failures as create; **or** `comboPrice`/`offeredQuantity` fails its check against the current (or just-recomputed) `totalPrice`/ceiling; **or** `offeredQuantity` was set below `soldQuantity`; **or** the patch would leave the combo `ACTIVE` past its `endsAt` or with its offer already sold out. |
 | `401`  | Missing/invalid JWT.                                                                                                                                                                                |
 | `403`  | Authenticated but not `ADMIN`.                                                                                                                                                                      |
 | `404`  | Combo doesn't exist (or is already soft-deleted); **or**, when `items` is sent, a bundled `productId`/`variantId` doesn't exist.                                                                    |
@@ -625,7 +704,11 @@ Every route except `/published-combos` and `/slug/:slug` uses `JwtAuthGuard` + `
 1. **Existence check** — `findComboImagePathsForDeletion(id)` doubles as the gallery-path lookup for step 3 → `404` if the combo doesn't exist. Not soft-delete-aware, since no write path sets `deletedAt` on a combo yet.
 2. **`comboProduct.delete()`** — one statement. `ON DELETE CASCADE` on `ComboItem.comboId` and `ComboImage.comboId` removes the bundle's item and gallery rows automatically; it does not touch the physical files.
 3. **Gallery files unlinked best-effort, after the DB delete commits** — same rationale as `ProductService.hardDeleteProduct`: a failed unlink must not roll back a delete the DB has already committed.
-4. **No `Product`/`ProductVariant` stock deduction.** A combo's `quantity` is a live-computed `MIN` over its items' current stock (see the [Availability Model](#availability-model-the-bottleneck-rule)) — it is never written back to `Product.quantity`/`ProductVariant.quantity`, and nothing is subtracted from `quantity` when a combo is created. `Product.comboQuantity`/`ProductVariant.comboQuantity` (`product.prisma`) is trigger-updated on every `combo_items` change and on this combo's own `quantity`/`offeredQuantity`/`status` changes, and reacts to this delete via cascade — but it's an informational counter only ("how much of this stock DRAFT/ACTIVE combos currently claim, scaled by how many bundles are actually being sold"), not a reservation that blocks other sales. Deleting the combo has no stock to give back, and its `comboQuantity` contribution drops out immediately.
+4. **No `Product`/`ProductVariant` stock deduction.** A combo's `availableQuantity` is a live-computed `MIN` over its items' current stock (see the [Availability Model](#availability-model-three-numbers)) — it is never written back to `Product.quantity`/`ProductVariant.quantity`, and nothing is subtracted from `quantity` when a combo is created. **A combo reserves nothing**, so deleting one has no stock to give back.
+
+   > **Superseded:** `Product.comboQuantity`/`ProductVariant.comboQuantity` used to be trigger-maintained here — "how much of this stock DRAFT/ACTIVE combos currently claim". Both columns were dropped in `20260819160000_combo_available_sold_quantity`. Even documented as informational-only, a column named "combo quantity" sitting next to `quantity` invited exactly the reading it did not support, and the admin inventory table had grown a "Combo Product Stock" column off the back of it. A product is available in the combo section for the same reason it is available in the product section: it has stock.
+
+5. **`soldQuantity` disappears with the row.** The order ledger (`order_items.combo_id`) remains the historical record of what the combo sold; `ON DELETE SET NULL` on that FK keeps the order lines intact.
 
 **Response shape**: no body (`204 No Content`).
 

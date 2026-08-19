@@ -87,9 +87,11 @@ const COMBO_PRODUCT_SELECT_COMMON = {
   endsAt: true,
   isFeatured: true,
   //* DERIVED AVAILABILITY — ONE COLUMN INSTEAD OF JOINING items →
-  //* products/variants AND AGGREGATING PER CARD. `quantity` IS ADMIN-ONLY,
-  //* MATCHING PRODUCT_SELECT_PUBLIC, WHICH EXPOSES stockStatus BUT NOT THE
-  //* RAW COUNT.
+  //* products/variants AND AGGREGATING PER CARD. THE THREE RAW COUNTS
+  //* (availableQuantity/offeredQuantity/soldQuantity) ARE ADMIN-ONLY, MATCHING
+  //* PRODUCT_SELECT_PUBLIC, WHICH EXPOSES stockStatus BUT NOT THE RAW COUNT.
+  //* stockStatus ALREADY FOLDS ALL THREE IN (SEE sync_combo_stock_status), SO
+  //* THE STOREFRONT LOSES NO ACCURACY BY SEEING ONLY IT.
   stockStatus: true,
   seoMetadata: true,
   images: { select: COMBO_IMAGE_SELECT, orderBy: { displayOrder: 'asc' } },
@@ -105,9 +107,10 @@ export const COMBO_PRODUCT_SELECT_ADMIN = {
   status: true,
   barcode: true,
   costPrice: true,
-  quantity: true,
-  lowStockThreshold: true,
+  availableQuantity: true,
   offeredQuantity: true,
+  soldQuantity: true,
+  lowStockThreshold: true,
   createdAt: true,
   updatedAt: true,
   deletedAt: true,

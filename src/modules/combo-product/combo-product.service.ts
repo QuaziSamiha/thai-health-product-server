@@ -90,14 +90,21 @@ export class ComboProductService {
       }
     }
 
-    const { items, quantity, limitingItemName } = await this.resolveComboItems(
-      dto.items,
+    //* A COMBO CANNOT BE CREATED ALREADY EXPIRED — endsAt IN THE PAST WOULD
+    //* PRODUCE A ROW THE VERY NEXT SWEEP DEACTIVATES. THE DTO CANNOT CATCH IT:
+    //* @IsAfter('startsAt') ONLY ORDERS THE TWO ENDPOINTS RELATIVE TO EACH
+    //* OTHER, NOT AGAINST now().
+    this.assertOfferWindowNotClosed(
+      dto.endsAt ? new Date(dto.endsAt) : undefined,
     );
+
+    const { items, availableQuantity, limitingItemName } =
+      await this.resolveComboItems(dto.items);
     //* THE ADMIN CANNOT OFFER MORE BUNDLES THAN STOCK CAN ASSEMBLE. CHECKED
     //* HERE RATHER THAN IN THE DTO BECAUSE THE CEILING DEPENDS ON LIVE STOCK.
     this.assertOfferedQuantityFits(
       dto.offeredQuantity,
-      quantity,
+      availableQuantity,
       limitingItemName,
     );
     //* FALLS BACK TO THE CONSTANT THAT MIRRORS THE COLUMN DEFAULT, SO THE
@@ -138,18 +145,28 @@ export class ComboProductService {
         totalPrice,
         comboPrice: dto.comboPrice,
         //* WRITTEN HERE SO THE RESPONSE FROM THIS CREATE ALREADY CARRIES THE
-        //* RIGHT AVAILABILITY — THE DB TRIGGER RECOMPUTES quantity ONLY AFTER
-        //* THE combo_items ROWS LAND, WHICH IS AFTER THE combo_products ROW
-        //* PRISMA RETURNS. THE TWO RULES ARE IDENTICAL BY CONSTRUCTION; SEE
-        //* resolveComboAvailability.
-        quantity,
+        //* RIGHT AVAILABILITY — THE DB TRIGGER RECOMPUTES availableQuantity
+        //* ONLY AFTER THE combo_items ROWS LAND, WHICH IS AFTER THE
+        //* combo_products ROW PRISMA RETURNS. THE TWO RULES ARE IDENTICAL BY
+        //* CONSTRUCTION; SEE resolveComboAvailability.
+        availableQuantity,
         //* THE THRESHOLD THE ADMIN CHOSE MUST FEED BOTH THE COLUMN AND THE
         //* APP-SIDE stockStatus, OR THE TWO DISAGREE UNTIL THE NEXT TRIGGER RUN.
         lowStockThreshold,
         //* ADMIN INTENT, STORED ALONGSIDE THE DERIVED CEILING — NOT INSTEAD OF
-        //* IT. THE TRIGGERS OWN `quantity`; NOTHING BUT AN ADMIN TOUCHES THIS.
+        //* IT. THE TRIGGERS OWN availableQuantity AND soldQuantity IS OWNED BY
+        //* THE ORDER PATH; NOTHING BUT AN ADMIN TOUCHES THIS ONE.
         offeredQuantity: dto.offeredQuantity,
-        stockStatus: this.computeStockStatus(quantity, lowStockThreshold),
+        //* A BRAND-NEW COMBO HAS SOLD NOTHING, SO THE SELLABLE COUNT IS THE
+        //* CAP OR THE CEILING, WHICHEVER IS LOWER — SEE computeSellableQuantity.
+        stockStatus: this.computeStockStatus(
+          this.computeSellableQuantity(
+            availableQuantity,
+            dto.offeredQuantity,
+            0,
+          ),
+          lowStockThreshold,
+        ),
         startsAt: dto.startsAt ? new Date(dto.startsAt) : undefined,
         endsAt: dto.endsAt ? new Date(dto.endsAt) : undefined,
         status: dto.status,
@@ -253,7 +270,9 @@ export class ComboProductService {
           0,
         )
       : Number(existing.totalPrice ?? 0);
-    const maxAssemblable = resolved ? resolved.quantity : existing.quantity;
+    const maxAssemblable = resolved
+      ? resolved.availableQuantity
+      : existing.availableQuantity;
 
     //* THE PRICE RULE IS CHECKED AGAINST WHICHEVER SIDE MOVED — A PATCH THAT
     //* ONLY LOWERS comboPrice STILL COMPARES AGAINST THE STORED totalPrice,
@@ -267,6 +286,34 @@ export class ComboProductService {
       maxAssemblable,
       resolved?.limitingItemName ?? 'a bundled product',
     );
+
+    //* A CAP CANNOT BE MOVED BELOW WHAT HAS ALREADY BEEN SOLD — THAT WOULD
+    //* CLAIM THE OFFER PROMISED FEWER BUNDLES THAN IT HAS SHIPPED. SETTING IT
+    //* EXACTLY EQUAL IS ALLOWED AND IS THE INTENDED WAY TO CLOSE AN OFFER
+    //* EARLY: THE EXHAUSTION TRIGGER THEN DEACTIVATES IT.
+    this.assertOfferedQuantityCoversSold(
+      dto.offeredQuantity,
+      existing.soldQuantity,
+    );
+
+    //* THE WINDOW AND THE CAP BOTH GATE *BEING ACTIVE*. WITHOUT THESE, SETTING
+    //* ACTIVE ON AN EXPIRED OR SOLD-OUT COMBO WOULD BE SILENTLY UNDONE — BY
+    //* trg_sync_combo_offer_exhaustion FOR THE CAP, BY THE NEXT SWEEP FOR THE
+    //* WINDOW — AND THE ADMIN WOULD SEE A SUCCESSFUL 200 THAT DID NOTHING.
+    //*
+    //* GATED ON THE *RESULTING* STATUS, NOT ON dto.status ALONE: THE SAME PAIR
+    //* MUST NOT BE REACHABLE BY MOVING endsAt INTO THE PAST ON A COMBO THAT IS
+    //* ALREADY LIVE. AN INACTIVE/DRAFT/ARCHIVED COMBO IS LEFT FULLY EDITABLE —
+    //* NOTHING ABOUT AN ENDED PROMOTION SHOULD BLOCK FIXING ITS COPY.
+    if ((dto.status ?? existing.status) === CategoryProductStatus.ACTIVE) {
+      this.assertOfferWindowNotClosed(
+        dto.endsAt ? new Date(dto.endsAt) : (existing.endsAt ?? undefined),
+      );
+      this.assertOfferNotExhausted(
+        dto.offeredQuantity ?? existing.offeredQuantity,
+        existing.soldQuantity,
+      );
+    }
 
     //* PUBLISHING WITHOUT RE-SENDING `items` IS THE ONE WAY A COMBO CAN GO
     //* LIVE AROUND A VARIANT THAT WAS RETIRED AFTER IT WAS BUNDLED — SEE
@@ -351,11 +398,15 @@ export class ComboProductService {
             );
           }
 
-          //* quantity/stockStatus ARE RECOMPUTED HERE ONLY WHEN THE ITEM LIST
+          //* availableQuantity IS REWRITTEN HERE ONLY WHEN THE ITEM LIST
           //* CHANGED, FOR THE SAME REASON AS CREATE: THE TRIGGER FIRES AFTER
           //* THE combo_items WRITES ABOVE BUT THE ROW PRISMA RETURNS IS READ
           //* IN THIS STATEMENT. WITH ITEMS UNTOUCHED THE COLUMN IS ALREADY
           //* CORRECT AND MUST NOT BE OVERWRITTEN FROM STALE INPUT.
+          //*
+          //* stockStatus TRACKS THE *SELLABLE* COUNT, SO IT ALSO HAS TO MOVE
+          //* WHEN ONLY offeredQuantity DID — A CAP LOWERED TO WHAT HAS ALREADY
+          //* SOLD TAKES THE COMBO TO OUT_OF_STOCK WITHOUT ANY ITEM CHANGING.
           return await this.comboProductRepository.updateComboProduct(
             id,
             {
@@ -371,10 +422,20 @@ export class ComboProductService {
               costPrice: dto.costPrice,
               comboPrice: dto.comboPrice,
               totalPrice: resolved ? totalPrice : undefined,
-              quantity: resolved ? resolved.quantity : undefined,
-              stockStatus: resolved
-                ? this.computeStockStatus(resolved.quantity, lowStockThreshold)
+              availableQuantity: resolved
+                ? resolved.availableQuantity
                 : undefined,
+              stockStatus:
+                resolved || dto.offeredQuantity !== undefined
+                  ? this.computeStockStatus(
+                      this.computeSellableQuantity(
+                        maxAssemblable,
+                        dto.offeredQuantity ?? existing.offeredQuantity,
+                        existing.soldQuantity,
+                      ),
+                      lowStockThreshold,
+                    )
+                  : undefined,
               lowStockThreshold: dto.lowStockThreshold,
               offeredQuantity: dto.offeredQuantity,
               startsAt: dto.startsAt ? new Date(dto.startsAt) : undefined,
@@ -426,9 +487,10 @@ export class ComboProductService {
    * best-effort, same rationale as `ProductService.hardDeleteProduct`.
    *
    * Does NOT touch `Product.quantity`/`ProductVariant.quantity`: a combo's
-   * own `quantity` is derived from live product/variant stock (see the
-   * Availability Model doc), never reserved from it, so there is nothing to
-   * give back when the combo disappears.
+   * own `availableQuantity` is derived from live product/variant stock (see
+   * the Availability Model doc), never reserved from it, so there is nothing
+   * to give back when the combo disappears. `soldQuantity` disappears with the
+   * row — the order ledger keeps the historical record of what was sold.
    */
   async hardDeleteComboProduct(id: number): Promise<void> {
     const combo =
@@ -541,13 +603,13 @@ export class ComboProductService {
    * `salePrice ?? basePrice` at bundling time, per ComboItem's documented
    * "price snapshot" contract).
    *
-   * Also returns the combo's `quantity` — how many complete bundles the
-   * current stock can assemble — since the per-item stock needed to derive
-   * it is already loaded here. See `resolveComboAvailability`.
+   * Also returns the combo's `availableQuantity` — how many complete bundles
+   * the current stock can assemble — since the per-item stock needed to
+   * derive it is already loaded here. See `resolveComboAvailability`.
    */
   private async resolveComboItems(itemDtos: ComboItemDto[]): Promise<{
     items: Prisma.ComboItemCreateManyComboInput[];
-    quantity: number;
+    availableQuantity: number;
     limitingItemName: string;
   }> {
     const productIds = [...new Set(itemDtos.map((item) => item.productId))];
@@ -606,7 +668,7 @@ export class ComboProductService {
           );
         }
         //* A RETIRED VARIANT CONTRIBUTES 0 STOCK TO THE BUNDLE (SEE
-        //* resolveComboAvailability AND recompute_combo_quantity), SO
+        //* resolveComboAvailability AND recompute_combo_available_quantity), SO
         //* BUNDLING ONE COULD ONLY EVER PRODUCE A COMBO THAT IS PERMANENTLY
         //* 0-ASSEMBLABLE. REJECT IT AT THE BOUNDARY INSTEAD OF SILENTLY
         //* CREATING AN UNSELLABLE OFFER. THE COMPLEMENTARY RULE LIVES IN
@@ -637,7 +699,7 @@ export class ComboProductService {
         //* OWN quantity IS THE STOCK THAT LIMITS THE BUNDLE — NOT total_stock,
         //* WHICH IS THE VARIANTS ROLL-UP AND IS 0 FOR A SIMPLE PRODUCT'S PARTS.
         //* A NON-ACTIVE VARIANT READS AS 0 REGARDLESS OF ITS SHELF STOCK,
-        //* MIRRORING recompute_combo_quantity. UNREACHABLE FROM THIS PATH
+        //* MIRRORING recompute_combo_available_quantity. UNREACHABLE FROM THIS PATH
         //* TODAY (THE GUARD ABOVE ALREADY REJECTED IT) — IT IS HERE BECAUSE
         //* THIS FORMULA MUST READ IDENTICALLY TO THE SQL IT MIRRORS, WHICH
         //* *IS* REACHED THAT WAY: A VARIANT CAN BE RETIRED LONG AFTER IT WAS
@@ -652,7 +714,7 @@ export class ComboProductService {
       };
     });
 
-    const quantity = this.resolveComboAvailability(resolved);
+    const availableQuantity = this.resolveComboAvailability(resolved);
 
     //* THE ITEM WHOSE OWN BUNDLE CEILING EQUALS THE COMBO'S — i.e. THE SCARCEST
     //* PART. FALLS BACK TO THE FIRST ROW FOR AN EMPTY/DEGENERATE SET.
@@ -661,19 +723,19 @@ export class ComboProductService {
         (entry) =>
           Math.floor(
             Math.max(entry.sourceStock, 0) / Math.max(entry.item.quantity, 1),
-          ) === quantity,
+          ) === availableQuantity,
       ) ?? resolved[0];
 
     return {
       items: resolved.map((entry) => entry.item),
-      quantity,
+      availableQuantity,
       limitingItemName: limiting?.name ?? 'a bundled product',
     };
   }
 
   /**
    * Refuses to publish a combo that still pins a retired variant. Such a
-   * bundle can never be assembled — `recompute_combo_quantity` reads a
+   * bundle can never be assembled — `recompute_combo_available_quantity` reads a
    * non-ACTIVE variant's stock as 0, so its `quantity` is pinned at 0 and
    * its `stockStatus` at OUT_OF_STOCK for as long as the variant stays
    * retired. Letting it go live would put a card on the storefront that can
@@ -706,8 +768,8 @@ export class ComboProductService {
    * sellable only if EVERY item has enough stock, so the bundle is capped by
    * its scarcest part — a MIN over items, not a sum. An empty combo yields 0.
    *
-   * MUST STAY IN SYNC WITH `recompute_combo_quantity` in migration
-   * 20260802140000_add_combo_stock_availability, which is the authority once
+   * MUST STAY IN SYNC WITH `recompute_combo_available_quantity` in migration
+   * 20260819160000_combo_available_sold_quantity, which is the authority once
    * rows exist; this exists so the create response is already correct (the
    * trigger fires only after the combo_items rows land, which is after the
    * combo_products row Prisma returns). Same dual-rule contract as
@@ -773,14 +835,88 @@ export class ComboProductService {
     );
   }
 
+  /**
+   * Refuses to lower the cap below what the offer has already sold. Equality
+   * is deliberately allowed — setting `offeredQuantity` to `soldQuantity` is
+   * the intended way to close a promotion early, and the exhaustion trigger
+   * turns it INACTIVE from there.
+   */
+  private assertOfferedQuantityCoversSold(
+    offeredQuantity: number | undefined,
+    soldQuantity: number,
+  ): void {
+    if (offeredQuantity === undefined) return;
+    if (offeredQuantity >= soldQuantity) return;
+
+    throw new BadRequestException(
+      `This combo has already sold ${soldQuantity} bundle${soldQuantity === 1 ? '' : 's'}, so the offered quantity cannot be set below ${soldQuantity}`,
+    );
+  }
+
+  /**
+   * Refuses to leave a combo ACTIVE past the end of its promotion window.
+   *
+   * The window is also enforced at read time — every public gate tests it
+   * live, so an expired combo stops selling the instant it expires rather
+   * than when the sweep next runs (see `ComboExpiryService`). This check
+   * exists so an admin action that *contradicts* the window fails loudly
+   * instead of appearing to succeed and being reverted moments later.
+   */
+  private assertOfferWindowNotClosed(endsAt: Date | undefined): void {
+    if (!endsAt) return;
+    if (endsAt.getTime() > Date.now()) return;
+
+    throw new BadRequestException(
+      `This combo's offer period ended on ${endsAt.toISOString()} — extend the end date to keep it running`,
+    );
+  }
+
+  /** Refuses to publish a capped offer that has already sold out. */
+  private assertOfferNotExhausted(
+    offeredQuantity: number | null | undefined,
+    soldQuantity: number,
+  ): void {
+    if (offeredQuantity === null || offeredQuantity === undefined) return;
+    if (soldQuantity < offeredQuantity) return;
+
+    throw new BadRequestException(
+      `All ${offeredQuantity} offered bundle${offeredQuantity === 1 ? '' : 's'} have been sold — raise the offered quantity before making this combo active again`,
+    );
+  }
+
+  /**
+   * How many bundles a customer can actually still buy — the number
+   * `stockStatus` is derived from and the one the order path checks against.
+   *
+   * A NULL cap does **not** subtract `soldQuantity`: with no cap, every sale
+   * has already pulled `availableQuantity` down through the component stock
+   * it consumed, so subtracting again would count the same sale twice.
+   *
+   * MUST STAY IN SYNC WITH the SQL function `combo_sellable_quantity` in
+   * migration 20260819160000_combo_available_sold_quantity.
+   */
+  private computeSellableQuantity(
+    availableQuantity: number,
+    offeredQuantity: number | null | undefined,
+    soldQuantity: number,
+  ): number {
+    const assemblable = Math.max(availableQuantity, 0);
+    if (offeredQuantity === null || offeredQuantity === undefined) {
+      return assemblable;
+    }
+    return Math.min(assemblable, Math.max(offeredQuantity - soldQuantity, 0));
+  }
+
   //* MIRRORS ProductService.computeStockStatus AND THE sync_combo_stock_status
   //* TRIGGER — THE THREE-STATE RULE MUST READ THE SAME IN ALL THREE PLACES.
+  //* FED THE *SELLABLE* COUNT (SEE computeSellableQuantity), NOT THE RAW
+  //* ASSEMBLABLE CEILING.
   private computeStockStatus(
-    quantity: number,
+    sellableQuantity: number,
     lowStockThreshold: number,
   ): StockStatus {
-    if (quantity <= 0) return StockStatus.OUT_OF_STOCK;
-    if (quantity <= lowStockThreshold) return StockStatus.LOW_STOCK;
+    if (sellableQuantity <= 0) return StockStatus.OUT_OF_STOCK;
+    if (sellableQuantity <= lowStockThreshold) return StockStatus.LOW_STOCK;
     return StockStatus.IN_STOCK;
   }
 

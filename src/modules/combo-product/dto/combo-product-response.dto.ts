@@ -168,17 +168,33 @@ export class ComboProductResponseDto {
   @Expose()
   @ApiProperty({
     description:
-      'How many complete bundles the current stock can assemble — the MIN across items of floor(item stock / item quantity), NOT a sum. Fully derived: never accepted from the client.',
+      'How many complete bundles the current component stock can assemble — the MIN across items of floor(item stock / item quantity), NOT a sum. Fully derived: never accepted from the client. A combo holds no inventory of its own, so this is a live view of its parts, not a warehouse count.',
     example: 7,
   })
-  quantity!: number;
+  availableQuantity!: number;
+
+  @Expose()
+  @ApiPropertyOptional({
+    description:
+      'How many bundles the admin put on sale — the cap on the whole promotion. The one availability field that is NOT derived. Null means no cap: sell whatever component stock allows.',
+    example: 20,
+  })
+  offeredQuantity?: number;
+
+  @Expose()
+  @ApiProperty({
+    description:
+      'How many bundles have actually been sold. Incremented when an order claims the combo and given back if that order is cancelled, failed, or returned. Once this reaches `offeredQuantity` the combo is forced INACTIVE automatically.',
+    example: 12,
+  })
+  soldQuantity!: number;
 
   @Expose()
   @ApiProperty({
     enum: StockStatus,
     enumName: 'StockStatus',
     description:
-      'Derived from `quantity`: OUT_OF_STOCK at 0, LOW_STOCK from 1 up to `lowStockThreshold`, IN_STOCK above it',
+      'Derived from the *sellable* count — `offeredQuantity` null ? `availableQuantity` : min(availableQuantity, max(offeredQuantity - soldQuantity, 0)). OUT_OF_STOCK at 0, LOW_STOCK from 1 up to `lowStockThreshold`, IN_STOCK above it. A sold-out capped offer reads OUT_OF_STOCK even with plenty of component stock behind it.',
     example: StockStatus.IN_STOCK,
   })
   stockStatus!: StockStatus;
@@ -190,14 +206,6 @@ export class ComboProductResponseDto {
     example: 10,
   })
   lowStockThreshold!: number;
-
-  @Expose()
-  @ApiPropertyOptional({
-    description:
-      'How many bundles the admin put on sale. The one availability field that is NOT derived — `quantity` above is the ceiling stock allows, this is the cap underneath it. Effective sellable = min(quantity, offeredQuantity). Null means no cap.',
-    example: 2,
-  })
-  offeredQuantity?: number;
 
   @Expose()
   @ApiPropertyOptional({ type: () => ComboSeoMetadataDto })
@@ -279,10 +287,11 @@ export class ComboProductResponseDto {
     this.startsAt = combo.startsAt ?? undefined;
     this.endsAt = combo.endsAt ?? undefined;
     this.isFeatured = combo.isFeatured!;
-    this.quantity = combo.quantity ?? 0;
+    this.availableQuantity = combo.availableQuantity ?? 0;
+    this.offeredQuantity = combo.offeredQuantity ?? undefined;
+    this.soldQuantity = combo.soldQuantity ?? 0;
     this.stockStatus = combo.stockStatus!;
     this.lowStockThreshold = combo.lowStockThreshold!;
-    this.offeredQuantity = combo.offeredQuantity ?? undefined;
     this.seoMetadata = toSeoMetadataDto(combo.seoMetadata);
     this.images = (combo.images ?? []).map(
       (img) => new ComboImageResponseDto(img, baseUrl),

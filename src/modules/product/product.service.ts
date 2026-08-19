@@ -247,22 +247,26 @@ export class ProductService {
   }
 
   /**
-   * Same flattening rule as `getProductDropdownOptions`, plus
-   * `comboQuantity`/`availableForCombo` (quantity - comboQuantity) per
-   * option — how much of this product/variant's current stock is still
-   * free to allocate to a combo, given the amount already earmarked as its
-   * own per-bundle prefill.
+   * Same flattening rule as `getProductDropdownOptions`, narrowed to what a
+   * combo may legally bundle.
+   *
+   * Each option's `quantity` is its whole stock story. There is no separate
+   * "free to bundle" figure: a combo reserves nothing and draws from the same
+   * pool a direct sale draws from, at checkout, so every unit in stock is
+   * bundleable. The `comboQuantity`/`availableForCombo` pair this endpoint
+   * used to return implied a reservation that never existed and was dropped
+   * in migration 20260819160000_combo_available_sold_quantity.
    *
    * **Membership is decided by status alone**: every ACTIVE SIMPLE product
    * and every ACTIVE variant of an ACTIVE product, whatever their stock.
-   * `availableForCombo` is *reported*, never used to filter — an earlier
-   * revision dropped any option below 1, which silently hid a live product
-   * from the combo builder for the entirely temporary reason that it
-   * happened to be out of stock, and read to the admin as "my product is
-   * missing" rather than "my product has no free stock". Stock is a
-   * quantity question the caller answers per row (the forms cap Qty at
-   * `availableForCombo` and block submit above it); presence in the list is
-   * a sellability question, and sellability is `status`.
+   * Stock is *reported*, never used to filter — an earlier revision dropped
+   * any option below 1, which silently hid a live product from the combo
+   * builder for the entirely temporary reason that it happened to be out of
+   * stock, and read to the admin as "my product is missing" rather than "my
+   * product has no stock". Stock is a quantity question the caller answers
+   * per row (the forms cap Qty at `quantity` and block submit above it);
+   * presence in the list is a sellability question, and sellability is
+   * `status`.
    *
    * The repository has already dropped non-ACTIVE variants (a combo cannot
    * bundle one), which leaves one case the flattening rule would otherwise

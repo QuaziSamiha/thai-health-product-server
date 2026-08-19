@@ -12,16 +12,20 @@ import { parseBooleanInput } from '../../../common/utils/json-transform.util';
 //* orderBy KEY, SO ONLY FIELDS VALIDATED HERE MAY EVER REACH IT. SAME
 //* CONTRACT AS PRODUCT_SORT_FIELDS (product/dto/active-products-query.dto.ts).
 //*
-//* `quantity` SORTS BY THE *DERIVED* BUNDLE COUNT (WHAT CURRENT STOCK CAN
-//* ASSEMBLE), NOT BY offeredQuantity — SORTING BY WHAT IS ACTUALLY SELLABLE IS
-//* WHAT AN ADMIN SCANNING FOR PROBLEMS WANTS.
+//* ALL THREE AVAILABILITY NUMBERS ARE SORTABLE BECAUSE THEY ANSWER DIFFERENT
+//* ADMIN QUESTIONS: `availableQuantity` = WHAT STOCK CAN ASSEMBLE RIGHT NOW
+//* (SORT TO FIND BUNDLES ABOUT TO BREAK), `offeredQuantity` = THE CAP THAT WAS
+//* PROMISED, `soldQuantity` = HOW FAR THAT CAP HAS BEEN CONSUMED (SORT TO FIND
+//* THE OFFERS ABOUT TO RETIRE THEMSELVES).
 export const COMBO_SORT_FIELDS = [
   'createdAt',
   'updatedAt',
   'title',
   'comboPrice',
   'totalPrice',
-  'quantity',
+  'availableQuantity',
+  'offeredQuantity',
+  'soldQuantity',
   'startsAt',
   'endsAt',
 ] as const;

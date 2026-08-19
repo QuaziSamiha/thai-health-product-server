@@ -2973,10 +2973,11 @@ export const ComboProductScalarFieldEnum = {
   endsAt: 'endsAt',
   status: 'status',
   isFeatured: 'isFeatured',
-  quantity: 'quantity',
+  availableQuantity: 'availableQuantity',
+  offeredQuantity: 'offeredQuantity',
+  soldQuantity: 'soldQuantity',
   stockStatus: 'stockStatus',
   lowStockThreshold: 'lowStockThreshold',
-  offeredQuantity: 'offeredQuantity',
   seoMetadata: 'seoMetadata',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -3317,7 +3318,6 @@ export const ProductScalarFieldEnum = {
   status: 'status',
   isFeatured: 'isFeatured',
   hasVariants: 'hasVariants',
-  comboQuantity: 'comboQuantity',
   costPrice: 'costPrice',
   discountType: 'discountType',
   discountValue: 'discountValue',
@@ -3380,7 +3380,6 @@ export const ProductVariantScalarFieldEnum = {
   salePrice: 'salePrice',
   attributes: 'attributes',
   isDefault: 'isDefault',
-  comboQuantity: 'comboQuantity',
   variantStatus: 'variantStatus',
   productId: 'productId'
 } as const
@@ -3420,6 +3419,7 @@ export const PromoCodeScalarFieldEnum = {
   isActive: 'isActive',
   startsAt: 'startsAt',
   endsAt: 'endsAt',
+  isPublic: 'isPublic',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

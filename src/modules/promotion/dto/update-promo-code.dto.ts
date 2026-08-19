@@ -80,6 +80,16 @@ export class UpdatePromoCodeDto {
   @IsBoolean({ message: 'isActive must be a boolean' })
   isActive?: boolean;
 
+  @ApiPropertyOptional({
+    description:
+      'Publish or unpublish this code on the storefront coupon list. Unpublishing ' +
+      'only hides it — anyone already holding the code can still redeem it while ' +
+      'isActive stays true.',
+  })
+  @IsOptional()
+  @IsBoolean({ message: 'isPublic must be a boolean' })
+  isPublic?: boolean;
+
   @ApiPropertyOptional({ description: 'When the code becomes valid' })
   @IsOptional()
   @IsDateString({}, { message: 'Start date must be a valid ISO date string' })

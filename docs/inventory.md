@@ -7,6 +7,10 @@ Module source: `src/modules/inventory/` (`inventory.controller.ts`, `inventory.s
 
 > **Scope note:** `Product`, `ProductVariant`, and `User` are documented in their own references — they appear here only as foreign-key targets needed to understand this domain's relationships.
 
+> **One stock pool, two sales channels.** A unit counted here is buyable on its own *or* as part of a combo — whichever checkout reaches it first. Nothing reserves stock for combos, and no column splits the shelf count into "product stock" and "combo stock". While a product's `quantity` is above zero it reads as available in both the product section and the combo section; at zero it reads out of stock in both.
+>
+> The admin inventory table used to carry "Single Product Stock" and "Combo Product Stock" columns derived from a `Product.comboQuantity` counter. Both columns and the counter behind them were removed in migration `20260819160000_combo_available_sold_quantity` — they described a reservation that never existed. A combo's own availability is computed from its components at read time; see `docs/combo-product.md` → **Availability Model**.
+
 ---
 
 ### DB Schema

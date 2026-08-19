@@ -31,6 +31,7 @@ import { PromoCodeQueryDto } from './dto/promo-code-query.dto';
 import { ValidatePromoCodeDto } from './dto/validate-promo-code.dto';
 import { PromoCodeResponseDto } from './dto/promo-code-response.dto';
 import { PromoCodeValidationResponseDto } from './dto/promo-code-validation-response.dto';
+import { PublicPromoCodeResponseDto } from './dto/public-promo-code-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/auth/roles.decorator';
@@ -89,6 +90,25 @@ export class PromotionController {
   @ResponseMessage('Promo codes retrieved successfully')
   async getAllPromoCodes(@Query() query: PromoCodeQueryDto) {
     return this.promotionService.listPromoCodes(query);
+  }
+
+  @Get('public-promo-codes')
+  @Public()
+  @ApiOperation({
+    summary: 'List the promo codes published to the storefront',
+    description:
+      'Returns only codes an admin explicitly published (isPublic) that are also active, ' +
+      'inside their validity window, and not exhausted — never every working code. ' +
+      'Targeted codes stay unlisted; isPublic defaults to false.',
+  })
+  @ApiOkResponse({
+    description: 'Published promo codes retrieved successfully.',
+    type: PublicPromoCodeResponseDto,
+    isArray: true,
+  })
+  @ResponseMessage('Promo codes retrieved successfully')
+  async getPublicPromoCodes() {
+    return this.promotionService.listPublicPromoCodes();
   }
 
   @Post('validate')

@@ -31,9 +31,10 @@ export type ComboProductAvgAggregateOutputType = {
   totalPrice: runtime.Decimal | null
   comboPrice: runtime.Decimal | null
   costPrice: runtime.Decimal | null
-  quantity: number | null
-  lowStockThreshold: number | null
+  availableQuantity: number | null
   offeredQuantity: number | null
+  soldQuantity: number | null
+  lowStockThreshold: number | null
   createdBy: number | null
   updatedBy: number | null
   deletedBy: number | null
@@ -44,9 +45,10 @@ export type ComboProductSumAggregateOutputType = {
   totalPrice: runtime.Decimal | null
   comboPrice: runtime.Decimal | null
   costPrice: runtime.Decimal | null
-  quantity: number | null
-  lowStockThreshold: number | null
+  availableQuantity: number | null
   offeredQuantity: number | null
+  soldQuantity: number | null
+  lowStockThreshold: number | null
   createdBy: number | null
   updatedBy: number | null
   deletedBy: number | null
@@ -71,10 +73,11 @@ export type ComboProductMinAggregateOutputType = {
   endsAt: Date | null
   status: $Enums.CategoryProductStatus | null
   isFeatured: boolean | null
-  quantity: number | null
+  availableQuantity: number | null
+  offeredQuantity: number | null
+  soldQuantity: number | null
   stockStatus: $Enums.StockStatus | null
   lowStockThreshold: number | null
-  offeredQuantity: number | null
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt: Date | null
@@ -103,10 +106,11 @@ export type ComboProductMaxAggregateOutputType = {
   endsAt: Date | null
   status: $Enums.CategoryProductStatus | null
   isFeatured: boolean | null
-  quantity: number | null
+  availableQuantity: number | null
+  offeredQuantity: number | null
+  soldQuantity: number | null
   stockStatus: $Enums.StockStatus | null
   lowStockThreshold: number | null
-  offeredQuantity: number | null
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt: Date | null
@@ -135,10 +139,11 @@ export type ComboProductCountAggregateOutputType = {
   endsAt: number
   status: number
   isFeatured: number
-  quantity: number
+  availableQuantity: number
+  offeredQuantity: number
+  soldQuantity: number
   stockStatus: number
   lowStockThreshold: number
-  offeredQuantity: number
   seoMetadata: number
   createdAt: number
   updatedAt: number
@@ -156,9 +161,10 @@ export type ComboProductAvgAggregateInputType = {
   totalPrice?: true
   comboPrice?: true
   costPrice?: true
-  quantity?: true
-  lowStockThreshold?: true
+  availableQuantity?: true
   offeredQuantity?: true
+  soldQuantity?: true
+  lowStockThreshold?: true
   createdBy?: true
   updatedBy?: true
   deletedBy?: true
@@ -169,9 +175,10 @@ export type ComboProductSumAggregateInputType = {
   totalPrice?: true
   comboPrice?: true
   costPrice?: true
-  quantity?: true
-  lowStockThreshold?: true
+  availableQuantity?: true
   offeredQuantity?: true
+  soldQuantity?: true
+  lowStockThreshold?: true
   createdBy?: true
   updatedBy?: true
   deletedBy?: true
@@ -196,10 +203,11 @@ export type ComboProductMinAggregateInputType = {
   endsAt?: true
   status?: true
   isFeatured?: true
-  quantity?: true
+  availableQuantity?: true
+  offeredQuantity?: true
+  soldQuantity?: true
   stockStatus?: true
   lowStockThreshold?: true
-  offeredQuantity?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
@@ -228,10 +236,11 @@ export type ComboProductMaxAggregateInputType = {
   endsAt?: true
   status?: true
   isFeatured?: true
-  quantity?: true
+  availableQuantity?: true
+  offeredQuantity?: true
+  soldQuantity?: true
   stockStatus?: true
   lowStockThreshold?: true
-  offeredQuantity?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
@@ -260,10 +269,11 @@ export type ComboProductCountAggregateInputType = {
   endsAt?: true
   status?: true
   isFeatured?: true
-  quantity?: true
+  availableQuantity?: true
+  offeredQuantity?: true
+  soldQuantity?: true
   stockStatus?: true
   lowStockThreshold?: true
-  offeredQuantity?: true
   seoMetadata?: true
   createdAt?: true
   updatedAt?: true
@@ -380,10 +390,11 @@ export type ComboProductGroupByOutputType = {
   endsAt: Date | null
   status: $Enums.CategoryProductStatus
   isFeatured: boolean
-  quantity: number
+  availableQuantity: number
+  offeredQuantity: number | null
+  soldQuantity: number
   stockStatus: $Enums.StockStatus
   lowStockThreshold: number
-  offeredQuantity: number | null
   seoMetadata: runtime.JsonValue | null
   createdAt: Date
   updatedAt: Date
@@ -436,10 +447,11 @@ export type ComboProductWhereInput = {
   endsAt?: Prisma.DateTimeNullableFilter<"ComboProduct"> | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFilter<"ComboProduct"> | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFilter<"ComboProduct"> | boolean
-  quantity?: Prisma.IntFilter<"ComboProduct"> | number
+  availableQuantity?: Prisma.IntFilter<"ComboProduct"> | number
+  offeredQuantity?: Prisma.IntNullableFilter<"ComboProduct"> | number | null
+  soldQuantity?: Prisma.IntFilter<"ComboProduct"> | number
   stockStatus?: Prisma.EnumStockStatusFilter<"ComboProduct"> | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFilter<"ComboProduct"> | number
-  offeredQuantity?: Prisma.IntNullableFilter<"ComboProduct"> | number | null
   seoMetadata?: Prisma.JsonNullableFilter<"ComboProduct">
   createdAt?: Prisma.DateTimeFilter<"ComboProduct"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ComboProduct"> | Date | string
@@ -476,10 +488,11 @@ export type ComboProductOrderByWithRelationInput = {
   endsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
-  quantity?: Prisma.SortOrder
+  availableQuantity?: Prisma.SortOrder
+  offeredQuantity?: Prisma.SortOrderInput | Prisma.SortOrder
+  soldQuantity?: Prisma.SortOrder
   stockStatus?: Prisma.SortOrder
   lowStockThreshold?: Prisma.SortOrder
-  offeredQuantity?: Prisma.SortOrderInput | Prisma.SortOrder
   seoMetadata?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -519,10 +532,11 @@ export type ComboProductWhereUniqueInput = Prisma.AtLeast<{
   endsAt?: Prisma.DateTimeNullableFilter<"ComboProduct"> | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFilter<"ComboProduct"> | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFilter<"ComboProduct"> | boolean
-  quantity?: Prisma.IntFilter<"ComboProduct"> | number
+  availableQuantity?: Prisma.IntFilter<"ComboProduct"> | number
+  offeredQuantity?: Prisma.IntNullableFilter<"ComboProduct"> | number | null
+  soldQuantity?: Prisma.IntFilter<"ComboProduct"> | number
   stockStatus?: Prisma.EnumStockStatusFilter<"ComboProduct"> | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFilter<"ComboProduct"> | number
-  offeredQuantity?: Prisma.IntNullableFilter<"ComboProduct"> | number | null
   seoMetadata?: Prisma.JsonNullableFilter<"ComboProduct">
   createdAt?: Prisma.DateTimeFilter<"ComboProduct"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ComboProduct"> | Date | string
@@ -559,10 +573,11 @@ export type ComboProductOrderByWithAggregationInput = {
   endsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
-  quantity?: Prisma.SortOrder
+  availableQuantity?: Prisma.SortOrder
+  offeredQuantity?: Prisma.SortOrderInput | Prisma.SortOrder
+  soldQuantity?: Prisma.SortOrder
   stockStatus?: Prisma.SortOrder
   lowStockThreshold?: Prisma.SortOrder
-  offeredQuantity?: Prisma.SortOrderInput | Prisma.SortOrder
   seoMetadata?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -600,10 +615,11 @@ export type ComboProductScalarWhereWithAggregatesInput = {
   endsAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ComboProduct"> | Date | string | null
   status?: Prisma.EnumCategoryProductStatusWithAggregatesFilter<"ComboProduct"> | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolWithAggregatesFilter<"ComboProduct"> | boolean
-  quantity?: Prisma.IntWithAggregatesFilter<"ComboProduct"> | number
+  availableQuantity?: Prisma.IntWithAggregatesFilter<"ComboProduct"> | number
+  offeredQuantity?: Prisma.IntNullableWithAggregatesFilter<"ComboProduct"> | number | null
+  soldQuantity?: Prisma.IntWithAggregatesFilter<"ComboProduct"> | number
   stockStatus?: Prisma.EnumStockStatusWithAggregatesFilter<"ComboProduct"> | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntWithAggregatesFilter<"ComboProduct"> | number
-  offeredQuantity?: Prisma.IntNullableWithAggregatesFilter<"ComboProduct"> | number | null
   seoMetadata?: Prisma.JsonNullableWithAggregatesFilter<"ComboProduct">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ComboProduct"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ComboProduct"> | Date | string
@@ -632,10 +648,11 @@ export type ComboProductCreateInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -669,10 +686,11 @@ export type ComboProductUncheckedCreateInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -705,10 +723,11 @@ export type ComboProductUpdateInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -742,10 +761,11 @@ export type ComboProductUncheckedUpdateInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -779,10 +799,11 @@ export type ComboProductCreateManyInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -811,10 +832,11 @@ export type ComboProductUpdateManyMutationInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -841,10 +863,11 @@ export type ComboProductUncheckedUpdateManyInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -879,10 +902,11 @@ export type ComboProductCountOrderByAggregateInput = {
   endsAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
-  quantity?: Prisma.SortOrder
+  availableQuantity?: Prisma.SortOrder
+  offeredQuantity?: Prisma.SortOrder
+  soldQuantity?: Prisma.SortOrder
   stockStatus?: Prisma.SortOrder
   lowStockThreshold?: Prisma.SortOrder
-  offeredQuantity?: Prisma.SortOrder
   seoMetadata?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -898,9 +922,10 @@ export type ComboProductAvgOrderByAggregateInput = {
   totalPrice?: Prisma.SortOrder
   comboPrice?: Prisma.SortOrder
   costPrice?: Prisma.SortOrder
-  quantity?: Prisma.SortOrder
-  lowStockThreshold?: Prisma.SortOrder
+  availableQuantity?: Prisma.SortOrder
   offeredQuantity?: Prisma.SortOrder
+  soldQuantity?: Prisma.SortOrder
+  lowStockThreshold?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
   updatedBy?: Prisma.SortOrder
   deletedBy?: Prisma.SortOrder
@@ -925,10 +950,11 @@ export type ComboProductMaxOrderByAggregateInput = {
   endsAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
-  quantity?: Prisma.SortOrder
+  availableQuantity?: Prisma.SortOrder
+  offeredQuantity?: Prisma.SortOrder
+  soldQuantity?: Prisma.SortOrder
   stockStatus?: Prisma.SortOrder
   lowStockThreshold?: Prisma.SortOrder
-  offeredQuantity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -957,10 +983,11 @@ export type ComboProductMinOrderByAggregateInput = {
   endsAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
-  quantity?: Prisma.SortOrder
+  availableQuantity?: Prisma.SortOrder
+  offeredQuantity?: Prisma.SortOrder
+  soldQuantity?: Prisma.SortOrder
   stockStatus?: Prisma.SortOrder
   lowStockThreshold?: Prisma.SortOrder
-  offeredQuantity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -975,9 +1002,10 @@ export type ComboProductSumOrderByAggregateInput = {
   totalPrice?: Prisma.SortOrder
   comboPrice?: Prisma.SortOrder
   costPrice?: Prisma.SortOrder
-  quantity?: Prisma.SortOrder
-  lowStockThreshold?: Prisma.SortOrder
+  availableQuantity?: Prisma.SortOrder
   offeredQuantity?: Prisma.SortOrder
+  soldQuantity?: Prisma.SortOrder
+  lowStockThreshold?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
   updatedBy?: Prisma.SortOrder
   deletedBy?: Prisma.SortOrder
@@ -1222,10 +1250,11 @@ export type ComboProductCreateWithoutCartItemsInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1258,10 +1287,11 @@ export type ComboProductUncheckedCreateWithoutCartItemsInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1309,10 +1339,11 @@ export type ComboProductUpdateWithoutCartItemsInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1345,10 +1376,11 @@ export type ComboProductUncheckedUpdateWithoutCartItemsInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1380,10 +1412,11 @@ export type ComboProductCreateWithoutItemsInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1416,10 +1449,11 @@ export type ComboProductUncheckedCreateWithoutItemsInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1467,10 +1501,11 @@ export type ComboProductUpdateWithoutItemsInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1503,10 +1538,11 @@ export type ComboProductUncheckedUpdateWithoutItemsInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1538,10 +1574,11 @@ export type ComboProductCreateWithoutImagesInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1574,10 +1611,11 @@ export type ComboProductUncheckedCreateWithoutImagesInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1625,10 +1663,11 @@ export type ComboProductUpdateWithoutImagesInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1661,10 +1700,11 @@ export type ComboProductUncheckedUpdateWithoutImagesInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1696,10 +1736,11 @@ export type ComboProductCreateWithoutOrderItemsInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1732,10 +1773,11 @@ export type ComboProductUncheckedCreateWithoutOrderItemsInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1783,10 +1825,11 @@ export type ComboProductUpdateWithoutOrderItemsInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1819,10 +1862,11 @@ export type ComboProductUncheckedUpdateWithoutOrderItemsInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1854,10 +1898,11 @@ export type ComboProductCreateWithoutCreatedByUserInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1890,10 +1935,11 @@ export type ComboProductUncheckedCreateWithoutCreatedByUserInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1935,10 +1981,11 @@ export type ComboProductCreateWithoutUpdatedByUserInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1971,10 +2018,11 @@ export type ComboProductUncheckedCreateWithoutUpdatedByUserInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2016,10 +2064,11 @@ export type ComboProductCreateWithoutDeletedByUserInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2052,10 +2101,11 @@ export type ComboProductUncheckedCreateWithoutDeletedByUserInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2117,10 +2167,11 @@ export type ComboProductScalarWhereInput = {
   endsAt?: Prisma.DateTimeNullableFilter<"ComboProduct"> | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFilter<"ComboProduct"> | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFilter<"ComboProduct"> | boolean
-  quantity?: Prisma.IntFilter<"ComboProduct"> | number
+  availableQuantity?: Prisma.IntFilter<"ComboProduct"> | number
+  offeredQuantity?: Prisma.IntNullableFilter<"ComboProduct"> | number | null
+  soldQuantity?: Prisma.IntFilter<"ComboProduct"> | number
   stockStatus?: Prisma.EnumStockStatusFilter<"ComboProduct"> | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFilter<"ComboProduct"> | number
-  offeredQuantity?: Prisma.IntNullableFilter<"ComboProduct"> | number | null
   seoMetadata?: Prisma.JsonNullableFilter<"ComboProduct">
   createdAt?: Prisma.DateTimeFilter<"ComboProduct"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ComboProduct"> | Date | string
@@ -2182,10 +2233,11 @@ export type ComboProductCreateManyCreatedByUserInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2214,10 +2266,11 @@ export type ComboProductCreateManyUpdatedByUserInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2246,10 +2299,11 @@ export type ComboProductCreateManyDeletedByUserInput = {
   endsAt?: Date | string | null
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
-  quantity?: number
+  availableQuantity?: number
+  offeredQuantity?: number | null
+  soldQuantity?: number
   stockStatus?: $Enums.StockStatus
   lowStockThreshold?: number
-  offeredQuantity?: number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2277,10 +2331,11 @@ export type ComboProductUpdateWithoutCreatedByUserInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2313,10 +2368,11 @@ export type ComboProductUncheckedUpdateWithoutCreatedByUserInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2349,10 +2405,11 @@ export type ComboProductUncheckedUpdateManyWithoutCreatedByUserInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2380,10 +2437,11 @@ export type ComboProductUpdateWithoutUpdatedByUserInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2416,10 +2474,11 @@ export type ComboProductUncheckedUpdateWithoutUpdatedByUserInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2452,10 +2511,11 @@ export type ComboProductUncheckedUpdateManyWithoutUpdatedByUserInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2483,10 +2543,11 @@ export type ComboProductUpdateWithoutDeletedByUserInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2519,10 +2580,11 @@ export type ComboProductUncheckedUpdateWithoutDeletedByUserInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2555,10 +2617,11 @@ export type ComboProductUncheckedUpdateManyWithoutDeletedByUserInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  availableQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  soldQuantity?: Prisma.IntFieldUpdateOperationsInput | number
   stockStatus?: Prisma.EnumStockStatusFieldUpdateOperationsInput | $Enums.StockStatus
   lowStockThreshold?: Prisma.IntFieldUpdateOperationsInput | number
-  offeredQuantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   seoMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2645,10 +2708,11 @@ export type ComboProductSelect<ExtArgs extends runtime.Types.Extensions.Internal
   endsAt?: boolean
   status?: boolean
   isFeatured?: boolean
-  quantity?: boolean
+  availableQuantity?: boolean
+  offeredQuantity?: boolean
+  soldQuantity?: boolean
   stockStatus?: boolean
   lowStockThreshold?: boolean
-  offeredQuantity?: boolean
   seoMetadata?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -2686,10 +2750,11 @@ export type ComboProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   endsAt?: boolean
   status?: boolean
   isFeatured?: boolean
-  quantity?: boolean
+  availableQuantity?: boolean
+  offeredQuantity?: boolean
+  soldQuantity?: boolean
   stockStatus?: boolean
   lowStockThreshold?: boolean
-  offeredQuantity?: boolean
   seoMetadata?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -2722,10 +2787,11 @@ export type ComboProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   endsAt?: boolean
   status?: boolean
   isFeatured?: boolean
-  quantity?: boolean
+  availableQuantity?: boolean
+  offeredQuantity?: boolean
+  soldQuantity?: boolean
   stockStatus?: boolean
   lowStockThreshold?: boolean
-  offeredQuantity?: boolean
   seoMetadata?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -2758,10 +2824,11 @@ export type ComboProductSelectScalar = {
   endsAt?: boolean
   status?: boolean
   isFeatured?: boolean
-  quantity?: boolean
+  availableQuantity?: boolean
+  offeredQuantity?: boolean
+  soldQuantity?: boolean
   stockStatus?: boolean
   lowStockThreshold?: boolean
-  offeredQuantity?: boolean
   seoMetadata?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -2772,7 +2839,7 @@ export type ComboProductSelectScalar = {
   deletedBy?: boolean
 }
 
-export type ComboProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "title" | "slug" | "sku" | "barcode" | "description" | "shortDescription" | "titleTh" | "shortDescTh" | "descriptionTh" | "totalPrice" | "comboPrice" | "costPrice" | "startsAt" | "endsAt" | "status" | "isFeatured" | "quantity" | "stockStatus" | "lowStockThreshold" | "offeredQuantity" | "seoMetadata" | "createdAt" | "updatedAt" | "deletedAt" | "publishedAt" | "createdBy" | "updatedBy" | "deletedBy", ExtArgs["result"]["comboProduct"]>
+export type ComboProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "title" | "slug" | "sku" | "barcode" | "description" | "shortDescription" | "titleTh" | "shortDescTh" | "descriptionTh" | "totalPrice" | "comboPrice" | "costPrice" | "startsAt" | "endsAt" | "status" | "isFeatured" | "availableQuantity" | "offeredQuantity" | "soldQuantity" | "stockStatus" | "lowStockThreshold" | "seoMetadata" | "createdAt" | "updatedAt" | "deletedAt" | "publishedAt" | "createdBy" | "updatedBy" | "deletedBy", ExtArgs["result"]["comboProduct"]>
 export type ComboProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   images?: boolean | Prisma.ComboProduct$imagesArgs<ExtArgs>
   items?: boolean | Prisma.ComboProduct$itemsArgs<ExtArgs>
@@ -2824,10 +2891,11 @@ export type $ComboProductPayload<ExtArgs extends runtime.Types.Extensions.Intern
     endsAt: Date | null
     status: $Enums.CategoryProductStatus
     isFeatured: boolean
-    quantity: number
+    availableQuantity: number
+    offeredQuantity: number | null
+    soldQuantity: number
     stockStatus: $Enums.StockStatus
     lowStockThreshold: number
-    offeredQuantity: number | null
     seoMetadata: runtime.JsonValue | null
     createdAt: Date
     updatedAt: Date
@@ -3284,10 +3352,11 @@ export interface ComboProductFieldRefs {
   readonly endsAt: Prisma.FieldRef<"ComboProduct", 'DateTime'>
   readonly status: Prisma.FieldRef<"ComboProduct", 'CategoryProductStatus'>
   readonly isFeatured: Prisma.FieldRef<"ComboProduct", 'Boolean'>
-  readonly quantity: Prisma.FieldRef<"ComboProduct", 'Int'>
+  readonly availableQuantity: Prisma.FieldRef<"ComboProduct", 'Int'>
+  readonly offeredQuantity: Prisma.FieldRef<"ComboProduct", 'Int'>
+  readonly soldQuantity: Prisma.FieldRef<"ComboProduct", 'Int'>
   readonly stockStatus: Prisma.FieldRef<"ComboProduct", 'StockStatus'>
   readonly lowStockThreshold: Prisma.FieldRef<"ComboProduct", 'Int'>
-  readonly offeredQuantity: Prisma.FieldRef<"ComboProduct", 'Int'>
   readonly seoMetadata: Prisma.FieldRef<"ComboProduct", 'Json'>
   readonly createdAt: Prisma.FieldRef<"ComboProduct", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ComboProduct", 'DateTime'>

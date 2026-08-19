@@ -87,18 +87,90 @@ export class ComboProductRepository extends BaseRepository {
 
   /**
    * Storefront visibility gate, applied to every public-facing read below:
-   * not soft-deleted, status ACTIVE, AND published (`publishedAt <= now()`).
+   * not soft-deleted, status ACTIVE, published (`publishedAt <= now()`), AND
+   * inside the promotion window.
+   *
    * Unlike `Product`'s equivalent gate, `publishedAt` IS part of combo
    * visibility — see the "only publicly live once status = ACTIVE AND
    * publishedAt <= now()" contract on `ComboProductResponsePublicDto`, and
    * the scheduled-publish gate a combo defaults to `DRAFT` for.
+   *
+   * The `startsAt`/`endsAt` window is tested here **live**, not trusted to
+   * the `status` column, because `status` is only corrected on a schedule
+   * (`ComboExpiryService`). Testing it per read means a promotion stops
+   * selling at the exact instant it ends rather than at the next sweep, and
+   * starts selling the instant it opens. The sweep is what keeps the stored
+   * `status` honest for the admin table; this is what keeps the storefront
+   * correct in between. A NULL endpoint means "no restriction on that side".
    */
   private publicVisibilityWhere(): Prisma.ComboProductWhereInput {
+    const now = new Date();
     return {
       deletedAt: null,
       status: CategoryProductStatus.ACTIVE,
-      publishedAt: { lte: new Date() },
+      publishedAt: { lte: now },
+      AND: [
+        { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
+        { OR: [{ endsAt: null }, { endsAt: { gt: now } }] },
+      ],
     };
+  }
+
+  /**
+   * The expiry sweep: every ACTIVE, non-deleted combo whose promotion window
+   * has closed becomes INACTIVE. Driven by `ComboExpiryService` on a
+   * schedule, because expiry is the one combo lifecycle rule no trigger can
+   * own — nothing writes the row when a clock passes a timestamp.
+   *
+   * Backed by `combo_products_expiry_sweep_idx`, a partial index over exactly
+   * this predicate (migration 20260819160000).
+   *
+   * Returns how many rows moved so the caller can log a real number instead
+   * of "sweep ran".
+   */
+  async deactivateExpiredCombos(tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    const { count } = await client.comboProduct.updateMany({
+      where: {
+        deletedAt: null,
+        status: CategoryProductStatus.ACTIVE,
+        endsAt: { not: null, lt: new Date() },
+      },
+      data: { status: CategoryProductStatus.INACTIVE },
+    });
+    return count;
+  }
+
+  /**
+   * Moves a combo's sold counter by `delta` (negative to give bundles back).
+   *
+   * The arithmetic is done in SQL, not read-then-write, so two concurrent
+   * checkouts of the same combo cannot both read the same value and lose one
+   * of the sales — the row lock serializes them.
+   *
+   * `GREATEST(..., 0)` is why this is raw rather than Prisma's `increment`:
+   * a give-back must never drive the counter below zero and trip
+   * `combo_products_sold_quantity_non_negative`. That would take a
+   * double-restore of the same order to reach, but a restore path failing
+   * *after* the stock was already handed back is the worst possible place to
+   * discover a constraint violation.
+   *
+   * Writing `sold_quantity` fires `trg_sync_combo_stock_status` (recomputing
+   * the sellable count) and `trg_sync_combo_offer_exhaustion` (retiring a
+   * capped offer that just sold out) in the same statement, so the caller
+   * never has to follow up with a status write of its own.
+   */
+  async adjustSoldQuantity(
+    comboId: number,
+    delta: number,
+    tx?: Prisma.TransactionClient,
+  ): Promise<void> {
+    const client = tx || this.prisma;
+    await client.$executeRaw`
+      UPDATE "public"."combo_products"
+      SET "sold_quantity" = GREATEST("sold_quantity" + ${delta}, 0)
+      WHERE "id" = ${comboId}
+    `;
   }
 
   async findBySlugPublic(slug: string, tx?: Prisma.TransactionClient) {

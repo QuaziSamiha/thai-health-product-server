@@ -39,7 +39,8 @@ import { IsSingleItemQuantitySufficient } from './single-item-quantity.validator
 //*
 //* DELIBERATELY ABSENT — SERVER-DERIVED, NEVER CLIENT INPUT:
 //*   totalPrice  (recomputed from `items`), slug (regenerated from `title`),
-//*   quantity / stockStatus (DB TRIGGERS), pricedAt (DB TRIGGER).
+//*   availableQuantity / soldQuantity / stockStatus (DB TRIGGERS AND THE
+//*   ORDER PATH), pricedAt (DB TRIGGER).
 //* AN EARLIER VERSION OF THIS DTO ACCEPTED totalPrice, WHICH — GIVEN THE
 //* combo_products_price_valid CHECK (combo_price <= total_price) — LET A
 //* CLIENT RAISE totalPrice TO LEGITIMISE ANY comboPrice.
@@ -218,8 +219,8 @@ export class UpdateComboProductDto {
   @Transform(blankNumberToUndefined)
   @IsOptional()
   @Type(() => Number)
-  @IsInt({ message: 'Combo quantity must be a whole number' })
-  @Min(1, { message: 'Combo quantity must be at least 1' })
+  @IsInt({ message: 'Offered quantity must be a whole number' })
+  @Min(1, { message: 'Offered quantity must be at least 1' })
   offeredQuantity?: number;
 
   // ─── SEO ─────────────────────────────────────────────────────────────────────

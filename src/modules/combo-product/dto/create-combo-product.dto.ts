@@ -273,7 +273,7 @@ export class CreateComboProductDto {
     minimum: 1,
     default: 10,
   })
-  //* NOT A STOCK COUNT — THE COMBO'S OWN `quantity` IS DERIVED BY DB TRIGGERS
+  //* NOT A STOCK COUNT — THE COMBO'S OWN `availableQuantity` IS DERIVED BY TRIGGERS
   //* AND IS NEVER CLIENT INPUT. THIS ONLY TUNES WHERE LOW_STOCK BEGINS.
   @Transform(blankNumberToUndefined)
   @IsOptional()
@@ -288,15 +288,15 @@ export class CreateComboProductDto {
     example: 2,
     minimum: 1,
   })
-  //* THE ONLY ADMIN-SET AVAILABILITY FIELD. THE COMBO'S `quantity` IS DERIVED
+  //* THE ONLY ADMIN-SET AVAILABILITY FIELD. `availableQuantity` IS DERIVED
   //* BY DB TRIGGERS AND IS THE *CEILING*; THIS IS THE ADMIN'S CAP UNDERNEATH
   //* IT. THE <= CHECK LIVES IN ComboProductService BECAUSE IT COMPARES AGAINST
   //* LIVE STOCK, WHICH A DTO CANNOT SEE.
   @Transform(blankNumberToUndefined)
   @IsOptional()
   @Type(() => Number)
-  @IsInt({ message: 'Combo quantity must be a whole number' })
-  @Min(1, { message: 'Combo quantity must be at least 1' })
+  @IsInt({ message: 'Offered quantity must be a whole number' })
+  @Min(1, { message: 'Offered quantity must be at least 1' })
   offeredQuantity?: number;
 
   // ─── SEO ─────────────────────────────────────────────────────────────────────

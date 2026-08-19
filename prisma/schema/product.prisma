@@ -33,11 +33,10 @@ model Product {
   shortDescTh   String? @map("short_desc_th") @db.VarChar(500)
 
   //* CONFIGURATIONS
-  type          ProductType           @default(SIMPLE)
-  status        CategoryProductStatus @default(ACTIVE)
-  isFeatured    Boolean               @default(false) @map("is_featured")
-  hasVariants   Boolean               @default(false) @map("has_variants") //* DERIVED FIELD TO READ FASTER (variants.length)
-  comboQuantity Int                   @default(0) @map("combo_quantity") //* LIVE, TRIGGER-MAINTAINED: SUM, ACROSS EVERY DRAFT/ACTIVE COMBO CURRENTLY BUNDLING THIS PRODUCT, OF (ComboItem.quantity * EFFECTIVE SELLABLE BUNDLES — LEAST(combo.quantity, COALESCE(combo.offeredQuantity, combo.quantity))). RETURNS TO 0 ONCE NO SUCH COMBO REFERENCES IT. INFORMATIONAL ONLY — NEVER SUBTRACTED FROM quantity OR GATING A SALE. SEE 20260804010000_repurpose_combo_quantity_as_live_commitment.
+  type        ProductType           @default(SIMPLE)
+  status      CategoryProductStatus @default(ACTIVE)
+  isFeatured  Boolean               @default(false) @map("is_featured")
+  hasVariants Boolean               @default(false) @map("has_variants") //* DERIVED FIELD TO READ FASTER (variants.length)
 
   //* PRICING (USE DECIMAL FOR FINANCIAL ACCURACY)
   costPrice     Decimal?     @map("cost_price") @db.Decimal(12, 2) //* FOR PROFIT CALCULATION
@@ -47,6 +46,13 @@ model Product {
   salePrice     Decimal      @default(0) @map("sale_price") @db.Decimal(12, 2) //* SERVER-DERIVED FROM basePrice + discountType/discountValue — NEVER CLIENT INPUT
 
   //* STOCK
+  //* ONE POOL, TWO SALES CHANNELS. A UNIT COUNTED HERE IS BUYABLE EITHER ON
+  //* ITS OWN OR AS PART OF A COMBO — WHICHEVER CHECKOUT REACHES IT FIRST. NO
+  //* COLUMN SPLITS IT INTO "PRODUCT STOCK" AND "COMBO STOCK", BECAUSE A COMBO
+  //* RESERVES NOTHING (SEE 20260819160000_combo_available_sold_quantity, WHICH
+  //* DROPPED THE combo_quantity COUNTER THAT USED TO IMPLY OTHERWISE). WHILE
+  //* THIS IS > 0 THE PRODUCT READS AS AVAILABLE IN BOTH THE PRODUCT SECTION
+  //* AND THE COMBO SECTION; AT 0 IT READS OUT OF STOCK IN BOTH.
   quantity          Int         @default(0) // * TOTAL QUANTITY OF A PRODUCT WITHOUT VARIANTS
   totalStock        Int         @default(0) @map("total_stock") // * TOTAL *SELLABLE* QUANTITY ACROSS VARIANTS -- Denormalized cache: sum of the quantity of every variant whose variantStatus = ACTIVE (a retired variant's shelf stock is still in the warehouse but cannot be bought, so it must not prop this product up to IN_STOCK -- see 20260818100000_add_product_variant_status). Kept in sync by sync_product_total_stock_from_variants and mirrored in app code at write time.
   stockStatus       StockStatus @default(OUT_OF_STOCK) @map("stock_status")
@@ -138,9 +144,8 @@ model ProductVariant {
   basePrice     Decimal      @default(0) @map("base_price") @db.Decimal(12, 2)
   salePrice     Decimal      @default(0) @map("sale_price") @db.Decimal(12, 2) //* SERVER-DERIVED FROM basePrice + discountType/discountValue — NEVER CLIENT INPUT
 
-  attributes    Json    @default("{}") // The JSON structure for attributes (e.g., {"color": "Red", "size": "XL"})  //* E.G. { "size": "500ml", "flavor": "Honey" }
-  isDefault     Boolean @default(false) @map("is_default")
-  comboQuantity Int     @default(0) @map("combo_quantity") //* SAME SEMANTICS AS Product.comboQuantity, SCOPED TO THIS VARIANT — WINS OVER THE PARENT PRODUCT'S VALUE WHEN A ComboItem PINS A VARIANT.
+  attributes Json    @default("{}") // The JSON structure for attributes (e.g., {"color": "Red", "size": "XL"})  //* E.G. { "size": "500ml", "flavor": "Honey" }
+  isDefault  Boolean @default(false) @map("is_default")
 
   //* CONFIGURATION
   //* PER-VARIANT VISIBILITY GATE — SAME ENUM AS Product.status BUT SCOPED TO

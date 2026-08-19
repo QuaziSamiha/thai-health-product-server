@@ -74,6 +74,13 @@ export class PromoCodeResponseDto {
   isActive!: boolean;
 
   @Expose()
+  @ApiProperty({
+    description:
+      'Whether the code is listed on the storefront. Independent of isActive — an active code is not published unless this is true.',
+  })
+  isPublic!: boolean;
+
+  @Expose()
   @ApiPropertyOptional({ description: 'When the code becomes valid' })
   startsAt?: Date | null;
 
@@ -121,6 +128,7 @@ export class PromoCodeResponseDto {
     this.usageLimitPerUser = promoCode.usageLimitPerUser ?? null;
     this.usedCount = promoCode.usedCount!;
     this.isActive = promoCode.isActive!;
+    this.isPublic = promoCode.isPublic!;
     this.startsAt = promoCode.startsAt ?? null;
     this.endsAt = promoCode.endsAt ?? null;
     this.remainingUses =

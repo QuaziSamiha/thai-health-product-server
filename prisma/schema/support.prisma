@@ -14,9 +14,9 @@ enum SupportType {
 }
 
 model Support {
-  id     Int         @id @default(autoincrement())
-  sid    String      @unique @default(uuid()) @db.Uuid //* USE NATIVE UUID TYPE FOR PERFORMANCE
-  type   SupportType
+  id   Int         @id @default(autoincrement())
+  sid  String      @unique @default(uuid()) @db.Uuid //* USE NATIVE UUID TYPE FOR PERFORMANCE
+  type SupportType
 
   //* AT MOST ONE ACTIVE ROW PER NAMED TYPE IS ENFORCED BY THE DB-ONLY PARTIAL
   //* UNIQUE INDEX `support_pages_active_type_key` (`type` WHERE status = ACTIVE

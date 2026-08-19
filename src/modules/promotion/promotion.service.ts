@@ -11,6 +11,7 @@ import { PromoCodeQueryDto } from './dto/promo-code-query.dto';
 import { ValidatePromoCodeDto } from './dto/validate-promo-code.dto';
 import { PromoCodeResponseDto } from './dto/promo-code-response.dto';
 import { PromoCodeValidationResponseDto } from './dto/promo-code-validation-response.dto';
+import { PublicPromoCodeResponseDto } from './dto/public-promo-code-response.dto';
 import { IPaginatedResult } from '../../shared/pagination';
 import { DiscountType, Prisma } from '../../generated/prisma/client';
 
@@ -29,6 +30,7 @@ type PromoCodeRecord = {
   usageLimitPerUser: number | null;
   usedCount: number;
   isActive: boolean;
+  isPublic: boolean;
   startsAt: Date | null;
   endsAt: Date | null;
   createdAt: Date;
@@ -74,6 +76,7 @@ export class PromotionService {
       usageLimit: dto.usageLimit,
       usageLimitPerUser: dto.usageLimitPerUser,
       isActive: dto.isActive,
+      isPublic: dto.isPublic,
       startsAt: dto.startsAt,
       endsAt: dto.endsAt,
     });
@@ -167,11 +170,31 @@ export class PromotionService {
       usageLimit: dto.usageLimit,
       usageLimitPerUser: dto.usageLimitPerUser,
       isActive: dto.isActive,
+      isPublic: dto.isPublic,
       startsAt: dto.startsAt,
       endsAt: dto.endsAt,
     });
 
     return new PromoCodeResponseDto(updated);
+  }
+
+  // ─── Storefront — published coupon list ────────────────────────────────────
+
+  /**
+   * The codes an admin has deliberately published (isPublic), narrowed to the
+   * ones that would actually apply if typed right now. Public and unauthed —
+   * publishing is the whole point, so there is nothing here to protect beyond
+   * the back-office fields PublicPromoCodeResponseDto already drops.
+   *
+   * This is NOT "every active code": isPublic defaults to false precisely so
+   * that a targeted code (email campaign, win-back, influencer) never leaks
+   * into a browsable list. See promo_codes.is_public in promotion.prisma.
+   */
+  async listPublicPromoCodes(): Promise<PublicPromoCodeResponseDto[]> {
+    const promoCodes = await this.repository.findPublished();
+    return promoCodes.map(
+      (promoCode) => new PublicPromoCodeResponseDto(promoCode),
+    );
   }
 
   // ─── Storefront — validate/preview (no side effects) ───────────────────────

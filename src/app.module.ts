@@ -15,6 +15,7 @@ import { DeliveryManModule } from './modules/delivery-man/delivery-man.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AppThrottlerModule } from './common/throttler/throttler.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { ScheduleModule } from '@nestjs/schedule';
 import { OtpModule } from './modules/otp/otp.module';
 import { MailModule } from './modules/mail/mail.module';
 import { CategoryModule } from './modules/category/category.module';
@@ -74,6 +75,18 @@ import {
       serveRoot: '/uploads',
       exclude: ['/uploads/{*any}'],
     }),
+
+    //* CRON HOST. REGISTERED ONCE AT THE ROOT SO EVERY @Cron/@Interval HANDLER
+    //* IN THE APP IS DISCOVERED BY THE SAME SCHEDULER. TODAY THAT IS ONLY
+    //* ComboExpiryService, WHICH RETIRES COMBOS PAST THEIR END DATE.
+    //*
+    //* NOTE FOR MULTI-INSTANCE DEPLOYMENTS: THIS SCHEDULER IS PER-PROCESS, SO
+    //* N REPLICAS RUN N COPIES OF EVERY JOB. THAT IS HARMLESS FOR THE EXPIRY
+    //* SWEEP — IT IS AN IDEMPOTENT `UPDATE ... WHERE status = 'ACTIVE'`, SO A
+    //* SECOND RUNNER SIMPLY MATCHES NOTHING — BUT ANY FUTURE JOB WITH SIDE
+    //* EFFECTS (SENDING MAIL, CHARGING A CARD) NEEDS A LOCK BEFORE IT IS ADDED
+    //* HERE.
+    ScheduleModule.forRoot(),
 
     LoggerModule,
     PrismaModule,

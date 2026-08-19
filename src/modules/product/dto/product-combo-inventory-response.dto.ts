@@ -10,13 +10,22 @@ import { toAbsoluteUrl } from './product-shared.dto';
 //* ═══════════════════════════════════════════════════════════════════════
 //* ADMIN COMBO-INVENTORY OPTION — SAME FLATTENING RULE AS
 //* ProductDropdownOptionDto (ONE ENTRY PER *SELECTABLE* THING, NOT PER
-//* PRODUCT ROW), PLUS `availableForCombo`: HOW MANY UNITS OF THIS
-//* PRODUCT/VARIANT ARE STILL FREE TO PUT INTO A COMBO GIVEN WHAT'S ALREADY
-//* COMMITTED TO OTHER COMBOS (quantity - comboQuantity). BUILT AS ITS OWN
-//* CLASS RATHER THAN EXTENDING ProductDropdownOptionDto — SEE THE NOTE
-//* ABOVE ProductResponsePublicDto IN product-response.dto.ts FOR WHY THIS
-//* CODEBASE KEEPS `new Dto(row)`-STYLE RESPONSE DTOS INDEPENDENT RATHER
-//* THAN INHERITING.
+//* PRODUCT ROW), SCOPED TO WHAT A COMBO MAY BUNDLE (ACTIVE PRODUCTS, ACTIVE
+//* VARIANTS ONLY).
+//*
+//* `quantity` IS THE WHOLE STOCK STORY HERE. THIS DTO ONCE ALSO CARRIED
+//* `comboQuantity` AND `availableForCombo` (quantity - comboQuantity), WHICH
+//* IMPLIED PART OF THE SHELF WAS SPOKEN FOR BY OTHER COMBOS. IT NEVER WAS: A
+//* COMBO RESERVES NOTHING AND DRAWS FROM THE SAME POOL A DIRECT SALE DRAWS
+//* FROM, AT CHECKOUT. BOTH FIELDS WERE DROPPED IN MIGRATION
+//* 20260819160000_combo_available_sold_quantity — WHILE STOCK IS > 0 THE
+//* OPTION IS AVAILABLE TO BUNDLE, AT 0 IT IS OUT OF STOCK, AND THERE IS NO
+//* THIRD NUMBER IN BETWEEN.
+//*
+//* BUILT AS ITS OWN CLASS RATHER THAN EXTENDING ProductDropdownOptionDto —
+//* SEE THE NOTE ABOVE ProductResponsePublicDto IN product-response.dto.ts FOR
+//* WHY THIS CODEBASE KEEPS `new Dto(row)`-STYLE RESPONSE DTOS INDEPENDENT
+//* RATHER THAN INHERITING.
 //* ═══════════════════════════════════════════════════════════════════════
 export class ProductComboInventoryOptionDto {
   @Expose()
@@ -84,26 +93,10 @@ export class ProductComboInventoryOptionDto {
   @Expose()
   @ApiProperty({
     description:
-      "Current stock count — the variant's own quantity for a variant option, otherwise the product's",
+      "Current stock count — the variant's own quantity for a variant option, otherwise the product's. This is also exactly how much is available to bundle: combos reserve nothing, so no part of this figure is spoken for by another combo.",
     example: 42,
   })
   quantity!: number;
-
-  @Expose()
-  @ApiProperty({
-    description:
-      "Stock currently committed across other DRAFT/ACTIVE combos — the variant's own comboQuantity for a variant option, otherwise the product's. Live-maintained by DB triggers.",
-    example: 2,
-  })
-  comboQuantity!: number;
-
-  @Expose()
-  @ApiProperty({
-    description:
-      'Stock still free to allocate to combos: quantity - comboQuantity. Can go negative when current stock is already below the configured per-bundle amount.',
-    example: 40,
-  })
-  availableForCombo!: number;
 
   @Expose()
   @ApiProperty({
@@ -172,7 +165,6 @@ export class ProductComboInventoryOptionDto {
         type: ProductType;
         status: CategoryProductStatus;
         quantity: number;
-        comboQuantity: number;
         costPrice: unknown;
         basePrice: unknown;
         salePrice: unknown;
@@ -187,7 +179,6 @@ export class ProductComboInventoryOptionDto {
         sku: string | null;
         barcode: string | null;
         quantity: number;
-        comboQuantity: number;
         costPrice: unknown;
         basePrice: unknown;
         salePrice: unknown;
@@ -205,9 +196,7 @@ export class ProductComboInventoryOptionDto {
     this.type = input.product.type;
     this.status = input.product.status;
     this.quantity = input.variant?.quantity ?? input.product.quantity;
-    this.comboQuantity =
-      input.variant?.comboQuantity ?? input.product.comboQuantity;
-    this.availableForCombo = this.quantity - this.comboQuantity;
+
     this.stockStatus = input.variant?.stockStatus ?? input.product.stockStatus;
     this.image = toAbsoluteUrl(input.product.images?.[0]?.url, baseUrl);
     this.updatedAt = input.product.updatedAt;

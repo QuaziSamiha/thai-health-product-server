@@ -24,12 +24,20 @@ model PromoCode {
   startsAt DateTime? @map("starts_at") @db.Timestamptz(3)
   endsAt   DateTime? @map("ends_at") @db.Timestamptz(3)
 
+  //* OPT-IN STOREFRONT LISTING. isActive ALONE MUST NEVER MEAN "PUBLISHED":
+  //* MOST CODES ARE HANDED OUT DELIBERATELY (EMAIL, INFLUENCER, WIN-BACK) AND
+  //* LISTING EVERY WORKING CODE WOULD DEFEAT THE COUPON. A CODE IS ONLY
+  //* BROWSABLE WHEN AN ADMIN DELIBERATELY PUBLISHES IT — DEFAULT false, SO
+  //* EVERY EXISTING CODE STAYS PRIVATE ACROSS THIS MIGRATION.
+  isPublic Boolean @default(false) @map("is_public")
+
   redemptions PromoCodeRedemption[]
 
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@index([isActive, startsAt, endsAt]) //* FAST VALIDITY LOOKUPS AT CHECKOUT
+  @@index([isPublic, isActive]) //* THE STOREFRONT'S "PUBLISHED COUPONS" LIST
   @@map("promo_codes")
 }
 

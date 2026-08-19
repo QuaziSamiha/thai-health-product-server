@@ -15,8 +15,8 @@ import {
 // ---------------------------------------------------------------------------
 // Covers ONE rule: membership in the combo-builder option list is decided by
 // STATUS ALONE — every ACTIVE simple product and every ACTIVE variant, at any
-// stock level. `availableForCombo` rides along as data for the caller's Qty
-// cap; it must never remove a row. The status filtering itself is a Prisma
+// stock level. `quantity` rides along as data for the caller's Qty cap; it
+// must never remove a row. The status filtering itself is a Prisma
 // `where` (see findProductComboInventoryOptions) and so is exercised against
 // a real DB, not here — these tests pin the SERVICE's own shaping.
 // ---------------------------------------------------------------------------
@@ -32,7 +32,6 @@ const row = (overrides: Record<string, unknown> = {}) => ({
   type: ProductType.SIMPLE,
   status: CategoryProductStatus.ACTIVE,
   quantity: 0,
-  comboQuantity: 0,
   costPrice: null,
   basePrice: 250,
   salePrice: 250,
@@ -50,7 +49,6 @@ const variantRow = (overrides: Record<string, unknown> = {}) => ({
   sku: null,
   barcode: null,
   quantity: 0,
-  comboQuantity: 0,
   costPrice: null,
   basePrice: 250,
   salePrice: 250,
@@ -93,22 +91,23 @@ describe('ProductService.getProductComboInventoryOptions', () => {
 
   afterEach(() => jest.clearAllMocks());
 
-  it('keeps an ACTIVE simple product with zero free stock', async () => {
+  it('keeps an ACTIVE simple product that is out of stock', async () => {
     repo.findProductComboInventoryOptions.mockResolvedValue([row()]);
 
     const options = await service.getProductComboInventoryOptions();
 
-    //* AN EARLIER REVISION DROPPED THIS ROW (availableForCombo < 1), WHICH READ
-    //* TO THE ADMIN AS "MY PRODUCT IS MISSING" RATHER THAN "NO FREE STOCK".
+    //* AN EARLIER REVISION DROPPED THIS ROW FOR HAVING NO FREE STOCK, WHICH
+    //* READ TO THE ADMIN AS "MY PRODUCT IS MISSING" RATHER THAN "NO STOCK".
     expect(options).toHaveLength(1);
-    expect(options[0].availableForCombo).toBe(0);
+    expect(options[0].quantity).toBe(0);
   });
 
-  it('keeps an ACTIVE variant whose stock is already fully committed', async () => {
+  it('reports a variant option at its own stock, not the parent product one', async () => {
     repo.findProductComboInventoryOptions.mockResolvedValue([
       row({
         type: ProductType.VARIABLE,
-        variants: [variantRow({ quantity: 5, comboQuantity: 9 })],
+        quantity: 99,
+        variants: [variantRow({ quantity: 5 })],
       }),
     ]);
 
@@ -116,9 +115,9 @@ describe('ProductService.getProductComboInventoryOptions', () => {
 
     expect(options).toHaveLength(1);
     expect(options[0].variantId).toBe(11);
-    //* NEGATIVE IS REPORTED HONESTLY, NOT CLAMPED AND NOT FILTERED — THE FORMS
-    //* FLOOR IT AT 0 FOR THE Qty CAP AND BLOCK SUBMIT ABOVE IT.
-    expect(options[0].availableForCombo).toBe(-4);
+    //* A VARIABLE PRODUCT'S OWN `quantity` IS NOT THE BUNDLE LIMIT FOR A
+    //* PINNED ROW — THE VARIANT'S IS. THE 99 ABOVE MUST NOT LEAK THROUGH.
+    expect(options[0].quantity).toBe(5);
   });
 
   it('returns one option per ACTIVE variant, not one per product', async () => {

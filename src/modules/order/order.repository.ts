@@ -100,6 +100,26 @@ export class OrderRepository extends BaseRepository {
     });
   }
 
+  /**
+   * The combo lines of one order, for giving `ComboProduct.soldQuantity` back
+   * when the order is cancelled, failed, or returned.
+   *
+   * Grouped in SQL rather than in JS because an order may legitimately carry
+   * the same combo on more than one line (different promo splits, a re-add
+   * during checkout), and the give-back must be one adjustment per combo.
+   */
+  async findComboLinesForOrder(orderId: number, tx: Prisma.TransactionClient) {
+    const grouped = await tx.orderItem.groupBy({
+      by: ['comboId'],
+      where: { orderId, comboId: { not: null } },
+      _sum: { quantity: true },
+    });
+    return grouped.map((row) => ({
+      comboId: row.comboId!,
+      quantity: row._sum.quantity ?? 0,
+    }));
+  }
+
   async findComboForOrder(id: number, tx: Prisma.TransactionClient) {
     return tx.comboProduct.findUnique({
       where: { id },
@@ -111,8 +131,15 @@ export class OrderRepository extends BaseRepository {
         status: true,
         deletedAt: true,
         comboPrice: true,
-        quantity: true,
+        //* ALL THREE AVAILABILITY NUMBERS — resolveComboLine NEEDS THEM
+        //* TOGETHER TO WORK OUT WHAT IS STILL BUYABLE (SEE THE SELLABLE RULE
+        //* ON ComboProduct). READING availableQuantity ALONE WOULD LET A
+        //* SOLD-OUT CAPPED OFFER KEEP TAKING ORDERS.
+        availableQuantity: true,
         offeredQuantity: true,
+        soldQuantity: true,
+        startsAt: true,
+        endsAt: true,
         images: {
           where: { isPrimary: true },
           select: { url: true },

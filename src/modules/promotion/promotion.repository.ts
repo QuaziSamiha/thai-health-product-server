@@ -26,6 +26,7 @@ export class PromotionRepository extends BaseRepository {
     usageLimitPerUser: true,
     usedCount: true,
     isActive: true,
+    isPublic: true,
     startsAt: true,
     endsAt: true,
     createdAt: true,
@@ -73,6 +74,48 @@ export class PromotionRepository extends BaseRepository {
       },
       searchableFields: ['code', 'description'],
       defaultSortField: 'createdAt',
+    });
+  }
+
+  /**
+   * The storefront's browsable coupon list. Every condition the customer would
+   * otherwise hit as a rejection at "Apply" is applied here instead, so a
+   * listed code is one that actually works right now:
+   *
+   *   published + active + inside the validity window + not exhausted
+   *
+   * Exhaustion is a column-to-column comparison (`usedCount < usageLimit`),
+   * expressed with a Prisma field reference so it stays in SQL rather than
+   * being filtered in memory after the fact. A NULL usageLimit means unlimited
+   * and would make that comparison NULL — hence the explicit OR branch, which
+   * is the same "null = unlimited" convention assertUsable applies.
+   *
+   * Deliberately unpaginated: this is a short curated list, not a catalogue.
+   * If it ever grows past a screenful, that is a merchandising problem to
+   * solve with a cap, not a pager.
+   */
+  async findPublished(tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    const now = new Date();
+    return await client.promoCode.findMany({
+      where: {
+        isPublic: true,
+        isActive: true,
+        AND: [
+          { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
+          { OR: [{ endsAt: null }, { endsAt: { gte: now } }] },
+          {
+            OR: [
+              { usageLimit: null },
+              { usedCount: { lt: this.prisma.promoCode.fields.usageLimit } },
+            ],
+          },
+        ],
+      },
+      select: this.PROMO_CODE_SELECT,
+      //* SOONEST-TO-EXPIRE FIRST SO A DEADLINE IS THE FIRST THING SEEN; NULLS
+      //* (OPEN-ENDED OFFERS) SORT LAST, WHICH IS WHERE THEY BELONG.
+      orderBy: [{ endsAt: { sort: 'asc', nulls: 'last' } }, { createdAt: 'desc' }],
     });
   }
 

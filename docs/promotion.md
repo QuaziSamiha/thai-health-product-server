@@ -31,6 +31,7 @@ erDiagram
         int usageLimitPerUser "nullable, default 1"
         int usedCount "denormalized counter"
         bool isActive
+        bool isPublic "opt-in storefront listing, default false"
         datetime startsAt "nullable"
         datetime endsAt "nullable"
     }
@@ -60,6 +61,7 @@ erDiagram
 | `usageLimit`/`usageLimitPerUser` | `INT` NULLABLE | Total redemptions across all customers / per customer. `null` = unlimited. |
 | `usedCount` | `INT` | Denormalized counter, incremented once per successful redemption — same cache pattern as `Product.totalStock`. |
 | `isActive` | `BOOLEAN` | An inactive code is treated as retired — see [Update Rules](#update-a-promo-code). |
+| `isPublic` | `BOOLEAN` | Whether the code is *listed* on the storefront. Orthogonal to `isActive`, which is whether it *works*. Defaults to `false` — see [Published Codes](#list-published-promo-codes). |
 | `startsAt`/`endsAt` | `TIMESTAMPTZ(3)` NULLABLE | Validity window. Either end may be open (`null`). |
 
 #### Data Dictionary — PromoCodeRedemption
@@ -99,11 +101,12 @@ Every endpoint is served by `PromotionController` → `PromotionService` → `Pr
 | :--- | :--- | :--- | :--- |
 | `POST` | `/create-promo-code` | `ADMIN`, `MARKETING` | [Create a promo code](#create-a-promo-code) |
 | `GET` | `/all-promo-codes` | `ADMIN`, `MARKETING` | List promo codes, paginated, filterable |
+| `GET` | `/public-promo-codes` | Public | [List published promo codes](#list-published-promo-codes) |
 | `POST` | `/validate` | Public (optional JWT) | [Validate a promo code](#validate-a-promo-code-preview) |
 | `GET` | `/:id` | `ADMIN`, `MARKETING` | One promo code by id |
 | `PATCH` | `/update-promo-code/:id` | `ADMIN`, `MARKETING` | [Update a promo code](#update-a-promo-code) |
 
-`/all-promo-codes` and `/validate` are declared before the bare `GET /:id` route so neither literal path is ever swallowed by the `:id` param match — same ordering discipline `OrderController` documents for its own routes.
+`/all-promo-codes`, `/public-promo-codes`, and `/validate` are declared before the bare `GET /:id` route so no literal path is ever swallowed by the `:id` param match — same ordering discipline `OrderController` documents for its own routes.
 
 There is deliberately **no delete endpoint** — see [Relationships and Cascading Rules](#relationships-and-cascading-rules).
 
@@ -125,6 +128,33 @@ Validates, in order:
 | `201` | Promo code created successfully. |
 | `400` | Invalid input; percentage over 100; end date in the past. |
 | `409` | A promo code with this `code` already exists. |
+
+---
+
+#### List Published Promo Codes
+
+**`GET /api/v1/promotion/promo-codes/public-promo-codes`**
+
+The storefront's browsable coupon list — the only endpoint that ever volunteers a code the customer did not already know. Public, unauthenticated, unpaginated.
+
+Two switches, not one:
+
+| Flag | Question it answers |
+| :--- | :--- |
+| `isActive` | Does this code work? |
+| `isPublic` | May a customer be *shown* that it exists? |
+
+They are independent on purpose. Most codes are handed out deliberately — an email campaign, an influencer, a win-back — and listing every working code would defeat the coupon. `isPublic` therefore defaults to `false`, so a code is browsable only when an admin publishes it, and the migration that added the column left every pre-existing code private.
+
+`PromotionRepository.findPublished` applies every condition that would otherwise come back as a rejection at "Apply", so a listed code is one that actually works right now: `isPublic` **and** `isActive` **and** inside the `startsAt`/`endsAt` window **and** not exhausted (`usedCount < usageLimit`, expressed as a Prisma field reference so the column-to-column comparison stays in SQL; `usageLimit: null` = unlimited, hence the explicit OR branch). Ordered soonest-to-expire first, open-ended offers last.
+
+**Response shape**: `PublicPromoCodeResponseDto` — a third view alongside the admin and preview shapes, carrying only `code`, `description`, `discountType`, `discountValue`, `minOrderAmount`, `maxDiscountAmount`, `endsAt`. `usageLimit`/`usedCount`/`usageLimitPerUser` are omitted: how close a campaign is to exhaustion is business data, and "17 left" invites scripted claiming.
+
+Per-customer eligibility is **not** evaluated here — the list is identical for everyone, including a customer who has already used one of the codes on it. Publishing changes discovery only; `/validate` and placement still enforce every limit.
+
+| Status | Cause |
+| :--- | :--- |
+| `200` | Published promo codes retrieved (an empty array when none are published). |
 
 ---
 
@@ -212,7 +242,7 @@ Full detail, including how the discount is split across `OrderItem` rows, lives 
 ### Known Gaps / Deferred Features
 
 - **No hard delete.** By design — see [Relationships and Cascading Rules](#relationships-and-cascading-rules). Retire a code via `isActive: false`.
-- **No "list active codes" public endpoint.** Deliberately absent — letting anyone browse every currently-working coupon code defeats the point of a coupon. Codes are looked up one at a time, by the exact string a customer typed in.
+- **No public listing of *every* active code.** Still deliberately absent, and `GET /public-promo-codes` is not it: that route lists only codes an admin opted in via `isPublic`. A code with `isPublic: false` — the default — is reachable only by typing it.
 - **No stacking / combining multiple codes on one order.** `CreateOrderDto.promoCode` is a single optional string; `PromoCodeRedemption.orderId` is `@unique`, so the schema itself only allows one redemption per order.
 - **No `SHIPPING`-type discount.** `DiscountType` (`shared.prisma`) only has `FIXED`/`PERCENTAGE` — a free-shipping coupon would need a schema change, not just a code change.
 - **No admin analytics endpoint** (e.g. total discount payout, top codes by redemption count) beyond what `usedCount` and the paginated list already expose. `PromoCodeRedemption` carries everything needed to build one later; nothing here precludes it.
