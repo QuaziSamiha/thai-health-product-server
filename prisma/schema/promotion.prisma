@@ -33,6 +33,13 @@ model PromoCode {
 
   redemptions PromoCodeRedemption[]
 
+  //* FREE-DELIVERY PERK ATTACHED TO THIS CODE, IF ANY (delivery-charge.prisma).
+  //* A LIST RATHER THAN AN OPTIONAL ONE-TO-ONE BECAUSE THE SAME CODE CAN CARRY
+  //* A DIFFERENT WAIVER PER DESTINATION ZONE — "FREE DELIVERY IN BANGKOK, HALF
+  //* OFF UPCOUNTRY" IS TWO RULES, ONE COUPON. THE DISCOUNT THIS CODE GIVES ON
+  //* THE *GOODS* IS STILL discountType/discountValue ABOVE AND IS UNAFFECTED.
+  freeDeliveryRules DeliveryFreeDeliveryRule[]
+
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 

@@ -1,0 +1,284 @@
+//* ============= DELIVERY CHARGE (SHIPPING RATE CARD) DOMAIN =============
+//* COVERS: WHAT THE *MERCHANT* CHARGES A CUSTOMER TO SHIP AN ORDER, AND WHEN
+//* THAT CHARGE IS WAIVED. THIS IS A PRICING DOMAIN, NOT A FULFILMENT ONE.
+//*
+//* DELIBERATELY SEPARATE FROM delivery.prisma, WHICH IS THE THIRD-PARTY
+//* COURIER DIRECTORY (DeliveryProvider/DeliveryZone/DeliveryShipment) — WHAT
+//* THE COURIER CHARGES *US* AND WHERE A PARCEL PHYSICALLY IS. THE TWO ANSWER
+//* DIFFERENT QUESTIONS AND MOVE AT DIFFERENT SPEEDS:
+//*   * DeliveryZone.baseFee  = OUR COST, RENEGOTIATED WITH A COURIER.
+//*   * DeliveryChargeRate    = THE CUSTOMER'S PRICE, A MERCHANDISING DECISION.
+//* MERGING THEM WOULD MEAN A COURIER RATE CHANGE SILENTLY REPRICING THE
+//* STOREFRONT. SEE docs/delivery-charge.md.
+//*
+//* THAILAND BUSINESS RULES THIS SCHEMA IS SHAPED AROUND (SEE THE DOC FOR THE
+//* SEEDED DEFAULTS):
+//*   * DESTINATIONS TIER AS BANGKOK METRO (BKK + NONTHABURI / PATHUM THANI /
+//*     SAMUT PRAKAN) -> CENTRAL -> UPCOUNTRY -> REMOTE (DEEP SOUTH, ISLANDS).
+//*   * COURIERS PRICE PER KG IN BANDS (0-1, 1-3, 3-5, 5-10, 10-20 KG) WITH A
+//*     PER-KG STEP ABOVE THE TOP BAND.
+//*   * REMOTE AREAS CARRY A FLAT SURCHARGE.
+//*   * COD CARRIES A PERCENTAGE FEE WITH A FLOOR AND A CEILING.
+//*   * FREE DELIVERY IS ALMOST ALWAYS A MINIMUM-BASKET PROMISE, SOMETIMES A
+//*     CAMPAIGN OR A COUPON PERK.
+//*
+//* ALL MONEY IS THB AND Decimal(12, 2), MATCHING Order'S PRICING COLUMNS.
+//* ALL WEIGHT IS KG AND Decimal(10, 3), MATCHING Product.weight.
+
+enum DeliveryChargeStatus {
+  ACTIVE
+  INACTIVE
+}
+
+//* WHICH CART METRIC A ZONE'S RATE TIERS ARE MEASURED ON. THE BASIS IS A
+//* PROPERTY OF THE *ZONE*, NOT OF AN INDIVIDUAL TIER: ONE ZONE PRICES ON ONE
+//* AXIS, AND ITS DeliveryChargeRate ROWS ARE THE NON-OVERLAPPING BANDS ALONG
+//* THAT AXIS. LETTING TIERS UNDER ONE ZONE DISAGREE ON THE AXIS WOULD MAKE
+//* "WHICH TIER APPLIES" AMBIGUOUS AND UNTESTABLE.
+enum DeliveryRateBasis {
+  FLAT //* ONE BAND, ONE PRICE — THE SIMPLE "50 BAHT ANYWHERE" CARD
+  WEIGHT //* TOTAL CHARGEABLE WEIGHT IN KG — THE THAI COURIER DEFAULT
+  ORDER_VALUE //* PAYABLE GOODS SUBTOTAL IN THB
+  ITEM_COUNT //* TOTAL UNITS IN THE BASKET
+}
+
+//* WHAT MAKES A FREE-DELIVERY RULE FIRE. EVERY TRIGGER IS ADDITIONALLY GATED
+//* ON THE RULE'S OWN VALIDITY WINDOW, ZONE SCOPE AND USAGE CAP — THE TRIGGER
+//* IS ONLY THE *EXTRA* CONDITION ON TOP OF THOSE.
+enum FreeDeliveryTrigger {
+  MIN_ORDER_AMOUNT //* BASKET REACHES minOrderAmount — THE "FREE OVER 1,000 BAHT" BANNER
+  PROMO_CODE //* THE CUSTOMER APPLIED THE LINKED PromoCode (A FREE-DELIVERY COUPON)
+  FIRST_ORDER //* CUSTOMER'S FIRST-EVER ORDER. LOGGED-IN ONLY — A GUEST HAS NO HISTORY TO CHECK, SO IT NEVER FIRES FOR THEM
+  CAMPAIGN //* THE WINDOW ITSELF IS THE WHOLE CONDITION, E.G. FREE DELIVERY DURING SONGKRAN
+}
+
+//* ============= ZONE (A PRICED DESTINATION TIER) =============
+//* THE UNIT AN ADMIN THINKS IN: "BANGKOK METRO", "UPCOUNTRY", "REMOTE". IT
+//* OWNS THE DELIVERY PROMISE (DAYS), THE FIXED ADD-ONS (HANDLING, REMOTE
+//* SURCHARGE, COD), AND THE TIERS THAT PRICE THE BASKET. WHICH CUSTOMER
+//* ADDRESSES FALL INTO IT IS DESCRIBED BY ITS DeliveryChargeArea ROWS.
+model DeliveryChargeZone {
+  id  Int    @id @default(autoincrement())
+  sid String @unique @default(uuid()) @db.Uuid
+
+  code        String  @unique @db.VarChar(50) //* STABLE LOOKUP KEY, E.G. "BKK_METRO" — SAFE TO REFERENCE FROM SEEDS/TESTS, UNLIKE THE DISPLAY NAME
+  name        String  @db.VarChar(150) //* "Bangkok Metropolitan"
+  nameTh      String? @map("name_th") @db.VarChar(150) //* THE STOREFRONT IS BILINGUAL, SAME CONVENTION AS Product.nameTh
+  description String? @db.Text
+
+  //* THE CATCH-ALL. EXACTLY ONE ACTIVE ZONE MAY CARRY THIS FLAG (PARTIAL
+  //* UNIQUE INDEX IN THE MIGRATION, NOT EXPRESSIBLE IN PRISMA). IT IS WHAT AN
+  //* ADDRESS FALLS BACK TO WHEN NO DeliveryChargeArea MATCHES; WITHOUT ONE, AN
+  //* UNMATCHED ADDRESS IS REFUSED AT CHECKOUT RATHER THAN SHIPPED AT A GUESSED
+  //* PRICE — SEE DeliveryChargeCalculator.resolveZone.
+  isDefault Boolean @default(false) @map("is_default")
+
+  //* TIE-BREAK WHEN TWO AREAS MATCH AT THE SAME SPECIFICITY. LOWER WINS.
+  //* SPECIFICITY IS DECIDED FIRST AND ALWAYS — THIS ONLY SETTLES A GENUINE TIE.
+  priority Int @default(100)
+
+  //* THE DELIVERY PROMISE, STORED AS A NUMERIC RANGE AND NEVER AS THE RAW
+  //* "2-3 days" STRING, SO IT STAYS SORTABLE AND CAN BE TURNED INTO REAL
+  //* DATES. SAME CONTRACT AS DeliveryZone.min/maxDeliveryDays (delivery.prisma).
+  minDeliveryDays Int @map("min_delivery_days")
+  maxDeliveryDays Int @map("max_delivery_days")
+
+  //* SAME-DAY DISPATCH CUT-OFF, IN MINUTES PAST MIDNIGHT ASIA/BANGKOK (E.G.
+  //* 960 = 16:00). AN ORDER PLACED AFTER IT COUNTS FROM THE NEXT DAY, WHICH IS
+  //* WHY THE ESTIMATED DATES CAN MOVE WITHOUT minDeliveryDays CHANGING.
+  //* NULL = NO CUT-OFF MODELLED; THE CLOCK STARTS TODAY WHATEVER THE HOUR.
+  cutOffMinutes Int? @map("cut_off_minutes")
+
+  //* WHETHER THE DAY COUNT SKIPS SUNDAYS. THAI COURIERS DELIVER SATURDAYS, SO
+  //* SUNDAY IS THE ONLY NON-WORKING DAY MODELLED — SEE addDeliveryDays.
+  businessDaysOnly Boolean @default(false) @map("business_days_only")
+
+  //* FIXED ADD-ONS, APPLIED ON TOP OF WHICHEVER RATE TIER MATCHED.
+  handlingFee     Decimal @default(0) @map("handling_fee") @db.Decimal(12, 2) //* PACKAGING/FULFILMENT, CHARGED EVERYWHERE THIS ZONE APPLIES
+  remoteSurcharge Decimal @default(0) @map("remote_surcharge") @db.Decimal(12, 2) //* REMOTE-AREA SURCHARGE — DEEP-SOUTH PROVINCES AND ISLANDS
+
+  //* HARD CEILING. A BASKET OVER THIS IS REFUSED AT CHECKOUT INSTEAD OF BEING
+  //* PRICED OFF THE TOP TIER'S PER-KG STEP AND THEN FAILING AT THE COUNTER.
+  //* NULL = NO CEILING.
+  maxWeightKg Decimal? @map("max_weight_kg") @db.Decimal(10, 3)
+
+  //* CASH ON DELIVERY. THAI COURIERS CHARGE A PERCENTAGE OF THE COLLECTED
+  //* AMOUNT WITH BOTH A FLOOR AND A CEILING — ALL THREE ARE NULLABLE SO A ZONE
+  //* CAN CHARGE A PURE PERCENTAGE, A CLAMPED ONE, OR NOTHING AT ALL.
+  //* codAvailable = false REFUSES COD FOR THIS DESTINATION OUTRIGHT.
+  codAvailable  Boolean  @default(true) @map("cod_available")
+  codFeePercent Decimal? @map("cod_fee_percent") @db.Decimal(5, 2) //* E.G. 3.00 = 3%
+  codFeeMin     Decimal? @map("cod_fee_min") @db.Decimal(12, 2)
+  codFeeMax     Decimal? @map("cod_fee_max") @db.Decimal(12, 2)
+
+  //* WHICH CART METRIC THIS ZONE'S TIERS MEASURE — SEE DeliveryRateBasis.
+  rateBasis DeliveryRateBasis @default(FLAT) @map("rate_basis")
+
+  status DeliveryChargeStatus @default(ACTIVE)
+
+  //* AUDIT TRAIL & TIMESTAMPS
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  createdBy     Int?  @map("created_by")
+  createdByUser User? @relation("DeliveryChargeZoneCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedBy     Int?  @map("updated_by")
+  updatedByUser User? @relation("DeliveryChargeZoneUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  //* RELATIONS
+  areas             DeliveryChargeArea[]
+  rates             DeliveryChargeRate[]
+  freeDeliveryRules DeliveryFreeDeliveryRule[]
+
+  @@index([status, priority]) //* THE MATCHING QUERY'S OWN FILTER + TIE-BREAK ORDER
+  @@map("delivery_charge_zones")
+}
+
+//* ============= AREA (WHICH ADDRESSES FALL INTO A ZONE) =============
+//* ONE MATCHING RULE. FIELD SEMANTICS ARE IDENTICAL TO Address/OrderAddress
+//* (address.prisma) — state IS THE PROVINCE, region THE DISTRICT — SO A
+//* CHECKOUT ADDRESS CAN BE MATCHED FIELD-FOR-FIELD WITHOUT TRANSLATION.
+//*
+//* A NULL FIELD IS A WILDCARD, WHICH IS WHAT MAKES THE RULE SET DECLARATIVE:
+//*   { state: null }                          -> THE WHOLE COUNTRY
+//*   { state: "Bangkok" }                     -> EVERY DISTRICT OF BANGKOK
+//*   { state: "Bangkok", region: "Watthana" } -> ONE DISTRICT
+//*   { postalPrefix: "10" }                   -> EVERY 10xxx POSTAL CODE
+//*   { postalCode: "10110" }                  -> ONE POSTAL CODE
+//*
+//* THERE IS NO "EXCLUDE" FLAG ON PURPOSE. CARVING AN ISLAND OUT OF ITS
+//* PROVINCE IS EXPRESSED BY PUTTING ITS POSTAL CODE IN THE REMOTE ZONE: A MORE
+//* SPECIFIC RULE ALWAYS BEATS A LESS SPECIFIC ONE, SO THE EXCLUSION FALLS OUT
+//* OF THE SAME MECHANISM INSTEAD OF NEEDING A SECOND ONE. SEE
+//* DeliveryChargeCalculator.scoreArea FOR THE SPECIFICITY LADDER.
+model DeliveryChargeArea {
+  id Int @id @default(autoincrement())
+
+  country      String  @default("Thailand") @db.VarChar(100)
+  state        String? @db.VarChar(100) //* PROVINCE — NULL = ANY PROVINCE
+  region       String? @db.VarChar(100) //* DISTRICT — NULL = ANY DISTRICT
+  postalCode   String? @map("postal_code") @db.VarChar(20) //* EXACT MATCH — THE MOST SPECIFIC RULE THERE IS
+  postalPrefix String? @map("postal_prefix") @db.VarChar(10) //* LEADING-DIGIT MATCH, E.G. "10" FOR ALL OF BANGKOK
+
+  zoneId Int                @map("zone_id")
+  zone   DeliveryChargeZone @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  //* THE COLUMN-LIST UNIQUE IS NOT ENOUGH ON ITS OWN — POSTGRES TREATS NULLS AS
+  //* DISTINCT, SO ("Thailand", NULL, NULL, NULL, NULL) COULD BE INSERTED TWICE.
+  //* A COALESCE-BASED UNIQUE INDEX IN THE MIGRATION CLOSES THAT; THIS ONE STAYS
+  //* FOR THE INDEX IT CREATES AND FOR PRISMA-LEVEL INTENT.
+  @@unique([zoneId, country, state, region, postalCode, postalPrefix])
+  @@index([zoneId])
+  @@index([country, state, region])
+  @@index([postalCode])
+  @@map("delivery_charge_areas")
+}
+
+//* ============= RATE TIER (ONE BAND ON THE ZONE'S AXIS) =============
+//* [minValue, maxValue) MEASURED IN WHATEVER DeliveryChargeZone.rateBasis SAYS
+//* — KG, THB, OR UNITS. maxValue NULL = UNBOUNDED, AND EVERY ZONE NEEDS
+//* EXACTLY ONE SUCH OPEN-ENDED TOP TIER OR A HEAVY BASKET WOULD PRICE TO
+//* NOTHING. HALF-OPEN BANDS ARE WHAT LET 1.0 KG BELONG TO THE 1-3 TIER AND NOT
+//* TO BOTH; THE MIGRATION'S GiST EXCLUSION CONSTRAINT ENFORCES THAT NO TWO
+//* ACTIVE TIERS UNDER ONE ZONE OVERLAP, SO A MISCONFIGURED CARD IS REJECTED BY
+//* THE DATABASE RATHER THAN SILENTLY PICKING WHICHEVER ROW SORTED FIRST.
+model DeliveryChargeRate {
+  id  Int    @id @default(autoincrement())
+  sid String @unique @default(uuid()) @db.Uuid
+
+  label String? @db.VarChar(100) //* DISPLAY-ONLY, E.G. "1-3 kg". THE NUMBERS BELOW ARE AUTHORITATIVE
+
+  minValue Decimal  @default(0) @map("min_value") @db.Decimal(12, 3) //* INCLUSIVE
+  maxValue Decimal? @map("max_value") @db.Decimal(12, 3) //* EXCLUSIVE, NULL = INFINITY
+
+  baseFee Decimal @map("base_fee") @db.Decimal(12, 2) //* CHARGED FOR LANDING ANYWHERE IN THIS BAND
+
+  //* PER-STEP OVERAGE *ABOVE minValue*, FOR THE OPEN-ENDED TOP BAND: A 5-KG+
+  //* TIER OF (baseFee 120, stepUnit 1, stepFee 20) CHARGES 120 AT 5.0 KG AND
+  //* 140 AT 5.5 KG — EACH STARTED UNIT COSTS A WHOLE stepFee, WHICH IS HOW
+  //* COURIERS ACTUALLY ROUND. LEAVE stepUnit NULL FOR A PURE FLAT BAND.
+  stepUnit Decimal? @map("step_unit") @db.Decimal(12, 3)
+  stepFee  Decimal  @default(0) @map("step_fee") @db.Decimal(12, 2)
+
+  status DeliveryChargeStatus @default(ACTIVE)
+
+  zoneId Int                @map("zone_id")
+  zone   DeliveryChargeZone @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([zoneId, status, minValue]) //* THE TIER LOOKUP READS EXACTLY THIS, IN THIS ORDER
+  @@map("delivery_charge_rates")
+}
+
+//* ============= FREE-DELIVERY RULE =============
+//* THE WAIVER LAYER. IT NEVER CHANGES WHAT DELIVERY *COSTS* — THAT STAYS ON
+//* THE RATE CARD ABOVE — IT ONLY DECIDES HOW MUCH OF IT THE MERCHANT ABSORBS,
+//* SO AN ORDER CAN ALWAYS SHOW BOTH "DELIVERY 80" AND "FREE DELIVERY -80" AND
+//* THE MARGIN REPORT CAN SEE WHAT THE PROMISE ACTUALLY COST.
+//*
+//* RULES ARE EVALUATED IN priority ORDER AND THE FIRST MATCH WINS — THEY DO
+//* NOT STACK. STACKING WAIVERS ON A SINGLE FEE HAS NO MEANING (THE SECOND ONE
+//* HAS NOTHING LEFT TO WAIVE) AND MAKES THE "WHY WAS THIS FREE" ANSWER
+//* AMBIGUOUS ON THE ORDER RECORD.
+model DeliveryFreeDeliveryRule {
+  id  Int    @id @default(autoincrement())
+  sid String @unique @default(uuid()) @db.Uuid
+
+  name        String  @db.VarChar(150) //* SNAPSHOTTED ONTO THE ORDER AS THE CUSTOMER-FACING REASON, SO WRITE IT FOR A RECEIPT: "Free delivery over 1,000 THB"
+  description String? @db.Text
+
+  trigger FreeDeliveryTrigger
+
+  //* TRIGGER-SPECIFIC INPUTS. EACH IS ONLY MEANINGFUL FOR ITS OWN TRIGGER AND
+  //* IS REQUIRED FOR IT — ENFORCED BY CHECK CONSTRAINTS IN THE MIGRATION, NOT
+  //* JUST IN THE DTO, SO A SEED OR A PSQL SESSION CANNOT CREATE A RULE THAT
+  //* CAN NEVER FIRE.
+  minOrderAmount Decimal?   @map("min_order_amount") @db.Decimal(12, 2) //* MIN_ORDER_AMOUNT
+  promoCodeId    Int?       @map("promo_code_id") //* PROMO_CODE
+  promoCode      PromoCode? @relation(fields: [promoCodeId], references: [id], onDelete: Cascade) //* CASCADE: A DELETED COUPON CANNOT LEAVE A RULE NOTHING CAN EVER TRIGGER
+
+  //* SCOPE. NULL = EVERY ZONE, WHICH IS THE COMMON CASE FOR A SITE-WIDE
+  //* THRESHOLD. SET IT TO KEEP AN EXPENSIVE DESTINATION OUT OF A PROMISE THE
+  //* MARGIN CANNOT CARRY.
+  zoneId Int?                @map("zone_id")
+  zone   DeliveryChargeZone? @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  //* CAPS WHAT THE MERCHANT ABSORBS. NULL = ABSORB THE WHOLE FEE. WITH IT SET,
+  //* THE CUSTOMER PAYS THE REMAINDER — "FREE DELIVERY UP TO 60" ON A 90 FEE IS
+  //* A 30 CHARGE, NOT A REFUSED WAIVER.
+  maxSubsidyAmount Decimal? @map("max_subsidy_amount") @db.Decimal(12, 2)
+
+  //* THE COD FEE IS A COURIER'S CASH-HANDLING CHARGE, NOT DELIVERY, SO A FREE
+  //* DELIVERY PROMISE DOES NOT TOUCH IT BY DEFAULT. OPT IN PER RULE.
+  waivesCodFee Boolean @default(false) @map("waives_cod_fee")
+
+  //* VALIDITY WINDOW AND USAGE CAP — SAME NULL-MEANS-UNLIMITED CONVENTION AS
+  //* PromoCode (promotion.prisma), INCLUDING THE DENORMALIZED usedCount
+  //* COUNTER BUMPED UNDER A GUARDED updateMany AT PLACEMENT.
+  startsAt DateTime? @map("starts_at") @db.Timestamptz(3)
+  endsAt   DateTime? @map("ends_at") @db.Timestamptz(3)
+
+  usageLimit Int? @map("usage_limit")
+  usedCount  Int  @default(0) @map("used_count")
+
+  priority Int     @default(100) //* LOWER IS EVALUATED FIRST; FIRST MATCH WINS
+  isActive Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  createdBy     Int?  @map("created_by")
+  createdByUser User? @relation("DeliveryFreeDeliveryRuleCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedBy     Int?  @map("updated_by")
+  updatedByUser User? @relation("DeliveryFreeDeliveryRuleUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@index([isActive, priority]) //* THE EVALUATION ORDER, INDEX-BACKED
+  @@index([isActive, startsAt, endsAt]) //* WINDOW FILTERING, MIRRORS PromoCode'S
+  @@index([zoneId])
+  @@index([promoCodeId])
+  @@map("delivery_free_delivery_rules")
+}

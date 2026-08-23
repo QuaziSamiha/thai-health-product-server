@@ -359,6 +359,67 @@ export class OrderResponseDto {
   })
   appliedPromoCode?: string | null;
 
+  //* ── Delivery snapshot ────────────────────────────────────────────────────
+  //* FROZEN AT PLACEMENT, NEVER RE-DERIVED FROM THE LIVE RATE CARD — SEE THE
+  //* BLOCK COMMENT ON Order IN order.prisma. deliveryCharge ABOVE STAYS THE
+  //* BILLED NUMBER; THESE EXPLAIN IT.
+
+  @Expose()
+  @ApiPropertyOptional({
+    description: 'Code of the zone this order was priced in.',
+    example: 'BKK_METRO',
+  })
+  deliveryZoneCode?: string | null;
+
+  @Expose()
+  @ApiPropertyOptional({
+    description: 'Name of the zone this order was priced in.',
+    example: 'Bangkok Metropolitan',
+  })
+  deliveryZoneName?: string | null;
+
+  @Expose()
+  @ApiProperty({
+    description:
+      'The delivery fee before any free-delivery waiver. deliveryChargeBase - deliveryCharge is what the promise cost the merchant.',
+    example: 80,
+  })
+  deliveryChargeBase!: number;
+
+  @Expose()
+  @ApiProperty({
+    description:
+      'Cash-handling fee included in deliveryCharge. Broken out so a COD refund knows what is and is not refundable.',
+    example: 20,
+  })
+  deliveryCodFee!: number;
+
+  @Expose()
+  @ApiProperty({
+    description: 'Whether a free-delivery rule waived part or all of the fee.',
+    example: true,
+  })
+  freeDeliveryApplied!: boolean;
+
+  @Expose()
+  @ApiPropertyOptional({
+    description: 'The customer-facing reason the delivery was free.',
+    example: 'Free delivery over ฿1,000',
+  })
+  freeDeliveryRuleName?: string | null;
+
+  @Expose()
+  @ApiPropertyOptional({
+    description: 'Earliest delivery date promised at checkout.',
+  })
+  estimatedDeliveryFrom?: Date | null;
+
+  @Expose()
+  @ApiPropertyOptional({
+    description: 'Latest delivery date promised at checkout.',
+  })
+  estimatedDeliveryTo?: Date | null;
+
   @Expose()
   @ApiPropertyOptional({
     description: 'Optional note left by the customer at checkout',
@@ -443,6 +504,14 @@ export class OrderResponseDto {
       taxAmount: unknown;
       totalAmount: unknown;
       appliedPromoCode: string | null;
+      deliveryZoneCode: string | null;
+      deliveryZoneName: string | null;
+      deliveryChargeBase: unknown;
+      deliveryCodFee: unknown;
+      freeDeliveryApplied: boolean;
+      freeDeliveryRuleName: string | null;
+      estimatedDeliveryFrom: Date | null;
+      estimatedDeliveryTo: Date | null;
       customerNote: string | null;
       cancelReason: string | null;
       placedAt: Date;
@@ -481,6 +550,14 @@ export class OrderResponseDto {
     this.taxAmount = Number(order.taxAmount);
     this.totalAmount = Number(order.totalAmount);
     this.appliedPromoCode = order.appliedPromoCode;
+    this.deliveryZoneCode = order.deliveryZoneCode;
+    this.deliveryZoneName = order.deliveryZoneName;
+    this.deliveryChargeBase = Number(order.deliveryChargeBase);
+    this.deliveryCodFee = Number(order.deliveryCodFee);
+    this.freeDeliveryApplied = order.freeDeliveryApplied;
+    this.freeDeliveryRuleName = order.freeDeliveryRuleName;
+    this.estimatedDeliveryFrom = order.estimatedDeliveryFrom;
+    this.estimatedDeliveryTo = order.estimatedDeliveryTo;
     this.customerNote = order.customerNote;
     this.cancelReason = order.cancelReason;
     this.placedAt = order.placedAt;

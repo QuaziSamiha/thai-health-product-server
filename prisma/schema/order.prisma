@@ -72,6 +72,31 @@ model Order {
 
   appliedPromoCode String? @map("applied_promo_code") @db.VarChar(50) //* DENORMALIZED DISPLAY COPY OF PromoCode.code — PromoCodeRedemption IS THE AUTHORITATIVE USAGE LEDGER
 
+  //* ============= DELIVERY-CHARGE SNAPSHOT =============
+  //* WHY deliveryCharge CAME OUT THE WAY IT DID, FROZEN THE SAME WAY EVERY
+  //* OTHER NUMBER ON THIS ROW IS. NO FK TO DeliveryChargeZone/Rate
+  //* (delivery-charge.prisma) ON PURPOSE: THE RATE CARD IS EDITED CONSTANTLY,
+  //* AND A LIVE JOIN WOULD MAKE A SIX-MONTH-OLD RECEIPT RE-EXPLAIN ITSELF WITH
+  //* TODAY'S PRICES. SAME SNAPSHOT CONTRACT AS OrderItem'S PRODUCT COLUMNS.
+  //*
+  //* deliveryChargeBase IS THE FEE *BEFORE* ANY WAIVER AND deliveryCharge IS
+  //* WHAT WAS ACTUALLY BILLED, SO freeDeliverySubsidy = base - charge IS WHAT
+  //* THE PROMISE COST THE MERCHANT ON THIS ORDER — WITHOUT BOTH NUMBERS A FREE
+  //* DELIVERY IS INDISTINGUISHABLE FROM A ZONE THAT SIMPLY CHARGES NOTHING.
+  deliveryZoneCode     String? @map("delivery_zone_code") @db.VarChar(50)
+  deliveryZoneName     String? @map("delivery_zone_name") @db.VarChar(150)
+  deliveryChargeBase   Decimal @default(0) @map("delivery_charge_base") @db.Decimal(12, 2)
+  deliveryCodFee       Decimal @default(0) @map("delivery_cod_fee") @db.Decimal(12, 2) //* CASH-HANDLING FEE, INCLUDED IN deliveryCharge — BROKEN OUT SO A COD REFUND KNOWS WHAT IS AND IS NOT REFUNDABLE
+  freeDeliveryApplied  Boolean @default(false) @map("free_delivery_applied")
+  freeDeliveryRuleName String? @map("free_delivery_rule_name") @db.VarChar(150) //* THE CUSTOMER-FACING REASON, E.G. "Free delivery over 1,000 THB"
+
+  //* THE DELIVERY PROMISE MADE AT CHECKOUT — DISTINCT FROM
+  //* DeliveryShipment.estimatedDelivery* (delivery.prisma), WHICH IS WHAT THE
+  //* COURIER PROMISED WHEN THE PARCEL WAS ACTUALLY BOOKED. WHEN THEY DISAGREE,
+  //* THIS ONE IS WHAT THE CUSTOMER WAS TOLD.
+  estimatedDeliveryFrom DateTime? @map("estimated_delivery_from") @db.Timestamptz(3)
+  estimatedDeliveryTo   DateTime? @map("estimated_delivery_to") @db.Timestamptz(3)
+
   customerNote String? @map("customer_note") @db.Text //* OPTIONAL NOTE LEFT BY THE CUSTOMER AT CHECKOUT
   cancelReason String? @map("cancel_reason") @db.Text
 

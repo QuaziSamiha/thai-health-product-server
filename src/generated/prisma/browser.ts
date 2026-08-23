@@ -63,6 +63,26 @@ export type ComboItem = Prisma.ComboItemModel
  */
 export type ComboImage = Prisma.ComboImageModel
 /**
+ * Model DeliveryChargeZone
+ * 
+ */
+export type DeliveryChargeZone = Prisma.DeliveryChargeZoneModel
+/**
+ * Model DeliveryChargeArea
+ * 
+ */
+export type DeliveryChargeArea = Prisma.DeliveryChargeAreaModel
+/**
+ * Model DeliveryChargeRate
+ * 
+ */
+export type DeliveryChargeRate = Prisma.DeliveryChargeRateModel
+/**
+ * Model DeliveryFreeDeliveryRule
+ * 
+ */
+export type DeliveryFreeDeliveryRule = Prisma.DeliveryFreeDeliveryRuleModel
+/**
  * Model DeliveryManProfile
  * 
  */

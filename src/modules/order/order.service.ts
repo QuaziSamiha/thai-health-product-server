@@ -22,6 +22,12 @@ import { CreateAddressDto } from '../address/dto/create-address.dto';
 import { InventoryService } from '../inventory/inventory.service';
 import { PromotionService } from '../promotion/promotion.service';
 import { ComboProductRepository } from '../combo-product/combo-product.repository';
+import { DeliveryChargeService } from '../delivery-charge/delivery-charge.service';
+import { QuoteDeliveryChargeDto } from '../delivery-charge/dto/quote-delivery-charge.dto';
+import {
+  DeliveryChargeQuote,
+  DeliveryQuoteResponseDto,
+} from '../delivery-charge/dto/delivery-quote-response.dto';
 import { IPaginatedResult, PaginationQueryDto } from '../../shared/pagination';
 import { CreateOrderDto, OrderItemDto } from './dto/create-order.dto';
 import {
@@ -40,9 +46,10 @@ import {
   streamPdfToBuffer,
 } from './invoice/invoice-pdf.builder';
 
-//* v1 FLAT DELIVERY RATE — NO DELIVERY-PRICING MODULE YET (SEE docs/order.md).
-//* SWAP FOR A REAL RULE ENGINE LATER; totalAmount'S FORMULA DOESN'T CHANGE.
-const FLAT_DELIVERY_CHARGE = 50;
+//* THE FLAT ฿50 CONSTANT THAT USED TO LIVE HERE IS GONE — DELIVERY IS NOW
+//* PRICED BY DeliveryChargeService AGAINST THE DESTINATION, THE BASKET AND THE
+//* LIVE FREE-DELIVERY RULES (SEE docs/delivery-charge.md). totalAmount'S
+//* FORMULA IS UNCHANGED; ONLY WHERE deliveryCharge COMES FROM IS.
 
 type ResolvedAddress = {
   recipientName: string;
@@ -99,6 +106,11 @@ type ResolvedCartLine = {
   name: string;
   available: number;
   unitPrice: number;
+  //* THE PRE-DISCOUNT LIST PRICE (A COMBO'S SUM-OF-PARTS totalPrice). PURELY
+  //* INFORMATIONAL — PLACEMENT CHARGES unitPrice AND NOTHING ELSE. IT EXISTS
+  //* SO validateCart CAN HAND THE STOREFRONT CART ENOUGH TO REDRAW A LINE
+  //* WHOSE DISCOUNT CHANGED AFTER IT WAS ADDED, STRIKETHROUGH INCLUDED.
+  basePrice: number;
   deductions: StockDeductionLine[];
   snapshot: OrderItemSnapshot;
 };
@@ -115,6 +127,9 @@ function unresolvableLine(
     name: 'Unavailable item',
     available: 0,
     unitPrice: 0,
+    //* 0/0 IS THE SIGNAL "NO PRICE COULD BE READ AT ALL". THE CART TREATS IT
+    //* AS "LEAVE THE SNAPSHOT ALONE" RATHER THAN REWRITING THE LINE TO FREE.
+    basePrice: 0,
     deductions: [],
     snapshot: {
       productId: null,
@@ -176,6 +191,7 @@ export class OrderService {
     private readonly inventoryService: InventoryService,
     private readonly promotionService: PromotionService,
     private readonly comboProductRepository: ComboProductRepository,
+    private readonly deliveryChargeService: DeliveryChargeService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -264,7 +280,6 @@ export class OrderService {
       const { orderItems, stockDeductions, subtotal } =
         await this.buildOrderItems(aggregatedItems, tx);
 
-      const deliveryCharge = FLAT_DELIVERY_CHARGE;
       const taxAmount = 0; //* NO VAT RULES DEFINED YET
 
       //* PROMO CODE — VALIDATED + RESERVED (GUARDED usedCount BUMP) INSIDE
@@ -272,6 +287,11 @@ export class OrderService {
       //* ROLL BACK ON FAILURE" SHAPE. THE DISCOUNT IS THEN SPLIT ACROSS
       //* orderItems SO EACH LINE'S OWN discountAmount/totalPrice REFLECTS
       //* ITS SHARE — SEE OrderItem's discountAmount CONTRACT (order.prisma).
+      //*
+      //* THIS RUNS *BEFORE* THE DELIVERY QUOTE ON PURPOSE: A FREE-DELIVERY
+      //* THRESHOLD IS MEASURED ON WHAT THE CUSTOMER ACTUALLY PAYS FOR GOODS,
+      //* SO THE COUPON HAS TO BE SETTLED FIRST — AND A PROMO_CODE-TRIGGERED
+      //* WAIVER NEEDS TO KNOW WHICH CODE WAS ACCEPTED, NOT WHICH WAS TYPED.
       let discountAmount = 0;
       let appliedPromoCode: string | null = null;
       let reservedPromoCodeId: number | null = null;
@@ -289,6 +309,21 @@ export class OrderService {
         reservedPromoCodeId = reservation.promoCodeId;
         this.allocateDiscountAcrossItems(orderItems, discountAmount, subtotal);
       }
+
+      //* DELIVERY — RE-PRICED HERE FROM THE SAME RULES THE CHECKOUT PREVIEW
+      //* USED, INSIDE THIS TRANSACTION, AGAINST THE ADDRESS THIS ORDER IS
+      //* ACTUALLY SHIPPING TO. THE CLIENT NEVER SENDS A FEE, SO A TAMPERED
+      //* PREVIEW CHANGES WHAT WAS DISPLAYED AND NOTHING THAT IS BILLED.
+      const delivery = await this.resolveDeliveryCharge(
+        address,
+        aggregatedItems,
+        round2(subtotal - discountAmount),
+        dto.paymentMethod,
+        reservedPromoCodeId,
+        userId,
+        tx,
+      );
+      const deliveryCharge = delivery.deliveryCharge;
 
       const totalAmount = round2(
         subtotal - discountAmount + deliveryCharge + taxAmount,
@@ -316,6 +351,17 @@ export class OrderService {
           taxAmount,
           totalAmount,
           appliedPromoCode,
+          //* THE DELIVERY SNAPSHOT — WHY deliveryCharge CAME OUT THE WAY IT
+          //* DID, FROZEN ALONGSIDE IT. SEE THE BLOCK COMMENT ON Order IN
+          //* order.prisma FOR WHY THIS IS SNAPSHOTTED AND NOT JOINED.
+          deliveryZoneCode: delivery.zone.code,
+          deliveryZoneName: delivery.zone.name,
+          deliveryChargeBase: delivery.baseCharge,
+          deliveryCodFee: delivery.codFee,
+          freeDeliveryApplied: delivery.freeDelivery.applied,
+          freeDeliveryRuleName: delivery.freeDelivery.ruleName,
+          estimatedDeliveryFrom: delivery.estimatedDeliveryFrom,
+          estimatedDeliveryTo: delivery.estimatedDeliveryTo,
           customerNote: dto.customerNote,
           userId: userId ?? null,
         },
@@ -399,6 +445,193 @@ export class OrderService {
     });
 
     return new OrderResponseDto(order!, this.getBaseUrl());
+  }
+
+  /**
+   * Prices delivery for an order that is mid-placement, and claims any
+   * free-delivery rule it turned out to qualify for.
+   *
+   * The claim is the reason this is not a bare `calculateQuote` call. A capped
+   * campaign ("free delivery on the first 500 orders") has to be consumed
+   * atomically, in this transaction, or two concurrent checkouts both see 499
+   * used and both go free. `claimFreeDelivery` runs the same guarded UPDATE
+   * the promo-code reservation does, and a lost race is handled the only way
+   * that keeps the books straight: re-price without the waiver and charge the
+   * fee. The customer sees a delivery charge they were briefly quoted at zero,
+   * which is the honest outcome — the alternative is giving away more free
+   * deliveries than the campaign was funded for.
+   *
+   * The re-price is a second `calculateQuote` rather than an adjustment of the
+   * first, so the losing path goes through exactly the same rules as every
+   * other order and can pick up a *different* rule if one applies (a ฿1,000
+   * threshold, say, when the capped campaign ran out).
+   */
+  private async resolveDeliveryCharge(
+    address: ResolvedAddress,
+    items: OrderItemDto[],
+    eligibleAmount: number,
+    paymentMethod: PaymentMethod,
+    appliedPromoCodeId: number | null,
+    userId: number | undefined,
+    tx: Prisma.TransactionClient,
+  ): Promise<DeliveryChargeQuote> {
+    const context = {
+      destination: {
+        state: address.state,
+        region: address.region,
+        postalCode: address.postalCode,
+        country: address.country,
+      },
+      items: items.map((item) => ({
+        productId: item.productId,
+        variantId: item.variantId,
+        comboId: item.comboId,
+        quantity: item.quantity,
+      })),
+      eligibleAmount,
+      paymentMethod,
+      appliedPromoCodeId,
+      userId: userId ?? null,
+    };
+
+    const quote = await this.deliveryChargeService.calculateQuote(context, tx);
+
+    if (quote.freeDelivery.ruleId === null) return quote;
+
+    const claimed = await this.deliveryChargeService.claimFreeDelivery(
+      quote.freeDelivery.ruleId,
+      tx,
+    );
+    if (claimed) return quote;
+
+    this.logger.warn(
+      `Free-delivery rule ${quote.freeDelivery.ruleId} was exhausted between quote and placement — re-pricing this order without it`,
+    );
+    //* THE RULE IS NOW AT ITS CAP, SO findApplicableRules WILL NOT RETURN IT
+    //* THIS TIME — NO NEED TO EXCLUDE IT EXPLICITLY.
+    return await this.deliveryChargeService.calculateQuote(context, tx);
+  }
+
+  /**
+   * The checkout page's delivery-fee preview.
+   *
+   * Lives on the order module rather than the delivery-charge one because it
+   * needs live catalog prices: a free-delivery threshold is measured against
+   * what the customer actually pays for goods, and only `resolveCartLine`
+   * knows what that is. Delivery-charge owns the rules, order owns the basket.
+   *
+   * Read-only in every sense — no stock is claimed, no promo code is reserved,
+   * no free-delivery use is burned. That last one matters: this endpoint fires
+   * on every edit to the address form, and a preview that consumed a campaign
+   * use would exhaust a 500-order promotion in an afternoon without a single
+   * order being placed.
+   *
+   * A line the catalog cannot price (deleted product, sold-out variant) is
+   * skipped rather than fatal. The cart page's own validation is what tells a
+   * customer about an unavailable item; failing the delivery quote over it
+   * would replace that clear message with an unrelated one.
+   */
+  async quoteDeliveryCharge(
+    dto: QuoteDeliveryChargeDto,
+    userId: number | undefined,
+  ): Promise<DeliveryQuoteResponseDto> {
+    const destination = await this.resolveQuoteDestination(dto, userId);
+    const items = this.aggregateItems(
+      dto.items.map((item) => ({
+        productId: item.productId,
+        variantId: item.variantId,
+        comboId: item.comboId,
+        quantity: item.quantity,
+      })),
+    );
+
+    const client = this.orderRepository.readClient;
+    let goodsSubtotal = 0;
+    for (const item of items) {
+      const resolved = await this.resolveCartLine(item, client);
+      if (resolved.unitPrice <= 0) continue;
+      goodsSubtotal += resolved.unitPrice * item.quantity;
+    }
+
+    //* THE COUPON'S EFFECT ON THE THRESHOLD IS PREVIEWED, NOT RESERVED. AN
+    //* INVALID OR EXHAUSTED CODE SIMPLY CONTRIBUTES NO DISCOUNT HERE — THE
+    //* PROMOTION MODULE OWNS TELLING THE CUSTOMER ABOUT IT, AND 400-ING A
+    //* DELIVERY QUOTE OVER A TYPO WOULD BLOCK CHECKOUT ON SOMETHING UNRELATED.
+    let promoDiscount = 0;
+    if (dto.promoCode) {
+      try {
+        const preview = await this.promotionService.previewDiscount(
+          { code: dto.promoCode, subtotal: round2(goodsSubtotal) },
+          userId,
+        );
+        promoDiscount = preview.discountAmount;
+      } catch {
+        promoDiscount = 0;
+      }
+    }
+
+    const quote = await this.deliveryChargeService.quoteForRequest({
+      destination,
+      items: items.map((item) => ({
+        productId: item.productId,
+        variantId: item.variantId,
+        comboId: item.comboId,
+        quantity: item.quantity,
+      })),
+      eligibleAmount: round2(Math.max(0, goodsSubtotal - promoDiscount)),
+      paymentMethod: dto.paymentMethod ?? PaymentMethod.CASH_ON_DELIVERY,
+      promoCode: dto.promoCode,
+      userId,
+    });
+
+    return new DeliveryQuoteResponseDto(quote);
+  }
+
+  /**
+   * The four address fields a quote is priced on.
+   *
+   * A saved address goes through AddressService, which enforces ownership —
+   * without that check an `addressId` is an enumeration handle that would hand
+   * back other customers' provinces and postal codes one 200 at a time. Guests
+   * are refused it outright: they have no address book, so any id they send
+   * can only be someone else's.
+   */
+  private async resolveQuoteDestination(
+    dto: QuoteDeliveryChargeDto,
+    userId: number | undefined,
+  ): Promise<{
+    state: string;
+    region: string;
+    postalCode: string;
+    country: string;
+  }> {
+    if (dto.addressId) {
+      if (!userId) {
+        throw new BadRequestException(
+          'Guests cannot use a saved address — provide a destination instead',
+        );
+      }
+      const saved = await this.addressService.getAddressById(
+        userId,
+        dto.addressId,
+      );
+      return {
+        state: saved.state,
+        region: saved.region,
+        postalCode: saved.postalCode,
+        country: saved.country,
+      };
+    }
+
+    //* GUARANTEED PRESENT — QuoteDestinationSourceConstraint ALREADY ENFORCED
+    //* EXACTLY ONE OF addressId/destination.
+    const destination = dto.destination!;
+    return {
+      state: destination.state,
+      region: destination.region,
+      postalCode: destination.postalCode,
+      country: destination.country ?? 'Thailand',
+    };
   }
 
   /**
@@ -622,6 +855,7 @@ export class OrderService {
         available: resolved.available,
         status: resolved.status,
         unitPrice: resolved.unitPrice,
+        basePrice: resolved.basePrice,
         message: resolved.message,
       });
     }
@@ -685,6 +919,7 @@ export class OrderService {
     const base = {
       name: combo.title,
       unitPrice,
+      basePrice: Number(combo.totalPrice),
       snapshot,
       deductions,
       notFound: false,
@@ -803,6 +1038,7 @@ export class OrderService {
     const base = {
       name: displayName,
       unitPrice: Number(variant.salePrice),
+      basePrice: Number(variant.basePrice),
       snapshot: {
         productId: variant.productId,
         variantId: variant.id,
@@ -885,6 +1121,7 @@ export class OrderService {
     const base = {
       name: product.name,
       unitPrice: Number(product.salePrice),
+      basePrice: Number(product.basePrice),
       snapshot: {
         productId: product.id,
         variantId: null,

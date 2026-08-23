@@ -24,6 +24,8 @@
     "db:seed:prod": "node node_modules/dotenv-cli/cli.js -e .env.production -- tsx prisma/seed.ts",
     "db:export-products": "node node_modules/dotenv-cli/cli.js -e .env.production -- tsx prisma/export-products.ts",
     "db:seed-products": "node node_modules/dotenv-cli/cli.js -e .env.production -- tsx prisma/seed-products.ts",
+    "db:seed-delivery-charge": "node node_modules/dotenv-cli/cli.js -e .env.development -- tsx prisma/seed-delivery-charge.ts",
+    "db:seed-delivery-charge:prod": "node node_modules/dotenv-cli/cli.js -e .env.production -- tsx prisma/seed-delivery-charge.ts",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",

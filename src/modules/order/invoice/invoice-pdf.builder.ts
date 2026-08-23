@@ -33,7 +33,10 @@ function drawItemsTableHeader(doc: PDFKit.PDFDocument): void {
     .fontSize(9)
     .fillColor('#475569')
     .text('ITEM', COL.name, y, { width: COL.qty - COL.name - 10 })
-    .text('QTY', COL.qty, y, { width: COL.unitPrice - COL.qty - 10, align: 'right' })
+    .text('QTY', COL.qty, y, {
+      width: COL.unitPrice - COL.qty - 10,
+      align: 'right',
+    })
     .text('UNIT PRICE', COL.unitPrice, y, {
       width: COL.total - COL.unitPrice - 10,
       align: 'right',
@@ -189,9 +192,12 @@ export function buildInvoicePdf(order: OrderResponseDto): PDFKit.PDFDocument {
       .fillColor('#0F172A')
       .text(item.name, COL.name, rowTop, { width: COL.qty - COL.name - 10 });
     if (details) {
-      doc.fontSize(8).fillColor('#94A3B8').text(details, COL.name, doc.y, {
-        width: COL.qty - COL.name - 10,
-      });
+      doc
+        .fontSize(8)
+        .fillColor('#94A3B8')
+        .text(details, COL.name, doc.y, {
+          width: COL.qty - COL.name - 10,
+        });
     }
 
     doc
@@ -235,7 +241,10 @@ export function buildInvoicePdf(order: OrderResponseDto): PDFKit.PDFDocument {
       .font(bold ? 'Helvetica-Bold' : 'Helvetica')
       .fontSize(bold ? 11 : 10)
       .fillColor(bold ? '#0F172A' : '#475569')
-      .text(label, totalsX, doc.y, { width: totalsLabelWidth, continued: false });
+      .text(label, totalsX, doc.y, {
+        width: totalsLabelWidth,
+        continued: false,
+      });
     doc
       .font(bold ? 'Helvetica-Bold' : 'Helvetica')
       .fontSize(bold ? 11 : 10)
@@ -250,7 +259,23 @@ export function buildInvoicePdf(order: OrderResponseDto): PDFKit.PDFDocument {
   if (order.discountAmount > 0) {
     totalsRow('Discount', `-${money(order.discountAmount)}`);
   }
-  totalsRow('Delivery Charge', money(order.deliveryCharge));
+  //* A WAIVED DELIVERY IS SHOWN AS TWO LINES, NOT ONE ZERO. AN INVOICE THAT
+  //* READS "Delivery Charge  ฿0.00" LOOKS LIKE A ZONE THAT HAPPENS TO BE FREE;
+  //* THE PROMISE THAT MADE IT FREE IS WHAT THE CUSTOMER WANTS TO SEE, AND WHAT
+  //* SUPPORT NEEDS WHEN THEY ASK ABOUT IT LATER. Order.deliveryChargeBase IS
+  //* THE PRE-WAIVER FEE — SEE THE DELIVERY SNAPSHOT BLOCK IN order.prisma.
+  if (
+    order.freeDeliveryApplied &&
+    order.deliveryChargeBase > order.deliveryCharge
+  ) {
+    totalsRow('Delivery Charge', money(order.deliveryChargeBase));
+    totalsRow(
+      order.freeDeliveryRuleName ?? 'Free Delivery',
+      `-${money(order.deliveryChargeBase - order.deliveryCharge)}`,
+    );
+  } else {
+    totalsRow('Delivery Charge', money(order.deliveryCharge));
+  }
   if (order.taxAmount > 0) {
     totalsRow('Tax', money(order.taxAmount));
   }
@@ -277,7 +302,9 @@ export function buildInvoicePdf(order: OrderResponseDto): PDFKit.PDFDocument {
     .fillColor('#0F172A')
     .text(
       `Method: ${order.paymentMethod.replace(/_/g, ' ')}   ·   Status: ${
-        payment ? payment.status.replace(/_/g, ' ') : order.paymentStatus.replace(/_/g, ' ')
+        payment
+          ? payment.status.replace(/_/g, ' ')
+          : order.paymentStatus.replace(/_/g, ' ')
       }${payment?.paidAt ? `   ·   Paid: ${formatDate(payment.paidAt)}` : ''}`,
     );
 

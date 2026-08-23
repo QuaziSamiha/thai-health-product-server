@@ -60,6 +60,10 @@ export const ModelName = {
   ComboProduct: 'ComboProduct',
   ComboItem: 'ComboItem',
   ComboImage: 'ComboImage',
+  DeliveryChargeZone: 'DeliveryChargeZone',
+  DeliveryChargeArea: 'DeliveryChargeArea',
+  DeliveryChargeRate: 'DeliveryChargeRate',
+  DeliveryFreeDeliveryRule: 'DeliveryFreeDeliveryRule',
   DeliveryManProfile: 'DeliveryManProfile',
   DeliveryProvider: 'DeliveryProvider',
   DeliveryZone: 'DeliveryZone',
@@ -280,6 +284,95 @@ export const ComboImageScalarFieldEnum = {
 export type ComboImageScalarFieldEnum = (typeof ComboImageScalarFieldEnum)[keyof typeof ComboImageScalarFieldEnum]
 
 
+export const DeliveryChargeZoneScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  code: 'code',
+  name: 'name',
+  nameTh: 'nameTh',
+  description: 'description',
+  isDefault: 'isDefault',
+  priority: 'priority',
+  minDeliveryDays: 'minDeliveryDays',
+  maxDeliveryDays: 'maxDeliveryDays',
+  cutOffMinutes: 'cutOffMinutes',
+  businessDaysOnly: 'businessDaysOnly',
+  handlingFee: 'handlingFee',
+  remoteSurcharge: 'remoteSurcharge',
+  maxWeightKg: 'maxWeightKg',
+  codAvailable: 'codAvailable',
+  codFeePercent: 'codFeePercent',
+  codFeeMin: 'codFeeMin',
+  codFeeMax: 'codFeeMax',
+  rateBasis: 'rateBasis',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy'
+} as const
+
+export type DeliveryChargeZoneScalarFieldEnum = (typeof DeliveryChargeZoneScalarFieldEnum)[keyof typeof DeliveryChargeZoneScalarFieldEnum]
+
+
+export const DeliveryChargeAreaScalarFieldEnum = {
+  id: 'id',
+  country: 'country',
+  state: 'state',
+  region: 'region',
+  postalCode: 'postalCode',
+  postalPrefix: 'postalPrefix',
+  zoneId: 'zoneId',
+  createdAt: 'createdAt'
+} as const
+
+export type DeliveryChargeAreaScalarFieldEnum = (typeof DeliveryChargeAreaScalarFieldEnum)[keyof typeof DeliveryChargeAreaScalarFieldEnum]
+
+
+export const DeliveryChargeRateScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  label: 'label',
+  minValue: 'minValue',
+  maxValue: 'maxValue',
+  baseFee: 'baseFee',
+  stepUnit: 'stepUnit',
+  stepFee: 'stepFee',
+  status: 'status',
+  zoneId: 'zoneId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DeliveryChargeRateScalarFieldEnum = (typeof DeliveryChargeRateScalarFieldEnum)[keyof typeof DeliveryChargeRateScalarFieldEnum]
+
+
+export const DeliveryFreeDeliveryRuleScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  name: 'name',
+  description: 'description',
+  trigger: 'trigger',
+  minOrderAmount: 'minOrderAmount',
+  promoCodeId: 'promoCodeId',
+  zoneId: 'zoneId',
+  maxSubsidyAmount: 'maxSubsidyAmount',
+  waivesCodFee: 'waivesCodFee',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  usageLimit: 'usageLimit',
+  usedCount: 'usedCount',
+  priority: 'priority',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy'
+} as const
+
+export type DeliveryFreeDeliveryRuleScalarFieldEnum = (typeof DeliveryFreeDeliveryRuleScalarFieldEnum)[keyof typeof DeliveryFreeDeliveryRuleScalarFieldEnum]
+
+
 export const DeliveryManProfileScalarFieldEnum = {
   id: 'id',
   sid: 'sid',
@@ -475,6 +568,14 @@ export const OrderScalarFieldEnum = {
   taxAmount: 'taxAmount',
   totalAmount: 'totalAmount',
   appliedPromoCode: 'appliedPromoCode',
+  deliveryZoneCode: 'deliveryZoneCode',
+  deliveryZoneName: 'deliveryZoneName',
+  deliveryChargeBase: 'deliveryChargeBase',
+  deliveryCodFee: 'deliveryCodFee',
+  freeDeliveryApplied: 'freeDeliveryApplied',
+  freeDeliveryRuleName: 'freeDeliveryRuleName',
+  estimatedDeliveryFrom: 'estimatedDeliveryFrom',
+  estimatedDeliveryTo: 'estimatedDeliveryTo',
   customerNote: 'customerNote',
   cancelReason: 'cancelReason',
   placedAt: 'placedAt',

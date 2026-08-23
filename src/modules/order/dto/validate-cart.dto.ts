@@ -23,9 +23,12 @@ export enum CartLineStatus {
 }
 //* NOTE THERE IS NO PRICE_CHANGED MEMBER: OrderItemDto CARRIES NO PRICE, SO
 //* THE SERVER HAS NOTHING TO COMPARE AGAINST. EVERY LINE RETURNS ITS LIVE
-//* `unitPrice` INSTEAD AND THE CLIENT DIFFS THAT AGAINST ITS OWN CACHED
-//* SNAPSHOT — WHICH IS PURELY COSMETIC ANYWAY, SINCE placeOrder PRICES
-//* SERVER-SIDE REGARDLESS OF WHAT THE CART BELIEVES.
+//* `unitPrice` AND `basePrice` INSTEAD AND THE CLIENT OVERWRITES ITS OWN
+//* CACHED SNAPSHOT WITH THEM — WHICH IS PURELY COSMETIC ANYWAY, SINCE
+//* placeOrder PRICES SERVER-SIDE REGARDLESS OF WHAT THE CART BELIEVES. THAT
+//* REFRESH IS THE WHOLE REASON BOTH NUMBERS TRAVEL: A CART LINE ADDED BEFORE
+//* AN ADMIN SET A DISCOUNT WOULD OTHERWISE KEEP QUOTING THE OLD PRICE UNTIL
+//* THE CUSTOMER REMOVED AND RE-ADDED IT.
 
 export class ValidateCartDto {
   @ApiProperty({
@@ -72,6 +75,12 @@ export class CartLineValidationDto {
       'Current unit price (sale price for a product/variant, combo price for a bundle) so a stale cart snapshot can be refreshed.',
   })
   unitPrice!: number;
+
+  @ApiProperty({
+    description:
+      "Current pre-discount list price (a combo's sum-of-parts totalPrice). Paired with unitPrice this is everything a cart line needs to redraw itself — including the strikethrough — after an admin changes the discount on something already sitting in a cart. 0 means the catalog row could not be read at all, in which case the client should keep whatever it has rather than rewrite the line to free.",
+  })
+  basePrice!: number;
 
   @ApiProperty({
     description: 'Customer-facing explanation, ready to render as-is',

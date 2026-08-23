@@ -48,6 +48,10 @@ export class OrderRepository extends BaseRepository {
         deletedAt: true,
         hasVariants: true,
         quantity: true,
+        //* BOTH PRICES, NOT JUST THE ONE PLACEMENT CHARGES. validateCart HANDS
+        //* basePrice BACK SO A localStorage CART CAN REFRESH ITS OWN SNAPSHOT
+        //* AND KEEP SHOWING THE STRUCK-THROUGH ORIGINAL NEXT TO THE NEW PRICE.
+        basePrice: true,
         salePrice: true,
         images: {
           where: { isPrimary: true, variantId: null },
@@ -68,6 +72,9 @@ export class OrderRepository extends BaseRepository {
         nameTh: true,
         sku: true,
         quantity: true,
+        //* SEE findProductForOrder — basePrice IS ONLY EVER REPORTED, NEVER
+        //* CHARGED; salePrice REMAINS WHAT PLACEMENT PRICES THE LINE AT.
+        basePrice: true,
         salePrice: true,
         attributes: true,
         //* THE VARIANT'S OWN SALEABILITY GATE, CHECKED ALONGSIDE THE PARENT
@@ -130,6 +137,9 @@ export class OrderRepository extends BaseRepository {
         sku: true,
         status: true,
         deletedAt: true,
+        //* THE BUNDLE'S SUM-OF-PARTS DISPLAY PRICE — THE STRUCK-THROUGH NUMBER
+        //* A COMBO CART LINE SHOWS ABOVE comboPrice, SO IT TRAVELS ALONGSIDE IT.
+        totalPrice: true,
         comboPrice: true,
         //* ALL THREE AVAILABILITY NUMBERS — resolveComboLine NEEDS THEM
         //* TOGETHER TO WORK OUT WHAT IS STILL BUYABLE (SEE THE SELLABLE RULE

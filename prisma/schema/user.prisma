@@ -89,6 +89,15 @@ model User {
   verifiedDeliveryMen      DeliveryManProfile[]    @relation("DeliveryManNidVerifiedBy")
   auditLogs                AuditLog[]              @relation("AuditLogActor")
 
+  //* DELIVERY-CHARGE RATE CARD (delivery-charge.prisma) — WHO SET THE PRICES
+  //* AND THE FREE-DELIVERY PROMISES. THESE ARE MERCHANDISING DECISIONS WITH A
+  //* DIRECT MARGIN IMPACT, SO THEY CARRY THE SAME created/updated ATTRIBUTION
+  //* AS Product AND ComboProduct RATHER THAN JUST A TIMESTAMP.
+  createdDeliveryChargeZones DeliveryChargeZone[]       @relation("DeliveryChargeZoneCreatedBy")
+  updatedDeliveryChargeZones DeliveryChargeZone[]       @relation("DeliveryChargeZoneUpdatedBy")
+  createdFreeDeliveryRules   DeliveryFreeDeliveryRule[] @relation("DeliveryFreeDeliveryRuleCreatedBy")
+  updatedFreeDeliveryRules   DeliveryFreeDeliveryRule[] @relation("DeliveryFreeDeliveryRuleUpdatedBy")
+
   //* PREVENTS TWO ROWS FROM CLAIMING THE SAME OAUTH IDENTITY. NULLs (EVERY
   //* EMAIL-AUTH USER) ARE NOT DISTINCT-CHECKED BY POSTGRES, SO THIS ONLY
   //* CONSTRAINS ROWS THAT ACTUALLY HAVE A providerId.

@@ -4,6 +4,8 @@ Third-party courier directory and shipment tracking for the storefront's **Set U
 
 > **Not the same thing as `UserRole.DELIVERY_PARTNER`** (`user.prisma`). That role is for **in-house delivery staff** accounts — the Set Up page's separate **"Delivery Man"** tab. This module is for **outsourced third-party couriers** (KEX Express, Flash Express, Thailand Post, etc.) — the **"External Delivery Service"** tab shown in the screenshot this doc was written from.
 
+> **Also not the same thing as the `delivery-charge` module** (`delivery-charge.prisma`, `docs/delivery-charge.md`). That one is the merchant's own **shipping rate card** — what the storefront charges a customer, and when it is waived. `DeliveryZone.baseFee` here is our **cost** with a courier; `DeliveryChargeRate.baseFee` there is the customer's **price**. Merging them would let a courier renegotiation silently reprice the shop.
+
 Schema source: `prisma/schema/delivery.prisma` (models `DeliveryProvider`, `DeliveryZone`, `DeliveryShipment`, `DeliveryStatusHistory`; enums `DeliveryEntityStatus`, `DeliveryIntegrationType`, `DeliveryPricingModel`, `DeliveryShipmentStatus`).
 Module source: **`DeliveryProvider`/`DeliveryZone` are implemented** — `src/modules/delivery/` (`delivery.controller.ts`, `delivery.service.ts`, `delivery.repository.ts`, `delivery.select.ts`, `dto/`). **`DeliveryShipment`/`DeliveryStatusHistory` are schema-only** — no module reads or writes them yet. See [API End Point & Business Logic](#api-end-point--business-logic) for what's real vs. still a roadmap sketch.
 

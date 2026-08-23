@@ -8,6 +8,7 @@ import { AddressModule } from '../address/address.module';
 import { InventoryModule } from '../inventory/inventory.module';
 import { PromotionModule } from '../promotion/promotion.module';
 import { ComboProductModule } from '../combo-product/combo-product.module';
+import { DeliveryChargeModule } from '../delivery-charge/delivery-charge.module';
 
 @Module({
   imports: [
@@ -19,6 +20,12 @@ import { ComboProductModule } from '../combo-product/combo-product.module';
     //* FOR ComboProductRepository.adjustSoldQuantity — PLACEMENT CLAIMS A
     //* BUNDLE AGAINST A CAPPED OFFER AND CANCELLATION GIVES IT BACK.
     ComboProductModule,
+    //* THE DELIVERY FEE IS COMPUTED, NOT ASSUMED. PLACEMENT ASKS
+    //* DeliveryChargeService FOR IT INSIDE ITS OWN TRANSACTION, AND THE
+    //* CHECKOUT PREVIEW ROUTE (POST /order/delivery-quote) GOES THROUGH THE
+    //* SAME CALL — WHICH IS WHAT MAKES "QUOTED == CHARGED" A PROPERTY OF THE
+    //* CODE RATHER THAN OF TWO IMPLEMENTATIONS AGREEING.
+    DeliveryChargeModule,
   ],
   controllers: [OrderController],
   providers: [OrderService, OrderRepository],

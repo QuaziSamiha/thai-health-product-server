@@ -77,6 +77,17 @@ export const ORDER_SELECT = {
   taxAmount: true,
   totalAmount: true,
   appliedPromoCode: true,
+  //* THE DELIVERY SNAPSHOT — WHAT ZONE PRICED THIS ORDER, WHAT THE FEE WAS
+  //* BEFORE ANY WAIVER, AND WHEN IT WAS PROMISED. THE ORDER DETAIL VIEW AND
+  //* THE INVOICE BOTH RENDER FROM THESE, NEVER FROM A LIVE RATE-CARD JOIN.
+  deliveryZoneCode: true,
+  deliveryZoneName: true,
+  deliveryChargeBase: true,
+  deliveryCodFee: true,
+  freeDeliveryApplied: true,
+  freeDeliveryRuleName: true,
+  estimatedDeliveryFrom: true,
+  estimatedDeliveryTo: true,
   customerNote: true,
   cancelReason: true,
   placedAt: true,

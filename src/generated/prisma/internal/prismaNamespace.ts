@@ -393,6 +393,10 @@ export const ModelName = {
   ComboProduct: 'ComboProduct',
   ComboItem: 'ComboItem',
   ComboImage: 'ComboImage',
+  DeliveryChargeZone: 'DeliveryChargeZone',
+  DeliveryChargeArea: 'DeliveryChargeArea',
+  DeliveryChargeRate: 'DeliveryChargeRate',
+  DeliveryFreeDeliveryRule: 'DeliveryFreeDeliveryRule',
   DeliveryManProfile: 'DeliveryManProfile',
   DeliveryProvider: 'DeliveryProvider',
   DeliveryZone: 'DeliveryZone',
@@ -431,7 +435,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "address" | "auditLog" | "blog" | "cart" | "cartItem" | "category" | "comboProduct" | "comboItem" | "comboImage" | "deliveryManProfile" | "deliveryProvider" | "deliveryZone" | "deliveryShipment" | "deliveryStatusHistory" | "home" | "batch" | "inventory" | "order" | "orderAddress" | "orderItem" | "orderStatusHistory" | "payment" | "product" | "productVariant" | "productImage" | "promoCode" | "promoCodeRedemption" | "support" | "user" | "profile" | "userSecurity" | "oTP"
+    modelProps: "address" | "auditLog" | "blog" | "cart" | "cartItem" | "category" | "comboProduct" | "comboItem" | "comboImage" | "deliveryChargeZone" | "deliveryChargeArea" | "deliveryChargeRate" | "deliveryFreeDeliveryRule" | "deliveryManProfile" | "deliveryProvider" | "deliveryZone" | "deliveryShipment" | "deliveryStatusHistory" | "home" | "batch" | "inventory" | "order" | "orderAddress" | "orderItem" | "orderStatusHistory" | "payment" | "product" | "productVariant" | "productImage" | "promoCode" | "promoCodeRedemption" | "support" | "user" | "profile" | "userSecurity" | "oTP"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1098,6 +1102,302 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ComboImageCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ComboImageCountAggregateOutputType> | number
+        }
+      }
+    }
+    DeliveryChargeZone: {
+      payload: Prisma.$DeliveryChargeZonePayload<ExtArgs>
+      fields: Prisma.DeliveryChargeZoneFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DeliveryChargeZoneFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeZonePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DeliveryChargeZoneFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeZonePayload>
+        }
+        findFirst: {
+          args: Prisma.DeliveryChargeZoneFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeZonePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DeliveryChargeZoneFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeZonePayload>
+        }
+        findMany: {
+          args: Prisma.DeliveryChargeZoneFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeZonePayload>[]
+        }
+        create: {
+          args: Prisma.DeliveryChargeZoneCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeZonePayload>
+        }
+        createMany: {
+          args: Prisma.DeliveryChargeZoneCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DeliveryChargeZoneCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeZonePayload>[]
+        }
+        delete: {
+          args: Prisma.DeliveryChargeZoneDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeZonePayload>
+        }
+        update: {
+          args: Prisma.DeliveryChargeZoneUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeZonePayload>
+        }
+        deleteMany: {
+          args: Prisma.DeliveryChargeZoneDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DeliveryChargeZoneUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DeliveryChargeZoneUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeZonePayload>[]
+        }
+        upsert: {
+          args: Prisma.DeliveryChargeZoneUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeZonePayload>
+        }
+        aggregate: {
+          args: Prisma.DeliveryChargeZoneAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDeliveryChargeZone>
+        }
+        groupBy: {
+          args: Prisma.DeliveryChargeZoneGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeliveryChargeZoneGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DeliveryChargeZoneCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeliveryChargeZoneCountAggregateOutputType> | number
+        }
+      }
+    }
+    DeliveryChargeArea: {
+      payload: Prisma.$DeliveryChargeAreaPayload<ExtArgs>
+      fields: Prisma.DeliveryChargeAreaFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DeliveryChargeAreaFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeAreaPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DeliveryChargeAreaFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeAreaPayload>
+        }
+        findFirst: {
+          args: Prisma.DeliveryChargeAreaFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeAreaPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DeliveryChargeAreaFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeAreaPayload>
+        }
+        findMany: {
+          args: Prisma.DeliveryChargeAreaFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeAreaPayload>[]
+        }
+        create: {
+          args: Prisma.DeliveryChargeAreaCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeAreaPayload>
+        }
+        createMany: {
+          args: Prisma.DeliveryChargeAreaCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DeliveryChargeAreaCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeAreaPayload>[]
+        }
+        delete: {
+          args: Prisma.DeliveryChargeAreaDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeAreaPayload>
+        }
+        update: {
+          args: Prisma.DeliveryChargeAreaUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeAreaPayload>
+        }
+        deleteMany: {
+          args: Prisma.DeliveryChargeAreaDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DeliveryChargeAreaUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DeliveryChargeAreaUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeAreaPayload>[]
+        }
+        upsert: {
+          args: Prisma.DeliveryChargeAreaUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeAreaPayload>
+        }
+        aggregate: {
+          args: Prisma.DeliveryChargeAreaAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDeliveryChargeArea>
+        }
+        groupBy: {
+          args: Prisma.DeliveryChargeAreaGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeliveryChargeAreaGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DeliveryChargeAreaCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeliveryChargeAreaCountAggregateOutputType> | number
+        }
+      }
+    }
+    DeliveryChargeRate: {
+      payload: Prisma.$DeliveryChargeRatePayload<ExtArgs>
+      fields: Prisma.DeliveryChargeRateFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DeliveryChargeRateFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeRatePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DeliveryChargeRateFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeRatePayload>
+        }
+        findFirst: {
+          args: Prisma.DeliveryChargeRateFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeRatePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DeliveryChargeRateFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeRatePayload>
+        }
+        findMany: {
+          args: Prisma.DeliveryChargeRateFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeRatePayload>[]
+        }
+        create: {
+          args: Prisma.DeliveryChargeRateCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeRatePayload>
+        }
+        createMany: {
+          args: Prisma.DeliveryChargeRateCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DeliveryChargeRateCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeRatePayload>[]
+        }
+        delete: {
+          args: Prisma.DeliveryChargeRateDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeRatePayload>
+        }
+        update: {
+          args: Prisma.DeliveryChargeRateUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeRatePayload>
+        }
+        deleteMany: {
+          args: Prisma.DeliveryChargeRateDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DeliveryChargeRateUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DeliveryChargeRateUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeRatePayload>[]
+        }
+        upsert: {
+          args: Prisma.DeliveryChargeRateUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryChargeRatePayload>
+        }
+        aggregate: {
+          args: Prisma.DeliveryChargeRateAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDeliveryChargeRate>
+        }
+        groupBy: {
+          args: Prisma.DeliveryChargeRateGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeliveryChargeRateGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DeliveryChargeRateCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeliveryChargeRateCountAggregateOutputType> | number
+        }
+      }
+    }
+    DeliveryFreeDeliveryRule: {
+      payload: Prisma.$DeliveryFreeDeliveryRulePayload<ExtArgs>
+      fields: Prisma.DeliveryFreeDeliveryRuleFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DeliveryFreeDeliveryRuleFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryFreeDeliveryRulePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DeliveryFreeDeliveryRuleFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryFreeDeliveryRulePayload>
+        }
+        findFirst: {
+          args: Prisma.DeliveryFreeDeliveryRuleFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryFreeDeliveryRulePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DeliveryFreeDeliveryRuleFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryFreeDeliveryRulePayload>
+        }
+        findMany: {
+          args: Prisma.DeliveryFreeDeliveryRuleFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryFreeDeliveryRulePayload>[]
+        }
+        create: {
+          args: Prisma.DeliveryFreeDeliveryRuleCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryFreeDeliveryRulePayload>
+        }
+        createMany: {
+          args: Prisma.DeliveryFreeDeliveryRuleCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DeliveryFreeDeliveryRuleCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryFreeDeliveryRulePayload>[]
+        }
+        delete: {
+          args: Prisma.DeliveryFreeDeliveryRuleDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryFreeDeliveryRulePayload>
+        }
+        update: {
+          args: Prisma.DeliveryFreeDeliveryRuleUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryFreeDeliveryRulePayload>
+        }
+        deleteMany: {
+          args: Prisma.DeliveryFreeDeliveryRuleDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DeliveryFreeDeliveryRuleUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DeliveryFreeDeliveryRuleUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryFreeDeliveryRulePayload>[]
+        }
+        upsert: {
+          args: Prisma.DeliveryFreeDeliveryRuleUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryFreeDeliveryRulePayload>
+        }
+        aggregate: {
+          args: Prisma.DeliveryFreeDeliveryRuleAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDeliveryFreeDeliveryRule>
+        }
+        groupBy: {
+          args: Prisma.DeliveryFreeDeliveryRuleGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeliveryFreeDeliveryRuleGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DeliveryFreeDeliveryRuleCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeliveryFreeDeliveryRuleCountAggregateOutputType> | number
         }
       }
     }
@@ -3021,6 +3321,95 @@ export const ComboImageScalarFieldEnum = {
 export type ComboImageScalarFieldEnum = (typeof ComboImageScalarFieldEnum)[keyof typeof ComboImageScalarFieldEnum]
 
 
+export const DeliveryChargeZoneScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  code: 'code',
+  name: 'name',
+  nameTh: 'nameTh',
+  description: 'description',
+  isDefault: 'isDefault',
+  priority: 'priority',
+  minDeliveryDays: 'minDeliveryDays',
+  maxDeliveryDays: 'maxDeliveryDays',
+  cutOffMinutes: 'cutOffMinutes',
+  businessDaysOnly: 'businessDaysOnly',
+  handlingFee: 'handlingFee',
+  remoteSurcharge: 'remoteSurcharge',
+  maxWeightKg: 'maxWeightKg',
+  codAvailable: 'codAvailable',
+  codFeePercent: 'codFeePercent',
+  codFeeMin: 'codFeeMin',
+  codFeeMax: 'codFeeMax',
+  rateBasis: 'rateBasis',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy'
+} as const
+
+export type DeliveryChargeZoneScalarFieldEnum = (typeof DeliveryChargeZoneScalarFieldEnum)[keyof typeof DeliveryChargeZoneScalarFieldEnum]
+
+
+export const DeliveryChargeAreaScalarFieldEnum = {
+  id: 'id',
+  country: 'country',
+  state: 'state',
+  region: 'region',
+  postalCode: 'postalCode',
+  postalPrefix: 'postalPrefix',
+  zoneId: 'zoneId',
+  createdAt: 'createdAt'
+} as const
+
+export type DeliveryChargeAreaScalarFieldEnum = (typeof DeliveryChargeAreaScalarFieldEnum)[keyof typeof DeliveryChargeAreaScalarFieldEnum]
+
+
+export const DeliveryChargeRateScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  label: 'label',
+  minValue: 'minValue',
+  maxValue: 'maxValue',
+  baseFee: 'baseFee',
+  stepUnit: 'stepUnit',
+  stepFee: 'stepFee',
+  status: 'status',
+  zoneId: 'zoneId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DeliveryChargeRateScalarFieldEnum = (typeof DeliveryChargeRateScalarFieldEnum)[keyof typeof DeliveryChargeRateScalarFieldEnum]
+
+
+export const DeliveryFreeDeliveryRuleScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  name: 'name',
+  description: 'description',
+  trigger: 'trigger',
+  minOrderAmount: 'minOrderAmount',
+  promoCodeId: 'promoCodeId',
+  zoneId: 'zoneId',
+  maxSubsidyAmount: 'maxSubsidyAmount',
+  waivesCodFee: 'waivesCodFee',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  usageLimit: 'usageLimit',
+  usedCount: 'usedCount',
+  priority: 'priority',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy'
+} as const
+
+export type DeliveryFreeDeliveryRuleScalarFieldEnum = (typeof DeliveryFreeDeliveryRuleScalarFieldEnum)[keyof typeof DeliveryFreeDeliveryRuleScalarFieldEnum]
+
+
 export const DeliveryManProfileScalarFieldEnum = {
   id: 'id',
   sid: 'sid',
@@ -3216,6 +3605,14 @@ export const OrderScalarFieldEnum = {
   taxAmount: 'taxAmount',
   totalAmount: 'totalAmount',
   appliedPromoCode: 'appliedPromoCode',
+  deliveryZoneCode: 'deliveryZoneCode',
+  deliveryZoneName: 'deliveryZoneName',
+  deliveryChargeBase: 'deliveryChargeBase',
+  deliveryCodFee: 'deliveryCodFee',
+  freeDeliveryApplied: 'freeDeliveryApplied',
+  freeDeliveryRuleName: 'freeDeliveryRuleName',
+  estimatedDeliveryFrom: 'estimatedDeliveryFrom',
+  estimatedDeliveryTo: 'estimatedDeliveryTo',
   customerNote: 'customerNote',
   cancelReason: 'cancelReason',
   placedAt: 'placedAt',
@@ -3737,6 +4134,48 @@ export type ListEnumStockStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
+ * Reference to a field of type 'DeliveryRateBasis'
+ */
+export type EnumDeliveryRateBasisFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeliveryRateBasis'>
+    
+
+
+/**
+ * Reference to a field of type 'DeliveryRateBasis[]'
+ */
+export type ListEnumDeliveryRateBasisFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeliveryRateBasis[]'>
+    
+
+
+/**
+ * Reference to a field of type 'DeliveryChargeStatus'
+ */
+export type EnumDeliveryChargeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeliveryChargeStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'DeliveryChargeStatus[]'
+ */
+export type ListEnumDeliveryChargeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeliveryChargeStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'FreeDeliveryTrigger'
+ */
+export type EnumFreeDeliveryTriggerFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FreeDeliveryTrigger'>
+    
+
+
+/**
+ * Reference to a field of type 'FreeDeliveryTrigger[]'
+ */
+export type ListEnumFreeDeliveryTriggerFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FreeDeliveryTrigger[]'>
+    
+
+
+/**
  * Reference to a field of type 'NidVerificationStatus'
  */
 export type EnumNidVerificationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NidVerificationStatus'>
@@ -4175,6 +4614,10 @@ export type GlobalOmitConfig = {
   comboProduct?: Prisma.ComboProductOmit
   comboItem?: Prisma.ComboItemOmit
   comboImage?: Prisma.ComboImageOmit
+  deliveryChargeZone?: Prisma.DeliveryChargeZoneOmit
+  deliveryChargeArea?: Prisma.DeliveryChargeAreaOmit
+  deliveryChargeRate?: Prisma.DeliveryChargeRateOmit
+  deliveryFreeDeliveryRule?: Prisma.DeliveryFreeDeliveryRuleOmit
   deliveryManProfile?: Prisma.DeliveryManProfileOmit
   deliveryProvider?: Prisma.DeliveryProviderOmit
   deliveryZone?: Prisma.DeliveryZoneOmit

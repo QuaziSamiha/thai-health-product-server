@@ -50,6 +50,11 @@ import {
   ApiPaginatedResponse,
   PaginationQueryDto,
 } from '../../shared/pagination';
+import { Throttle } from '@nestjs/throttler';
+import { THROTTLER_SHORT } from '../../common/throttler/throttler.constants';
+import { DELIVERY_QUOTE_THROTTLE } from '../delivery-charge/delivery-charge.constants';
+import { QuoteDeliveryChargeDto } from '../delivery-charge/dto/quote-delivery-charge.dto';
+import { DeliveryQuoteResponseDto } from '../delivery-charge/dto/delivery-quote-response.dto';
 
 type AuthedRequest = Request & { user?: { id: number; role: UserRole } };
 
@@ -103,7 +108,7 @@ export class OrderController {
   @ApiOperation({
     summary: 'Check a cart against live availability (guest or logged-in)',
     description:
-      'Read-only dry run of the placement rules. Returns a per-line verdict so the storefront can clamp an over-quantity line and disable checkout *before* the customer fills in an address, instead of failing at the final submit. Exists because the public product endpoints deliberately withhold exact stock counts — the only figures disclosed here are for lines the caller already holds. Advisory only: nothing is reserved, and stock can still move before the order is placed.',
+      'Read-only dry run of the placement rules. Returns a per-line verdict so the storefront can clamp an over-quantity line and disable checkout *before* the customer fills in an address, instead of failing at the final submit. Exists because the public product endpoints deliberately withhold exact stock counts — the only figures disclosed here are for lines the caller already holds. Each line also carries its live `unitPrice`/`basePrice`, which is how a client-side cart reprices itself after an admin changed a discount on something already in it. Advisory only: nothing is reserved, and stock can still move before the order is placed.',
   })
   @ApiBody({ type: ValidateCartDto })
   @ApiOkResponse({
@@ -114,6 +119,36 @@ export class OrderController {
   @ResponseMessage('Cart validated')
   async validateCart(@Body() dto: ValidateCartDto) {
     return this.orderService.validateCart(dto);
+  }
+
+  @Post('delivery-quote')
+  @Public()
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ [THROTTLER_SHORT]: DELIVERY_QUOTE_THROTTLE })
+  @ApiOperation({
+    summary: 'Preview the delivery charge for a basket and a destination',
+    description:
+      'Called from the order-place page once the customer has entered or picked a delivery address — never from the cart, which has no address and therefore no basis for a fee. Works with or without a Bearer token; a logged-in customer may pass a saved addressId (ownership is enforced) and guests pass a destination inline. ' +
+      'Read-only and advisory: nothing is reserved, no free-delivery campaign use is burned, and no fee is carried forward. Placement recomputes the charge from the same rules inside its own transaction and bills that, so this response can only ever change what the customer is shown. ' +
+      'Weight and item count are read from the catalog, never from the request. Rate-limited per IP because it is the most database-expensive public read in the app and doubles as a price oracle.',
+  })
+  @ApiBody({ type: QuoteDeliveryChargeDto })
+  @ApiOkResponse({
+    description: 'Delivery charge quoted.',
+    type: DeliveryQuoteResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description:
+      'Malformed payload, an address outside the delivery area, a basket over the zone weight limit, or COD requested where it is not offered.',
+  })
+  @ApiNotFoundResponse({ description: 'The saved address does not exist.' })
+  @ResponseMessage('Delivery charge calculated successfully')
+  async quoteDeliveryCharge(
+    @Body() dto: QuoteDeliveryChargeDto,
+    @Req() req: AuthedRequest,
+  ) {
+    return this.orderService.quoteDeliveryCharge(dto, req.user?.id);
   }
 
   @Get('my-orders')

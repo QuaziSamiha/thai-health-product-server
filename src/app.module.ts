@@ -29,6 +29,7 @@ import { AddressModule } from './modules/address/address.module';
 import { OrderModule } from './modules/order/order.module';
 import { PromotionModule } from './modules/promotion/promotion.module';
 import { DeliveryModule } from './modules/delivery/delivery.module';
+import { DeliveryChargeModule } from './modules/delivery-charge/delivery-charge.module';
 import { AuditLogModule } from './modules/audit-log/audit-log.module';
 import { HealthModule } from './health/health.module';
 import { validate } from './config/env.validation';
@@ -107,6 +108,7 @@ import {
     PromotionModule,
     OrderModule,
     DeliveryModule,
+    DeliveryChargeModule,
     AuditLogModule,
   ],
   controllers: [AppController],

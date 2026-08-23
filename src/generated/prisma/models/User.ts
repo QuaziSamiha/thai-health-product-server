@@ -309,6 +309,10 @@ export type UserWhereInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryListRelationFilter
   verifiedDeliveryMen?: Prisma.DeliveryManProfileListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneListRelationFilter
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneListRelationFilter
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleListRelationFilter
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -354,6 +358,10 @@ export type UserOrderByWithRelationInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryOrderByRelationAggregateInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileOrderByRelationAggregateInput
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneOrderByRelationAggregateInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneOrderByRelationAggregateInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleOrderByRelationAggregateInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -403,6 +411,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryListRelationFilter
   verifiedDeliveryMen?: Prisma.DeliveryManProfileListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneListRelationFilter
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneListRelationFilter
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleListRelationFilter
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleListRelationFilter
 }, "id" | "sid" | "authProvider_providerId">
 
 export type UserOrderByWithAggregationInput = {
@@ -487,6 +499,10 @@ export type UserCreateInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -532,6 +548,10 @@ export type UserUncheckedCreateInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUpdateInput = {
@@ -576,6 +596,10 @@ export type UserUpdateInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -621,6 +645,10 @@ export type UserUncheckedUpdateInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -881,6 +909,70 @@ export type UserUpdateOneWithoutDeletedCombosNestedInput = {
   delete?: Prisma.UserWhereInput | boolean
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDeletedCombosInput, Prisma.UserUpdateWithoutDeletedCombosInput>, Prisma.UserUncheckedUpdateWithoutDeletedCombosInput>
+}
+
+export type UserCreateNestedOneWithoutCreatedDeliveryChargeZonesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedDeliveryChargeZonesInput, Prisma.UserUncheckedCreateWithoutCreatedDeliveryChargeZonesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedDeliveryChargeZonesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutUpdatedDeliveryChargeZonesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedDeliveryChargeZonesInput, Prisma.UserUncheckedCreateWithoutUpdatedDeliveryChargeZonesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedDeliveryChargeZonesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutCreatedDeliveryChargeZonesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedDeliveryChargeZonesInput, Prisma.UserUncheckedCreateWithoutCreatedDeliveryChargeZonesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedDeliveryChargeZonesInput
+  upsert?: Prisma.UserUpsertWithoutCreatedDeliveryChargeZonesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedDeliveryChargeZonesInput, Prisma.UserUpdateWithoutCreatedDeliveryChargeZonesInput>, Prisma.UserUncheckedUpdateWithoutCreatedDeliveryChargeZonesInput>
+}
+
+export type UserUpdateOneWithoutUpdatedDeliveryChargeZonesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedDeliveryChargeZonesInput, Prisma.UserUncheckedCreateWithoutUpdatedDeliveryChargeZonesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedDeliveryChargeZonesInput
+  upsert?: Prisma.UserUpsertWithoutUpdatedDeliveryChargeZonesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUpdatedDeliveryChargeZonesInput, Prisma.UserUpdateWithoutUpdatedDeliveryChargeZonesInput>, Prisma.UserUncheckedUpdateWithoutUpdatedDeliveryChargeZonesInput>
+}
+
+export type UserCreateNestedOneWithoutCreatedFreeDeliveryRulesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedFreeDeliveryRulesInput, Prisma.UserUncheckedCreateWithoutCreatedFreeDeliveryRulesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedFreeDeliveryRulesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutUpdatedFreeDeliveryRulesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedFreeDeliveryRulesInput, Prisma.UserUncheckedCreateWithoutUpdatedFreeDeliveryRulesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedFreeDeliveryRulesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutCreatedFreeDeliveryRulesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedFreeDeliveryRulesInput, Prisma.UserUncheckedCreateWithoutCreatedFreeDeliveryRulesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedFreeDeliveryRulesInput
+  upsert?: Prisma.UserUpsertWithoutCreatedFreeDeliveryRulesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedFreeDeliveryRulesInput, Prisma.UserUpdateWithoutCreatedFreeDeliveryRulesInput>, Prisma.UserUncheckedUpdateWithoutCreatedFreeDeliveryRulesInput>
+}
+
+export type UserUpdateOneWithoutUpdatedFreeDeliveryRulesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedFreeDeliveryRulesInput, Prisma.UserUncheckedCreateWithoutUpdatedFreeDeliveryRulesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedFreeDeliveryRulesInput
+  upsert?: Prisma.UserUpsertWithoutUpdatedFreeDeliveryRulesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUpdatedFreeDeliveryRulesInput, Prisma.UserUpdateWithoutUpdatedFreeDeliveryRulesInput>, Prisma.UserUncheckedUpdateWithoutUpdatedFreeDeliveryRulesInput>
 }
 
 export type UserCreateNestedOneWithoutDeliveryManProfileInput = {
@@ -1250,6 +1342,10 @@ export type UserCreateWithoutAddressesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutAddressesInput = {
@@ -1294,6 +1390,10 @@ export type UserUncheckedCreateWithoutAddressesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutAddressesInput = {
@@ -1353,6 +1453,10 @@ export type UserUpdateWithoutAddressesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAddressesInput = {
@@ -1397,6 +1501,10 @@ export type UserUncheckedUpdateWithoutAddressesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutAuditLogsInput = {
@@ -1440,6 +1548,10 @@ export type UserCreateWithoutAuditLogsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -1484,6 +1596,10 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -1543,6 +1659,10 @@ export type UserUpdateWithoutAuditLogsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -1587,6 +1707,10 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutBlogsInput = {
@@ -1630,6 +1754,10 @@ export type UserCreateWithoutBlogsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutBlogsInput = {
@@ -1674,6 +1802,10 @@ export type UserUncheckedCreateWithoutBlogsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutBlogsInput = {
@@ -1733,6 +1865,10 @@ export type UserUpdateWithoutBlogsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBlogsInput = {
@@ -1777,6 +1913,10 @@ export type UserUncheckedUpdateWithoutBlogsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutCartsInput = {
@@ -1820,6 +1960,10 @@ export type UserCreateWithoutCartsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCartsInput = {
@@ -1864,6 +2008,10 @@ export type UserUncheckedCreateWithoutCartsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCartsInput = {
@@ -1923,6 +2071,10 @@ export type UserUpdateWithoutCartsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCartsInput = {
@@ -1967,6 +2119,10 @@ export type UserUncheckedUpdateWithoutCartsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutCreatedCategoriesInput = {
@@ -2010,6 +2166,10 @@ export type UserCreateWithoutCreatedCategoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedCategoriesInput = {
@@ -2054,6 +2214,10 @@ export type UserUncheckedCreateWithoutCreatedCategoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedCategoriesInput = {
@@ -2102,6 +2266,10 @@ export type UserCreateWithoutUpdatedCategoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedCategoriesInput = {
@@ -2146,6 +2314,10 @@ export type UserUncheckedCreateWithoutUpdatedCategoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedCategoriesInput = {
@@ -2205,6 +2377,10 @@ export type UserUpdateWithoutCreatedCategoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedCategoriesInput = {
@@ -2249,6 +2425,10 @@ export type UserUncheckedUpdateWithoutCreatedCategoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutUpdatedCategoriesInput = {
@@ -2303,6 +2483,10 @@ export type UserUpdateWithoutUpdatedCategoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedCategoriesInput = {
@@ -2347,6 +2531,10 @@ export type UserUncheckedUpdateWithoutUpdatedCategoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutCreatedCombosInput = {
@@ -2390,6 +2578,10 @@ export type UserCreateWithoutCreatedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedCombosInput = {
@@ -2434,6 +2626,10 @@ export type UserUncheckedCreateWithoutCreatedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedCombosInput = {
@@ -2482,6 +2678,10 @@ export type UserCreateWithoutUpdatedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedCombosInput = {
@@ -2526,6 +2726,10 @@ export type UserUncheckedCreateWithoutUpdatedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedCombosInput = {
@@ -2574,6 +2778,10 @@ export type UserCreateWithoutDeletedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutDeletedCombosInput = {
@@ -2618,6 +2826,10 @@ export type UserUncheckedCreateWithoutDeletedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutDeletedCombosInput = {
@@ -2677,6 +2889,10 @@ export type UserUpdateWithoutCreatedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedCombosInput = {
@@ -2721,6 +2937,10 @@ export type UserUncheckedUpdateWithoutCreatedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutUpdatedCombosInput = {
@@ -2775,6 +2995,10 @@ export type UserUpdateWithoutUpdatedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedCombosInput = {
@@ -2819,6 +3043,10 @@ export type UserUncheckedUpdateWithoutUpdatedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutDeletedCombosInput = {
@@ -2873,6 +3101,10 @@ export type UserUpdateWithoutDeletedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeletedCombosInput = {
@@ -2917,6 +3149,834 @@ export type UserUncheckedUpdateWithoutDeletedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserCreateWithoutCreatedDeliveryChargeZonesInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutCreatedDeliveryChargeZonesInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutCreatedDeliveryChargeZonesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedDeliveryChargeZonesInput, Prisma.UserUncheckedCreateWithoutCreatedDeliveryChargeZonesInput>
+}
+
+export type UserCreateWithoutUpdatedDeliveryChargeZonesInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutUpdatedDeliveryChargeZonesInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutUpdatedDeliveryChargeZonesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedDeliveryChargeZonesInput, Prisma.UserUncheckedCreateWithoutUpdatedDeliveryChargeZonesInput>
+}
+
+export type UserUpsertWithoutCreatedDeliveryChargeZonesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedDeliveryChargeZonesInput, Prisma.UserUncheckedUpdateWithoutCreatedDeliveryChargeZonesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedDeliveryChargeZonesInput, Prisma.UserUncheckedCreateWithoutCreatedDeliveryChargeZonesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCreatedDeliveryChargeZonesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedDeliveryChargeZonesInput, Prisma.UserUncheckedUpdateWithoutCreatedDeliveryChargeZonesInput>
+}
+
+export type UserUpdateWithoutCreatedDeliveryChargeZonesInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCreatedDeliveryChargeZonesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUpsertWithoutUpdatedDeliveryChargeZonesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedDeliveryChargeZonesInput, Prisma.UserUncheckedUpdateWithoutUpdatedDeliveryChargeZonesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedDeliveryChargeZonesInput, Prisma.UserUncheckedCreateWithoutUpdatedDeliveryChargeZonesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutUpdatedDeliveryChargeZonesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedDeliveryChargeZonesInput, Prisma.UserUncheckedUpdateWithoutUpdatedDeliveryChargeZonesInput>
+}
+
+export type UserUpdateWithoutUpdatedDeliveryChargeZonesInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutUpdatedDeliveryChargeZonesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserCreateWithoutCreatedFreeDeliveryRulesInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutCreatedFreeDeliveryRulesInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutCreatedFreeDeliveryRulesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedFreeDeliveryRulesInput, Prisma.UserUncheckedCreateWithoutCreatedFreeDeliveryRulesInput>
+}
+
+export type UserCreateWithoutUpdatedFreeDeliveryRulesInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutUpdatedFreeDeliveryRulesInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutUpdatedFreeDeliveryRulesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedFreeDeliveryRulesInput, Prisma.UserUncheckedCreateWithoutUpdatedFreeDeliveryRulesInput>
+}
+
+export type UserUpsertWithoutCreatedFreeDeliveryRulesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedFreeDeliveryRulesInput, Prisma.UserUncheckedUpdateWithoutCreatedFreeDeliveryRulesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedFreeDeliveryRulesInput, Prisma.UserUncheckedCreateWithoutCreatedFreeDeliveryRulesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCreatedFreeDeliveryRulesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedFreeDeliveryRulesInput, Prisma.UserUncheckedUpdateWithoutCreatedFreeDeliveryRulesInput>
+}
+
+export type UserUpdateWithoutCreatedFreeDeliveryRulesInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCreatedFreeDeliveryRulesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUpsertWithoutUpdatedFreeDeliveryRulesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedFreeDeliveryRulesInput, Prisma.UserUncheckedUpdateWithoutUpdatedFreeDeliveryRulesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedFreeDeliveryRulesInput, Prisma.UserUncheckedCreateWithoutUpdatedFreeDeliveryRulesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutUpdatedFreeDeliveryRulesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedFreeDeliveryRulesInput, Prisma.UserUncheckedUpdateWithoutUpdatedFreeDeliveryRulesInput>
+}
+
+export type UserUpdateWithoutUpdatedFreeDeliveryRulesInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutUpdatedFreeDeliveryRulesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
 }
 
 export type UserCreateWithoutDeliveryManProfileInput = {
@@ -2960,6 +4020,10 @@ export type UserCreateWithoutDeliveryManProfileInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutDeliveryManProfileInput = {
@@ -3004,6 +4068,10 @@ export type UserUncheckedCreateWithoutDeliveryManProfileInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutDeliveryManProfileInput = {
@@ -3052,6 +4120,10 @@ export type UserCreateWithoutVerifiedDeliveryMenInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutVerifiedDeliveryMenInput = {
@@ -3096,6 +4168,10 @@ export type UserUncheckedCreateWithoutVerifiedDeliveryMenInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutVerifiedDeliveryMenInput = {
@@ -3155,6 +4231,10 @@ export type UserUpdateWithoutDeliveryManProfileInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeliveryManProfileInput = {
@@ -3199,6 +4279,10 @@ export type UserUncheckedUpdateWithoutDeliveryManProfileInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutVerifiedDeliveryMenInput = {
@@ -3253,6 +4337,10 @@ export type UserUpdateWithoutVerifiedDeliveryMenInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVerifiedDeliveryMenInput = {
@@ -3297,6 +4385,10 @@ export type UserUncheckedUpdateWithoutVerifiedDeliveryMenInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutCreatedDeliveryProvidersInput = {
@@ -3340,6 +4432,10 @@ export type UserCreateWithoutCreatedDeliveryProvidersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedDeliveryProvidersInput = {
@@ -3384,6 +4480,10 @@ export type UserUncheckedCreateWithoutCreatedDeliveryProvidersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedDeliveryProvidersInput = {
@@ -3432,6 +4532,10 @@ export type UserCreateWithoutUpdatedDeliveryProvidersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedDeliveryProvidersInput = {
@@ -3476,6 +4580,10 @@ export type UserUncheckedCreateWithoutUpdatedDeliveryProvidersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedDeliveryProvidersInput = {
@@ -3535,6 +4643,10 @@ export type UserUpdateWithoutCreatedDeliveryProvidersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedDeliveryProvidersInput = {
@@ -3579,6 +4691,10 @@ export type UserUncheckedUpdateWithoutCreatedDeliveryProvidersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutUpdatedDeliveryProvidersInput = {
@@ -3633,6 +4749,10 @@ export type UserUpdateWithoutUpdatedDeliveryProvidersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedDeliveryProvidersInput = {
@@ -3677,6 +4797,10 @@ export type UserUncheckedUpdateWithoutUpdatedDeliveryProvidersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutBookedDeliveryShipmentsInput = {
@@ -3720,6 +4844,10 @@ export type UserCreateWithoutBookedDeliveryShipmentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutBookedDeliveryShipmentsInput = {
@@ -3764,6 +4892,10 @@ export type UserUncheckedCreateWithoutBookedDeliveryShipmentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutBookedDeliveryShipmentsInput = {
@@ -3823,6 +4955,10 @@ export type UserUpdateWithoutBookedDeliveryShipmentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBookedDeliveryShipmentsInput = {
@@ -3867,6 +5003,10 @@ export type UserUncheckedUpdateWithoutBookedDeliveryShipmentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutDeliveryStatusChangesInput = {
@@ -3910,6 +5050,10 @@ export type UserCreateWithoutDeliveryStatusChangesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutDeliveryStatusChangesInput = {
@@ -3954,6 +5098,10 @@ export type UserUncheckedCreateWithoutDeliveryStatusChangesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutDeliveryStatusChangesInput = {
@@ -4013,6 +5161,10 @@ export type UserUpdateWithoutDeliveryStatusChangesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeliveryStatusChangesInput = {
@@ -4057,6 +5209,10 @@ export type UserUncheckedUpdateWithoutDeliveryStatusChangesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutCreatedHomeContentsInput = {
@@ -4100,6 +5256,10 @@ export type UserCreateWithoutCreatedHomeContentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedHomeContentsInput = {
@@ -4144,6 +5304,10 @@ export type UserUncheckedCreateWithoutCreatedHomeContentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedHomeContentsInput = {
@@ -4192,6 +5356,10 @@ export type UserCreateWithoutUpdatedHomeContentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedHomeContentsInput = {
@@ -4236,6 +5404,10 @@ export type UserUncheckedCreateWithoutUpdatedHomeContentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedHomeContentsInput = {
@@ -4295,6 +5467,10 @@ export type UserUpdateWithoutCreatedHomeContentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedHomeContentsInput = {
@@ -4339,6 +5515,10 @@ export type UserUncheckedUpdateWithoutCreatedHomeContentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutUpdatedHomeContentsInput = {
@@ -4393,6 +5573,10 @@ export type UserUpdateWithoutUpdatedHomeContentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedHomeContentsInput = {
@@ -4437,6 +5621,10 @@ export type UserUncheckedUpdateWithoutUpdatedHomeContentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutInventoriesInput = {
@@ -4480,6 +5668,10 @@ export type UserCreateWithoutInventoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutInventoriesInput = {
@@ -4524,6 +5716,10 @@ export type UserUncheckedCreateWithoutInventoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutInventoriesInput = {
@@ -4583,6 +5779,10 @@ export type UserUpdateWithoutInventoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInventoriesInput = {
@@ -4627,6 +5827,10 @@ export type UserUncheckedUpdateWithoutInventoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutOrdersInput = {
@@ -4670,6 +5874,10 @@ export type UserCreateWithoutOrdersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutOrdersInput = {
@@ -4714,6 +5922,10 @@ export type UserUncheckedCreateWithoutOrdersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutOrdersInput = {
@@ -4773,6 +5985,10 @@ export type UserUpdateWithoutOrdersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrdersInput = {
@@ -4817,6 +6033,10 @@ export type UserUncheckedUpdateWithoutOrdersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutOrderStatusChangesInput = {
@@ -4860,6 +6080,10 @@ export type UserCreateWithoutOrderStatusChangesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutOrderStatusChangesInput = {
@@ -4904,6 +6128,10 @@ export type UserUncheckedCreateWithoutOrderStatusChangesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutOrderStatusChangesInput = {
@@ -4963,6 +6191,10 @@ export type UserUpdateWithoutOrderStatusChangesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrderStatusChangesInput = {
@@ -5007,6 +6239,10 @@ export type UserUncheckedUpdateWithoutOrderStatusChangesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutCreatedProductsInput = {
@@ -5050,6 +6286,10 @@ export type UserCreateWithoutCreatedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedProductsInput = {
@@ -5094,6 +6334,10 @@ export type UserUncheckedCreateWithoutCreatedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedProductsInput = {
@@ -5142,6 +6386,10 @@ export type UserCreateWithoutUpdatedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedProductsInput = {
@@ -5186,6 +6434,10 @@ export type UserUncheckedCreateWithoutUpdatedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedProductsInput = {
@@ -5234,6 +6486,10 @@ export type UserCreateWithoutDeletedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutDeletedProductsInput = {
@@ -5278,6 +6534,10 @@ export type UserUncheckedCreateWithoutDeletedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutDeletedProductsInput = {
@@ -5337,6 +6597,10 @@ export type UserUpdateWithoutCreatedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedProductsInput = {
@@ -5381,6 +6645,10 @@ export type UserUncheckedUpdateWithoutCreatedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutUpdatedProductsInput = {
@@ -5435,6 +6703,10 @@ export type UserUpdateWithoutUpdatedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedProductsInput = {
@@ -5479,6 +6751,10 @@ export type UserUncheckedUpdateWithoutUpdatedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutDeletedProductsInput = {
@@ -5533,6 +6809,10 @@ export type UserUpdateWithoutDeletedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeletedProductsInput = {
@@ -5577,6 +6857,10 @@ export type UserUncheckedUpdateWithoutDeletedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutPromoCodeRedemptionsInput = {
@@ -5620,6 +6904,10 @@ export type UserCreateWithoutPromoCodeRedemptionsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutPromoCodeRedemptionsInput = {
@@ -5664,6 +6952,10 @@ export type UserUncheckedCreateWithoutPromoCodeRedemptionsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutPromoCodeRedemptionsInput = {
@@ -5723,6 +7015,10 @@ export type UserUpdateWithoutPromoCodeRedemptionsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPromoCodeRedemptionsInput = {
@@ -5767,6 +7063,10 @@ export type UserUncheckedUpdateWithoutPromoCodeRedemptionsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutCreatedSupportsInput = {
@@ -5810,6 +7110,10 @@ export type UserCreateWithoutCreatedSupportsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedSupportsInput = {
@@ -5854,6 +7158,10 @@ export type UserUncheckedCreateWithoutCreatedSupportsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedSupportsInput = {
@@ -5902,6 +7210,10 @@ export type UserCreateWithoutUpdatedSupportsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutUpdatedSupportsInput = {
@@ -5946,6 +7258,10 @@ export type UserUncheckedCreateWithoutUpdatedSupportsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutUpdatedSupportsInput = {
@@ -6005,6 +7321,10 @@ export type UserUpdateWithoutCreatedSupportsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedSupportsInput = {
@@ -6049,6 +7369,10 @@ export type UserUncheckedUpdateWithoutCreatedSupportsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutUpdatedSupportsInput = {
@@ -6103,6 +7427,10 @@ export type UserUpdateWithoutUpdatedSupportsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpdatedSupportsInput = {
@@ -6147,6 +7475,10 @@ export type UserUncheckedUpdateWithoutUpdatedSupportsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutProfileInput = {
@@ -6190,6 +7522,10 @@ export type UserCreateWithoutProfileInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutProfileInput = {
@@ -6234,6 +7570,10 @@ export type UserUncheckedCreateWithoutProfileInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutProfileInput = {
@@ -6293,6 +7633,10 @@ export type UserUpdateWithoutProfileInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProfileInput = {
@@ -6337,6 +7681,10 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutSecurityInput = {
@@ -6380,6 +7728,10 @@ export type UserCreateWithoutSecurityInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutSecurityInput = {
@@ -6424,6 +7776,10 @@ export type UserUncheckedCreateWithoutSecurityInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutSecurityInput = {
@@ -6483,6 +7839,10 @@ export type UserUpdateWithoutSecurityInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSecurityInput = {
@@ -6527,6 +7887,10 @@ export type UserUncheckedUpdateWithoutSecurityInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutOtpsInput = {
@@ -6570,6 +7934,10 @@ export type UserCreateWithoutOtpsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutOtpsInput = {
@@ -6614,6 +7982,10 @@ export type UserUncheckedCreateWithoutOtpsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutOtpsInput = {
@@ -6673,6 +8045,10 @@ export type UserUpdateWithoutOtpsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOtpsInput = {
@@ -6717,6 +8093,10 @@ export type UserUncheckedUpdateWithoutOtpsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 
@@ -6751,6 +8131,10 @@ export type UserCountOutputType = {
   deliveryStatusChanges: number
   verifiedDeliveryMen: number
   auditLogs: number
+  createdDeliveryChargeZones: number
+  updatedDeliveryChargeZones: number
+  createdFreeDeliveryRules: number
+  updatedFreeDeliveryRules: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -6780,6 +8164,10 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   deliveryStatusChanges?: boolean | UserCountOutputTypeCountDeliveryStatusChangesArgs
   verifiedDeliveryMen?: boolean | UserCountOutputTypeCountVerifiedDeliveryMenArgs
   auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
+  createdDeliveryChargeZones?: boolean | UserCountOutputTypeCountCreatedDeliveryChargeZonesArgs
+  updatedDeliveryChargeZones?: boolean | UserCountOutputTypeCountUpdatedDeliveryChargeZonesArgs
+  createdFreeDeliveryRules?: boolean | UserCountOutputTypeCountCreatedFreeDeliveryRulesArgs
+  updatedFreeDeliveryRules?: boolean | UserCountOutputTypeCountUpdatedFreeDeliveryRulesArgs
 }
 
 /**
@@ -6974,6 +8362,34 @@ export type UserCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Types.
   where?: Prisma.AuditLogWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCreatedDeliveryChargeZonesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeliveryChargeZoneWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountUpdatedDeliveryChargeZonesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeliveryChargeZoneWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCreatedFreeDeliveryRulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeliveryFreeDeliveryRuleWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountUpdatedFreeDeliveryRulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeliveryFreeDeliveryRuleWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -7018,6 +8434,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   deliveryStatusChanges?: boolean | Prisma.User$deliveryStatusChangesArgs<ExtArgs>
   verifiedDeliveryMen?: boolean | Prisma.User$verifiedDeliveryMenArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
+  createdDeliveryChargeZones?: boolean | Prisma.User$createdDeliveryChargeZonesArgs<ExtArgs>
+  updatedDeliveryChargeZones?: boolean | Prisma.User$updatedDeliveryChargeZonesArgs<ExtArgs>
+  createdFreeDeliveryRules?: boolean | Prisma.User$createdFreeDeliveryRulesArgs<ExtArgs>
+  updatedFreeDeliveryRules?: boolean | Prisma.User$updatedFreeDeliveryRulesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -7100,6 +8520,10 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   deliveryStatusChanges?: boolean | Prisma.User$deliveryStatusChangesArgs<ExtArgs>
   verifiedDeliveryMen?: boolean | Prisma.User$verifiedDeliveryMenArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
+  createdDeliveryChargeZones?: boolean | Prisma.User$createdDeliveryChargeZonesArgs<ExtArgs>
+  updatedDeliveryChargeZones?: boolean | Prisma.User$updatedDeliveryChargeZonesArgs<ExtArgs>
+  createdFreeDeliveryRules?: boolean | Prisma.User$createdFreeDeliveryRulesArgs<ExtArgs>
+  updatedFreeDeliveryRules?: boolean | Prisma.User$updatedFreeDeliveryRulesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -7137,6 +8561,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     deliveryStatusChanges: Prisma.$DeliveryStatusHistoryPayload<ExtArgs>[]
     verifiedDeliveryMen: Prisma.$DeliveryManProfilePayload<ExtArgs>[]
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
+    createdDeliveryChargeZones: Prisma.$DeliveryChargeZonePayload<ExtArgs>[]
+    updatedDeliveryChargeZones: Prisma.$DeliveryChargeZonePayload<ExtArgs>[]
+    createdFreeDeliveryRules: Prisma.$DeliveryFreeDeliveryRulePayload<ExtArgs>[]
+    updatedFreeDeliveryRules: Prisma.$DeliveryFreeDeliveryRulePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -7575,6 +9003,10 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   deliveryStatusChanges<T extends Prisma.User$deliveryStatusChangesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$deliveryStatusChangesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryStatusHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   verifiedDeliveryMen<T extends Prisma.User$verifiedDeliveryMenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$verifiedDeliveryMenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryManProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  createdDeliveryChargeZones<T extends Prisma.User$createdDeliveryChargeZonesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdDeliveryChargeZonesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryChargeZonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  updatedDeliveryChargeZones<T extends Prisma.User$updatedDeliveryChargeZonesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$updatedDeliveryChargeZonesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryChargeZonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  createdFreeDeliveryRules<T extends Prisma.User$createdFreeDeliveryRulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdFreeDeliveryRulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryFreeDeliveryRulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  updatedFreeDeliveryRules<T extends Prisma.User$updatedFreeDeliveryRulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$updatedFreeDeliveryRulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryFreeDeliveryRulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8688,6 +10120,102 @@ export type User$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
+}
+
+/**
+ * User.createdDeliveryChargeZones
+ */
+export type User$createdDeliveryChargeZonesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeliveryChargeZone
+   */
+  select?: Prisma.DeliveryChargeZoneSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DeliveryChargeZone
+   */
+  omit?: Prisma.DeliveryChargeZoneOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryChargeZoneInclude<ExtArgs> | null
+  where?: Prisma.DeliveryChargeZoneWhereInput
+  orderBy?: Prisma.DeliveryChargeZoneOrderByWithRelationInput | Prisma.DeliveryChargeZoneOrderByWithRelationInput[]
+  cursor?: Prisma.DeliveryChargeZoneWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeliveryChargeZoneScalarFieldEnum | Prisma.DeliveryChargeZoneScalarFieldEnum[]
+}
+
+/**
+ * User.updatedDeliveryChargeZones
+ */
+export type User$updatedDeliveryChargeZonesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeliveryChargeZone
+   */
+  select?: Prisma.DeliveryChargeZoneSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DeliveryChargeZone
+   */
+  omit?: Prisma.DeliveryChargeZoneOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryChargeZoneInclude<ExtArgs> | null
+  where?: Prisma.DeliveryChargeZoneWhereInput
+  orderBy?: Prisma.DeliveryChargeZoneOrderByWithRelationInput | Prisma.DeliveryChargeZoneOrderByWithRelationInput[]
+  cursor?: Prisma.DeliveryChargeZoneWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeliveryChargeZoneScalarFieldEnum | Prisma.DeliveryChargeZoneScalarFieldEnum[]
+}
+
+/**
+ * User.createdFreeDeliveryRules
+ */
+export type User$createdFreeDeliveryRulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeliveryFreeDeliveryRule
+   */
+  select?: Prisma.DeliveryFreeDeliveryRuleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DeliveryFreeDeliveryRule
+   */
+  omit?: Prisma.DeliveryFreeDeliveryRuleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryFreeDeliveryRuleInclude<ExtArgs> | null
+  where?: Prisma.DeliveryFreeDeliveryRuleWhereInput
+  orderBy?: Prisma.DeliveryFreeDeliveryRuleOrderByWithRelationInput | Prisma.DeliveryFreeDeliveryRuleOrderByWithRelationInput[]
+  cursor?: Prisma.DeliveryFreeDeliveryRuleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeliveryFreeDeliveryRuleScalarFieldEnum | Prisma.DeliveryFreeDeliveryRuleScalarFieldEnum[]
+}
+
+/**
+ * User.updatedFreeDeliveryRules
+ */
+export type User$updatedFreeDeliveryRulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeliveryFreeDeliveryRule
+   */
+  select?: Prisma.DeliveryFreeDeliveryRuleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DeliveryFreeDeliveryRule
+   */
+  omit?: Prisma.DeliveryFreeDeliveryRuleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryFreeDeliveryRuleInclude<ExtArgs> | null
+  where?: Prisma.DeliveryFreeDeliveryRuleWhereInput
+  orderBy?: Prisma.DeliveryFreeDeliveryRuleOrderByWithRelationInput | Prisma.DeliveryFreeDeliveryRuleOrderByWithRelationInput[]
+  cursor?: Prisma.DeliveryFreeDeliveryRuleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeliveryFreeDeliveryRuleScalarFieldEnum | Prisma.DeliveryFreeDeliveryRuleScalarFieldEnum[]
 }
 
 /**

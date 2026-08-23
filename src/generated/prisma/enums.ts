@@ -45,6 +45,34 @@ export const CartStatus = {
 export type CartStatus = (typeof CartStatus)[keyof typeof CartStatus]
 
 
+export const DeliveryChargeStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE'
+} as const
+
+export type DeliveryChargeStatus = (typeof DeliveryChargeStatus)[keyof typeof DeliveryChargeStatus]
+
+
+export const DeliveryRateBasis = {
+  FLAT: 'FLAT',
+  WEIGHT: 'WEIGHT',
+  ORDER_VALUE: 'ORDER_VALUE',
+  ITEM_COUNT: 'ITEM_COUNT'
+} as const
+
+export type DeliveryRateBasis = (typeof DeliveryRateBasis)[keyof typeof DeliveryRateBasis]
+
+
+export const FreeDeliveryTrigger = {
+  MIN_ORDER_AMOUNT: 'MIN_ORDER_AMOUNT',
+  PROMO_CODE: 'PROMO_CODE',
+  FIRST_ORDER: 'FIRST_ORDER',
+  CAMPAIGN: 'CAMPAIGN'
+} as const
+
+export type FreeDeliveryTrigger = (typeof FreeDeliveryTrigger)[keyof typeof FreeDeliveryTrigger]
+
+
 export const DeliveryVehicleType = {
   BICYCLE: 'BICYCLE',
   MOTORCYCLE: 'MOTORCYCLE',
