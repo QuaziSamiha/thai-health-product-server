@@ -28,13 +28,19 @@ export class DeliveryAreaResponseDto {
     description: 'Province. Absent means "any province in the country".',
     example: 'Bangkok',
   })
-  state?: string;
+  province?: string;
 
   @ApiPropertyOptional({
     description: 'District. Absent means "any district in the province".',
     example: 'Watthana',
   })
-  region?: string;
+  district?: string;
+
+  @ApiPropertyOptional({
+    description: 'Subdistrict. Absent means "any subdistrict in the district".',
+    example: 'Ang Thong',
+  })
+  subdistrict?: string;
 
   @ApiPropertyOptional({ example: '10110' })
   postalCode?: string;
@@ -191,8 +197,9 @@ export class DeliveryZoneResponseDto {
     areas: {
       id: number;
       country: string;
-      state: string | null;
-      region: string | null;
+      province: string | null;
+      district: string | null;
+      subdistrict: string | null;
       postalCode: string | null;
       postalPrefix: string | null;
     }[];
@@ -240,8 +247,9 @@ export class DeliveryZoneResponseDto {
     this.areas = zone.areas.map((area) => ({
       id: area.id,
       country: area.country,
-      state: area.state ?? undefined,
-      region: area.region ?? undefined,
+      province: area.province ?? undefined,
+      district: area.district ?? undefined,
+      subdistrict: area.subdistrict ?? undefined,
       postalCode: area.postalCode ?? undefined,
       postalPrefix: area.postalPrefix ?? undefined,
     }));

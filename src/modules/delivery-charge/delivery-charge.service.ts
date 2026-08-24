@@ -380,7 +380,7 @@ export class DeliveryChargeService {
     }
 
     throw new BadRequestException(
-      `We do not currently deliver to ${destination.region}, ${destination.state} ${destination.postalCode}. Please try a different address or contact us.`,
+      `We do not currently deliver to ${destination.district}, ${destination.province} ${destination.postalCode}. Please try a different address or contact us.`,
     );
   }
 
@@ -629,6 +629,12 @@ export class DeliveryChargeService {
     dto: CreateDeliveryZoneDto,
   ): Promise<DeliveryZoneResponseDto> {
     this.assertRateCardIsUsable(dto.rates);
+    this.assertAreaRulesAreCoherent(dto.areas);
+    this.assertZoneHasCoverage(dto.areas, dto.isDefault ?? false);
+    await this.assertOneZonePerWholeCountry(
+      dto.areas,
+      dto.status ?? DeliveryChargeStatus.ACTIVE,
+    );
 
     const existing = await this.repository.findZoneByCode(dto.code);
     if (existing) {
@@ -743,6 +749,41 @@ export class DeliveryChargeService {
     }
 
     if (dto.rates) this.assertRateCardIsUsable(dto.rates);
+    if (dto.areas) this.assertAreaRulesAreCoherent(dto.areas);
+
+    //* DEACTIVATING THE CATCH-ALL DOES EXACTLY WHAT DELETING IT DOES — EVERY
+    //* ADDRESS NO AREA RULE COVERS IS REFUSED AT CHECKOUT, BECAUSE THE
+    //* FALLBACK LOOKUP ONLY CONSIDERS ACTIVE ZONES. WITHOUT THIS, THE DELETE
+    //* GUARD BELOW IS TRIVIALLY BYPASSED BY SETTING status INSTEAD.
+    //* AREAS ARE OMITTED WHEN THE EDIT DID NOT TOUCH THEM, IN WHICH CASE THE
+    //* ROWS ALREADY ON THE ZONE ARE WHAT WILL BE IN FORCE — SO REACTIVATING A
+    //* ZONE IS CHECKED AGAINST *ITS* COVERAGE, NOT AGAINST AN EMPTY LIST.
+    await this.assertOneZonePerWholeCountry(
+      dto.areas ??
+        existing.areas.map((area) => ({
+          country: area.country,
+          province: area.province ?? undefined,
+          district: area.district ?? undefined,
+          subdistrict: area.subdistrict ?? undefined,
+          postalCode: area.postalCode ?? undefined,
+          postalPrefix: area.postalPrefix ?? undefined,
+        })),
+      dto.status ?? existing.status,
+      id,
+    );
+
+    const staysDefault = dto.isDefault ?? existing.isDefault;
+
+    //* AREAS ARE ONLY CHECKED WHEN THE EDIT SENDS THEM. AN UPDATE THAT LEAVES
+    //* THEM ALONE MUST NOT BE REJECTED FOR COVERAGE IT NEVER TOUCHED —
+    //* OTHERWISE CLEARING isDefault ON A LEGACY ZONE WOULD BE UNREACHABLE.
+    if (dto.areas) this.assertZoneHasCoverage(dto.areas, staysDefault);
+
+    if (staysDefault && dto.status === DeliveryChargeStatus.INACTIVE) {
+      throw new ConflictException(
+        'This is the fallback zone for addresses no other zone covers. Deactivating it would stop checkout for every address it catches — make another zone the default first.',
+      );
+    }
 
     if (dto.code && dto.code !== existing.code) {
       const conflict = await this.repository.findZoneByCode(dto.code);
@@ -841,6 +882,134 @@ export class DeliveryChargeService {
    *
    * Only active bands are considered, matching what the calculator reads.
    */
+  /**
+   * Rejects a coverage rule that makes two claims at once.
+   *
+   * `scoreArea` reads a postal rule and returns immediately — the named levels
+   * on the same row are **never consulted**. So `{ province: 'Amnat Charoen',
+   * postalCode: '10110' }` is not a narrower rule, it is a rule about a
+   * Bangkok postcode with a misleading province attached, and the row displays
+   * a province it does not honour. The two are alternative ways to name the
+   * same row, exactly as `postalCode` and `postalPrefix` already are.
+   *
+   * Caught here rather than only in the DB so the message names the row and
+   * says which half to drop. The hierarchy checks below duplicate two DB
+   * constraints for the same reason.
+   */
+  private assertAreaRulesAreCoherent(areas: DeliveryAreaInputDto[]): void {
+    areas.forEach((area, index) => {
+      const label = `Coverage rule ${index + 1}`;
+      const named = area.province ?? area.district ?? area.subdistrict;
+
+      if (area.postalCode && area.postalPrefix) {
+        throw new BadRequestException(
+          `${label} sets both a postal code and a postal prefix — use one or the other`,
+        );
+      }
+      if ((area.postalCode ?? area.postalPrefix) && named) {
+        throw new BadRequestException(
+          `${label} mixes a postal rule with a province/district — a postal rule ignores them, so give the postal code its own coverage rule`,
+        );
+      }
+      //* A RULE THAT NAMES NOWHERE COVERS EVERYWHERE. THAT IS THE CATCH-ALL'S
+      //* JOB — AND THE NATIONWIDE CHARGE IS THE SCREEN FOR IT — SO A ZONE
+      //* CARRYING ONE IS A SECOND, COMPETING COUNTRY-WIDE PRICE DRESSED UP AS
+      //* A REGION. IT IS ALSO WHAT AN UNTOUCHED COVERAGE ROW SAVES AS, WHICH
+      //* IS HOW IT HAPPENS BY ACCIDENT RATHER THAN ON PURPOSE.
+      if (!named && !area.postalCode && !area.postalPrefix) {
+        throw new BadRequestException(
+          `${label} does not name anywhere. Give it a province or a postal code — to charge one price for the whole country, use the nationwide delivery charge instead of a zone`,
+        );
+      }
+      if (area.district && !area.province) {
+        throw new BadRequestException(
+          `${label} names a district without its province, which would match every same-named district in the country`,
+        );
+      }
+      if (area.subdistrict && !area.district) {
+        throw new BadRequestException(
+          `${label} names a subdistrict without its district`,
+        );
+      }
+    });
+  }
+
+  /**
+   * The countries a set of coverage rules claims *whole*.
+   *
+   * A rule with nothing but a country on it is the widest claim there is: it
+   * matches every address in that country at rung 100 of the ladder. It is
+   * also what an untouched coverage row saves as, which is how two zones end
+   * up silently covering the same country.
+   */
+  private countriesClaimedWhole(areas: DeliveryAreaInputDto[]): string[] {
+    const countries = areas
+      .filter(
+        (area) =>
+          !area.province &&
+          !area.district &&
+          !area.subdistrict &&
+          !area.postalCode &&
+          !area.postalPrefix,
+      )
+      .map((area) => area.country?.trim() || 'Thailand');
+    return [...new Set(countries.map((c) => c.toLowerCase()))].map(
+      (lower) => countries.find((c) => c.toLowerCase() === lower)!,
+    );
+  }
+
+  /**
+   * Refuses a second active zone covering an entire country.
+   *
+   * Two country-wide rules tie at 100 on every address, so which zone prices
+   * the order comes down to `priority` and then `id` — an answer nobody chose
+   * and nothing on screen explains. One is a decision; two is a coin flip
+   * charged to the customer.
+   *
+   * The catch-all is deliberately *not* caught here: it holds no area rules at
+   * all, so it never ties with anything. It only applies where nothing matched
+   * — which is why a country-wide rule makes it unreachable, and why the
+   * nationwide card already says so in its own words.
+   */
+  private async assertOneZonePerWholeCountry(
+    areas: DeliveryAreaInputDto[],
+    status: DeliveryChargeStatus,
+    excludeZoneId?: number,
+  ): Promise<void> {
+    //* AN INACTIVE ZONE PRICES NOTHING, SO IT CANNOT TIE WITH ANYTHING.
+    if (status === DeliveryChargeStatus.INACTIVE) return;
+
+    for (const country of this.countriesClaimedWhole(areas)) {
+      const clashes = await this.repository.findActiveZonesCoveringWholeCountry(
+        country,
+        excludeZoneId,
+      );
+      if (clashes.length > 0) {
+        throw new ConflictException(
+          `"${clashes[0].name}" already covers the whole of ${country}. Two zones covering the same country tie on every order, so give this zone the provinces or postal codes it should actually cover — or deactivate "${clashes[0].name}".`,
+        );
+      }
+    }
+  }
+
+  /**
+   * A zone that is not the catch-all has to say where it applies.
+   *
+   * With no coverage rules it matches nothing and prices nothing — the admin
+   * table already has to call that out as "never matches" — so saving one is
+   * always a mistake. The catch-all is the deliberate exception: it carries no
+   * rules *because* it is the fallback.
+   */
+  private assertZoneHasCoverage(
+    areas: DeliveryAreaInputDto[],
+    isDefault: boolean,
+  ): void {
+    if (isDefault || areas.length > 0) return;
+    throw new BadRequestException(
+      'A delivery zone needs at least one coverage rule, or it never matches an address. Add the provinces or postal codes it covers, or switch on "Catch-all zone" to make it the fallback.',
+    );
+  }
+
   private assertRateCardIsUsable(rates: DeliveryRateInputDto[]): void {
     const active = rates.filter(
       (rate) =>
@@ -1165,8 +1334,9 @@ export class DeliveryChargeService {
 function toAreaRow(area: DeliveryAreaInputDto) {
   return {
     country: area.country ?? 'Thailand',
-    state: area.state ?? null,
-    region: area.region ?? null,
+    province: area.province ?? null,
+    district: area.district ?? null,
+    subdistrict: area.subdistrict ?? null,
     postalCode: area.postalCode ?? null,
     postalPrefix: area.postalPrefix ?? null,
   };

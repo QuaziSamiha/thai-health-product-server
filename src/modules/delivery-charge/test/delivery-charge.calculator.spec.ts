@@ -35,16 +35,18 @@ const atIct = (iso: string): Date =>
 
 const area = (overrides: Partial<AreaRule>): AreaRule => ({
   country: 'Thailand',
-  state: null,
-  region: null,
+  province: null,
+  district: null,
+  subdistrict: null,
   postalCode: null,
   postalPrefix: null,
   ...overrides,
 });
 
 const BANGKOK = {
-  state: 'Bangkok',
-  region: 'Watthana',
+  subdistrict: 'Khlong Toei Nuea',
+  district: 'Watthana',
+  province: 'Bangkok',
   postalCode: '10110',
   country: 'Thailand',
 };
@@ -53,9 +55,19 @@ describe('scoreArea — which zone claims an address', () => {
   it('ranks an exact postal code above every other kind of rule', () => {
     expect(scoreArea(area({ postalCode: '10110' }), BANGKOK)).toBe(1000);
     expect(
-      scoreArea(area({ state: 'Bangkok', region: 'Watthana' }), BANGKOK),
+      scoreArea(
+        area({
+          province: 'Bangkok',
+          district: 'Watthana',
+          subdistrict: 'Khlong Toei Nuea',
+        }),
+        BANGKOK,
+      ),
+    ).toBe(950);
+    expect(
+      scoreArea(area({ province: 'Bangkok', district: 'Watthana' }), BANGKOK),
     ).toBe(900);
-    expect(scoreArea(area({ state: 'Bangkok' }), BANGKOK)).toBe(600);
+    expect(scoreArea(area({ province: 'Bangkok' }), BANGKOK)).toBe(600);
     expect(scoreArea(area({}), BANGKOK)).toBe(100);
   });
 
@@ -64,7 +76,7 @@ describe('scoreArea — which zone claims an address', () => {
   //* CODE, THE UPCOUNTRY ZONE NAMES SURAT THANI, AND THE NARROWER ONE WINS.
   it('lets a narrower rule beat a wider one over the same address', () => {
     const exact = scoreArea(area({ postalCode: '10110' }), BANGKOK)!;
-    const province = scoreArea(area({ state: 'Bangkok' }), BANGKOK)!;
+    const province = scoreArea(area({ province: 'Bangkok' }), BANGKOK)!;
     expect(exact).toBeGreaterThan(province);
   });
 
@@ -75,19 +87,29 @@ describe('scoreArea — which zone claims an address', () => {
   });
 
   it('treats a null field as a wildcard, not as a requirement to be null', () => {
-    //* { state: null } CLAIMS THE WHOLE COUNTRY. IF IT WERE READ AS "ADDRESSES
+    //* { province: null } CLAIMS THE WHOLE COUNTRY. IF IT WERE READ AS "ADDRESSES
     //* WITH NO PROVINCE" THE CATCH-ALL RULE WOULD MATCH NOTHING AT ALL.
     expect(scoreArea(area({}), BANGKOK)).not.toBeNull();
   });
 
   it('ignores case and surrounding whitespace', () => {
-    expect(scoreArea(area({ state: '  bangkok ' }), BANGKOK)).toBe(600);
+    expect(scoreArea(area({ province: '  bangkok ' }), BANGKOK)).toBe(600);
   });
 
   it('is a hard miss when a populated field disagrees', () => {
-    expect(scoreArea(area({ state: 'Chiang Mai' }), BANGKOK)).toBeNull();
+    expect(scoreArea(area({ province: 'Chiang Mai' }), BANGKOK)).toBeNull();
     expect(
-      scoreArea(area({ state: 'Bangkok', region: 'Bang Rak' }), BANGKOK),
+      scoreArea(area({ province: 'Bangkok', district: 'Bang Rak' }), BANGKOK),
+    ).toBeNull();
+    expect(
+      scoreArea(
+        area({
+          province: 'Bangkok',
+          district: 'Watthana',
+          subdistrict: 'Khlong Tan Nuea',
+        }),
+        BANGKOK,
+      ),
     ).toBeNull();
     //* A POSTAL RULE THAT DOES NOT MATCH MUST NOT FALL THROUGH TO BE SCORED AS
     //* A PROVINCE OR COUNTRY RULE — THAT WOULD MAKE A 50000 RULE MATCH BANGKOK.

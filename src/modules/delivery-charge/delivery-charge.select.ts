@@ -6,8 +6,9 @@
 export const DELIVERY_CHARGE_AREA_SELECT = {
   id: true,
   country: true,
-  state: true,
-  region: true,
+  province: true,
+  district: true,
+  subdistrict: true,
   postalCode: true,
   postalPrefix: true,
 } as const;

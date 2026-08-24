@@ -24,8 +24,9 @@ export class DeliveryManRepository extends BaseRepository {
 
   private readonly ADDRESS_SELECT = {
     addressLine: true,
-    state: true,
-    region: true,
+    subdistrict: true,
+    district: true,
+    province: true,
   } as const;
 
   private readonly DELIVERY_MAN_PROFILE_SELECT = {
@@ -117,7 +118,12 @@ export class DeliveryManRepository extends BaseRepository {
       {
         where: { role: UserRole.DELIVERY_PARTNER, deletedAt: null },
         select: this.DETAIL_SELECT,
-        searchableFields: ['email', 'phone', 'profile.firstName', 'profile.lastName'],
+        searchableFields: [
+          'email',
+          'phone',
+          'profile.firstName',
+          'profile.lastName',
+        ],
         defaultSortField: 'createdAt',
       },
     );

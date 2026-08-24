@@ -54,18 +54,29 @@ export class AddressResponseDto {
 
   @Expose()
   @ApiProperty({
-    description: 'Street name and house/unit number',
-    example: '123/45 Sukhumvit Road',
+    description:
+      'Everything below subdistrict level: house/unit number, moo, soi, street, building and area detail',
+    example: '123/45 Sukhumvit Road, Soi 21, Nova Building 3rd floor',
   })
   addressLine!: string;
 
   @Expose()
-  @ApiProperty({ description: 'Province level', example: 'Bangkok' })
-  state!: string;
+  @ApiProperty({
+    description: 'Subdistrict — tambon (khwaeng in Bangkok)',
+    example: 'Khlong Toei Nuea',
+  })
+  subdistrict!: string;
 
   @Expose()
-  @ApiProperty({ description: 'District level', example: 'Watthana' })
-  region!: string;
+  @ApiProperty({
+    description: 'District — amphoe (khet in Bangkok)',
+    example: 'Watthana',
+  })
+  district!: string;
+
+  @Expose()
+  @ApiProperty({ description: 'Province — changwat', example: 'Bangkok' })
+  province!: string;
 
   @Expose()
   @ApiProperty({ description: 'Postal/ZIP code', example: '10110' })
@@ -92,8 +103,9 @@ export class AddressResponseDto {
     this.recipientName = address.recipientName!;
     this.phone = address.phone ?? undefined;
     this.addressLine = address.addressLine!;
-    this.state = address.state!;
-    this.region = address.region!;
+    this.subdistrict = address.subdistrict!;
+    this.district = address.district!;
+    this.province = address.province!;
     this.postalCode = address.postalCode!;
     this.country = address.country!;
     this.createdAt = address.createdAt!;

@@ -9,6 +9,10 @@ import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { AddressResponseDto } from './dto/address-response.dto';
 import { formatDisplayName } from '../../common/utils/display-name.util';
+import {
+  assertServedCountry,
+  assertThaiAddress,
+} from '../../common/geography/thai-geography';
 
 @Injectable()
 export class AddressService {
@@ -38,8 +42,7 @@ export class AddressService {
 
     const user = await this.addressRepository.findUserContactInfo(userId, tx);
 
-    const recipientName =
-      dto.recipientName ?? formatDisplayName(user?.profile);
+    const recipientName = dto.recipientName ?? formatDisplayName(user?.profile);
     const phone = dto.phone ?? user?.phone ?? undefined;
 
     if (!recipientName) {
@@ -55,6 +58,18 @@ export class AddressService {
     userId: number,
     dto: CreateAddressDto,
   ): Promise<AddressResponseDto> {
+    //* BEFORE THE TRANSACTION — A MALFORMED ADDRESS NEEDS NO DATABASE WORK
+    //* TO REJECT, AND THE DTO'S OWN RULES ONLY CHECK EACH FIELD IN ISOLATION
+    //* (5 DIGITS, 2+ CHARACTERS). THEY CANNOT SEE THAT THE FOUR VALUES
+    //* CONTRADICT EACH OTHER — SEE common/geography/thai-geography.ts.
+    assertServedCountry(dto.country);
+    assertThaiAddress({
+      province: dto.province,
+      district: dto.district,
+      subdistrict: dto.subdistrict,
+      postalCode: dto.postalCode,
+    });
+
     return this.addressRepository.withTransaction(async (tx) => {
       const { recipientName, phone } = await this.resolveContactDefaults(
         userId,
@@ -80,8 +95,9 @@ export class AddressService {
         {
           label: dto.label,
           addressLine: dto.addressLine,
-          state: dto.state,
-          region: dto.region,
+          subdistrict: dto.subdistrict,
+          district: dto.district,
+          province: dto.province,
           postalCode: dto.postalCode,
           country: dto.country,
           recipientName,
@@ -130,6 +146,18 @@ export class AddressService {
         throw new NotFoundException('Address not found');
       }
       this.assertOwnership(existing, userId);
+
+      //* PATCH IS PARTIAL, SO THE FOUR LEVELS ARE VALIDATED AS THE ROW WOULD
+      //* *END UP* — MERGING WHAT WAS SENT OVER WHAT IS STORED. VALIDATING ONLY
+      //* THE SENT FIELDS WOULD LET "CHANGE JUST THE POSTAL CODE" PUT A BANGKOK
+      //* CODE ON A SURIN ADDRESS, WHICH IS THE EXACT HOLE THIS CLOSES.
+      assertServedCountry(dto.country);
+      assertThaiAddress({
+        province: dto.province ?? existing.province,
+        district: dto.district ?? existing.district,
+        subdistrict: dto.subdistrict ?? existing.subdistrict,
+        postalCode: dto.postalCode ?? existing.postalCode,
+      });
 
       if (dto.isDefault) {
         await this.addressRepository.clearDefaultForUser(userId, tx);

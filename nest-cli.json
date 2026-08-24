@@ -9,6 +9,11 @@
         "include": "modules/mail/templates/**/*",
         "watchAssets": true,
         "outDir": "dist/src"
+      },
+      {
+        "include": "common/geography/*.json",
+        "watchAssets": true,
+        "outDir": "dist/src"
       }
     ]
   }

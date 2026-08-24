@@ -49,8 +49,8 @@ export type DeliveryZoneMinAggregateOutputType = {
   sid: string | null
   serviceName: string | null
   areaName: string | null
-  state: string | null
-  region: string | null
+  province: string | null
+  district: string | null
   postalCodePrefix: string | null
   country: string | null
   minDeliveryDays: number | null
@@ -70,8 +70,8 @@ export type DeliveryZoneMaxAggregateOutputType = {
   sid: string | null
   serviceName: string | null
   areaName: string | null
-  state: string | null
-  region: string | null
+  province: string | null
+  district: string | null
   postalCodePrefix: string | null
   country: string | null
   minDeliveryDays: number | null
@@ -91,8 +91,8 @@ export type DeliveryZoneCountAggregateOutputType = {
   sid: number
   serviceName: number
   areaName: number
-  state: number
-  region: number
+  province: number
+  district: number
   postalCodePrefix: number
   country: number
   minDeliveryDays: number
@@ -132,8 +132,8 @@ export type DeliveryZoneMinAggregateInputType = {
   sid?: true
   serviceName?: true
   areaName?: true
-  state?: true
-  region?: true
+  province?: true
+  district?: true
   postalCodePrefix?: true
   country?: true
   minDeliveryDays?: true
@@ -153,8 +153,8 @@ export type DeliveryZoneMaxAggregateInputType = {
   sid?: true
   serviceName?: true
   areaName?: true
-  state?: true
-  region?: true
+  province?: true
+  district?: true
   postalCodePrefix?: true
   country?: true
   minDeliveryDays?: true
@@ -174,8 +174,8 @@ export type DeliveryZoneCountAggregateInputType = {
   sid?: true
   serviceName?: true
   areaName?: true
-  state?: true
-  region?: true
+  province?: true
+  district?: true
   postalCodePrefix?: true
   country?: true
   minDeliveryDays?: true
@@ -282,8 +282,8 @@ export type DeliveryZoneGroupByOutputType = {
   sid: string
   serviceName: string | null
   areaName: string
-  state: string | null
-  region: string | null
+  province: string | null
+  district: string | null
   postalCodePrefix: string | null
   country: string
   minDeliveryDays: number
@@ -326,8 +326,8 @@ export type DeliveryZoneWhereInput = {
   sid?: Prisma.UuidFilter<"DeliveryZone"> | string
   serviceName?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
   areaName?: Prisma.StringFilter<"DeliveryZone"> | string
-  state?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
-  region?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
+  province?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
+  district?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
   postalCodePrefix?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
   country?: Prisma.StringFilter<"DeliveryZone"> | string
   minDeliveryDays?: Prisma.IntFilter<"DeliveryZone"> | number
@@ -349,8 +349,8 @@ export type DeliveryZoneOrderByWithRelationInput = {
   sid?: Prisma.SortOrder
   serviceName?: Prisma.SortOrderInput | Prisma.SortOrder
   areaName?: Prisma.SortOrder
-  state?: Prisma.SortOrderInput | Prisma.SortOrder
-  region?: Prisma.SortOrderInput | Prisma.SortOrder
+  province?: Prisma.SortOrderInput | Prisma.SortOrder
+  district?: Prisma.SortOrderInput | Prisma.SortOrder
   postalCodePrefix?: Prisma.SortOrderInput | Prisma.SortOrder
   country?: Prisma.SortOrder
   minDeliveryDays?: Prisma.SortOrder
@@ -376,8 +376,8 @@ export type DeliveryZoneWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.DeliveryZoneWhereInput | Prisma.DeliveryZoneWhereInput[]
   serviceName?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
   areaName?: Prisma.StringFilter<"DeliveryZone"> | string
-  state?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
-  region?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
+  province?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
+  district?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
   postalCodePrefix?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
   country?: Prisma.StringFilter<"DeliveryZone"> | string
   minDeliveryDays?: Prisma.IntFilter<"DeliveryZone"> | number
@@ -399,8 +399,8 @@ export type DeliveryZoneOrderByWithAggregationInput = {
   sid?: Prisma.SortOrder
   serviceName?: Prisma.SortOrderInput | Prisma.SortOrder
   areaName?: Prisma.SortOrder
-  state?: Prisma.SortOrderInput | Prisma.SortOrder
-  region?: Prisma.SortOrderInput | Prisma.SortOrder
+  province?: Prisma.SortOrderInput | Prisma.SortOrder
+  district?: Prisma.SortOrderInput | Prisma.SortOrder
   postalCodePrefix?: Prisma.SortOrderInput | Prisma.SortOrder
   country?: Prisma.SortOrder
   minDeliveryDays?: Prisma.SortOrder
@@ -428,8 +428,8 @@ export type DeliveryZoneScalarWhereWithAggregatesInput = {
   sid?: Prisma.UuidWithAggregatesFilter<"DeliveryZone"> | string
   serviceName?: Prisma.StringNullableWithAggregatesFilter<"DeliveryZone"> | string | null
   areaName?: Prisma.StringWithAggregatesFilter<"DeliveryZone"> | string
-  state?: Prisma.StringNullableWithAggregatesFilter<"DeliveryZone"> | string | null
-  region?: Prisma.StringNullableWithAggregatesFilter<"DeliveryZone"> | string | null
+  province?: Prisma.StringNullableWithAggregatesFilter<"DeliveryZone"> | string | null
+  district?: Prisma.StringNullableWithAggregatesFilter<"DeliveryZone"> | string | null
   postalCodePrefix?: Prisma.StringNullableWithAggregatesFilter<"DeliveryZone"> | string | null
   country?: Prisma.StringWithAggregatesFilter<"DeliveryZone"> | string
   minDeliveryDays?: Prisma.IntWithAggregatesFilter<"DeliveryZone"> | number
@@ -448,8 +448,8 @@ export type DeliveryZoneCreateInput = {
   sid?: string
   serviceName?: string | null
   areaName: string
-  state?: string | null
-  region?: string | null
+  province?: string | null
+  district?: string | null
   postalCodePrefix?: string | null
   country?: string
   minDeliveryDays: number
@@ -470,8 +470,8 @@ export type DeliveryZoneUncheckedCreateInput = {
   sid?: string
   serviceName?: string | null
   areaName: string
-  state?: string | null
-  region?: string | null
+  province?: string | null
+  district?: string | null
   postalCodePrefix?: string | null
   country?: string
   minDeliveryDays: number
@@ -491,8 +491,8 @@ export type DeliveryZoneUpdateInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   serviceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   areaName?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   postalCodePrefix?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.StringFieldUpdateOperationsInput | string
   minDeliveryDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -513,8 +513,8 @@ export type DeliveryZoneUncheckedUpdateInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   serviceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   areaName?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   postalCodePrefix?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.StringFieldUpdateOperationsInput | string
   minDeliveryDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -535,8 +535,8 @@ export type DeliveryZoneCreateManyInput = {
   sid?: string
   serviceName?: string | null
   areaName: string
-  state?: string | null
-  region?: string | null
+  province?: string | null
+  district?: string | null
   postalCodePrefix?: string | null
   country?: string
   minDeliveryDays: number
@@ -555,8 +555,8 @@ export type DeliveryZoneUpdateManyMutationInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   serviceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   areaName?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   postalCodePrefix?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.StringFieldUpdateOperationsInput | string
   minDeliveryDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -575,8 +575,8 @@ export type DeliveryZoneUncheckedUpdateManyInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   serviceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   areaName?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   postalCodePrefix?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.StringFieldUpdateOperationsInput | string
   minDeliveryDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -613,8 +613,8 @@ export type DeliveryZoneCountOrderByAggregateInput = {
   sid?: Prisma.SortOrder
   serviceName?: Prisma.SortOrder
   areaName?: Prisma.SortOrder
-  state?: Prisma.SortOrder
-  region?: Prisma.SortOrder
+  province?: Prisma.SortOrder
+  district?: Prisma.SortOrder
   postalCodePrefix?: Prisma.SortOrder
   country?: Prisma.SortOrder
   minDeliveryDays?: Prisma.SortOrder
@@ -643,8 +643,8 @@ export type DeliveryZoneMaxOrderByAggregateInput = {
   sid?: Prisma.SortOrder
   serviceName?: Prisma.SortOrder
   areaName?: Prisma.SortOrder
-  state?: Prisma.SortOrder
-  region?: Prisma.SortOrder
+  province?: Prisma.SortOrder
+  district?: Prisma.SortOrder
   postalCodePrefix?: Prisma.SortOrder
   country?: Prisma.SortOrder
   minDeliveryDays?: Prisma.SortOrder
@@ -664,8 +664,8 @@ export type DeliveryZoneMinOrderByAggregateInput = {
   sid?: Prisma.SortOrder
   serviceName?: Prisma.SortOrder
   areaName?: Prisma.SortOrder
-  state?: Prisma.SortOrder
-  region?: Prisma.SortOrder
+  province?: Prisma.SortOrder
+  district?: Prisma.SortOrder
   postalCodePrefix?: Prisma.SortOrder
   country?: Prisma.SortOrder
   minDeliveryDays?: Prisma.SortOrder
@@ -760,8 +760,8 @@ export type DeliveryZoneCreateWithoutProviderInput = {
   sid?: string
   serviceName?: string | null
   areaName: string
-  state?: string | null
-  region?: string | null
+  province?: string | null
+  district?: string | null
   postalCodePrefix?: string | null
   country?: string
   minDeliveryDays: number
@@ -781,8 +781,8 @@ export type DeliveryZoneUncheckedCreateWithoutProviderInput = {
   sid?: string
   serviceName?: string | null
   areaName: string
-  state?: string | null
-  region?: string | null
+  province?: string | null
+  district?: string | null
   postalCodePrefix?: string | null
   country?: string
   minDeliveryDays: number
@@ -831,8 +831,8 @@ export type DeliveryZoneScalarWhereInput = {
   sid?: Prisma.UuidFilter<"DeliveryZone"> | string
   serviceName?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
   areaName?: Prisma.StringFilter<"DeliveryZone"> | string
-  state?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
-  region?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
+  province?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
+  district?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
   postalCodePrefix?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
   country?: Prisma.StringFilter<"DeliveryZone"> | string
   minDeliveryDays?: Prisma.IntFilter<"DeliveryZone"> | number
@@ -851,8 +851,8 @@ export type DeliveryZoneCreateWithoutShipmentsInput = {
   sid?: string
   serviceName?: string | null
   areaName: string
-  state?: string | null
-  region?: string | null
+  province?: string | null
+  district?: string | null
   postalCodePrefix?: string | null
   country?: string
   minDeliveryDays: number
@@ -872,8 +872,8 @@ export type DeliveryZoneUncheckedCreateWithoutShipmentsInput = {
   sid?: string
   serviceName?: string | null
   areaName: string
-  state?: string | null
-  region?: string | null
+  province?: string | null
+  district?: string | null
   postalCodePrefix?: string | null
   country?: string
   minDeliveryDays: number
@@ -908,8 +908,8 @@ export type DeliveryZoneUpdateWithoutShipmentsInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   serviceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   areaName?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   postalCodePrefix?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.StringFieldUpdateOperationsInput | string
   minDeliveryDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -929,8 +929,8 @@ export type DeliveryZoneUncheckedUpdateWithoutShipmentsInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   serviceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   areaName?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   postalCodePrefix?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.StringFieldUpdateOperationsInput | string
   minDeliveryDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -950,8 +950,8 @@ export type DeliveryZoneCreateManyProviderInput = {
   sid?: string
   serviceName?: string | null
   areaName: string
-  state?: string | null
-  region?: string | null
+  province?: string | null
+  district?: string | null
   postalCodePrefix?: string | null
   country?: string
   minDeliveryDays: number
@@ -969,8 +969,8 @@ export type DeliveryZoneUpdateWithoutProviderInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   serviceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   areaName?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   postalCodePrefix?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.StringFieldUpdateOperationsInput | string
   minDeliveryDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -990,8 +990,8 @@ export type DeliveryZoneUncheckedUpdateWithoutProviderInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   serviceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   areaName?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   postalCodePrefix?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.StringFieldUpdateOperationsInput | string
   minDeliveryDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1011,8 +1011,8 @@ export type DeliveryZoneUncheckedUpdateManyWithoutProviderInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   serviceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   areaName?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   postalCodePrefix?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.StringFieldUpdateOperationsInput | string
   minDeliveryDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1062,8 +1062,8 @@ export type DeliveryZoneSelect<ExtArgs extends runtime.Types.Extensions.Internal
   sid?: boolean
   serviceName?: boolean
   areaName?: boolean
-  state?: boolean
-  region?: boolean
+  province?: boolean
+  district?: boolean
   postalCodePrefix?: boolean
   country?: boolean
   minDeliveryDays?: boolean
@@ -1086,8 +1086,8 @@ export type DeliveryZoneSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   sid?: boolean
   serviceName?: boolean
   areaName?: boolean
-  state?: boolean
-  region?: boolean
+  province?: boolean
+  district?: boolean
   postalCodePrefix?: boolean
   country?: boolean
   minDeliveryDays?: boolean
@@ -1108,8 +1108,8 @@ export type DeliveryZoneSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   sid?: boolean
   serviceName?: boolean
   areaName?: boolean
-  state?: boolean
-  region?: boolean
+  province?: boolean
+  district?: boolean
   postalCodePrefix?: boolean
   country?: boolean
   minDeliveryDays?: boolean
@@ -1130,8 +1130,8 @@ export type DeliveryZoneSelectScalar = {
   sid?: boolean
   serviceName?: boolean
   areaName?: boolean
-  state?: boolean
-  region?: boolean
+  province?: boolean
+  district?: boolean
   postalCodePrefix?: boolean
   country?: boolean
   minDeliveryDays?: boolean
@@ -1146,7 +1146,7 @@ export type DeliveryZoneSelectScalar = {
   providerId?: boolean
 }
 
-export type DeliveryZoneOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "serviceName" | "areaName" | "state" | "region" | "postalCodePrefix" | "country" | "minDeliveryDays" | "maxDeliveryDays" | "pricingModel" | "baseFee" | "codAvailable" | "codFeePercent" | "status" | "createdAt" | "updatedAt" | "providerId", ExtArgs["result"]["deliveryZone"]>
+export type DeliveryZoneOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "serviceName" | "areaName" | "province" | "district" | "postalCodePrefix" | "country" | "minDeliveryDays" | "maxDeliveryDays" | "pricingModel" | "baseFee" | "codAvailable" | "codFeePercent" | "status" | "createdAt" | "updatedAt" | "providerId", ExtArgs["result"]["deliveryZone"]>
 export type DeliveryZoneInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   provider?: boolean | Prisma.DeliveryProviderDefaultArgs<ExtArgs>
   shipments?: boolean | Prisma.DeliveryZone$shipmentsArgs<ExtArgs>
@@ -1170,8 +1170,8 @@ export type $DeliveryZonePayload<ExtArgs extends runtime.Types.Extensions.Intern
     sid: string
     serviceName: string | null
     areaName: string
-    state: string | null
-    region: string | null
+    province: string | null
+    district: string | null
     postalCodePrefix: string | null
     country: string
     minDeliveryDays: number
@@ -1613,8 +1613,8 @@ export interface DeliveryZoneFieldRefs {
   readonly sid: Prisma.FieldRef<"DeliveryZone", 'String'>
   readonly serviceName: Prisma.FieldRef<"DeliveryZone", 'String'>
   readonly areaName: Prisma.FieldRef<"DeliveryZone", 'String'>
-  readonly state: Prisma.FieldRef<"DeliveryZone", 'String'>
-  readonly region: Prisma.FieldRef<"DeliveryZone", 'String'>
+  readonly province: Prisma.FieldRef<"DeliveryZone", 'String'>
+  readonly district: Prisma.FieldRef<"DeliveryZone", 'String'>
   readonly postalCodePrefix: Prisma.FieldRef<"DeliveryZone", 'String'>
   readonly country: Prisma.FieldRef<"DeliveryZone", 'String'>
   readonly minDeliveryDays: Prisma.FieldRef<"DeliveryZone", 'Int'>

@@ -15,8 +15,9 @@ interface CreateAddressData {
   recipientName: string;
   phone?: string;
   addressLine: string;
-  state: string;
-  region: string;
+  subdistrict: string;
+  district: string;
+  province: string;
   postalCode: string;
   country?: string;
   isDefault: boolean;

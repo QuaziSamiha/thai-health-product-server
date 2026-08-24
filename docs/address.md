@@ -26,9 +26,10 @@ erDiagram
         boolean isDefault
         string recipientName
         string phone
-        string addressLine
-        string state "province level"
-        string region "district level"
+        string addressLine "house no, moo, soi, street, area detail"
+        string subdistrict "tambon / khwaeng"
+        string district "amphoe / khet"
+        string province "changwat"
         string postalCode
         string country "default Thailand"
         int userId FK
@@ -77,9 +78,10 @@ erDiagram
 | `isDefault`     | `BOOLEAN`         | NOT NULL, DEFAULT `false`, `@map("is_default")`                         | At most one `true` row per user, enforced in the service layer (no partial unique index — see [Known Gaps](#known-gaps--recommended-hardening)). |
 | `recipientName` | `VARCHAR(200)`    | NOT NULL, `@map("recipient_name")`                                       | Name of the person receiving the delivery **at this address** — not necessarily the account holder. See [Create an Address](#create-an-address) for the profile-name fallback. |
 | `phone`         | `VARCHAR(20)`     | NOT NULL                                                                 | Contact number for the courier at this address. Same fallback treatment as `recipientName`.                                                     |
-| `addressLine`   | `VARCHAR(255)`    | NOT NULL, `@map("address_line")`                                         | Street name and house/unit number.                                                                                                              |
-| `state`         | `VARCHAR(100)`    | NOT NULL                                                                 | Province level — checkout's "select state" field.                                                                                               |
-| `region`        | `VARCHAR(100)`    | NOT NULL                                                                 | District level — checkout's "select region" field.                                                                                              |
+| `addressLine`   | `VARCHAR(255)`    | NOT NULL, `@map("address_line")`                                         | Everything below subdistrict level: house/unit number, moo, soi, street, building, and the area/landmark detail the courier needs.               |
+| `subdistrict`   | `VARCHAR(100)`    | NOT NULL                                                                 | Tambon (khwaeng in Bangkok) — checkout's "select sub-district" field. New in migration `20260824090000`; rows saved before it carry `''`. |
+| `district`      | `VARCHAR(100)`    | NOT NULL                                                                 | Amphoe (khet in Bangkok) — checkout's "select district" field. Named `region` before `20260824090000`.                                       |
+| `province`      | `VARCHAR(100)`    | NOT NULL                                                                 | Changwat — checkout's "select province" field. Named `state` before `20260824090000`.                                                        |
 | `postalCode`    | `VARCHAR(20)`     | NOT NULL, `@map("postal_code")`                                          | Postal/ZIP code.                                                                                                                                 |
 | `country`       | `VARCHAR(100)`    | NOT NULL, DEFAULT `"Thailand"`                                           | Free-text country name.                                                                                                                         |
 | `userId`        | `INT`             | FK → `users.id`, NOT NULL, **ON DELETE CASCADE**, `@map("user_id")`      | Owning user.                                                                                                                                     |
@@ -106,12 +108,13 @@ erDiagram
 | `id`, `sid`               | `addresses` | B-Tree (unique)  | Identity lookups; created automatically by `@id`/`@unique`.                                                    |
 | `addresses_user_id_is_default_idx` | `addresses` | B-Tree (composite) | `(user_id, is_default)` — serves both "list this user's addresses" and "find this user's default address" (`AddressRepository.findAllByUserId` / `findDefaultByUserId`). |
 
-**No check constraints are declared at the DB level** on this table — `postalCode`'s 5-digit format, and the minimum lengths on `recipientName`/`addressLine`/`state`/`region`, are enforced only by `CreateAddressDto`/`UpdateAddressDto`'s `class-validator` rules, not by a Postgres `CHECK`. A direct DB write (or a future second API) bypasses them entirely — the same class of gap as `isDefault` uniqueness below. Compare `combo-product.prisma`'s price/quantity `CHECK`s, which are enforced at the DB layer as the authoritative backstop, DTO validation being only the first line of defense.
+**No check constraints are declared at the DB level** on this table — `postalCode`'s 5-digit format, and the minimum lengths on `recipientName`/`addressLine`/`subdistrict`/`district`/`province`, are enforced only by `CreateAddressDto`/`UpdateAddressDto`'s `class-validator` rules, not by a Postgres `CHECK`. A direct DB write (or a future second API) bypasses them entirely — the same class of gap as `isDefault` uniqueness below. Compare `combo-product.prisma`'s price/quantity `CHECK`s, which are enforced at the DB layer as the authoritative backstop, DTO validation being only the first line of defense.
 
 ---
 
 #### Conventions
 
+- **The address is stored as Thailand's own administrative hierarchy, not a Western `state`/`region` pair.** `province` (changwat) → `district` (amphoe/khet) → `subdistrict` (tambon/khwaeng) are the three levels a Thai courier routes on, and `addressLine` carries everything below them — house/unit number, moo, soi, street, building, area detail. Migration `20260824090000_thai_address_taxonomy` renamed `state`→`province` and `region`→`district` (pure renames: they already held exactly those values) and added the `subdistrict` level, which had no column at all. `OrderAddress`, `DeliveryChargeArea` and `DeliveryZone` carry the same names so a checkout address is matched field-for-field with no translation layer.
 - **All `DateTime` columns are `@db.Timestamptz(3)`** — repo-wide convention (migration `20260802160000_timestamptz_repo_wide`); any new `DateTime` field must carry it.
 - **All columns are `snake_case`** via `@map()`. Prisma field names stay camelCase; only the database identifiers are mapped.
 - **Shipping-only in v1.** `CreateAddressDto`/`UpdateAddressDto` expose no `type` field — the server always writes `AddressType.SHIPPING`, and `GET /address` / `GET /address/default` implicitly return only shipping addresses (which today is all of them). `AddressType.BILLING` exists solely for `OrderAddress`'s snapshot side; there is no billing address book. See [Known Gaps](#known-gaps--recommended-hardening).
@@ -119,17 +122,19 @@ erDiagram
 - **Hard delete, no soft-delete column.** Unlike `Product`/`ComboProduct`, `Address` carries no `deletedAt`. This is a deliberate v1 decision, not an oversight — a deleted address-book row cannot corrupt a past order because `OrderAddress` never joins it live (see [Relationships](#relationships-and-cascading-rules)), so there is nothing a soft delete would protect.
 - **No automatic default promotion.** Deleting the current default address does not designate another one automatically — the user (or the checkout flow) must explicitly pick/set a new default. See [Delete an Address](#delete-an-address).
 - **Input hardening reuses the repo's shared transform utilities** (`common/utils/json-transform.util.ts`) rather than hand-rolled `@Transform` blocks: `trimString` on every free-text field, `emptyStringToUndefined` wherever `""` should mean "not provided" (`label`, `country`, and — deliberately — `recipientName`/`phone` on create, so an explicit blank falls through to the profile/account fallback instead of failing validation), and `parseBooleanInput` for `isDefault`'s multipart/JSON boolean coercion (same helper `combo-product`'s DTOs use for `isFeatured`).
-- **Create vs. update treat a blank `recipientName`/`phone`/`addressLine`/`state`/`region`/`postalCode` differently, on purpose.** On `CreateAddressDto`, `recipientName`/`phone` collapse `""` to "use the fallback" (see [Create an Address](#create-an-address)). On `UpdateAddressDto`, every one of these NOT-NULL-backed fields uses the `@IsOptional()` + `@IsNotEmpty()` idiom instead: omitted → "leave unchanged" (skipped entirely), explicitly sent blank → `400`, since a NOT NULL column can never legitimately be blanked out via `PATCH` and silently ignoring that input would mask a client bug.
+- **Create vs. update treat a blank `recipientName`/`phone`/`addressLine`/`subdistrict`/`district`/`province`/`postalCode` differently, on purpose.** On `CreateAddressDto`, `recipientName`/`phone` collapse `""` to "use the fallback" (see [Create an Address](#create-an-address)). On `UpdateAddressDto`, every one of these NOT-NULL-backed fields uses the `@IsOptional()` + `@IsNotEmpty()` idiom instead: omitted → "leave unchanged" (skipped entirely), explicitly sent blank → `400`, since a NOT NULL column can never legitimately be blanked out via `PATCH` and silently ignoring that input would mask a client bug.
 
 ---
 
 #### Example Data
 
-| label     | isDefault | recipientName    | phone           | addressLine                | state       | region     | postalCode | country    |
-| :-------- | :-------- | :--------------- | :-------------- | :-------------------------- | :---------- | :--------- | :--------- | :--------- |
-| **Home**  | `true`    | Somchai Jaidee   | `+66812345678`  | 123/45 Sukhumvit Road       | Bangkok     | Watthana   | `10110`    | Thailand   |
-| **Office**| `false`   | Somchai Jaidee   | `+66812345678`  | 99 Silom Road, 12th Floor   | Bangkok     | Bang Rak   | `10500`    | Thailand   |
-| **Mom's House** | `false` | Aunt Malee  | `+66898765432`  | 45 Moo 3, Chiang Mai-Lampang Rd | Chiang Mai | Mueang     | `50000`    | Thailand   |
+| label     | isDefault | recipientName    | phone           | addressLine                     | subdistrict       | district        | province    | postalCode | country    |
+| :-------- | :-------- | :--------------- | :-------------- | :------------------------------ | :---------------- | :-------------- | :---------- | :--------- | :--------- |
+| **Home**  | `true`    | Somchai Jaidee   | `+66812345678`  | 123/45 Sukhumvit Road, Soi 21   | Khlong Toei Nuea  | Watthana        | Bangkok     | `10110`    | Thailand   |
+| **Office**| `false`   | Somchai Jaidee   | `+66812345678`  | 99 Silom Road, 12th Floor       | Silom             | Bang Rak        | Bangkok     | `10500`    | Thailand   |
+| **Mom's House** | `false` | Aunt Malee  | `+66898765432`  | 45 Moo 3, Chiang Mai-Lampang Rd | Nong Pa Khrang    | Mueang Chiang Mai | Chiang Mai | `50000`    | Thailand   |
+
+> A Thai address reads narrowest-first: `addressLine` (house number, moo, soi, street, building) → `subdistrict` (tambon) → `district` (amphoe) → `province` (changwat) → `postalCode`. In Bangkok the same two levels are called khwaeng and khet; the columns are the same.
 
 > The third row shows why `recipientName`/`phone` cannot be a live join off the account holder's own `Profile`/`User.phone` — this address delivers to someone else entirely.
 
@@ -141,7 +146,8 @@ erDiagram
 - **No billing address book.** `AddressType.BILLING` is declared but unreachable through this module's DTOs — see [Conventions](#conventions). If a separate billing address book is ever needed, `CreateAddressDto`/`UpdateAddressDto` would need a `type` field and the uniqueness/default logic would need to become per-type.
 - **`OrderModule` does not exist yet.** Checkout auto-fill (`GET /address/default`) and snapshot-at-placement (copying a chosen `Address` into `OrderAddress`) are designed for but not implemented — `AddressModule` currently exports `AddressService` for exactly this future consumer, but nothing imports it yet.
 - **No automatic default re-assignment on delete** (see [Conventions](#conventions)) — a user who deletes their only/default address has zero defaults until they explicitly set a new one.
-- **`postalCode` format and the field minimum lengths are DTO-only, not DB-enforced** (see [Indexes & Constraints](#indexes--constraints)) — a direct DB write, or a future second write path, could still insert `postalCode: "1"` or a single-character `state`.
+- **`postalCode` format and the field minimum lengths are DTO-only, not DB-enforced** (see [Indexes & Constraints](#indexes--constraints)) — a direct DB write, or a future second write path, could still insert `postalCode: "1"` or a single-character `province`.
+- **Addresses saved before migration `20260824090000` have `subdistrict = ''`.** The column is NOT NULL, but there was never a subdistrict to recover for those rows, so they were backfilled with the empty string and the DEFAULT dropped immediately — every write since must supply a real value (the DTOs require 2+ characters). An empty `subdistrict` therefore means "saved before the Thai taxonomy landed", and the invoice renderer filters it out rather than printing a bare leading comma. A one-off data pass over `addresses`/`order_addresses` would clear it for good.
 
 ---
 
@@ -167,7 +173,7 @@ Every route uses `JwtAuthGuard` + `RolesGuard` + `@Roles(UserRole.CUSTOMER)` (de
 
 #### Response Shapes
 
-A single shape, `AddressResponseDto`, serves every endpoint — there is no admin/public split (every caller is the address's own owner) and no separate minified shape (the address book is never large enough to need one). It excludes nothing sensitive; `id`, `sid`, `label`, `type`, `isDefault`, `recipientName`, `phone`, `addressLine`, `state`, `region`, `postalCode`, `country`, `createdAt`, `updatedAt` are all returned as-is from the row.
+A single shape, `AddressResponseDto`, serves every endpoint — there is no admin/public split (every caller is the address's own owner) and no separate minified shape (the address book is never large enough to need one). It excludes nothing sensitive; `id`, `sid`, `label`, `type`, `isDefault`, `recipientName`, `phone`, `addressLine`, `subdistrict`, `district`, `province`, `postalCode`, `country`, `createdAt`, `updatedAt` are all returned as-is from the row.
 
 ---
 
@@ -192,7 +198,7 @@ A single shape, `AddressResponseDto`, serves every endpoint — there is no admi
    - `phone` defaults to the caller's own `User.phone`.
    - If a value is still missing after the fallback (no `Profile` row at all, or `User.phone` is `null`), the request fails with `400` naming exactly which field has nothing to fall back to — it never silently creates an address with a blank contact field.
    - Supplying both explicitly skips the profile lookup entirely.
-2. **DTO-level input hardening runs first**, before any of the above: every free-text field is trimmed (`trimString`); `addressLine` requires 5+ characters, `state`/`region`/`recipientName` require 2+; `postalCode` must match `^\d{5}$` exactly. `recipientName`/`phone` specifically collapse an explicit `""` (or, for `phone`, whitespace that `TransformThaiPhone` reduces to `""`) to `undefined` rather than a validation error, so a blank submission is treated the same as an omitted field and reaches the fallback in step 1 — see [Conventions](#conventions).
+2. **DTO-level input hardening runs first**, before any of the above: every free-text field is trimmed (`trimString`); `addressLine` requires 5+ characters, `subdistrict`/`district`/`province`/`recipientName` require 2+; `postalCode` must match `^\d{5}$` exactly. `recipientName`/`phone` specifically collapse an explicit `""` (or, for `phone`, whitespace that `TransformThaiPhone` reduces to `""`) to `undefined` rather than a validation error, so a blank submission is treated the same as an omitted field and reaches the fallback in step 1 — see [Conventions](#conventions).
 3. **The first address a user ever saves always becomes the default** (`existingCount === 0`), regardless of whether `dto.isDefault` was sent — a user should never end up with zero default addresses once they have at least one.
 4. **`isDefault: true` (explicit or forced by rule 3) clears every other default row for this user first** (`clearDefaultForUser`), inside the same transaction as the insert — so a concurrent read can never observe two defaults.
 5. **`type` is never taken from the client.** The repository hard-codes `AddressType.SHIPPING` on every insert — see [Conventions](#conventions).
@@ -309,7 +315,7 @@ A single shape, `AddressResponseDto`, serves every endpoint — there is no admi
 
 1. **Existence + ownership check**, same contract as [Get an Address by ID](#get-an-address-by-id) — `404` then `403`.
 2. **`recipientName`/`phone` have no profile fallback here**, unlike create. An omitted field on a `PATCH` means "leave unchanged", not "clear it" — falling back to the profile would incorrectly overwrite a deliberately-kept value whenever the client only meant to patch, say, `addressLine`.
-3. **Every NOT-NULL-backed field (`recipientName`, `phone`, `addressLine`, `state`, `region`, `postalCode`) rejects an explicit blank instead of silently ignoring it.** Omitted → skipped (rule 2). Present but empty/whitespace-only after trimming → `400` — a client cannot blank out a required column by sending `""`. This is the opposite trade-off from create's fallback-on-blank behavior, deliberately: update has nothing sensible to fall back to. See [Conventions](#conventions).
+3. **Every NOT-NULL-backed field (`recipientName`, `phone`, `addressLine`, `subdistrict`, `district`, `province`, `postalCode`) rejects an explicit blank instead of silently ignoring it.** Omitted → skipped (rule 2). Present but empty/whitespace-only after trimming → `400` — a client cannot blank out a required column by sending `""`. This is the opposite trade-off from create's fallback-on-blank behavior, deliberately: update has nothing sensible to fall back to. See [Conventions](#conventions).
 4. **`isDefault: true` clears every other default row for this user first** (`clearDefaultForUser`), same rule as create. `isDefault` omitted, or sent `false`, touches no other row.
 
 **Response shape**: `AddressResponseDto`.

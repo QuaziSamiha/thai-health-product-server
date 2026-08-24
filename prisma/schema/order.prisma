@@ -137,11 +137,16 @@ model OrderAddress {
 
   recipientName String @map("recipient_name") @db.VarChar(200)
   phone         String @db.VarChar(20)
-  addressLine   String @map("address_line") @db.VarChar(255)
-  state         String @db.VarChar(100)
-  region        String @db.VarChar(100)
-  postalCode    String @map("postal_code") @db.VarChar(20)
-  country       String @default("Thailand") @db.VarChar(100)
+
+  //* SAME THAI HIERARCHY AS Address (address.prisma), COPIED FIELD-FOR-FIELD:
+  //* addressLine -> subdistrict (TAMBON) -> district (AMPHOE) -> province
+  //* (CHANGWAT) -> postalCode.
+  addressLine String @map("address_line") @db.VarChar(255)
+  subdistrict String @db.VarChar(100)
+  district    String @db.VarChar(100)
+  province    String @db.VarChar(100)
+  postalCode  String @map("postal_code") @db.VarChar(20)
+  country     String @default("Thailand") @db.VarChar(100)
 
   sourceAddressId Int?     @map("source_address_id") //* BEST-EFFORT LINK BACK TO THE ADDRESS BOOK ROW THIS WAS COPIED FROM, FOR "REORDER" UX — NOT AUTHORITATIVE, MAY BE NULL/DANGLING IF THE SOURCE WAS DELETED
   sourceAddress   Address? @relation(fields: [sourceAddressId], references: [id], onDelete: SetNull)

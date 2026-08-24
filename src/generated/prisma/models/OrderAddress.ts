@@ -44,8 +44,9 @@ export type OrderAddressMinAggregateOutputType = {
   recipientName: string | null
   phone: string | null
   addressLine: string | null
-  state: string | null
-  region: string | null
+  subdistrict: string | null
+  district: string | null
+  province: string | null
   postalCode: string | null
   country: string | null
   sourceAddressId: number | null
@@ -59,8 +60,9 @@ export type OrderAddressMaxAggregateOutputType = {
   recipientName: string | null
   phone: string | null
   addressLine: string | null
-  state: string | null
-  region: string | null
+  subdistrict: string | null
+  district: string | null
+  province: string | null
   postalCode: string | null
   country: string | null
   sourceAddressId: number | null
@@ -74,8 +76,9 @@ export type OrderAddressCountAggregateOutputType = {
   recipientName: number
   phone: number
   addressLine: number
-  state: number
-  region: number
+  subdistrict: number
+  district: number
+  province: number
   postalCode: number
   country: number
   sourceAddressId: number
@@ -103,8 +106,9 @@ export type OrderAddressMinAggregateInputType = {
   recipientName?: true
   phone?: true
   addressLine?: true
-  state?: true
-  region?: true
+  subdistrict?: true
+  district?: true
+  province?: true
   postalCode?: true
   country?: true
   sourceAddressId?: true
@@ -118,8 +122,9 @@ export type OrderAddressMaxAggregateInputType = {
   recipientName?: true
   phone?: true
   addressLine?: true
-  state?: true
-  region?: true
+  subdistrict?: true
+  district?: true
+  province?: true
   postalCode?: true
   country?: true
   sourceAddressId?: true
@@ -133,8 +138,9 @@ export type OrderAddressCountAggregateInputType = {
   recipientName?: true
   phone?: true
   addressLine?: true
-  state?: true
-  region?: true
+  subdistrict?: true
+  district?: true
+  province?: true
   postalCode?: true
   country?: true
   sourceAddressId?: true
@@ -235,8 +241,9 @@ export type OrderAddressGroupByOutputType = {
   recipientName: string
   phone: string
   addressLine: string
-  state: string
-  region: string
+  subdistrict: string
+  district: string
+  province: string
   postalCode: string
   country: string
   sourceAddressId: number | null
@@ -273,8 +280,9 @@ export type OrderAddressWhereInput = {
   recipientName?: Prisma.StringFilter<"OrderAddress"> | string
   phone?: Prisma.StringFilter<"OrderAddress"> | string
   addressLine?: Prisma.StringFilter<"OrderAddress"> | string
-  state?: Prisma.StringFilter<"OrderAddress"> | string
-  region?: Prisma.StringFilter<"OrderAddress"> | string
+  subdistrict?: Prisma.StringFilter<"OrderAddress"> | string
+  district?: Prisma.StringFilter<"OrderAddress"> | string
+  province?: Prisma.StringFilter<"OrderAddress"> | string
   postalCode?: Prisma.StringFilter<"OrderAddress"> | string
   country?: Prisma.StringFilter<"OrderAddress"> | string
   sourceAddressId?: Prisma.IntNullableFilter<"OrderAddress"> | number | null
@@ -290,8 +298,9 @@ export type OrderAddressOrderByWithRelationInput = {
   recipientName?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   addressLine?: Prisma.SortOrder
-  state?: Prisma.SortOrder
-  region?: Prisma.SortOrder
+  subdistrict?: Prisma.SortOrder
+  district?: Prisma.SortOrder
+  province?: Prisma.SortOrder
   postalCode?: Prisma.SortOrder
   country?: Prisma.SortOrder
   sourceAddressId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -311,8 +320,9 @@ export type OrderAddressWhereUniqueInput = Prisma.AtLeast<{
   recipientName?: Prisma.StringFilter<"OrderAddress"> | string
   phone?: Prisma.StringFilter<"OrderAddress"> | string
   addressLine?: Prisma.StringFilter<"OrderAddress"> | string
-  state?: Prisma.StringFilter<"OrderAddress"> | string
-  region?: Prisma.StringFilter<"OrderAddress"> | string
+  subdistrict?: Prisma.StringFilter<"OrderAddress"> | string
+  district?: Prisma.StringFilter<"OrderAddress"> | string
+  province?: Prisma.StringFilter<"OrderAddress"> | string
   postalCode?: Prisma.StringFilter<"OrderAddress"> | string
   country?: Prisma.StringFilter<"OrderAddress"> | string
   sourceAddressId?: Prisma.IntNullableFilter<"OrderAddress"> | number | null
@@ -328,8 +338,9 @@ export type OrderAddressOrderByWithAggregationInput = {
   recipientName?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   addressLine?: Prisma.SortOrder
-  state?: Prisma.SortOrder
-  region?: Prisma.SortOrder
+  subdistrict?: Prisma.SortOrder
+  district?: Prisma.SortOrder
+  province?: Prisma.SortOrder
   postalCode?: Prisma.SortOrder
   country?: Prisma.SortOrder
   sourceAddressId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -351,8 +362,9 @@ export type OrderAddressScalarWhereWithAggregatesInput = {
   recipientName?: Prisma.StringWithAggregatesFilter<"OrderAddress"> | string
   phone?: Prisma.StringWithAggregatesFilter<"OrderAddress"> | string
   addressLine?: Prisma.StringWithAggregatesFilter<"OrderAddress"> | string
-  state?: Prisma.StringWithAggregatesFilter<"OrderAddress"> | string
-  region?: Prisma.StringWithAggregatesFilter<"OrderAddress"> | string
+  subdistrict?: Prisma.StringWithAggregatesFilter<"OrderAddress"> | string
+  district?: Prisma.StringWithAggregatesFilter<"OrderAddress"> | string
+  province?: Prisma.StringWithAggregatesFilter<"OrderAddress"> | string
   postalCode?: Prisma.StringWithAggregatesFilter<"OrderAddress"> | string
   country?: Prisma.StringWithAggregatesFilter<"OrderAddress"> | string
   sourceAddressId?: Prisma.IntNullableWithAggregatesFilter<"OrderAddress"> | number | null
@@ -365,8 +377,9 @@ export type OrderAddressCreateInput = {
   recipientName: string
   phone: string
   addressLine: string
-  state: string
-  region: string
+  subdistrict: string
+  district: string
+  province: string
   postalCode: string
   country?: string
   createdAt?: Date | string
@@ -380,8 +393,9 @@ export type OrderAddressUncheckedCreateInput = {
   recipientName: string
   phone: string
   addressLine: string
-  state: string
-  region: string
+  subdistrict: string
+  district: string
+  province: string
   postalCode: string
   country?: string
   sourceAddressId?: number | null
@@ -394,8 +408,9 @@ export type OrderAddressUpdateInput = {
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
-  region?: Prisma.StringFieldUpdateOperationsInput | string
+  subdistrict?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  province?: Prisma.StringFieldUpdateOperationsInput | string
   postalCode?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -409,8 +424,9 @@ export type OrderAddressUncheckedUpdateInput = {
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
-  region?: Prisma.StringFieldUpdateOperationsInput | string
+  subdistrict?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  province?: Prisma.StringFieldUpdateOperationsInput | string
   postalCode?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   sourceAddressId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -424,8 +440,9 @@ export type OrderAddressCreateManyInput = {
   recipientName: string
   phone: string
   addressLine: string
-  state: string
-  region: string
+  subdistrict: string
+  district: string
+  province: string
   postalCode: string
   country?: string
   sourceAddressId?: number | null
@@ -438,8 +455,9 @@ export type OrderAddressUpdateManyMutationInput = {
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
-  region?: Prisma.StringFieldUpdateOperationsInput | string
+  subdistrict?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  province?: Prisma.StringFieldUpdateOperationsInput | string
   postalCode?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -451,8 +469,9 @@ export type OrderAddressUncheckedUpdateManyInput = {
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
-  region?: Prisma.StringFieldUpdateOperationsInput | string
+  subdistrict?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  province?: Prisma.StringFieldUpdateOperationsInput | string
   postalCode?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   sourceAddressId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -481,8 +500,9 @@ export type OrderAddressCountOrderByAggregateInput = {
   recipientName?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   addressLine?: Prisma.SortOrder
-  state?: Prisma.SortOrder
-  region?: Prisma.SortOrder
+  subdistrict?: Prisma.SortOrder
+  district?: Prisma.SortOrder
+  province?: Prisma.SortOrder
   postalCode?: Prisma.SortOrder
   country?: Prisma.SortOrder
   sourceAddressId?: Prisma.SortOrder
@@ -502,8 +522,9 @@ export type OrderAddressMaxOrderByAggregateInput = {
   recipientName?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   addressLine?: Prisma.SortOrder
-  state?: Prisma.SortOrder
-  region?: Prisma.SortOrder
+  subdistrict?: Prisma.SortOrder
+  district?: Prisma.SortOrder
+  province?: Prisma.SortOrder
   postalCode?: Prisma.SortOrder
   country?: Prisma.SortOrder
   sourceAddressId?: Prisma.SortOrder
@@ -517,8 +538,9 @@ export type OrderAddressMinOrderByAggregateInput = {
   recipientName?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   addressLine?: Prisma.SortOrder
-  state?: Prisma.SortOrder
-  region?: Prisma.SortOrder
+  subdistrict?: Prisma.SortOrder
+  district?: Prisma.SortOrder
+  province?: Prisma.SortOrder
   postalCode?: Prisma.SortOrder
   country?: Prisma.SortOrder
   sourceAddressId?: Prisma.SortOrder
@@ -621,8 +643,9 @@ export type OrderAddressCreateWithoutSourceAddressInput = {
   recipientName: string
   phone: string
   addressLine: string
-  state: string
-  region: string
+  subdistrict: string
+  district: string
+  province: string
   postalCode: string
   country?: string
   createdAt?: Date | string
@@ -635,8 +658,9 @@ export type OrderAddressUncheckedCreateWithoutSourceAddressInput = {
   recipientName: string
   phone: string
   addressLine: string
-  state: string
-  region: string
+  subdistrict: string
+  district: string
+  province: string
   postalCode: string
   country?: string
   orderId: number
@@ -678,8 +702,9 @@ export type OrderAddressScalarWhereInput = {
   recipientName?: Prisma.StringFilter<"OrderAddress"> | string
   phone?: Prisma.StringFilter<"OrderAddress"> | string
   addressLine?: Prisma.StringFilter<"OrderAddress"> | string
-  state?: Prisma.StringFilter<"OrderAddress"> | string
-  region?: Prisma.StringFilter<"OrderAddress"> | string
+  subdistrict?: Prisma.StringFilter<"OrderAddress"> | string
+  district?: Prisma.StringFilter<"OrderAddress"> | string
+  province?: Prisma.StringFilter<"OrderAddress"> | string
   postalCode?: Prisma.StringFilter<"OrderAddress"> | string
   country?: Prisma.StringFilter<"OrderAddress"> | string
   sourceAddressId?: Prisma.IntNullableFilter<"OrderAddress"> | number | null
@@ -692,8 +717,9 @@ export type OrderAddressCreateWithoutOrderInput = {
   recipientName: string
   phone: string
   addressLine: string
-  state: string
-  region: string
+  subdistrict: string
+  district: string
+  province: string
   postalCode: string
   country?: string
   createdAt?: Date | string
@@ -706,8 +732,9 @@ export type OrderAddressUncheckedCreateWithoutOrderInput = {
   recipientName: string
   phone: string
   addressLine: string
-  state: string
-  region: string
+  subdistrict: string
+  district: string
+  province: string
   postalCode: string
   country?: string
   sourceAddressId?: number | null
@@ -746,8 +773,9 @@ export type OrderAddressCreateManySourceAddressInput = {
   recipientName: string
   phone: string
   addressLine: string
-  state: string
-  region: string
+  subdistrict: string
+  district: string
+  province: string
   postalCode: string
   country?: string
   orderId: number
@@ -759,8 +787,9 @@ export type OrderAddressUpdateWithoutSourceAddressInput = {
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
-  region?: Prisma.StringFieldUpdateOperationsInput | string
+  subdistrict?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  province?: Prisma.StringFieldUpdateOperationsInput | string
   postalCode?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -773,8 +802,9 @@ export type OrderAddressUncheckedUpdateWithoutSourceAddressInput = {
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
-  region?: Prisma.StringFieldUpdateOperationsInput | string
+  subdistrict?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  province?: Prisma.StringFieldUpdateOperationsInput | string
   postalCode?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   orderId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -787,8 +817,9 @@ export type OrderAddressUncheckedUpdateManyWithoutSourceAddressInput = {
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
-  region?: Prisma.StringFieldUpdateOperationsInput | string
+  subdistrict?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  province?: Prisma.StringFieldUpdateOperationsInput | string
   postalCode?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   orderId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -801,8 +832,9 @@ export type OrderAddressCreateManyOrderInput = {
   recipientName: string
   phone: string
   addressLine: string
-  state: string
-  region: string
+  subdistrict: string
+  district: string
+  province: string
   postalCode: string
   country?: string
   sourceAddressId?: number | null
@@ -814,8 +846,9 @@ export type OrderAddressUpdateWithoutOrderInput = {
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
-  region?: Prisma.StringFieldUpdateOperationsInput | string
+  subdistrict?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  province?: Prisma.StringFieldUpdateOperationsInput | string
   postalCode?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -828,8 +861,9 @@ export type OrderAddressUncheckedUpdateWithoutOrderInput = {
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
-  region?: Prisma.StringFieldUpdateOperationsInput | string
+  subdistrict?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  province?: Prisma.StringFieldUpdateOperationsInput | string
   postalCode?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   sourceAddressId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -842,8 +876,9 @@ export type OrderAddressUncheckedUpdateManyWithoutOrderInput = {
   recipientName?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   addressLine?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
-  region?: Prisma.StringFieldUpdateOperationsInput | string
+  subdistrict?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  province?: Prisma.StringFieldUpdateOperationsInput | string
   postalCode?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   sourceAddressId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -858,8 +893,9 @@ export type OrderAddressSelect<ExtArgs extends runtime.Types.Extensions.Internal
   recipientName?: boolean
   phone?: boolean
   addressLine?: boolean
-  state?: boolean
-  region?: boolean
+  subdistrict?: boolean
+  district?: boolean
+  province?: boolean
   postalCode?: boolean
   country?: boolean
   sourceAddressId?: boolean
@@ -875,8 +911,9 @@ export type OrderAddressSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   recipientName?: boolean
   phone?: boolean
   addressLine?: boolean
-  state?: boolean
-  region?: boolean
+  subdistrict?: boolean
+  district?: boolean
+  province?: boolean
   postalCode?: boolean
   country?: boolean
   sourceAddressId?: boolean
@@ -892,8 +929,9 @@ export type OrderAddressSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   recipientName?: boolean
   phone?: boolean
   addressLine?: boolean
-  state?: boolean
-  region?: boolean
+  subdistrict?: boolean
+  district?: boolean
+  province?: boolean
   postalCode?: boolean
   country?: boolean
   sourceAddressId?: boolean
@@ -909,8 +947,9 @@ export type OrderAddressSelectScalar = {
   recipientName?: boolean
   phone?: boolean
   addressLine?: boolean
-  state?: boolean
-  region?: boolean
+  subdistrict?: boolean
+  district?: boolean
+  province?: boolean
   postalCode?: boolean
   country?: boolean
   sourceAddressId?: boolean
@@ -918,7 +957,7 @@ export type OrderAddressSelectScalar = {
   createdAt?: boolean
 }
 
-export type OrderAddressOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type" | "recipientName" | "phone" | "addressLine" | "state" | "region" | "postalCode" | "country" | "sourceAddressId" | "orderId" | "createdAt", ExtArgs["result"]["orderAddress"]>
+export type OrderAddressOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type" | "recipientName" | "phone" | "addressLine" | "subdistrict" | "district" | "province" | "postalCode" | "country" | "sourceAddressId" | "orderId" | "createdAt", ExtArgs["result"]["orderAddress"]>
 export type OrderAddressInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sourceAddress?: boolean | Prisma.OrderAddress$sourceAddressArgs<ExtArgs>
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
@@ -944,8 +983,9 @@ export type $OrderAddressPayload<ExtArgs extends runtime.Types.Extensions.Intern
     recipientName: string
     phone: string
     addressLine: string
-    state: string
-    region: string
+    subdistrict: string
+    district: string
+    province: string
     postalCode: string
     country: string
     sourceAddressId: number | null
@@ -1381,8 +1421,9 @@ export interface OrderAddressFieldRefs {
   readonly recipientName: Prisma.FieldRef<"OrderAddress", 'String'>
   readonly phone: Prisma.FieldRef<"OrderAddress", 'String'>
   readonly addressLine: Prisma.FieldRef<"OrderAddress", 'String'>
-  readonly state: Prisma.FieldRef<"OrderAddress", 'String'>
-  readonly region: Prisma.FieldRef<"OrderAddress", 'String'>
+  readonly subdistrict: Prisma.FieldRef<"OrderAddress", 'String'>
+  readonly district: Prisma.FieldRef<"OrderAddress", 'String'>
+  readonly province: Prisma.FieldRef<"OrderAddress", 'String'>
   readonly postalCode: Prisma.FieldRef<"OrderAddress", 'String'>
   readonly country: Prisma.FieldRef<"OrderAddress", 'String'>
   readonly sourceAddressId: Prisma.FieldRef<"OrderAddress", 'Int'>

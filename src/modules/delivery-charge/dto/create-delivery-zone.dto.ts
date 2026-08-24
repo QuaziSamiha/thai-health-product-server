@@ -51,20 +51,31 @@ export class DeliveryAreaInputDto {
   })
   @IsOptional()
   @Transform(({ value }) => emptyStringToUndefined(trimString(value)))
-  @IsString({ message: 'State must be a valid text string' })
-  @MaxLength(100, { message: 'State cannot exceed 100 characters' })
-  state?: string;
+  @IsString({ message: 'Province must be a valid text string' })
+  @MaxLength(100, { message: 'Province cannot exceed 100 characters' })
+  province?: string;
 
   @ApiPropertyOptional({
     description:
-      'District. Requires state — a district on its own would match every province that happens to contain one by that name.',
+      'District. Requires province — a district on its own would match every province that happens to contain one by that name.',
     example: 'Watthana',
   })
   @IsOptional()
   @Transform(({ value }) => emptyStringToUndefined(trimString(value)))
-  @IsString({ message: 'Region must be a valid text string' })
-  @MaxLength(100, { message: 'Region cannot exceed 100 characters' })
-  region?: string;
+  @IsString({ message: 'District must be a valid text string' })
+  @MaxLength(100, { message: 'District cannot exceed 100 characters' })
+  district?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Subdistrict (tambon). Requires district, which itself requires province — the three levels only narrow a rule from the top down.',
+    example: 'Ang Thong',
+  })
+  @IsOptional()
+  @Transform(({ value }) => emptyStringToUndefined(trimString(value)))
+  @IsString({ message: 'Subdistrict must be a valid text string' })
+  @MaxLength(100, { message: 'Subdistrict cannot exceed 100 characters' })
+  subdistrict?: string;
 
   @ApiPropertyOptional({
     description:
@@ -132,14 +143,25 @@ export class DeliveryRateInputDto {
   maxValue?: number;
 
   @ApiProperty({
-    description: 'Fee charged for landing anywhere in this band, in THB.',
+    description:
+      'Fee charged for landing anywhere in this band, in THB. Must be above 0 — a free zone is expressed as a free delivery rule, not a zero band.',
     example: 60,
-    minimum: 0,
+    minimum: 0.01,
   })
   @Transform(blankNumberToUndefined)
   @Type(() => Number)
   @IsNumber({}, { message: 'Base fee must be a valid number' })
-  @Min(0, { message: 'Base fee cannot be negative' })
+  //* NOT Min(0). A BAND PRICED AT 0 SHIPS EVERY ORDER THAT LANDS IN IT FREE,
+  //* AND THE ORDER RECORDS ฿0.00 WITH freeDeliveryApplied = false AND NO RULE
+  //* NAME — SO NOTHING ON THE ORDER SAYS *WHY* IT WAS FREE. A DELIBERATE
+  //* WAIVER IS A DeliveryFreeDeliveryRule (SCOPEABLE TO ONE ZONE VIA zoneId,
+  //* AND SNAPSHOTTED ONTO THE ORDER). THE NATIONWIDE FLAT RATE IS THE ONE
+  //* EXCEPTION AND DOES NOT COME THROUGH THIS DTO — SEE
+  //* SetNationwideFlatRateDto.charge, WHERE 0 IS AN EXPLICIT, LABELLED CHOICE.
+  @Min(0.01, {
+    message:
+      'Base fee must be more than 0 — use a free delivery rule to waive the charge instead',
+  })
   baseFee!: number;
 
   @ApiPropertyOptional({

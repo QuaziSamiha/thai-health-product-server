@@ -54,8 +54,9 @@ import {
 const { Pool } = pkg;
 
 interface SeedArea {
-  state?: string;
-  region?: string;
+  province?: string;
+  district?: string;
+  subdistrict?: string;
   postalCode?: string;
   postalPrefix?: string;
 }
@@ -138,9 +139,9 @@ const ZONES: SeedZone[] = [
       //* FIFTY DISTRICT ROWS. THE THREE METRO PROVINCES ARE 11xxx/12xxx AND SO
       //* HAVE TO BE NAMED, WHICH IS ALSO CLEARER TO AN ADMIN READING THE TABLE.
       { postalPrefix: '10' },
-      { state: 'Nonthaburi' },
-      { state: 'Pathum Thani' },
-      { state: 'Samut Prakan' },
+      { province: 'Nonthaburi' },
+      { province: 'Pathum Thani' },
+      { province: 'Samut Prakan' },
     ],
     rates: weightBands([40, 55, 75, 110], 150, 15),
   },
@@ -164,21 +165,25 @@ const ZONES: SeedZone[] = [
     codFeeMin: 15,
     codFeeMax: 300,
     areas: [
-      { state: 'Ayutthaya' },
-      { state: 'Nakhon Pathom' },
-      { state: 'Samut Sakhon' },
-      { state: 'Samut Songkhram' },
-      { state: 'Saraburi' },
-      { state: 'Ang Thong' },
-      { state: 'Sing Buri' },
-      { state: 'Lopburi' },
-      { state: 'Chachoengsao' },
-      { state: 'Nakhon Nayok' },
-      { state: 'Suphan Buri' },
-      { state: 'Ratchaburi' },
-      { state: 'Kanchanaburi' },
-      { state: 'Chonburi' },
-      { state: 'Rayong' },
+      //* CANONICAL RTGS NAMES, MATCHING THE CHECKOUT PICKER'S DATASET EXACTLY
+      //* (client: lib/thailand/geography.ts). ZONE MATCHING IS A TEXT COMPARE —
+      //* 'Ayutthaya' NEVER MATCHES THE 'Phra Nakhon Si Ayutthaya' THE FORM NOW
+      //* SUBMITS, AND THE ADDRESS WOULD SILENTLY FALL THROUGH TO THE CATCH-ALL.
+      { province: 'Phra Nakhon Si Ayutthaya' },
+      { province: 'Nakhon Pathom' },
+      { province: 'Samut Sakhon' },
+      { province: 'Samut Songkhram' },
+      { province: 'Saraburi' },
+      { province: 'Ang Thong' },
+      { province: 'Sing Buri' },
+      { province: 'Lop Buri' },
+      { province: 'Chachoengsao' },
+      { province: 'Nakhon Nayok' },
+      { province: 'Suphan Buri' },
+      { province: 'Ratchaburi' },
+      { province: 'Kanchanaburi' },
+      { province: 'Chon Buri' },
+      { province: 'Rayong' },
     ],
     rates: weightBands([50, 70, 95, 140], 190, 20),
   },
@@ -233,10 +238,10 @@ const ZONES: SeedZone[] = [
     //* PLUS THE OUTBOUND ONE, AND THIS IS WHERE THAT ACTUALLY HAPPENS.
     codAvailable: false,
     areas: [
-      { state: 'Yala' },
-      { state: 'Pattani' },
-      { state: 'Narathiwat' },
-      { state: 'Mae Hong Son' },
+      { province: 'Yala' },
+      { province: 'Pattani' },
+      { province: 'Narathiwat' },
+      { province: 'Mae Hong Son' },
       //* KOH SAMUI / KOH PHA NGAN — INSIDE SURAT THANI, WHICH IS OTHERWISE
       //* UPCOUNTRY. THE EXACT POSTAL CODE OUT-SCORES THE PROVINCE RULE.
       { postalCode: '84140' },

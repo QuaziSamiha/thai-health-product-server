@@ -69,7 +69,7 @@ export class DeliveryChargeRepository extends BaseRepository {
    * area rules and active rate bands attached.
    *
    * The `OR` narrows on the two axes an area rule can be indexed by — province
-   * and postal code — and deliberately keeps the wildcard rows (`state IS
+   * and postal code — and deliberately keeps the wildcard rows (`province IS
    * NULL`) in the result, because those are exactly the country-wide rules
    * that must still be considered. What it filters out is the bulk: every rule
    * naming a *different* province. The remaining candidates are then scored in
@@ -87,7 +87,7 @@ export class DeliveryChargeRepository extends BaseRepository {
    * per zone-tier at most.
    */
   async findCandidateZonesForDestination(
-    destination: { state: string; postalCode: string; country: string },
+    destination: { province: string; postalCode: string; country: string },
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx || this.prisma;
@@ -98,8 +98,10 @@ export class DeliveryChargeRepository extends BaseRepository {
           some: {
             country: { equals: destination.country, mode: 'insensitive' },
             OR: [
-              { state: null },
-              { state: { equals: destination.state, mode: 'insensitive' } },
+              { province: null },
+              {
+                province: { equals: destination.province, mode: 'insensitive' },
+              },
               { postalCode: destination.postalCode },
               { postalPrefix: { not: null } },
             ],
@@ -111,8 +113,9 @@ export class DeliveryChargeRepository extends BaseRepository {
         areas: {
           select: {
             country: true,
-            state: true,
-            region: true,
+            province: true,
+            district: true,
+            subdistrict: true,
             postalCode: true,
             postalPrefix: true,
           },
@@ -129,6 +132,39 @@ export class DeliveryChargeRepository extends BaseRepository {
    * fallback it never uses, and would risk the fallback out-scoring a real
    * match through some future ladder change.
    */
+  /**
+   * Active zones holding a country-wide coverage rule — every named level and
+   * both postal fields NULL — for one country.
+   *
+   * Such a rule matches every address in that country at the lowest rung of
+   * the ladder (100), so two of them tie on every single order and the winner
+   * falls to `priority`, then `id`. That is not a pricing decision anyone
+   * made. Used to refuse the second one rather than let the pair sit there
+   * quietly disagreeing.
+   */
+  async findActiveZonesCoveringWholeCountry(
+    country: string,
+    excludeZoneId?: number,
+  ) {
+    return await this.prisma.deliveryChargeZone.findMany({
+      where: {
+        status: DeliveryChargeStatus.ACTIVE,
+        ...(excludeZoneId !== undefined ? { id: { not: excludeZoneId } } : {}),
+        areas: {
+          some: {
+            country: { equals: country, mode: 'insensitive' },
+            province: null,
+            district: null,
+            subdistrict: null,
+            postalCode: null,
+            postalPrefix: null,
+          },
+        },
+      },
+      select: { id: true, name: true },
+    });
+  }
+
   async findDefaultZone(tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return await client.deliveryChargeZone.findFirst({

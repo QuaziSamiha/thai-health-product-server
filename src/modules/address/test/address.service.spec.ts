@@ -23,8 +23,9 @@ const makeAddress = (overrides: Record<string, unknown> = {}) => ({
   recipientName: 'Somchai Jaidee',
   phone: '+66812345678',
   addressLine: '123/45 Sukhumvit Road',
-  state: 'Bangkok',
-  region: 'Watthana',
+  subdistrict: 'Khlong Toei Nuea',
+  district: 'Watthana',
+  province: 'Bangkok',
   postalCode: '10110',
   country: 'Thailand',
   userId: 1,
@@ -84,10 +85,68 @@ describe('AddressService', () => {
       recipientName: 'Somchai Jaidee',
       phone: '0812345678',
       addressLine: '123/45 Sukhumvit Road',
-      state: 'Bangkok',
-      region: 'Watthana',
+      subdistrict: 'Khlong Toei Nuea',
+      district: 'Watthana',
+      province: 'Bangkok',
       postalCode: '10110',
     };
+
+    //* ─── Thai address integrity ───────────────────────────────────────────
+    //* THE DTO VALIDATES EACH FIELD ALONE (5 DIGITS, 2+ CHARACTERS); ONLY THE
+    //* SERVICE CAN SEE THAT THE FOUR VALUES CONTRADICT EACH OTHER. THESE ARE
+    //* THE PAYLOADS A curl CAN SEND THAT THE PICKER NEVER WOULD.
+
+    it('rejects a province that is not in Thailand', async () => {
+      await expect(
+        service.createAddress(userId, { ...dto, province: 'Gotham' }),
+      ).rejects.toThrow(BadRequestException);
+      expect(repo.createAddress).not.toHaveBeenCalled();
+    });
+
+    it('rejects a district that does not belong to the province', async () => {
+      await expect(
+        service.createAddress(userId, { ...dto, district: 'Ko Samui' }),
+      ).rejects.toThrow(BadRequestException);
+      expect(repo.createAddress).not.toHaveBeenCalled();
+    });
+
+    it('rejects a sub-district that does not belong to the district', async () => {
+      await expect(
+        service.createAddress(userId, { ...dto, subdistrict: 'Ang Thong' }),
+      ).rejects.toThrow(BadRequestException);
+      expect(repo.createAddress).not.toHaveBeenCalled();
+    });
+
+    //* THE ONE THAT COSTS MONEY: A VALID-LOOKING 5-DIGIT CODE FROM ANOTHER
+    //* PROVINCE OUT-SCORES EVERY OTHER ZONE RULE (1000 ON THE SPECIFICITY
+    //* LADDER), SO IT WOULD PRICE AN UPCOUNTRY PARCEL AT THE METRO RATE.
+    it('rejects a postal code that does not belong to the sub-district', async () => {
+      await expect(
+        service.createAddress(userId, { ...dto, postalCode: '12303' }),
+      ).rejects.toThrow(BadRequestException);
+      expect(repo.createAddress).not.toHaveBeenCalled();
+    });
+
+    it('rejects a country the storefront does not deliver to', async () => {
+      await expect(
+        service.createAddress(userId, { ...dto, country: 'Bangladesh' }),
+      ).rejects.toThrow(BadRequestException);
+      expect(repo.createAddress).not.toHaveBeenCalled();
+    });
+
+    it('accepts the same address with different casing and padding', async () => {
+      repo.countByUserId.mockResolvedValue(0);
+      repo.createAddress.mockResolvedValue(makeAddress({ isDefault: true }));
+
+      await expect(
+        service.createAddress(userId, {
+          ...dto,
+          province: '  bangkok ',
+          district: 'WATTHANA',
+          country: 'thailand',
+        }),
+      ).resolves.toBeDefined();
+    });
 
     it('makes the first address the default even when isDefault is not set', async () => {
       repo.countByUserId.mockResolvedValue(0);
@@ -150,8 +209,9 @@ describe('AddressService', () => {
 
     const addressFieldsOnly: CreateAddressDto = {
       addressLine: dto.addressLine,
-      state: dto.state,
-      region: dto.region,
+      subdistrict: dto.subdistrict,
+      district: dto.district,
+      province: dto.province,
       postalCode: dto.postalCode,
     };
 

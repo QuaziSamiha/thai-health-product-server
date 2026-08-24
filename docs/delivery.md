@@ -43,8 +43,8 @@ erDiagram
         int id PK
         uuid sid UK "public identifier"
         string areaName "e.g. Bangkok, Thailand"
-        string state "nullable, province level"
-        string region "nullable, district level"
+        string province "nullable, changwat level"
+        string district "nullable, amphoe level"
         int minDeliveryDays
         int maxDeliveryDays
         decimal baseFee
@@ -166,9 +166,9 @@ erDiagram
 | `sid`                    | `UUID`                             | UNIQUE, NOT NULL, DEFAULT `uuid()`, `@db.Uuid`                                               | Public-facing identifier.                                                                                        |
 | `serviceName`            | `VARCHAR(100)`                     | NULLABLE, `@map("service_name")`                                                             | Optional tier label, e.g. `"Standard"`, `"Express"`, `"Economy"`.                                                |
 | `areaName`               | `VARCHAR(150)`                     | NOT NULL, `@map("area_name")`                                                                | **"Delivery Area"** column — display label, e.g. `"Bangkok, Thailand"`.                                          |
-| `state`                  | `VARCHAR(100)`                     | NULLABLE                                                                                     | Province level — same field semantics as `Address.state`. `NULL` = covers the whole country.                     |
-| `region`                 | `VARCHAR(100)`                     | NULLABLE                                                                                     | District level — same field semantics as `Address.region`. `NULL` = covers the whole `state`.                    |
-| `postalCodePrefix`       | `VARCHAR(10)`                      | NULLABLE, `@map("postal_code_prefix")`                                                       | E.g. `"10"` to match all Bangkok postal codes — finer-grained matching than `state`/`region` alone.               |
+| `province`                  | `VARCHAR(100)`                     | NULLABLE                                                                                     | Province level (changwat) — same field name and semantics as `Address.province`. `NULL` = covers the whole country.                     |
+| `district`                 | `VARCHAR(100)`                     | NULLABLE                                                                                     | District level (amphoe) — same field name and semantics as `Address.district`. `NULL` = covers the whole `province`.                    |
+| `postalCodePrefix`       | `VARCHAR(10)`                      | NULLABLE, `@map("postal_code_prefix")`                                                       | E.g. `"10"` to match all Bangkok postal codes — finer-grained matching than `province`/`district` alone.               |
 | `country`                | `VARCHAR(100)`                     | NOT NULL, DEFAULT `"Thailand"`                                                                | Same default as `Address.country`.                                                                               |
 | `minDeliveryDays`        | `INT`                              | NOT NULL, `@map("min_delivery_days")`                                                        | Lower bound of the **"Delivery Time"** column, e.g. `3`.                                                          |
 | `maxDeliveryDays`        | `INT`                              | NOT NULL, `@map("max_delivery_days")`                                                        | Upper bound, e.g. `7`. UI renders `"${min}-${max} days"` — never stored as a string. See [Conventions](#conventions-1). |
@@ -251,7 +251,7 @@ erDiagram
 | `sid`, `name`, `slug` (`DeliveryProvider`, each `@unique`)                                          | B-Tree (unique)      | Identity lookups.                                                                                     |
 | `@@index([status])` (`DeliveryProvider`)                                                            | B-Tree               | The checkout quote query and admin "active providers" filter.                                          |
 | `@@unique([providerId, areaName, minDeliveryDays, maxDeliveryDays])` (`DeliveryZone`)                | B-Tree (unique)      | Prevents true duplicate zone rows while allowing multiple service tiers per area.                       |
-| `@@index([providerId])`, `@@index([areaName])`, `@@index([state, region])` (`DeliveryZone`)          | B-Tree               | Listing a provider's zones; matching a checkout address to candidate zones.                             |
+| `@@index([providerId])`, `@@index([areaName])`, `@@index([province, district])` (`DeliveryZone`)          | B-Tree               | Listing a provider's zones; matching a checkout address to candidate zones.                             |
 | `orderId` (`DeliveryShipment`, `@unique`)                                                            | B-Tree (unique)      | "Does this order already have a shipment?" lookup — also the enforcement mechanism itself.               |
 | `@@index([providerId])`, `@@index([zoneId])`, `@@index([status])`, `@@index([trackingNumber])` (`DeliveryShipment`) | B-Tree      | Admin filtering by courier/zone/status; the public tracking-number lookup.                              |
 | `@@index([shipmentId, createdAt])` (`DeliveryStatusHistory`)                                         | B-Tree (composite)   | Chronological status trail for one shipment — same shape as `OrderStatusHistory`'s index.               |
@@ -259,7 +259,7 @@ erDiagram
 
 ##### Recommended future indexes (not yet needed at current scale)
 
-- **`@@index([postalCodePrefix])`** on `DeliveryZone` — once checkout quoting does high-volume prefix matching, a plain `state`/`region` composite may not be selective enough.
+- **`@@index([postalCodePrefix])`** on `DeliveryZone` — once checkout quoting does high-volume prefix matching, a plain `province`/`district` composite may not be selective enough.
 - **Partial index** `ON delivery_shipments (order_id) WHERE status NOT IN ('CANCELLED')` — if shipments are ever allowed to be re-created after a cancellation (which today's plain `orderId @unique` forbids entirely, see [Known Gaps](#known-gaps--recommended-hardening)).
 
 ---
@@ -359,7 +359,7 @@ erDiagram
 ##### Provider & Zone Selection
 
 - When several `ACTIVE` providers have a zone matching a checkout address, rank candidates by **`DeliveryProvider.priority` ascending, then `DeliveryZone.baseFee` ascending** — cheapest of the preferred provider first, not a global cheapest-wins auction. This keeps the merchant able to bias toward a preferred courier even if a competitor is momentarily cheaper.
-- Zone matching should try the **most specific field first**: `postalCodePrefix` → `region` → `state` → country-wide (`state IS NULL`). A zone with a narrower match should always win over a broader one covering the same address, even if the broader one has a better `priority`.
+- Zone matching should try the **most specific field first**: `postalCodePrefix` → `district` → `province` → country-wide (`province IS NULL`). A zone with a narrower match should always win over a broader one covering the same address, even if the broader one has a better `priority`.
 
 ##### Delivery-Time Rendering
 
@@ -430,15 +430,15 @@ Guarded routes follow the existing `JwtAuthGuard` + `RolesGuard` + `@Roles(...)`
 
 **`POST /api/v1/delivery/quote`**
 
-**Purpose**: Given a destination (state/region/postalCode — the same shape as checkout's address form), return every matching, `ACTIVE` provider/zone option so the customer can pick one before placing the order.
+**Purpose**: Given a destination (province/district/postalCode — the same shape as checkout's address form), return every matching, `ACTIVE` provider/zone option so the customer can pick one before placing the order.
 
 **Access**: Public — no auth guard, so guest checkout can quote delivery options too.
 
-**Proposed request body**: `{ state, region?, postalCode?, codRequired?: boolean }`.
+**Proposed request body**: `{ province, district?, postalCode?, codRequired?: boolean }`.
 
 **Business logic — proposed:**
 
-1. Filter `DeliveryZone` rows where `status = ACTIVE` **and** the destination matches per [Provider & Zone Selection](#provider--zone-selection) (`postalCodePrefix` → `region` → `state` → country-wide), joined to `DeliveryProvider` where `status = ACTIVE`.
+1. Filter `DeliveryZone` rows where `status = ACTIVE` **and** the destination matches per [Provider & Zone Selection](#provider--zone-selection) (`postalCodePrefix` → `district` → `province` → country-wide), joined to `DeliveryProvider` where `status = ACTIVE`.
 2. If `codRequired` is true, additionally filter `codAvailable = true`.
 3. Sort results by `DeliveryProvider.priority` ascending, then `DeliveryZone.baseFee` ascending.
 4. Return each match as `{ providerSid, providerName, zoneSid, serviceName, deliveryTime: "${min}-${max} days", fee, codAvailable }` — never expose `apiCredentialRef`, internal `id`s, or `notes`.
@@ -447,7 +447,7 @@ Guarded routes follow the existing `JwtAuthGuard` + `RolesGuard` + `@Roles(...)`
 | Status | Cause                                                          |
 | :----- | :---------------------------------------------------------------- |
 | `200`  | Always — `options: []` is valid when nothing covers the address.    |
-| `400`  | Missing/invalid `state`.                                            |
+| `400`  | Missing/invalid `province`.                                            |
 
 ---
 

@@ -29,11 +29,11 @@ export class UpdateAddressDto {
   @MaxLength(100, { message: 'Label cannot exceed 100 characters' })
   label?: string;
 
-  //* recipientName/phone/addressLine/state/region/postalCode BACK NOT-NULL
-  //* COLUMNS — @IsOptional() SKIPS THEM ONLY WHEN OMITTED ENTIRELY
-  //* ("DON'T CHANGE THIS FIELD"); @IsNotEmpty() STILL FIRES IF THE CLIENT
-  //* EXPLICITLY SENDS "" OR WHITESPACE, SINCE A NOT-NULL COLUMN CAN NEVER
-  //* BE BLANKED OUT VIA PATCH.
+  //* recipientName/phone/addressLine/subdistrict/district/province/postalCode
+  //* BACK NOT-NULL COLUMNS — @IsOptional() SKIPS THEM ONLY WHEN OMITTED
+  //* ENTIRELY ("DON'T CHANGE THIS FIELD"); @IsNotEmpty() STILL FIRES IF THE
+  //* CLIENT EXPLICITLY SENDS "" OR WHITESPACE, SINCE A NOT-NULL COLUMN CAN
+  //* NEVER BE BLANKED OUT VIA PATCH.
 
   @ApiPropertyOptional({
     description: 'Full name of the person receiving the delivery',
@@ -66,8 +66,9 @@ export class UpdateAddressDto {
   phone?: string;
 
   @ApiPropertyOptional({
-    description: 'Street name and house/unit number',
-    example: '123/45 Sukhumvit Road',
+    description:
+      'Everything below subdistrict level: house/unit number, moo, soi, street, building, and any area or landmark detail the courier needs',
+    example: '123/45 Sukhumvit Road, Soi 21, Nova Building 3rd floor',
     minLength: 5,
     maxLength: 255,
   })
@@ -80,32 +81,49 @@ export class UpdateAddressDto {
   addressLine?: string;
 
   @ApiPropertyOptional({
-    description: 'Province level, e.g. checkout\'s "select state" field',
-    example: 'Bangkok',
+    description:
+      'Subdistrict (tambon — khwaeng in Bangkok), e.g. checkout\'s "select sub-district" field',
+    example: 'Khlong Toei Nuea',
     minLength: 2,
     maxLength: 100,
   })
   @IsOptional()
   @Transform(({ value }) => trimString(value))
-  @IsNotEmpty({ message: 'State cannot be blank' })
-  @IsString({ message: 'State must be a valid text string' })
-  @MinLength(2, { message: 'State must be at least 2 characters long' })
-  @MaxLength(100, { message: 'State cannot exceed 100 characters' })
-  state?: string;
+  @IsNotEmpty({ message: 'Subdistrict cannot be blank' })
+  @IsString({ message: 'Subdistrict must be a valid text string' })
+  @MinLength(2, { message: 'Subdistrict must be at least 2 characters long' })
+  @MaxLength(100, { message: 'Subdistrict cannot exceed 100 characters' })
+  subdistrict?: string;
 
   @ApiPropertyOptional({
-    description: 'District level, e.g. checkout\'s "select region" field',
+    description:
+      'District (amphoe — khet in Bangkok), e.g. checkout\'s "select district" field',
     example: 'Watthana',
     minLength: 2,
     maxLength: 100,
   })
   @IsOptional()
   @Transform(({ value }) => trimString(value))
-  @IsNotEmpty({ message: 'Region cannot be blank' })
-  @IsString({ message: 'Region must be a valid text string' })
-  @MinLength(2, { message: 'Region must be at least 2 characters long' })
-  @MaxLength(100, { message: 'Region cannot exceed 100 characters' })
-  region?: string;
+  @IsNotEmpty({ message: 'District cannot be blank' })
+  @IsString({ message: 'District must be a valid text string' })
+  @MinLength(2, { message: 'District must be at least 2 characters long' })
+  @MaxLength(100, { message: 'District cannot exceed 100 characters' })
+  district?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Province (changwat), e.g. checkout\'s "select province" field',
+    example: 'Bangkok',
+    minLength: 2,
+    maxLength: 100,
+  })
+  @IsOptional()
+  @Transform(({ value }) => trimString(value))
+  @IsNotEmpty({ message: 'Province cannot be blank' })
+  @IsString({ message: 'Province must be a valid text string' })
+  @MinLength(2, { message: 'Province must be at least 2 characters long' })
+  @MaxLength(100, { message: 'Province cannot exceed 100 characters' })
+  province?: string;
 
   @ApiPropertyOptional({
     description: 'Postal/ZIP code — exactly 5 digits',

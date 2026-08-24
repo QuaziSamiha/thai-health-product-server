@@ -61,31 +61,44 @@ class QuoteItemSourceConstraint implements ValidatorConstraintInterface {
   }
 }
 
-//* ONLY THE FIELDS THAT MOVE THE PRICE. MIRRORS Address/OrderAddress SEMANTICS
-//* EXACTLY (state = PROVINCE, region = DISTRICT) SO A QUOTE AND THE ORDER IT
-//* TURNS INTO ARE PRICED OFF THE SAME FOUR VALUES.
+//* ONLY THE FIELDS THAT MOVE THE PRICE. FIELD-FOR-FIELD IDENTICAL TO
+//* Address/OrderAddress (subdistrict / district / province — THE THAI
+//* ADMINISTRATIVE LEVELS) SO A QUOTE AND THE ORDER IT TURNS INTO ARE PRICED
+//* OFF THE SAME FIVE VALUES.
 export class DeliveryDestinationDto {
   @ApiProperty({
-    description: 'Province level — checkout\'s "select state" field',
-    example: 'Bangkok',
+    description:
+      'Subdistrict (tambon) — checkout\'s "select sub-district" field',
+    example: 'Khlong Toei Nuea',
   })
   @Transform(({ value }) => trimString(value))
-  @IsNotEmpty({ message: 'State is required' })
-  @IsString({ message: 'State must be a valid text string' })
-  @MinLength(2, { message: 'State must be at least 2 characters long' })
-  @MaxLength(100, { message: 'State cannot exceed 100 characters' })
-  state!: string;
+  @IsNotEmpty({ message: 'Subdistrict is required' })
+  @IsString({ message: 'Subdistrict must be a valid text string' })
+  @MinLength(2, { message: 'Subdistrict must be at least 2 characters long' })
+  @MaxLength(100, { message: 'Subdistrict cannot exceed 100 characters' })
+  subdistrict!: string;
 
   @ApiProperty({
-    description: 'District level — checkout\'s "select region" field',
+    description: 'District (amphoe) — checkout\'s "select district" field',
     example: 'Watthana',
   })
   @Transform(({ value }) => trimString(value))
-  @IsNotEmpty({ message: 'Region is required' })
-  @IsString({ message: 'Region must be a valid text string' })
-  @MinLength(2, { message: 'Region must be at least 2 characters long' })
-  @MaxLength(100, { message: 'Region cannot exceed 100 characters' })
-  region!: string;
+  @IsNotEmpty({ message: 'District is required' })
+  @IsString({ message: 'District must be a valid text string' })
+  @MinLength(2, { message: 'District must be at least 2 characters long' })
+  @MaxLength(100, { message: 'District cannot exceed 100 characters' })
+  district!: string;
+
+  @ApiProperty({
+    description: 'Province (changwat) — checkout\'s "select province" field',
+    example: 'Bangkok',
+  })
+  @Transform(({ value }) => trimString(value))
+  @IsNotEmpty({ message: 'Province is required' })
+  @IsString({ message: 'Province must be a valid text string' })
+  @MinLength(2, { message: 'Province must be at least 2 characters long' })
+  @MaxLength(100, { message: 'Province cannot exceed 100 characters' })
+  province!: string;
 
   @ApiProperty({
     description: 'Postal code — exactly 5 digits',

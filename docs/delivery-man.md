@@ -194,8 +194,9 @@ erDiagram
   },
   "defaultAddress": {
     "addressLine": "45 Sukhumvit Soi 21",
-    "state": "Bangkok",
-    "region": "Watthana"
+    "subdistrict": "Khlong Toei Nuea",
+    "district": "Watthana",
+    "province": "Bangkok"
   },
   "deliveryManProfile": {
     "nidNumber": "1234567890123",

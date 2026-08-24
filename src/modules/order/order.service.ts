@@ -45,6 +45,10 @@ import {
   buildInvoicePdf,
   streamPdfToBuffer,
 } from './invoice/invoice-pdf.builder';
+import {
+  assertServedCountry,
+  assertThaiAddress,
+} from '../../common/geography/thai-geography';
 
 //* THE FLAT ฿50 CONSTANT THAT USED TO LIVE HERE IS GONE — DELIVERY IS NOW
 //* PRICED BY DeliveryChargeService AGAINST THE DESTINATION, THE BASKET AND THE
@@ -55,8 +59,9 @@ type ResolvedAddress = {
   recipientName: string;
   phone: string;
   addressLine: string;
-  state: string;
-  region: string;
+  subdistrict: string;
+  district: string;
+  province: string;
   postalCode: string;
   country: string;
   sourceAddressId: number | null;
@@ -391,8 +396,9 @@ export class OrderService {
           recipientName: address.recipientName,
           phone: address.phone,
           addressLine: address.addressLine,
-          state: address.state,
-          region: address.region,
+          subdistrict: address.subdistrict,
+          district: address.district,
+          province: address.province,
           postalCode: address.postalCode,
           country: address.country,
           sourceAddressId: address.sourceAddressId,
@@ -477,8 +483,9 @@ export class OrderService {
   ): Promise<DeliveryChargeQuote> {
     const context = {
       destination: {
-        state: address.state,
-        region: address.region,
+        subdistrict: address.subdistrict,
+        district: address.district,
+        province: address.province,
         postalCode: address.postalCode,
         country: address.country,
       },
@@ -588,7 +595,7 @@ export class OrderService {
   }
 
   /**
-   * The four address fields a quote is priced on.
+   * The five address fields a quote is priced on.
    *
    * A saved address goes through AddressService, which enforces ownership —
    * without that check an `addressId` is an enumeration handle that would hand
@@ -600,8 +607,9 @@ export class OrderService {
     dto: QuoteDeliveryChargeDto,
     userId: number | undefined,
   ): Promise<{
-    state: string;
-    region: string;
+    subdistrict: string;
+    district: string;
+    province: string;
     postalCode: string;
     country: string;
   }> {
@@ -616,8 +624,9 @@ export class OrderService {
         dto.addressId,
       );
       return {
-        state: saved.state,
-        region: saved.region,
+        subdistrict: saved.subdistrict,
+        district: saved.district,
+        province: saved.province,
         postalCode: saved.postalCode,
         country: saved.country,
       };
@@ -626,9 +635,21 @@ export class OrderService {
     //* GUARANTEED PRESENT — QuoteDestinationSourceConstraint ALREADY ENFORCED
     //* EXACTLY ONE OF addressId/destination.
     const destination = dto.destination!;
+    //* A QUOTE IS A PRICE PROMISE THE ORDER IS THEN PLACED AGAINST, SO IT IS
+    //* VALIDATED THE SAME WAY PLACEMENT IS — QUOTING A FICTIONAL DESTINATION
+    //* WOULD ONLY DEFER THE 400 TO THE MOMENT AFTER THE CUSTOMER CONFIRMS.
+    assertServedCountry(destination.country);
+    assertThaiAddress({
+      province: destination.province,
+      district: destination.district,
+      subdistrict: destination.subdistrict,
+      postalCode: destination.postalCode,
+    });
+
     return {
-      state: destination.state,
-      region: destination.region,
+      subdistrict: destination.subdistrict,
+      district: destination.district,
+      province: destination.province,
       postalCode: destination.postalCode,
       country: destination.country ?? 'Thailand',
     };
@@ -668,8 +689,9 @@ export class OrderService {
           //* FALLBACK FOR THE OrderAddress SNAPSHOT, WHICH STAYS NON-NULL.
           phone: saved.phone ?? dto.phone,
           addressLine: saved.addressLine,
-          state: saved.state,
-          region: saved.region,
+          subdistrict: saved.subdistrict,
+          district: saved.district,
+          province: saved.province,
           postalCode: saved.postalCode,
           country: saved.country,
           sourceAddressId: saved.id,
@@ -684,8 +706,9 @@ export class OrderService {
         recipientName: newAddress.recipientName ?? fallbackRecipientName,
         phone: newAddress.phone ?? dto.phone,
         addressLine: newAddress.addressLine,
-        state: newAddress.state,
-        region: newAddress.region,
+        subdistrict: newAddress.subdistrict,
+        district: newAddress.district,
+        province: newAddress.province,
         postalCode: newAddress.postalCode,
         country: newAddress.country,
       };
@@ -697,8 +720,9 @@ export class OrderService {
         //* SATISFY AddressResponseDto.phone'S WIDER (OPTIONAL) TYPE.
         phone: saved.phone ?? dto.phone,
         addressLine: saved.addressLine,
-        state: saved.state,
-        region: saved.region,
+        subdistrict: saved.subdistrict,
+        district: saved.district,
+        province: saved.province,
         postalCode: saved.postalCode,
         country: saved.country,
         sourceAddressId: saved.id,
@@ -715,12 +739,25 @@ export class OrderService {
       throw new BadRequestException('An address is required');
     }
     const newAddress = dto.newAddress;
+    //* A GUEST'S ADDRESS IS USED INLINE AND NEVER PASSES THROUGH
+    //* AddressService, SO THE HIERARCHY CHECK THAT PROTECTS THE ADDRESS BOOK
+    //* HAS TO BE REPEATED HERE — OTHERWISE GUEST CHECKOUT IS THE UNGUARDED
+    //* DOOR INTO THE SAME MISPRICING.
+    assertServedCountry(newAddress.country);
+    assertThaiAddress({
+      province: newAddress.province,
+      district: newAddress.district,
+      subdistrict: newAddress.subdistrict,
+      postalCode: newAddress.postalCode,
+    });
+
     return {
       recipientName: newAddress.recipientName ?? fallbackRecipientName,
       phone: newAddress.phone ?? dto.phone,
       addressLine: newAddress.addressLine,
-      state: newAddress.state,
-      region: newAddress.region,
+      subdistrict: newAddress.subdistrict,
+      district: newAddress.district,
+      province: newAddress.province,
       postalCode: newAddress.postalCode,
       country: newAddress.country ?? 'Thailand',
       sourceAddressId: null,

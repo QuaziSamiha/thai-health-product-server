@@ -4,6 +4,10 @@
     "moduleResolution": "nodenext",
     "resolvePackageJsonExports": true,
     "esModuleInterop": true,
+    //* FOR common/geography/thai-geography.json — THE ADDRESS DATASET THE
+    //* CHECKOUT CASCADE IS VALIDATED AGAINST. nest-cli.json COPIES IT INTO
+    //* dist/ AS AN ASSET, SO THE COMPILED require() RESOLVES IN PRODUCTION.
+    "resolveJsonModule": true,
     "isolatedModules": true,
     "declaration": true,
     "removeComments": true,

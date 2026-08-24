@@ -55,14 +55,17 @@ export class DeliveryManResponseDto {
   })
   address?: {
     addressLine: string;
-    state: string;
-    region: string;
+    subdistrict: string;
+    district: string;
+    province: string;
   };
 
   @ApiPropertyOptional({ description: 'Thai national ID number (13 digits)' })
   nidNumber?: string;
 
-  @ApiPropertyOptional({ description: 'Absolute URL of the uploaded NID scan/PDF' })
+  @ApiPropertyOptional({
+    description: 'Absolute URL of the uploaded NID scan/PDF',
+  })
   nidDocumentUrl?: string;
 
   @ApiProperty({ enum: NidVerificationStatus })
@@ -134,8 +137,9 @@ export class DeliveryManResponseDto {
     this.address = defaultAddress
       ? {
           addressLine: defaultAddress.addressLine!,
-          state: defaultAddress.state!,
-          region: defaultAddress.region!,
+          subdistrict: defaultAddress.subdistrict!,
+          district: defaultAddress.district!,
+          province: defaultAddress.province!,
         }
       : undefined;
 

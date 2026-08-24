@@ -21,9 +21,15 @@ model Address {
   recipientName String  @map("recipient_name") @db.VarChar(200)
   phone         String? @db.VarChar(20) //* NULLABLE — NOT EVERY ACCOUNT (E.G. SOCIAL LOGIN) HAS A PHONE ON FILE TO FALL BACK TO. phone IS MANDATORY AT ORDER PLACEMENT INSTEAD (CreateOrderDto.phone), NOT AT ADDRESS-BOOK SAVE TIME.
 
-  addressLine String @map("address_line") @db.VarChar(255) //* STREET NAME & HOUSE NUMBER
-  state       String @db.VarChar(100) //* PROVINCE LEVEL — CHECKOUT'S "SELECT STATE"
-  region      String @db.VarChar(100) //* DISTRICT LEVEL — CHECKOUT'S "SELECT REGION"
+  //* THAI ADMINISTRATIVE HIERARCHY, NARROWEST FIRST. THE THREE NAMED LEVELS
+  //* ARE THE ONES A THAI COURIER ACTUALLY ROUTES ON AND THE ONES THE CHECKOUT
+  //* FORM ASKS FOR — THEY ARE NOT INTERCHANGEABLE WITH THE WESTERN
+  //* state/region PAIR THIS MODEL USED BEFORE (MIGRATION
+  //* 20260824090000_thai_address_taxonomy).
+  addressLine String @map("address_line") @db.VarChar(255) //* HOUSE/UNIT NUMBER, MOO, SOI, STREET, BUILDING — EVERY DETAIL BELOW SUBDISTRICT LEVEL, INCLUDING THE AREA/LANDMARK LINE
+  subdistrict String @db.VarChar(100) //* TAMBON (แขวง IN BANGKOK, ตำบล ELSEWHERE) — CHECKOUT'S "SELECT SUB-DISTRICT"
+  district    String @db.VarChar(100) //* AMPHOE (เขต IN BANGKOK, อำเภอ ELSEWHERE) — CHECKOUT'S "SELECT DISTRICT"
+  province    String @db.VarChar(100) //* CHANGWAT (จังหวัด) — CHECKOUT'S "SELECT PROVINCE"
   postalCode  String @map("postal_code") @db.VarChar(20)
   country     String @default("Thailand") @db.VarChar(100)
 

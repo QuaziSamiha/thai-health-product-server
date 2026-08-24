@@ -135,16 +135,19 @@ model DeliveryChargeZone {
 }
 
 //* ============= AREA (WHICH ADDRESSES FALL INTO A ZONE) =============
-//* ONE MATCHING RULE. FIELD SEMANTICS ARE IDENTICAL TO Address/OrderAddress
-//* (address.prisma) — state IS THE PROVINCE, region THE DISTRICT — SO A
-//* CHECKOUT ADDRESS CAN BE MATCHED FIELD-FOR-FIELD WITHOUT TRANSLATION.
+//* ONE MATCHING RULE. FIELD NAMES AND SEMANTICS ARE IDENTICAL TO
+//* Address/OrderAddress (address.prisma) — province / district / subdistrict
+//* ARE THE THAI ADMINISTRATIVE LEVELS — SO A CHECKOUT ADDRESS CAN BE MATCHED
+//* FIELD-FOR-FIELD WITHOUT TRANSLATION.
 //*
 //* A NULL FIELD IS A WILDCARD, WHICH IS WHAT MAKES THE RULE SET DECLARATIVE:
-//*   { state: null }                          -> THE WHOLE COUNTRY
-//*   { state: "Bangkok" }                     -> EVERY DISTRICT OF BANGKOK
-//*   { state: "Bangkok", region: "Watthana" } -> ONE DISTRICT
-//*   { postalPrefix: "10" }                   -> EVERY 10xxx POSTAL CODE
-//*   { postalCode: "10110" }                  -> ONE POSTAL CODE
+//*   { province: null }                              -> THE WHOLE COUNTRY
+//*   { province: "Bangkok" }                         -> EVERY DISTRICT OF BANGKOK
+//*   { province: "Bangkok", district: "Watthana" }   -> ONE DISTRICT
+//*   { province: "Surat Thani", district: "Ko Samui",
+//*     subdistrict: "Ang Thong" }                    -> ONE SUBDISTRICT
+//*   { postalPrefix: "10" }                          -> EVERY 10xxx POSTAL CODE
+//*   { postalCode: "10110" }                         -> ONE POSTAL CODE
 //*
 //* THERE IS NO "EXCLUDE" FLAG ON PURPOSE. CARVING AN ISLAND OUT OF ITS
 //* PROVINCE IS EXPRESSED BY PUTTING ITS POSTAL CODE IN THE REMOTE ZONE: A MORE
@@ -155,8 +158,9 @@ model DeliveryChargeArea {
   id Int @id @default(autoincrement())
 
   country      String  @default("Thailand") @db.VarChar(100)
-  state        String? @db.VarChar(100) //* PROVINCE — NULL = ANY PROVINCE
-  region       String? @db.VarChar(100) //* DISTRICT — NULL = ANY DISTRICT
+  province     String? @db.VarChar(100) //* CHANGWAT — NULL = ANY PROVINCE
+  district     String? @db.VarChar(100) //* AMPHOE — NULL = ANY DISTRICT
+  subdistrict  String? @db.VarChar(100) //* TAMBON — NULL = ANY SUBDISTRICT. ONLY MEANINGFUL ALONGSIDE district, WHICH IS ONLY MEANINGFUL ALONGSIDE province — SEE scoreArea
   postalCode   String? @map("postal_code") @db.VarChar(20) //* EXACT MATCH — THE MOST SPECIFIC RULE THERE IS
   postalPrefix String? @map("postal_prefix") @db.VarChar(10) //* LEADING-DIGIT MATCH, E.G. "10" FOR ALL OF BANGKOK
 
@@ -166,12 +170,12 @@ model DeliveryChargeArea {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
 
   //* THE COLUMN-LIST UNIQUE IS NOT ENOUGH ON ITS OWN — POSTGRES TREATS NULLS AS
-  //* DISTINCT, SO ("Thailand", NULL, NULL, NULL, NULL) COULD BE INSERTED TWICE.
+  //* DISTINCT, SO ("Thailand", NULL, NULL, NULL, NULL, NULL) COULD BE INSERTED TWICE.
   //* A COALESCE-BASED UNIQUE INDEX IN THE MIGRATION CLOSES THAT; THIS ONE STAYS
   //* FOR THE INDEX IT CREATES AND FOR PRISMA-LEVEL INTENT.
-  @@unique([zoneId, country, state, region, postalCode, postalPrefix])
+  @@unique([zoneId, country, province, district, subdistrict, postalCode, postalPrefix])
   @@index([zoneId])
-  @@index([country, state, region])
+  @@index([country, province, district])
   @@index([postalCode])
   @@map("delivery_charge_areas")
 }

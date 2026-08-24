@@ -102,9 +102,9 @@ model DeliveryZone {
   //* COVERAGE — SAME FIELD SEMANTICS AS Address/OrderAddress (address.prisma)
   //* SO A CUSTOMER'S ADDRESS CAN BE MATCHED AGAINST A ZONE PROGRAMMATICALLY
   areaName         String  @map("area_name") @db.VarChar(150) //* "DELIVERY AREA" COLUMN, E.G. "BANGKOK, THAILAND" — DISPLAY LABEL
-  state            String? @db.VarChar(100) //* PROVINCE LEVEL, NULLABLE = COVERS THE WHOLE COUNTRY
-  region           String? @db.VarChar(100) //* DISTRICT LEVEL, NULLABLE = COVERS THE WHOLE STATE
-  postalCodePrefix String? @map("postal_code_prefix") @db.VarChar(10) //* E.G. "10" TO MATCH ALL BANGKOK POSTAL CODES — FINER-GRAINED MATCHING THAN state/region ALONE
+  province         String? @db.VarChar(100) //* CHANGWAT LEVEL, NULLABLE = COVERS THE WHOLE COUNTRY
+  district         String? @db.VarChar(100) //* AMPHOE LEVEL, NULLABLE = COVERS THE WHOLE PROVINCE
+  postalCodePrefix String? @map("postal_code_prefix") @db.VarChar(10) //* E.G. "10" TO MATCH ALL BANGKOK POSTAL CODES — FINER-GRAINED MATCHING THAN province/district ALONE
   country          String  @default("Thailand") @db.VarChar(100)
 
   //* DELIVERY TIME — STORED AS A NUMERIC RANGE, NEVER THE RAW "3-7 days"
@@ -133,7 +133,7 @@ model DeliveryZone {
   @@unique([providerId, areaName, minDeliveryDays, maxDeliveryDays]) //* PREVENTS TRUE DUPLICATE ROWS WHILE STILL ALLOWING MULTIPLE SERVICE TIERS PER AREA
   @@index([providerId])
   @@index([areaName])
-  @@index([state, region])
+  @@index([province, district])
   @@map("delivery_zones")
 }
 

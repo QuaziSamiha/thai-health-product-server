@@ -127,16 +127,23 @@ export class OrderAddressResponseDto {
   phone!: string;
 
   @Expose()
-  @ApiProperty({ description: 'Street name and house/unit number' })
+  @ApiProperty({
+    description:
+      'Everything below subdistrict level: house/unit number, moo, soi, street, building and area detail',
+  })
   addressLine!: string;
 
   @Expose()
-  @ApiProperty({ description: 'Province level' })
-  state!: string;
+  @ApiProperty({ description: 'Subdistrict — tambon (khwaeng in Bangkok)' })
+  subdistrict!: string;
 
   @Expose()
-  @ApiProperty({ description: 'District level' })
-  region!: string;
+  @ApiProperty({ description: 'District — amphoe (khet in Bangkok)' })
+  district!: string;
+
+  @Expose()
+  @ApiProperty({ description: 'Province — changwat' })
+  province!: string;
 
   @Expose()
   @ApiProperty({ description: 'Postal/ZIP code' })
@@ -151,8 +158,9 @@ export class OrderAddressResponseDto {
     recipientName: string;
     phone: string;
     addressLine: string;
-    state: string;
-    region: string;
+    subdistrict: string;
+    district: string;
+    province: string;
     postalCode: string;
     country: string;
   }) {
@@ -160,8 +168,9 @@ export class OrderAddressResponseDto {
     this.recipientName = address.recipientName;
     this.phone = address.phone;
     this.addressLine = address.addressLine;
-    this.state = address.state;
-    this.region = address.region;
+    this.subdistrict = address.subdistrict;
+    this.district = address.district;
+    this.province = address.province;
     this.postalCode = address.postalCode;
     this.country = address.country;
   }

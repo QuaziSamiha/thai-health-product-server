@@ -25,8 +25,9 @@ export function round3(value: number): number {
 
 /** The address fields zone matching is decided on — a subset of OrderAddress. */
 export interface DeliveryDestination {
-  state: string;
-  region: string;
+  subdistrict: string;
+  district: string;
+  province: string;
   postalCode: string;
   country: string;
 }
@@ -34,8 +35,9 @@ export interface DeliveryDestination {
 /** One DeliveryChargeArea row, reduced to what matching reads. */
 export interface AreaRule {
   country: string;
-  state: string | null;
-  region: string | null;
+  province: string | null;
+  district: string | null;
+  subdistrict: string | null;
   postalCode: string | null;
   postalPrefix: string | null;
 }
@@ -55,12 +57,13 @@ function sameText(a: string | null, b: string | null): boolean {
  * later without renumbering the ones already in production:
  *
  *   1000  exact postal code          the most specific statement possible
+ *    950  province + district + subdistrict
  *    900  province + district
  *    800  postal prefix              +length, so "101" outranks "10"
  *    600  province alone
  *    100  country alone              a deliberate catch-all rule
  *
- * A NULL field is a wildcard, never a mismatch: `{ state: null }` is a claim
+ * A NULL field is a wildcard, never a mismatch: `{ province: null }` is a claim
  * about the whole country, not a claim about addresses with no province. A
  * populated field that disagrees is a hard miss, which is what stops a Bangkok
  * rule from being scored against a Chiang Mai address at all.
@@ -88,15 +91,31 @@ export function scoreArea(
     return 800 + prefix.length;
   }
 
-  if (rule.state !== null && !sameText(rule.state, destination.state)) {
+  if (
+    rule.province !== null &&
+    !sameText(rule.province, destination.province)
+  ) {
     return null;
   }
-  if (rule.region !== null && !sameText(rule.region, destination.region)) {
+  if (
+    rule.district !== null &&
+    !sameText(rule.district, destination.district)
+  ) {
+    return null;
+  }
+  if (
+    rule.subdistrict !== null &&
+    !sameText(rule.subdistrict, destination.subdistrict)
+  ) {
     return null;
   }
 
-  if (rule.state !== null && rule.region !== null) return 900;
-  if (rule.state !== null) return 600;
+  //* THE HIERARCHY IS ENFORCED IN THE DB (district_needs_province,
+  //* subdistrict_needs_district CHECKS IN MIGRATION 20260824090000), SO A
+  //* NON-NULL subdistrict ALWAYS ARRIVES WITH ITS district AND province.
+  if (rule.subdistrict !== null) return 950;
+  if (rule.province !== null && rule.district !== null) return 900;
+  if (rule.province !== null) return 600;
   return 100;
 }
 

@@ -69,8 +69,9 @@ erDiagram
     DELIVERY_CHARGE_AREA {
         int id PK
         string country "Thailand default"
-        string state "nullable = any province"
-        string region "nullable = any district"
+        string province "nullable = any province"
+        string district "nullable = any district"
+        string subdistrict "nullable = any subdistrict"
         string postalCode "nullable, exact"
         string postalPrefix "nullable, leading digits"
         int zoneId FK
@@ -113,7 +114,7 @@ erDiagram
 * **Money** is THB, `Decimal(12, 2)`, matching `Order`'s pricing columns. **Weight** is kg, `Decimal(10, 3)`, matching `Product.weight`.
 * **The rate basis belongs to the zone, not to a band.** One zone prices on one axis and its bands are the segments along it. Letting bands under one zone disagree on the unit would make "which band applies" unanswerable.
 * **Bands are half-open, `[minValue, maxValue)`.** Exactly 1.0 kg belongs to the 1–3 band and not to both.
-* **NULL is a wildcard, never a requirement to be null.** `{ state: null }` on an area rule claims the whole country; it does not mean "addresses with no province".
+* **NULL is a wildcard, never a requirement to be null.** `{ province: null }` on an area rule claims the whole country; it does not mean "addresses with no province".
 * **There is no "exclude" flag.** Carving Koh Samui out of Surat Thani is done by putting its postal code in the REMOTE zone — a more specific rule always beats a less specific one, so the exclusion falls out of the matching ladder instead of needing a second mechanism.
 
 ### Constraints the database enforces itself
@@ -125,9 +126,10 @@ Everything the database can enforce, it does — application checks exist on top
 | `delivery_charge_rates_no_overlapping_bands` (GiST `EXCLUDE` over `numrange`, `WHERE status = 'ACTIVE'`) | Two active bands in one zone overlapping, which has no defined "which band wins" — the bug would be invisible, since the customer is simply charged whatever row the planner returned first |
 | `delivery_charge_zones_one_active_default` (partial unique) | Two catch-all zones, which would make resolution order-dependent. Scoped to `ACTIVE` so a replacement default can be staged and swapped in |
 | `delivery_free_delivery_rules_trigger_inputs_check` | A rule that can never fire (a `MIN_ORDER_AMOUNT` with no threshold), or one carrying a condition its trigger never evaluates |
-| `delivery_charge_areas_rule_unique` (COALESCE-based) | Duplicate area rules. A plain column-list unique cannot: Postgres treats NULLs as distinct, so `('Thailand', NULL, NULL, NULL, NULL)` would otherwise be insertable twice |
+| `delivery_charge_areas_rule_unique` (COALESCE-based) | Duplicate area rules. A plain column-list unique cannot: Postgres treats NULLs as distinct, so `('Thailand', NULL, NULL, NULL, NULL, NULL)` would otherwise be insertable twice |
 | `delivery_charge_areas_postal_exclusive_check` | A rule setting both `postal_code` and `postal_prefix` — two spellings of one axis, claiming a precision it does not have |
-| `delivery_charge_areas_region_needs_state_check` | A district named without its province, which would match every same-named district in the country |
+| `delivery_charge_areas_district_needs_province_check` | A district named without its province, which would match every same-named district in the country |
+| `delivery_charge_areas_subdistrict_needs_district_check` | A subdistrict named without its district — the same hole one level down |
 | `orders_delivery_charge_base_check` | A waiver that *increases* the fee, which would make the margin report read the subsidy as negative |
 
 `btree_gist` is created by the migration (as `pg_trgm` already was in `20260817130000`).
@@ -167,6 +169,7 @@ Each candidate area rule is scored; the zone keeps its best rule; the highest sc
 | Score | Rule shape |
 |---|---|
 | 1000 | exact postal code |
+| 950 | province + district + subdistrict |
 | 900 | province + district |
 | 800 + prefix length | postal prefix (so `101` outranks `10`) |
 | 600 | province alone |
@@ -343,14 +346,37 @@ Two conventions worth noting, both departures from the surrounding admin screens
 
 `IInputField`'s type union gained `"time"`. `InputField` already passes `inputType` straight through and only special-cases `"number"`, so a time value needs no handling — it is a string like any other.
 
+### Coverage is picked, not typed
+
+The three named levels of a coverage rule come from `useThaiGeography()` — the same 77-province / 921-district / 7,436-subdistrict dataset the checkout address form uses, cascading province → district → sub-district, submitting the same canonical **English** names.
+
+This is not a convenience. Zone matching compares an admin's rule against a customer's stored address, case- and whitespace-insensitively but not slug-insensitively. A hand-typed `"Bangkok "`, `"bangkok"`, `"Krung Thep"` or `"Chiang mai"` produced a rule that matched **nothing** — and failed *silently*, by never winning the ladder rather than by erroring. The order simply priced off the catch-all, so a typo looked like a pricing bug. Sharing one dataset across both sides removes the class of defect.
+
+Details worth keeping:
+
+* **The wildcard is still an empty string.** Radix refuses a `SelectItem` with value `""`, so each dropdown carries an "Any …" entry under a private `__ANY__` sentinel that `onSelectionChange` immediately rewrites back to `""`. The sentinel never leaves `CoverageAreaRow` — the form value, the schema and the payload only ever hold a real name or `""`.
+* **Choosing a level clears the ones below it.** A district left behind from the previous province would be saved as a real rule, and a district that is not in its province matches nothing. The server cannot catch it: both names are individually valid.
+* **District and sub-district are disabled until their parent is set**, mirroring the two DB check constraints rather than offering an empty list that reads as missing data.
+* **Each row is its own component.** The rows are a field array and every row runs an independent cascade, so the watches cannot live in a `.map` body.
+* **Postal Code stays a typed field** — one exact value, not a choice from a cascade — but it is validated against the dataset's **956 real postal codes**, not against `\d{5}`. Five digits admits 90,000 strings of which ~99% do not exist, and a code that does not exist fails in exactly the same silent way a mistyped province did. `isKnownPostalCode()` is deliberately synchronous so the zod schema can call it, reading the same module cache `loadGeography()` fills, and **fails open** when the dataset has not loaded — any form asking the question also renders the dropdowns, so the cache is warm by submit time, and treating "not loaded" as invalid would block a save over a slow chunk fetch.
+* **A zone must narrow, or it is not a zone.** Two rules, both enforced in the zod schema and in the service: every coverage rule has to name a province or a postal code, and a zone that is not the catch-all needs at least one of them. A rule naming nowhere covers everywhere — which is what the catch-all does and what the nationwide charge screen is *for* — so a zone carrying one is a second country-wide price wearing a region's name. A zone with no rules at all matches nothing and prices nothing; the admin table already had to label that "never matches". The catch-all is the deliberate exception on both counts, since it carries no rules precisely because it is the fallback. On update the coverage check runs only when the edit actually sends `areas`, so clearing `isDefault` on an older zone stays reachable. The array-level "at least one" error is rendered in the coverage section's empty state — nothing else owns that field, and without it the save would fail silently.
+* **Only one active zone may cover a whole country.** A coverage rule carrying nothing but a country matches every address in it at rung 100, so two of them tie on *every* order and the winner falls to `priority`, then `id` — an answer nobody chose and nothing on screen explains. `assertOneZonePerWholeCountry` refuses the second on create and on update, naming the zone already holding it. The check runs per country, case-insensitively, and skips `INACTIVE` zones (they price nothing, so they cannot tie); on update it excludes the zone being edited and falls back to that zone's stored areas when the edit does not send any. The **catch-all is deliberately exempt** — it holds no area rules, so it never ties; it applies only where nothing matched, which is exactly why a country-wide rule makes it unreachable and why the nationwide card says so itself. In the form, an untouched coverage row now states its claim — *"Covers the whole country — only one zone can do that"* — because that row saving as a country-wide rule is how two zones quietly end up covering the same ground.
+* **A zone can be retired with the "Zone is active" switch — except the catch-all.** The status column was displayed and the DTO accepted it, but nothing in the form ever wrote it. The switch maps to the `DeliveryChargeStatus` enum in `buildZonePayload`; an on/off fact does not need a two-option dropdown. Deactivating the catch-all is refused by `updateZone` with the **same 409 as deleting it**, because the fallback lookup only considers `ACTIVE` zones — so retiring it would refuse every address no other zone covers, and without this guard the delete block was bypassable by setting `status` instead. The form shows the reason before the save is attempted rather than relying on the round-trip.
+* **A zone band cannot be priced at 0, and the charge is never pre-filled.** The Add form used to seed `baseFee: 0`, so a zone saved without the charge ever being touched — and shipped every order in it free. A zero band also records `฿0.00` on the order with `freeDeliveryApplied = false` and no rule name, so nothing on the order says *why* it was free. A deliberate waiver is a `DeliveryFreeDeliveryRule`, which is scopeable to one zone via `zoneId` and is snapshotted onto the order. Enforced in the zod schema and by `@Min(0.01)` on `DeliveryRateInputDto.baseFee`; `useFieldArray.append` demands the whole field shape, so a new band spells the absence out rather than omitting it. **The nationwide flat rate is the deliberate exception** — it does not go through this DTO, and `0` there is an explicit labelled choice ("enter 0 to deliver free everywhere") rendered as **Free** on the card.
+* **A rule names a place *or* a postal code, never both.** `scoreArea` reads a postal rule and returns immediately, so the named levels on that row are never consulted — `{ province: 'Amnat Charoen', postalCode: '10110' }` is not a narrower rule, it is a rule about a *Bangkok* postcode wearing the wrong province. The form disables whichever half is unused; `assertAreaRulesAreCoherent` rejects it server-side on both create and update, naming the row and saying which half to drop. A row saved before the rule existed can hold both, so a **conflicted row stays fully editable** and shows an amber explanation — disabling on "the other side is set" would lock every control and leave deleting the row as the only way out.
+* **Postal Prefix is not on screen** (see below). A row that still carries one — the seeded `BKK_METRO` covers Bangkok with a `10` prefix — renders a read-only line saying so. Without it that row would show three "Any" dropdowns and an empty postal box, i.e. a whole-country wildcard, which is the opposite of what it claims.
+* `ISingleSelectSearch` gained `placeholderText`, defaulting to `labelName`. A repeating row labels only its first entry, so the trigger would otherwise render blank on rows 2+.
+
+`delivery.prisma`'s `DeliveryZone` — the *external courier* directory — needs none of this. Its `province`/`district`/`postalCodePrefix` were already Thai-named, so the address taxonomy change did not touch it, and its admin form only ever collects the `areaName` display label. Those columns have no reader today; adding a `subdistrict` to match `Address` would be a column with no consumer.
+
 ### Deferred admin fields
 
-Fourteen inputs are commented out of the two zone-facing forms, to keep the day-one screens short. **Commented, never deleted** — the columns, the DTOs, the zod schemas, the payload builders and the calculator all still handle them, so restoring one is uncommenting a block, not rebuilding a feature. Each block carries a `FUTURE FEATURE — HIDDEN, NOT REMOVED` marker.
+Fifteen inputs are commented out of the two zone-facing forms, to keep the day-one screens short. **Commented, never deleted** — the columns, the DTOs, the zod schemas, the payload builders and the calculator all still handle them, so restoring one is uncommenting a block, not rebuilding a feature. Each block carries a `FUTURE FEATURE — HIDDEN, NOT REMOVED` marker.
 
 | Form | Hidden | Still on screen |
 | --- | --- | --- |
 | `SetNationwideFlatRate` | Dispatch Cut-off, Max Order Weight, COD Fee %, COD Fee Min, COD Fee Max | Charge, Min/Max Delivery Days, Skip Sundays, Accept COD, "only delivery charge" |
-| `DeliveryZoneFields` | Thai Name, Charge Based On, Dispatch Cut-off, Handling Fee, Remote Surcharge, Max Order Weight, COD Fee %, COD Fee Min, COD Fee Max | Zone Name, Zone Code, Description, Coverage, Charge, Min/Max Delivery Days, Skip Sundays, Catch-all, Accept COD |
+| `DeliveryZoneFields` | Thai Name, Charge Based On, Postal Prefix, Dispatch Cut-off, Handling Fee, Remote Surcharge, Max Order Weight, COD Fee %, COD Fee Min, COD Fee Max | Zone Name, Zone Code, Description, Coverage, Charge, Min/Max Delivery Days, Skip Sundays, Catch-all, Accept COD |
 
 **Accept Cash on Delivery stays in both.** It decides whether COD is *offered*, which is a live setting; only the fee is deferred. COD therefore works and costs the customer nothing until the fee fields return.
 
