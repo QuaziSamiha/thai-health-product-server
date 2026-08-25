@@ -305,6 +305,62 @@ export class OrderRepository extends BaseRepository {
     });
   }
 
+  // ─── Reads — dashboard aggregates ─────────────────────────────────────────
+
+  /**
+   * Every order headline the admin dashboard shows, in one round trip.
+   *
+   * Revenue deliberately excludes `CANCELLED` and `FAILED` orders — the same
+   * exclusion `DeliveryChargeRepository.hasPreviousOrders` applies, and for
+   * the same reason: an order that fell over at the payment step never
+   * earned anything, and counting it turns the revenue card into fiction.
+   * Every other status (including `RETURNED`/`REFUNDED`, which *did* take
+   * money before giving it back) stays in, and the per-status tally is
+   * returned alongside so the refunded slice remains visible.
+   *
+   * The tallies come back as raw, **sparse** groupBy results — densifying
+   * them is the service's job (`tallyByEnum`).
+   */
+  async countOrderStats(revenueSince: Date, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    const earning: Prisma.OrderWhereInput = {
+      status: { notIn: [OrderStatus.CANCELLED, OrderStatus.FAILED] },
+    };
+
+    const [
+      total,
+      statusTally,
+      paymentStatusTally,
+      paymentMethodTally,
+      lifetimeRevenue,
+      windowRevenue,
+      windowCount,
+    ] = await Promise.all([
+      client.order.count(),
+      client.order.groupBy({ by: ['status'], _count: { _all: true } }),
+      client.order.groupBy({ by: ['paymentStatus'], _count: { _all: true } }),
+      client.order.groupBy({ by: ['paymentMethod'], _count: { _all: true } }),
+      client.order.aggregate({ where: earning, _sum: { totalAmount: true } }),
+      client.order.aggregate({
+        where: { ...earning, placedAt: { gte: revenueSince } },
+        _sum: { totalAmount: true },
+      }),
+      client.order.count({ where: { placedAt: { gte: revenueSince } } }),
+    ]);
+
+    return {
+      total,
+      statusTally,
+      paymentStatusTally,
+      paymentMethodTally,
+      //* Prisma.Decimal | null — COERCED TO number AT THE DTO BOUNDARY, THE
+      //* SAME PLACE EVERY OTHER MONEY COLUMN IN THIS MODULE IS COERCED.
+      lifetimeRevenue: lifetimeRevenue._sum.totalAmount,
+      windowRevenue: windowRevenue._sum.totalAmount,
+      windowCount,
+    };
+  }
+
   // ─── Writes — status/payment management ──────────────────────────────────
 
   async updateOrderStatus(

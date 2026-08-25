@@ -42,6 +42,14 @@ import {
 } from './dto/update-order.dto';
 import { OrderResponseDto } from './dto/order-response.dto';
 import {
+  IN_TRANSIT_ORDER_STATUSES,
+  NON_EARNING_ORDER_STATUSES,
+  OPEN_ORDER_STATUSES,
+  OrderRevenueDto,
+  OrderStatsDto,
+} from './dto/order-stats.dto';
+import { sumOf, tallyByEnum } from '../../common/utils/tally.util';
+import {
   buildInvoicePdf,
   streamPdfToBuffer,
 } from './invoice/invoice-pdf.builder';
@@ -54,6 +62,13 @@ import {
 //* PRICED BY DeliveryChargeService AGAINST THE DESTINATION, THE BASKET AND THE
 //* LIVE FREE-DELIVERY RULES (SEE docs/delivery-charge.md). totalAmount'S
 //* FORMULA IS UNCHANGED; ONLY WHERE deliveryCharge COMES FROM IS.
+
+const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
+
+//* TRAILING WINDOW FOR THE DASHBOARD'S REVENUE CARD. THIRTY DAYS MATCHES THE
+//* "NEW USERS" WINDOW ON UserService, SO THE TWO NUMBERS ON THE SAME SCREEN
+//* COVER THE SAME PERIOD AND CAN BE READ AGAINST EACH OTHER.
+const DEFAULT_REVENUE_WINDOW_DAYS = 30;
 
 type ResolvedAddress = {
   recipientName: string;
@@ -1330,6 +1345,62 @@ export class OrderService {
       ...result,
       data: result.data.map((order) => new OrderResponseDto(order, baseUrl)),
     };
+  }
+
+  /**
+   * The Order module's slice of the admin dashboard overview.
+   *
+   * `DashboardService` calls this rather than querying `Order` itself, so
+   * "which orders count as revenue" is decided once — here and in
+   * `countOrderStats` — instead of being re-guessed by every consumer that
+   * wants a total.
+   */
+  async getOrderStats(
+    revenueWindowDays = DEFAULT_REVENUE_WINDOW_DAYS,
+  ): Promise<OrderStatsDto> {
+    const revenueSince = new Date(
+      Date.now() - revenueWindowDays * MILLISECONDS_PER_DAY,
+    );
+    const stats = await this.orderRepository.countOrderStats(revenueSince);
+
+    const byStatus = tallyByEnum(
+      Object.values(OrderStatus),
+      stats.statusTally,
+      (row) => row.status,
+      (row) => row._count._all,
+    );
+
+    const lifetime = Number(stats.lifetimeRevenue ?? 0);
+
+    return new OrderStatsDto({
+      total: stats.total,
+      byStatus,
+      byPaymentStatus: tallyByEnum(
+        Object.values(PaymentStatus),
+        stats.paymentStatusTally,
+        (row) => row.paymentStatus,
+        (row) => row._count._all,
+      ),
+      byPaymentMethod: tallyByEnum(
+        Object.values(PaymentMethod),
+        stats.paymentMethodTally,
+        (row) => row.paymentMethod,
+        (row) => row._count._all,
+      ),
+      open: sumOf(byStatus, OPEN_ORDER_STATUSES),
+      inTransit: sumOf(byStatus, IN_TRANSIT_ORDER_STATUSES),
+      revenue: new OrderRevenueDto({
+        lifetime,
+        window: Number(stats.windowRevenue ?? 0),
+        windowDays: revenueWindowDays,
+        windowOrders: stats.windowCount,
+        //* THE DENOMINATOR FOR "AVERAGE ORDER VALUE" HAS TO BE THE SAME SET
+        //* THE NUMERATOR CAME FROM — DIVIDING EARNING REVENUE BY *ALL*
+        //* ORDERS WOULD DEPRESS THE AVERAGE BY EVERY CANCELLATION.
+        earningOrders:
+          stats.total - sumOf(byStatus, NON_EARNING_ORDER_STATUSES),
+      }),
+    });
   }
 
   // ─── Admin — status & payment management ──────────────────────────────────

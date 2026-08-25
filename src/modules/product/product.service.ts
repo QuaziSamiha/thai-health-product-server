@@ -27,6 +27,13 @@ import { UpdateVariantStatusDto } from './dto/update-variant-status.dto';
 import { VariantStatusChangeResponseDto } from './dto/variant-status-response.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ActiveProductsQueryDto } from './dto/active-products-query.dto';
+import {
+  ProductStatsDto,
+  ProductStockUnitsDto,
+  ProductVariantCountDto,
+  ProductVariantStatsDto,
+} from './dto/product-stats.dto';
+import { tallyByEnum } from '../../common/utils/tally.util';
 import { generateSlug } from '../../common/utils/slug.util';
 import { parseStoragePath } from '../../common/utils/storage-path.util';
 import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
@@ -55,6 +62,11 @@ const DEFAULT_HOME_SECTION_LIMIT = 4;
 //* SO THE APP-COMPUTED stockStatus MATCHES WHAT THE DB TRIGGER WILL ALSO
 //* DERIVE FROM THE COLUMN'S OWN DEFAULT.
 const DEFAULT_LOW_STOCK_THRESHOLD = 10;
+
+//* HOW MANY ROWS THE DASHBOARD'S "VARIANTS PER PRODUCT" PANEL SHOWS. A
+//* LEADERBOARD, NOT THE FULL CATALOG — THE COMPLETE LIST ALREADY HAS ITS OWN
+//* PAGINATED ENDPOINT (GET /product/all-product).
+const DEFAULT_TOP_VARIANT_PRODUCT_LIMIT = 8;
 
 //* THE SLICE OF A STORED VARIANT THE RECONCILE LOGIC NEEDS — STRUCTURALLY
 //* SATISFIED BY THE ROWS `findByIdAdmin` ALREADY LOADS.
@@ -224,6 +236,74 @@ export class ProductService {
     return this.toPublicDtoList(
       await this.productRepository.findBestProducts(limit),
     );
+  }
+
+  /**
+   * The Product module's slice of the admin dashboard overview.
+   *
+   * `DashboardService` calls this rather than querying `Product` itself, so
+   * the catalog's own rules — soft-deleted rows are not part of the catalog,
+   * SIMPLE stock lives in `quantity` while VARIABLE stock lives in
+   * `totalStock`, a variant's own `variantStatus` only ever narrows the
+   * parent's `status` — are applied once, here.
+   */
+  async getProductStats(
+    topProductLimit = DEFAULT_TOP_VARIANT_PRODUCT_LIMIT,
+  ): Promise<ProductStatsDto> {
+    const [stats, topProducts] = await Promise.all([
+      this.productRepository.countProductStats(),
+      this.productRepository.findTopProductsByVariantCount(topProductLimit),
+    ]);
+
+    const byType = tallyByEnum(
+      Object.values(ProductType),
+      stats.typeTally,
+      (row) => row.type,
+      (row) => row._count._all,
+    );
+
+    const variableCount = byType[ProductType.VARIABLE];
+
+    return new ProductStatsDto({
+      total: stats.total,
+      deleted: stats.deleted,
+      byStatus: tallyByEnum(
+        Object.values(CategoryProductStatus),
+        stats.statusTally,
+        (row) => row.status,
+        (row) => row._count._all,
+      ),
+      byType,
+      byStockStatus: tallyByEnum(
+        Object.values(StockStatus),
+        stats.stockStatusTally,
+        (row) => row.stockStatus,
+        (row) => row._count._all,
+      ),
+      withVariants: stats.withVariants,
+      featured: stats.featured,
+      stockUnits: new ProductStockUnitsDto({
+        simple: stats.simpleStockUnits,
+        variable: stats.variableStockUnits,
+      }),
+      variants: new ProductVariantStatsDto({
+        total: stats.variantTotal,
+        byStatus: tallyByEnum(
+          Object.values(CategoryProductStatus),
+          stats.variantStatusTally,
+          (row) => row.variantStatus,
+          (row) => row._count._all,
+        ),
+        //* GUARDED — A CATALOG WITH NO VARIABLE PRODUCTS YET WOULD OTHERWISE
+        //* REPORT NaN, WHICH SERIALIZES TO `null` AND BREAKS THE CARD.
+        averagePerVariableProduct: variableCount
+          ? Math.round((stats.variantTotal / variableCount) * 10) / 10
+          : 0,
+        topProducts: topProducts.map(
+          (product) => new ProductVariantCountDto(product),
+        ),
+      }),
+    });
   }
 
   /**

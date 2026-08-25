@@ -119,6 +119,64 @@ export class PromotionRepository extends BaseRepository {
     });
   }
 
+  // ─── Reads — Dashboard aggregates ──────────────────────────────────────────
+
+  /**
+   * Every promo-code headline the admin dashboard shows, in one round trip.
+   *
+   * `redeemable` applies the full checkout validity test — the same
+   * predicate `findPublished` uses, minus its `isPublic` gate, since a code
+   * handed out by email is just as redeemable as a listed one. Counting
+   * `isActive` alone would over-report every code whose window has closed or
+   * whose `usageLimit` is already spent.
+   *
+   * `totalRedemptions` reads the `PromoCodeRedemption` ledger rather than
+   * summing the denormalized `usedCount` counters — the ledger is the
+   * authoritative record (see promotion.prisma), and the gap between the two
+   * numbers is exactly the drift worth being able to see.
+   */
+  async countPromoCodeStats(tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    const now = new Date();
+
+    const [total, active, publicCodes, expired, redeemable, redemptions] =
+      await Promise.all([
+        client.promoCode.count(),
+        client.promoCode.count({ where: { isActive: true } }),
+        client.promoCode.count({ where: { isPublic: true, isActive: true } }),
+        client.promoCode.count({ where: { endsAt: { lt: now } } }),
+        client.promoCode.count({
+          where: {
+            isActive: true,
+            AND: [
+              { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
+              { OR: [{ endsAt: null }, { endsAt: { gte: now } }] },
+              {
+                OR: [
+                  { usageLimit: null },
+                  {
+                    usedCount: {
+                      lt: this.prisma.promoCode.fields.usageLimit,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        }),
+        client.promoCodeRedemption.count(),
+      ]);
+
+    return {
+      total,
+      active,
+      publicCodes,
+      expired,
+      redeemable,
+      totalRedemptions: redemptions,
+    };
+  }
+
   // ─── Mutations — PromoCode ─────────────────────────────────────────────────
 
   async create(

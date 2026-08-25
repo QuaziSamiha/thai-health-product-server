@@ -31,6 +31,7 @@ import { PromotionModule } from './modules/promotion/promotion.module';
 import { DeliveryModule } from './modules/delivery/delivery.module';
 import { DeliveryChargeModule } from './modules/delivery-charge/delivery-charge.module';
 import { AuditLogModule } from './modules/audit-log/audit-log.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { HealthModule } from './health/health.module';
 import { validate } from './config/env.validation';
 import appConfig from './config/app.config';
@@ -110,6 +111,11 @@ import {
     DeliveryModule,
     DeliveryChargeModule,
     AuditLogModule,
+
+    //* COMPOSITION-ONLY MODULE — OWNS NO TABLE AND READS EVERY FIGURE THROUGH
+    //* THE SERVICE OF THE MODULE THAT OWNS IT. REGISTERED LAST BECAUSE IT
+    //* DEPENDS ON EIGHT OF THE MODULES ABOVE AND ON NOTHING BELOW.
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [

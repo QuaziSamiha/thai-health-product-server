@@ -24,7 +24,17 @@ import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
 import type { IStorageService } from '../../shared/storage/interfaces/storage.interface';
 import { PaginationQueryDto, IPaginatedResult } from '../../shared/pagination';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import {
+  CategoryProductCountDto,
+  CategoryStatsDto,
+} from './dto/category-stats.dto';
+import { tallyByEnum } from '../../common/utils/tally.util';
 import { CategoryProductStatus } from '../../generated/prisma/enums';
+
+//* HOW MANY ROWS THE DASHBOARD'S "PRODUCTS PER CATEGORY" PANEL SHOWS. A
+//* LEADERBOARD, NOT THE FULL TAXONOMY — THE COMPLETE LIST ALREADY HAS ITS
+//* OWN PAGINATED ENDPOINT (GET /category/all-categories).
+const DEFAULT_TOP_CATEGORY_LIMIT = 8;
 
 @Injectable()
 export class CategoryService {
@@ -204,6 +214,39 @@ export class CategoryService {
     return categories.map(
       (category) => new RootActiveCategoryResponseDto(category),
     );
+  }
+
+  /**
+   * The Category module's slice of the admin dashboard overview.
+   *
+   * `DashboardService` calls this rather than querying `Category` itself —
+   * the taxonomy's rules (root = level 0, assignable = level 1, `productCount`
+   * is a subtree rollup) are defined here, and a second implementation of
+   * them in a consumer module is exactly what drifts.
+   */
+  async getCategoryStats(
+    topCategoryLimit = DEFAULT_TOP_CATEGORY_LIMIT,
+  ): Promise<CategoryStatsDto> {
+    const [stats, topCategories] = await Promise.all([
+      this.categoryRepository.countCategoryStats(),
+      this.categoryRepository.findTopCategoriesByProductCount(topCategoryLimit),
+    ]);
+
+    return new CategoryStatsDto({
+      total: stats.total,
+      byStatus: tallyByEnum(
+        Object.values(CategoryProductStatus),
+        stats.statusTally,
+        (row) => row.status,
+        (row) => row._count._all,
+      ),
+      rootCategories: stats.rootCount,
+      productCategories: stats.productCategoryCount,
+      featured: stats.featuredCount,
+      topByProductCount: topCategories.map(
+        (category) => new CategoryProductCountDto(category),
+      ),
+    });
   }
 
   async getCategoryBySlug(slug: string): Promise<CategoryResponseDto> {

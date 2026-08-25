@@ -252,6 +252,76 @@ export class CategoryRepository extends BaseRepository {
     });
   }
 
+  // ─── Reads — Dashboard aggregates ──────────────────────────────────────────
+
+  /**
+   * Every category headline the admin dashboard shows, in one round trip.
+   * DashboardService owns no Category query of its own — it asks
+   * CategoryService, which lands here, so the taxonomy's own rules
+   * (root = level 0, assignable = level 1) are applied by the module that
+   * defines them rather than re-derived by a consumer.
+   *
+   * `statusTally` is the raw, **sparse** groupBy result — densifying it is
+   * the service's job (`tallyByEnum`), which keeps this method a pure query.
+   */
+  async countCategoryStats(tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+
+    const [statusTally, total, rootCount, productCategoryCount, featuredCount] =
+      await Promise.all([
+        client.category.groupBy({
+          by: ['status'],
+          _count: { _all: true },
+        }),
+        client.category.count(),
+        client.category.count({ where: { parentId: null } }),
+        //* THE SAME PREDICATE findProductCategories USES, MINUS THE status
+        //* GATE — THE CARD COUNTS EVERY ASSIGNABLE TIER-1 CATEGORY, NOT ONLY
+        //* THE LIVE ONES, AND THE ACTIVE SLICE IS ALREADY IN statusTally.
+        client.category.count({ where: { level: 1 } }),
+        client.category.count({ where: { isFeatured: true } }),
+      ]);
+
+    return {
+      statusTally,
+      total,
+      rootCount,
+      productCategoryCount,
+      featuredCount,
+    };
+  }
+
+  /**
+   * The busiest categories by catalog size, for the dashboard's
+   * "products per category" panel.
+   *
+   * Reads the trigger-maintained `productCount` rollup rather than counting
+   * the `products` relation per row: that column is already the *sellable
+   * subtree* tally (see category.prisma), so a root reports its whole branch
+   * — the only meaningful number for a root, since products may never be
+   * filed on one directly. Counting the relation instead would report 0 for
+   * every root and quietly make the panel useless.
+   */
+  async findTopCategoriesByProductCount(
+    limit: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return await client.category.findMany({
+      where: { productCount: { gt: 0 } },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        level: true,
+        status: true,
+        productCount: true,
+      },
+      orderBy: [{ productCount: 'desc' }, { name: 'asc' }],
+      take: limit,
+    });
+  }
+
   /**
    * Everything `CategoryService.deleteCategory` needs to decide — and carry
    * out — a removal, in one query: identity for the response, the three image

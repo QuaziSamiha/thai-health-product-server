@@ -6,15 +6,17 @@ NestJS backend for the Thai Health Product (Thai Health Product) e-commerce plat
 
 | Area | Doc |
 | --- | --- |
-| Prisma — file map & how the pieces connect | [docs/architecture/prisma.md](./docs/architecture/prisma.md) |
+| Prisma — file map & how the pieces connect | [docs/architecture/prisma-architecture.md](./docs/architecture/prisma-architecture.md) |
 | Prisma — CLI commands (migrate, studio, reset, deploy) | [docs/commands/prisma.md](./docs/commands/prisma.md) |
-| Prisma — concepts, conventions, developer guide | [docs/concepts/prisma.md](./docs/concepts/prisma.md) |
+| Prisma — concepts, conventions, developer guide | [docs/concepts/prisma-concepts.md](./docs/concepts/prisma-concepts.md) |
 | Project setup from scratch | [documentations/PROJECT_SETUP.md](./documentations/PROJECT_SETUP.md) |
 | Category module — taxonomy tree, schema + endpoints | [docs/category.md](./docs/category.md) |
 | Category module (legacy schema notes) | [documentations/CATEGORY.md](./documentations/CATEGORY.md) |
-| Product module | [documentations/PRODUCT.md](./documentations/PRODUCT.md) |
-| Shared pagination pattern | [documentations/PAGINATION.md](./documentations/PAGINATION.md) |
-| Delivery module — schema design + API plan | [docs/delivery.md](./docs/delivery.md) |
+| Product module — schema + endpoints | [docs/product.md](./docs/product.md) |
+| Shared pagination pattern | [docs/architecture/pagination-architecture.md](./docs/architecture/pagination-architecture.md) |
+| Delivery module — third-party couriers (what a courier charges **us**) | [docs/delivery.md](./docs/delivery.md) |
+| Delivery Charge module — shipping rate card (what the **customer** pays) | [docs/delivery-charge.md](./docs/delivery-charge.md) |
+| Delivery Man module — in-house delivery staff | [docs/delivery-man.md](./docs/delivery-man.md) |
 | User module — identity schema, endpoints, security model | [docs/user.md](./docs/user.md) |
 | Support module — policy/info pages, schema + endpoints | [docs/support.md](./docs/support.md) |
 
@@ -156,7 +158,7 @@ yarn start:prod      # .env.production
   - [Data Dictionary — ComboProduct](./docs/combo-product.md#data-dictionary--comboproduct)
   - [Data Dictionary — ComboItem](./docs/combo-product.md#data-dictionary--comboitem)
   - [Data Dictionary — ComboImage](./docs/combo-product.md#data-dictionary--comboimage)
-  - [Availability Model (The Bottleneck Rule)](./docs/combo-product.md#availability-model-the-bottleneck-rule)
+  - [Availability Model (Three Numbers)](./docs/combo-product.md#availability-model-three-numbers)
   - [Bundling Rules](./docs/combo-product.md#bundling-rules)
   - [Price Snapshot Dating](./docs/combo-product.md#price-snapshot-dating)
   - [Relationships and Cascading Rules](./docs/combo-product.md#relationships-and-cascading-rules)
@@ -220,7 +222,11 @@ yarn start:prod      # .env.production
   - [Update a Support Page — `PATCH /support/update-support-page/:id`](./docs/support.md#update-a-support-page)
   - [Delete a Support Page — `DELETE /support/delete-support-page/:id`](./docs/support.md#delete-a-support-page)
   - [Built but Not Yet Exposed](./docs/support.md#built-but-not-yet-exposed)
-### Delivery (External Delivery Service) — schema design, not yet implemented
+### Delivery (External Delivery Service)
+
+> **Provider/zone CRUD is implemented; shipments/tracking are still schema-only.** Three delivery-related modules, easy to confuse: **this one** is the third-party courier directory (what a courier charges *us*, and where a parcel is). [Delivery Charge](#delivery-charge-shipping-rate-card) is the merchant's own rate card (what the *customer* pays). [Delivery Man](#delivery-man-in-house-delivery-staff) is in-house staff accounts.
+
+- [topics covered](./docs/delivery.md#topics-covered)
 - [db schema](./docs/delivery.md#db-schema)
   - [Entity-Relationship Diagram (ERD)](./docs/delivery.md#entity-relationship-diagram-erd)
   - [Enum Definitions](./docs/delivery.md#enum-definitions)
@@ -235,14 +241,36 @@ yarn start:prod      # .env.production
   - [Example Usage (JSON Response)](./docs/delivery.md#example-usage-json-response)
   - [Implementation & Best Practices](./docs/delivery.md#implementation--best-practices)
   - [Known Gaps / Recommended Hardening](./docs/delivery.md#known-gaps--recommended-hardening)
-- [api end point and business logic (planned)](./docs/delivery.md#api-end-point--business-logic-planned)
-  - [Endpoint Overview](./docs/delivery.md#endpoint-overview)
+- [api end point and business logic](./docs/delivery.md#api-end-point--business-logic)
+  - [Implemented Today](./docs/delivery.md#implemented-today) — the four live routes
+    - [The flat-row abstraction](./docs/delivery.md#the-flat-row-abstraction)
+    - [Create — `POST /delivery/create-external-delivery-service`](./docs/delivery.md#create-an-external-delivery-service)
+    - [List — `GET /delivery/all-external-delivery-services`](./docs/delivery.md#list-external-delivery-services)
+    - [Update — `PATCH /delivery/update-external-delivery-service/:id`](./docs/delivery.md#update-an-external-delivery-service)
+    - [Delete — `DELETE /delivery/delete-external-delivery-service/:id`](./docs/delivery.md#delete-an-external-delivery-service)
+  - [Endpoint Overview](./docs/delivery.md#endpoint-overview) — Phase 2 plan, **not** implemented
   - [Get Delivery Quote (Public)](./docs/delivery.md#get-delivery-quote-public)
   - [Book a Shipment](./docs/delivery.md#book-a-shipment)
   - [Update Shipment Status](./docs/delivery.md#update-shipment-status)
   - [Public Tracking Lookup](./docs/delivery.md#public-tracking-lookup)
   - [Inbound Courier Webhook](./docs/delivery.md#inbound-courier-webhook)
-### Delivery Man (In-House Delivery Staff) — schema design, not yet implemented
+### Delivery Charge (Shipping Rate Card)
+
+> What the **customer** is charged to ship an order, and when it is waived. Not the same thing as [Delivery](#delivery-external-delivery-service), which is what a **courier** charges us.
+
+- [What this replaced](./docs/delivery-charge.md#what-this-replaced)
+- [db schema](./docs/delivery-charge.md#db-schema)
+- [How a charge is calculated](./docs/delivery-charge.md#how-a-charge-is-calculated)
+- [Where the quote route lives](./docs/delivery-charge.md#where-the-quote-route-lives)
+- [api end points](./docs/delivery-charge.md#api-end-points)
+- [Security](./docs/delivery-charge.md#security)
+- [The order snapshot](./docs/delivery-charge.md#the-order-snapshot)
+- [Admin UI](./docs/delivery-charge.md#admin-ui)
+- [Storefront behaviour](./docs/delivery-charge.md#storefront-behaviour)
+- [Seeded Thailand rate card](./docs/delivery-charge.md#seeded-thailand-rate-card)
+- [Known Gaps / Recommended Hardening](./docs/delivery-charge.md#known-gaps--recommended-hardening)
+
+### Delivery Man (In-House Delivery Staff)
 - [db schema](./docs/delivery-man.md#db-schema)
   - [Entity-Relationship Diagram (ERD)](./docs/delivery-man.md#entity-relationship-diagram-erd)
   - [Enum Definitions](./docs/delivery-man.md#enum-definitions)

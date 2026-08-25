@@ -12,6 +12,7 @@ import { ValidatePromoCodeDto } from './dto/validate-promo-code.dto';
 import { PromoCodeResponseDto } from './dto/promo-code-response.dto';
 import { PromoCodeValidationResponseDto } from './dto/promo-code-validation-response.dto';
 import { PublicPromoCodeResponseDto } from './dto/public-promo-code-response.dto';
+import { PromoCodeStatsDto } from './dto/promo-code-stats.dto';
 import { IPaginatedResult } from '../../shared/pagination';
 import { DiscountType, Prisma } from '../../generated/prisma/client';
 
@@ -195,6 +196,27 @@ export class PromotionService {
     return promoCodes.map(
       (promoCode) => new PublicPromoCodeResponseDto(promoCode),
     );
+  }
+
+  /**
+   * The Promotion module's slice of the admin dashboard overview.
+   *
+   * `DashboardService` calls this rather than querying `PromoCode` itself,
+   * so the three separate ideas this module keeps distinct — the `isActive`
+   * switch, actual redeemability, and public listing — stay distinct on the
+   * dashboard too.
+   */
+  async getPromoCodeStats(): Promise<PromoCodeStatsDto> {
+    const stats = await this.repository.countPromoCodeStats();
+
+    return new PromoCodeStatsDto({
+      total: stats.total,
+      active: stats.active,
+      redeemable: stats.redeemable,
+      published: stats.publicCodes,
+      expired: stats.expired,
+      totalRedemptions: stats.totalRedemptions,
+    });
   }
 
   // ─── Storefront — validate/preview (no side effects) ───────────────────────

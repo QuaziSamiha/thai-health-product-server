@@ -13,6 +13,8 @@ import {
   BlogResponseDto,
   BlogResponsePublicDto,
 } from './dto/blog-response.dto';
+import { BlogStatsDto } from './dto/blog-stats.dto';
+import { tallyByEnum } from '../../common/utils/tally.util';
 import { generateSlug } from '../../common/utils/slug.util';
 import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
 import type { IStorageService } from '../../shared/storage/interfaces/storage.interface';
@@ -109,6 +111,25 @@ export class BlogService {
           ),
       ),
     };
+  }
+
+  /**
+   * The Blog module's slice of the admin dashboard overview.
+   * `DashboardService` calls this rather than querying `Blog` itself.
+   */
+  async getBlogStats(): Promise<BlogStatsDto> {
+    const stats = await this.blogRepository.countBlogStats();
+
+    return new BlogStatsDto({
+      total: stats.total,
+      byStatus: tallyByEnum(
+        Object.values(BlogStatus),
+        stats.statusTally,
+        (row) => row.status,
+        (row) => row._count._all,
+      ),
+      totalComments: stats.totalComments,
+    });
   }
 
   async getBlogBySlug(slug: string): Promise<BlogResponsePublicDto> {

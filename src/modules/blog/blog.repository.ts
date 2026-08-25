@@ -78,6 +78,27 @@ export class BlogRepository extends BaseRepository {
     });
   }
 
+  // ─── Reads — Dashboard aggregates ────────────────────────────────────────────
+
+  /**
+   * Every blog headline the admin dashboard shows, in one round trip.
+   * `Blog` has no soft delete, so there is nothing to exclude here.
+   *
+   * `statusTally` is the raw, **sparse** groupBy result — densifying it is
+   * the service's job (`tallyByEnum`).
+   */
+  async countBlogStats(tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+
+    const [total, statusTally, comments] = await Promise.all([
+      client.blog.count(),
+      client.blog.groupBy({ by: ['status'], _count: { _all: true } }),
+      client.blog.aggregate({ _sum: { totalComments: true } }),
+    ]);
+
+    return { total, statusTally, totalComments: comments._sum.totalComments ?? 0 };
+  }
+
   // ─── Mutations ───────────────────────────────────────────────────────────────
 
   async createBlog(

@@ -17,7 +17,9 @@ import {
   ComboProductResponseDto,
   ComboProductResponsePublicDto,
 } from './dto/combo-product-response.dto';
+import { ComboProductStatsDto } from './dto/combo-product-stats.dto';
 import { IPaginatedResult } from '../../shared/pagination';
+import { tallyByEnum } from '../../common/utils/tally.util';
 import { generateSlug } from '../../common/utils/slug.util';
 import { parseStoragePath } from '../../common/utils/storage-path.util';
 import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
@@ -591,6 +593,34 @@ export class ComboProductService {
     return combos.map(
       (combo) => new ComboProductResponsePublicDto(combo, baseUrl),
     );
+  }
+
+  /**
+   * The ComboProduct module's slice of the admin dashboard overview.
+   *
+   * `DashboardService` calls this rather than querying `ComboProduct`
+   * itself — the distinction between a combo's *stored* status and what the
+   * storefront is actually serving (the live `startsAt`/`endsAt` window test)
+   * is this module's rule, and a consumer counting `status = ACTIVE` on its
+   * own would quietly over-report between expiry sweeps.
+   */
+  async getComboStats(): Promise<ComboProductStatsDto> {
+    const stats = await this.comboProductRepository.countComboStats();
+
+    return new ComboProductStatsDto({
+      total: stats.total,
+      deleted: stats.deleted,
+      byStatus: tallyByEnum(
+        Object.values(CategoryProductStatus),
+        stats.statusTally,
+        (row) => row.status,
+        (row) => row._count._all,
+      ),
+      sellingNow: stats.sellingNow,
+      expired: stats.expired,
+      featured: stats.featured,
+      soldBundles: stats.soldBundles,
+    });
   }
 
   /**

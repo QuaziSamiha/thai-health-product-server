@@ -150,6 +150,27 @@ export class SupportRepository extends BaseRepository {
     });
   }
 
+  // ─── Reads — Dashboard aggregates ────────────────────────────────────────────
+
+  /**
+   * Every support-page headline the admin dashboard shows, in one round trip.
+   * `Support` has no soft delete, so there is nothing to exclude here.
+   *
+   * Both tallies come back as raw, **sparse** groupBy results — densifying
+   * them is the service's job (`tallyByEnum`).
+   */
+  async countSupportStats(tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+
+    const [total, statusTally, typeTally] = await Promise.all([
+      client.support.count(),
+      client.support.groupBy({ by: ['status'], _count: { _all: true } }),
+      client.support.groupBy({ by: ['type'], _count: { _all: true } }),
+    ]);
+
+    return { total, statusTally, typeTally };
+  }
+
   // ─── Mutations ───────────────────────────────────────────────────────────────
 
   async createSupport(

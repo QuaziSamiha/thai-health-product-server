@@ -192,6 +192,62 @@ export class ComboProductRepository extends BaseRepository {
     });
   }
 
+  // ─── Reads — Dashboard aggregates ────────────────────────────────────────────
+
+  /**
+   * Every combo headline the admin dashboard shows, in one round trip.
+   *
+   * Soft-deleted combos are excluded from every number except `deleted`, the
+   * same contract `findAllCombosAdmin` applies.
+   *
+   * `sellingNow` reuses `publicVisibilityWhere()` rather than counting
+   * `status = ACTIVE`: the stored status is only corrected on the expiry
+   * sweep's schedule, so between sweeps it over-reports. Asking the same
+   * predicate the storefront asks means the card says what a customer can
+   * actually buy right now. `expired` is the gap between the two — combos
+   * still flagged ACTIVE whose window has already closed, i.e. exactly what
+   * the next sweep will retire.
+   */
+  async countComboStats(tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    const now = new Date();
+    const live: Prisma.ComboProductWhereInput = { deletedAt: null };
+
+    const [total, deleted, statusTally, featured, sellingNow, expired, sold] =
+      await Promise.all([
+        client.comboProduct.count({ where: live }),
+        client.comboProduct.count({ where: { deletedAt: { not: null } } }),
+        client.comboProduct.groupBy({
+          by: ['status'],
+          where: live,
+          _count: { _all: true },
+        }),
+        client.comboProduct.count({ where: { ...live, isFeatured: true } }),
+        client.comboProduct.count({ where: this.publicVisibilityWhere() }),
+        client.comboProduct.count({
+          where: {
+            ...live,
+            status: CategoryProductStatus.ACTIVE,
+            endsAt: { lt: now },
+          },
+        }),
+        client.comboProduct.aggregate({
+          where: live,
+          _sum: { soldQuantity: true },
+        }),
+      ]);
+
+    return {
+      total,
+      deleted,
+      statusTally,
+      featured,
+      sellingNow,
+      expired,
+      soldBundles: sold._sum.soldQuantity ?? 0,
+    };
+  }
+
   // ─── Reads — Lists ───────────────────────────────────────────────────────────
 
   /**

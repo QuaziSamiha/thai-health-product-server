@@ -7,9 +7,43 @@ Third-party courier directory and shipment tracking for the storefront's **Set U
 > **Also not the same thing as the `delivery-charge` module** (`delivery-charge.prisma`, `docs/delivery-charge.md`). That one is the merchant's own **shipping rate card** — what the storefront charges a customer, and when it is waived. `DeliveryZone.baseFee` here is our **cost** with a courier; `DeliveryChargeRate.baseFee` there is the customer's **price**. Merging them would let a courier renegotiation silently reprice the shop.
 
 Schema source: `prisma/schema/delivery.prisma` (models `DeliveryProvider`, `DeliveryZone`, `DeliveryShipment`, `DeliveryStatusHistory`; enums `DeliveryEntityStatus`, `DeliveryIntegrationType`, `DeliveryPricingModel`, `DeliveryShipmentStatus`).
-Module source: **`DeliveryProvider`/`DeliveryZone` are implemented** — `src/modules/delivery/` (`delivery.controller.ts`, `delivery.service.ts`, `delivery.repository.ts`, `delivery.select.ts`, `dto/`). **`DeliveryShipment`/`DeliveryStatusHistory` are schema-only** — no module reads or writes them yet. See [API End Point & Business Logic](#api-end-point--business-logic) for what's real vs. still a roadmap sketch.
+Module source: **`DeliveryProvider`/`DeliveryZone` are implemented** — `src/modules/delivery/` (`delivery.controller.ts`, `delivery.service.ts`, `delivery.repository.ts`, `delivery.select.ts`, `dto/`), exposed as four admin routes over a flat provider ⋈ zone row. **`DeliveryShipment`/`DeliveryStatusHistory` are schema-only** — no module reads or writes them yet. See [Implemented Today](#implemented-today) for what's real and [Endpoint Overview](#endpoint-overview) onward for what's still a roadmap sketch.
 
 > **Scope note:** `User` is documented in its own reference (`user.md`) — it appears here only as the `createdBy`/`updatedBy`/`changedBy` foreign-key target needed for the audit trail. `Order` is deliberately **not** a Prisma relation from this module — see [Known Gaps](#known-gaps--recommended-hardening).
+
+---
+
+## Topics Covered
+
+- [DB Schema](#db-schema)
+  - [Entity-Relationship Diagram (ERD)](#entity-relationship-diagram-erd)
+  - [Enum Definitions](#enum-definitions) — [`DeliveryEntityStatus`](#deliveryentitystatus-shared-by-deliveryproviderstatus-and-deliveryzonestatus) · [`DeliveryIntegrationType`](#deliveryintegrationtype) · [`DeliveryPricingModel`](#deliverypricingmodel) · [`DeliveryShipmentStatus`](#deliveryshipmentstatus)
+  - [Data Dictionary — DeliveryProvider](#data-dictionary--deliveryprovider)
+  - [Data Dictionary — DeliveryZone](#data-dictionary--deliveryzone)
+  - [Data Dictionary — DeliveryShipment](#data-dictionary--deliveryshipment)
+  - [Data Dictionary — DeliveryStatusHistory](#data-dictionary--deliverystatushistory)
+  - [Relationships and Cascading Rules](#relationships-and-cascading-rules)
+  - [Performance Optimizations (Indexes)](#performance-optimizations-indexes) — [Current](#current-indexes-deliveryprisma) · [Recommended future](#recommended-future-indexes-not-yet-needed-at-current-scale)
+  - [Conventions](#conventions)
+  - [Example Data](#example-data)
+  - [Example Usage (JSON Response)](#example-usage-json-response)
+  - [Implementation & Best Practices](#implementation--best-practices) — [Provider & Zone Selection](#provider--zone-selection) · [Delivery-Time Rendering](#delivery-time-rendering) · [Credential Handling](#credential-handling) · [Shipment Booking Flow](#shipment-booking-flow) · [Webhook Handling](#webhook-handling-integrationtype--webhook)
+  - [Known Gaps / Recommended Hardening](#known-gaps--recommended-hardening)
+- [API End Point & Business Logic](#api-end-point--business-logic)
+  - [Implemented Today](#implemented-today) — the four live routes
+    - [Create an External Delivery Service — `POST /delivery/create-external-delivery-service`](#create-an-external-delivery-service)
+    - [List External Delivery Services — `GET /delivery/all-external-delivery-services`](#list-external-delivery-services)
+    - [Update an External Delivery Service — `PATCH /delivery/update-external-delivery-service/:id`](#update-an-external-delivery-service)
+    - [Delete an External Delivery Service — `DELETE /delivery/delete-external-delivery-service/:id`](#delete-an-external-delivery-service)
+  - [Endpoint Overview](#endpoint-overview) — Phase 2 plan, **not** implemented
+  - [Get Delivery Quote (Public)](#get-delivery-quote-public)
+  - [Book a Shipment](#book-a-shipment)
+  - [Update Shipment Status](#update-shipment-status)
+  - [Public Tracking Lookup](#public-tracking-lookup)
+  - [Inbound Courier Webhook](#inbound-courier-webhook)
+  - [Create / List / Update Provider & Zone Endpoints](#create--list--update-provider--zone-endpoints)
+
+**Related:** [`delivery-charge.md`](./delivery-charge.md) (what the customer is charged) · [`delivery-man.md`](./delivery-man.md) (in-house staff) · [`order.md`](./order.md) · [`address.md`](./address.md)
 
 ---
 
@@ -171,7 +205,7 @@ erDiagram
 | `postalCodePrefix`       | `VARCHAR(10)`                      | NULLABLE, `@map("postal_code_prefix")`                                                       | E.g. `"10"` to match all Bangkok postal codes — finer-grained matching than `province`/`district` alone.               |
 | `country`                | `VARCHAR(100)`                     | NOT NULL, DEFAULT `"Thailand"`                                                                | Same default as `Address.country`.                                                                               |
 | `minDeliveryDays`        | `INT`                              | NOT NULL, `@map("min_delivery_days")`                                                        | Lower bound of the **"Delivery Time"** column, e.g. `3`.                                                          |
-| `maxDeliveryDays`        | `INT`                              | NOT NULL, `@map("max_delivery_days")`                                                        | Upper bound, e.g. `7`. UI renders `"${min}-${max} days"` — never stored as a string. See [Conventions](#conventions-1). |
+| `maxDeliveryDays`        | `INT`                              | NOT NULL, `@map("max_delivery_days")`                                                        | Upper bound, e.g. `7`. UI renders `"${min}-${max} days"` — never stored as a string. See [Conventions](#conventions). |
 | `pricingModel`           | `ENUM(DeliveryPricingModel)`       | NOT NULL, DEFAULT `FLAT`, `@map("pricing_model")`                                            | How `baseFee` is interpreted.                                                                                     |
 | `baseFee`                | `DECIMAL(12,2)`                    | NOT NULL, DEFAULT `0`, `@map("base_fee")`                                                    | Flat fee, or per-kg/per-km rate depending on `pricingModel`.                                                      |
 | `codAvailable`           | `BOOLEAN`                          | NOT NULL, DEFAULT `false`, `@map("cod_available")`                                           | Whether Cash-on-Delivery is offered on this zone — relevant since `Order.paymentMethod` includes `CASH_ON_DELIVERY` (`order.prisma`). |
@@ -396,21 +430,78 @@ This is a **from-scratch schema design**, not a hardening pass on existing produ
 
 ---
 
-### API End Point & Business Logic (Planned)
+### API End Point & Business Logic
 
-**Nothing below is implemented.** No `src/modules/delivery/` exists yet — this section is the proposed contract, written so the eventual controller/service/repository trio (and the client checkout/admin UI) can be built against a single agreed design rather than improvised endpoint-by-endpoint. Treat every route, DTO name, and business-logic step below as a **plan to review and revise**, not documentation of running code. Suggested base path: `/api/v1/delivery`, following the existing per-module prefix convention (`/api/v1/blog`, `/api/v1/combo`, etc.).
+**This section has two tiers, and the difference matters.** [Implemented Today](#implemented-today) documents the four routes that actually exist in `src/modules/delivery/`. Everything from [Endpoint Overview](#endpoint-overview) onward is a **Phase 2 design sketch** — no shipment, quoting, tracking or webhook code exists, and those route names are proposals that the shipped routes already deviate from. Read the two tiers as "what runs" and "what was drawn on the whiteboard", never as one list.
+
+Base path is `/api/v1/delivery`, following the per-module prefix convention (`/api/v1/blog`, `/api/v1/combo`, …).
+
+---
+
+#### Implemented Today
+
+Four admin-CRUD routes backing the **Set Up → External Delivery Service** table. All four are `JwtAuthGuard` + `RolesGuard` + `@Roles(ADMIN, MANAGER)`; **this module exposes no public route yet**, so the `/quote`, `/track` and `/webhook` entries in the Phase 2 table below have no counterpart in running code.
+
+| Method   | Path                                        | Access             | Purpose                                                   |
+| :------- | :------------------------------------------- | :------------------ | :---------------------------------------------------------- |
+| `POST`   | `/create-external-delivery-service`           | `ADMIN`, `MANAGER`   | [Create a row](#create-an-external-delivery-service)         |
+| `GET`    | `/all-external-delivery-services`             | `ADMIN`, `MANAGER`   | [Paginated listing](#list-external-delivery-services)        |
+| `PATCH`  | `/update-external-delivery-service/:id`       | `ADMIN`, `MANAGER`   | [Update a row](#update-an-external-delivery-service)         |
+| `DELETE` | `/delete-external-delivery-service/:id`       | `ADMIN`, `MANAGER`   | [Delete a row](#delete-an-external-delivery-service)         |
+
+##### The flat-row abstraction
+
+The admin table is one flat row per line — Company / Number / Location / Delivery Area / Delivery Time — but that row is a **`DeliveryProvider` ⋈ `DeliveryZone` join**, not one table (see [Conventions](#conventions)). The four routes hide that join rather than exposing provider and zone as separate resources:
+
+- **`:id` is the zone's id, not the provider's.** A row *is* a zone; the provider is the thing several rows may share.
+- **Creating a row for an existing company name attaches a new zone to that provider** instead of creating a second provider. This is precisely how "KEX Express" legitimately appears twice with two different delivery-time ranges.
+- **Deleting a row deletes only the zone.** The provider survives — it may own other rows — and simply stops appearing in the table once it has none left. Nothing is hard-deleted at the provider level, which is what keeps the `RESTRICT` in [Relationships and Cascading Rules](#relationships-and-cascading-rules) from ever being hit from this screen.
+
+##### Create an External Delivery Service
+
+**`POST /api/v1/delivery/create-external-delivery-service`** — one flat submission becomes a provider (new or reused) plus one zone, in a single transaction.
+
+| Status | Cause                                                                                |
+| :----- | :--------------------------------------------------------------------------------------|
+| `201`  | Row created.                                                                            |
+| `400`  | Invalid input.                                                                          |
+| `409`  | The company name resolves to a duplicate provider identifier (slug collision).           |
+
+##### List External Delivery Services
+
+**`GET /api/v1/delivery/all-external-delivery-services`** — paginated via the shared `PaginationQueryDto`; `search` matches **company name and delivery area**. Returns `DeliveryServiceRowDto`, which carries both the row's own `sid`/`id` (the zone) and `providerSid`, so the client can act on either half without a second call.
+
+##### Update an External Delivery Service
+
+**`PATCH /api/v1/delivery/update-external-delivery-service/:id`** — partially updates the zone and, when company-level fields are present, its owning provider.
+
+Cross-field ordering (`minDeliveryDays` ≤ `maxDeliveryDays`) is re-checked in the service rather than left to the DTO, because a PATCH may send only one end of the pair and the comparison has to run against the row's stored value for the other — the same reasoning `DeliveryChargeService.updateZone` uses.
+
+| Status | Cause                                                                                |
+| :----- | :--------------------------------------------------------------------------------------|
+| `200`  | Row updated.                                                                            |
+| `404`  | No row with that id.                                                                    |
+| `409`  | The new company name collides with a **different** existing provider — delete and re-add rather than renaming across providers. |
+
+##### Delete an External Delivery Service
+
+**`DELETE /api/v1/delivery/delete-external-delivery-service/:id`** — `204 No Content`; `404` if the row does not exist. Deletes the zone only, per [the flat-row abstraction](#the-flat-row-abstraction).
+
+---
 
 #### Endpoint Overview
 
+> **Phase 2 — none of the following is implemented.** The table is the original proposed contract, kept so shipments/quoting/tracking can be built against one agreed design rather than improvised endpoint-by-endpoint. Note that the provider/zone rows below were **superseded** by the four flat-row routes in [Implemented Today](#implemented-today) — the names differ, and the shipped ones are authoritative.
+
 | Method   | Path                              | Access                     | Purpose                                                     |
 | :------- | :--------------------------------- | :-------------------------- | :------------------------------------------------------------ |
-| `POST`   | `/create-provider`                 | `ADMIN`, `MANAGER`           | [Create a delivery provider](#create-a-delivery-provider)       |
-| `GET`    | `/all-providers`                   | `ADMIN`, `MANAGER`           | [Admin listing — every status](#list-all-providers-admin)       |
-| `GET`    | `/active-providers`                | **Public**                   | [Active providers for checkout](#list-active-providers-public)  |
-| `PATCH`  | `/update-provider/:id`             | `ADMIN`, `MANAGER`           | [Update a provider](#update-a-delivery-provider)                 |
-| `PATCH`  | `/deactivate-provider/:id`         | `ADMIN`, `MANAGER`           | [Deactivate a provider](#deactivate-a-delivery-provider) (`status → INACTIVE`, the "delete" path) |
-| `DELETE` | `/delete-provider/:id`             | `ADMIN` only                  | [Hard delete a provider](#hard-delete-a-delivery-provider) (only succeeds with zero shipment history) |
-| `POST`   | `/create-zone`                     | `ADMIN`, `MANAGER`           | [Create a delivery zone](#create-a-delivery-zone)                |
+| `POST`   | `/create-provider`                 | `ADMIN`, `MANAGER`           | Create a provider — **superseded by** [create-external-delivery-service](#create-an-external-delivery-service)       |
+| `GET`    | `/all-providers`                   | `ADMIN`, `MANAGER`           | Admin listing — **superseded by** [all-external-delivery-services](#list-external-delivery-services)       |
+| `GET`    | `/active-providers`                | **Public**                   | Active providers for checkout — no public route exists yet  |
+| `PATCH`  | `/update-provider/:id`             | `ADMIN`, `MANAGER`           | Update a provider — **superseded by** [update-external-delivery-service](#update-an-external-delivery-service)                 |
+| `PATCH`  | `/deactivate-provider/:id`         | `ADMIN`, `MANAGER`           | Deactivate a provider (`status → INACTIVE`, the "delete" path) |
+| `DELETE` | `/delete-provider/:id`             | `ADMIN` only                  | Hard delete a provider (only succeeds with zero shipment history) |
+| `POST`   | `/create-zone`                     | `ADMIN`, `MANAGER`           | Create a zone — **superseded by** [create-external-delivery-service](#create-an-external-delivery-service)                |
 | `GET`    | `/zones-by-provider/:providerId`   | `ADMIN`, `MANAGER`           | List a provider's zones                                        |
 | `PATCH`  | `/update-zone/:id`                 | `ADMIN`, `MANAGER`           | Update a zone's time/fee/coverage                               |
 | `DELETE` | `/delete-zone/:id`                 | `ADMIN`, `MANAGER`           | Delete a zone (`SET NULL`s any `DeliveryShipment.zoneId` pointing to it) |

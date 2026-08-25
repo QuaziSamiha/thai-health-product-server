@@ -11,9 +11,11 @@ import {
   SupportResponseDto,
   SupportResponsePublicDto,
 } from './dto/support-response.dto';
+import { SupportStatsDto } from './dto/support-stats.dto';
 import { generateSlug } from '../../common/utils/slug.util';
+import { tallyByEnum } from '../../common/utils/tally.util';
 import { IPaginatedResult } from '../../shared/pagination';
-import { SupportType } from '../../generated/prisma/enums';
+import { SupportStatus, SupportType } from '../../generated/prisma/enums';
 
 @Injectable()
 export class SupportService {
@@ -64,6 +66,30 @@ export class SupportService {
   async getActiveTabs(): Promise<SupportResponsePublicDto[]> {
     const supports = await this.supportRepository.findActiveTabs();
     return supports.map((support) => new SupportResponsePublicDto(support));
+  }
+
+  /**
+   * The Support module's slice of the admin dashboard overview.
+   * `DashboardService` calls this rather than querying `Support` itself.
+   */
+  async getSupportStats(): Promise<SupportStatsDto> {
+    const stats = await this.supportRepository.countSupportStats();
+
+    return new SupportStatsDto({
+      total: stats.total,
+      byStatus: tallyByEnum(
+        Object.values(SupportStatus),
+        stats.statusTally,
+        (row) => row.status,
+        (row) => row._count._all,
+      ),
+      byType: tallyByEnum(
+        Object.values(SupportType),
+        stats.typeTally,
+        (row) => row.type,
+        (row) => row._count._all,
+      ),
+    });
   }
 
   async getActiveSupportByType(

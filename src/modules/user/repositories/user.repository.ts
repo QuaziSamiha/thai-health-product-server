@@ -275,6 +275,53 @@ export class UserRepository extends BaseRepository {
       defaultSortField: 'createdAt',
     });
   }
+
+  /**
+   * Every account headline the admin dashboard shows, in one round trip.
+   *
+   * Soft-deleted accounts (`deletedAt` set) are excluded from **every**
+   * number except `deleted` itself. Note this is not the same thing as
+   * `UserStatus.DEACTIVATED`: `UserService.deactivateUser` writes the status
+   * without stamping `deletedAt`, so a deactivated account is still a live
+   * row and is still counted in `byRole` / `byStatus` — which is what an
+   * admin looking at "how many admins do we have" needs to see.
+   *
+   * The tallies come back as raw, **sparse** groupBy results — densifying
+   * them is the service's job (`tallyByEnum`).
+   */
+  async countUserStats(newSince: Date, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    const live: Prisma.UserWhereInput = { deletedAt: null };
+
+    const [total, deleted, roleTally, statusTally, verifiedEmails, newUsers] =
+      await Promise.all([
+        client.user.count({ where: live }),
+        client.user.count({ where: { deletedAt: { not: null } } }),
+        client.user.groupBy({
+          by: ['role'],
+          where: live,
+          _count: { _all: true },
+        }),
+        client.user.groupBy({
+          by: ['status'],
+          where: live,
+          _count: { _all: true },
+        }),
+        client.user.count({
+          where: { ...live, security: { isEmailVerified: true } },
+        }),
+        client.user.count({ where: { ...live, createdAt: { gte: newSince } } }),
+      ]);
+
+    return {
+      total,
+      deleted,
+      roleTally,
+      statusTally,
+      verifiedEmails,
+      newUsers,
+    };
+  }
 }
 
 // async findByEmailWithAuth(email: string, includeAuth = false) {

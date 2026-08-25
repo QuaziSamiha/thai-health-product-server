@@ -39,7 +39,21 @@ import {
 import { PaginationQueryDto, IPaginatedResult } from '../../shared/pagination';
 import { STORAGE_SERVICE_TOKEN } from '../../shared/storage/storage.constants';
 import { assertAccountCanAuthenticate } from '../../common/utils/account-status.util';
+import { sumOf, tallyByEnum } from '../../common/utils/tally.util';
+import {
+  ADMIN_ROLES,
+  SHOPPER_ROLES,
+  UserStatsDto,
+} from './dto/user-stats.dto';
 import type { IStorageService } from '../../shared/storage/interfaces/storage.interface';
+
+const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
+
+//* TRAILING WINDOW FOR THE DASHBOARD'S "NEW USERS" CARD. THIRTY DAYS
+//* MATCHES THE REVENUE WINDOW ON THE ORDER CARD, SO THE TWO NUMBERS ON THE
+//* SAME SCREEN COVER THE SAME PERIOD AND CAN BE READ AGAINST EACH OTHER.
+const DEFAULT_NEW_USER_WINDOW_DAYS = 30;
+
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name);
@@ -292,6 +306,52 @@ export class UserService {
           ),
       ),
     };
+  }
+
+  /**
+   * The User module's slice of the admin dashboard overview.
+   *
+   * `DashboardService` calls this rather than querying `User` itself, so the
+   * role groupings that matter to the business — who counts as an "admin",
+   * who counts as staff — are defined once, next to the enum they read.
+   */
+  async getUserStats(
+    newUserWindowDays = DEFAULT_NEW_USER_WINDOW_DAYS,
+  ): Promise<UserStatsDto> {
+    const newSince = new Date(
+      Date.now() - newUserWindowDays * MILLISECONDS_PER_DAY,
+    );
+    const stats = await this.userRepo.countUserStats(newSince);
+
+    const byRole = tallyByEnum(
+      Object.values(UserRole),
+      stats.roleTally,
+      (row) => row.role,
+      (row) => row._count._all,
+    );
+
+    const customers = sumOf(byRole, SHOPPER_ROLES);
+
+    return new UserStatsDto({
+      total: stats.total,
+      deleted: stats.deleted,
+      byRole,
+      byStatus: tallyByEnum(
+        Object.values(UserStatus),
+        stats.statusTally,
+        (row) => row.status,
+        (row) => row._count._all,
+      ),
+      admins: sumOf(byRole, ADMIN_ROLES),
+      //* STAFF IS DERIVED AS "EVERYONE MINUS THE SHOPPERS" RATHER THAN SUMMED
+      //* FROM A LIST OF STAFF ROLES — A ROLE ADDED TO THE SCHEMA LATER IS
+      //* THEN COUNTED AUTOMATICALLY INSTEAD OF SILENTLY FALLING THROUGH.
+      staff: stats.total - customers,
+      customers,
+      verifiedEmails: stats.verifiedEmails,
+      newUsers: stats.newUsers,
+      newUserWindowDays,
+    });
   }
 
   async getUserById(id: number) {

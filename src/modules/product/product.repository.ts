@@ -369,6 +369,125 @@ export class ProductRepository extends BaseRepository {
     });
   }
 
+  // ─── Reads — Dashboard aggregates ────────────────────────────────────────────
+
+  /**
+   * Every catalog headline the admin dashboard shows, in one round trip.
+   *
+   * Soft-deleted products are excluded from **every** number here except
+   * `deleted` itself: a retired product is not part of the catalog, and
+   * counting it would make "total products" disagree with what the admin
+   * product listing shows. `deleted` is reported separately so the row is
+   * still visible rather than silently dropped.
+   *
+   * The tallies come back as raw, **sparse** groupBy results — densifying
+   * them is the service's job (`tallyByEnum`), which keeps this a pure query.
+   */
+  async countProductStats(tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    const live: Prisma.ProductWhereInput = { deletedAt: null };
+
+    const [
+      total,
+      deleted,
+      statusTally,
+      typeTally,
+      stockStatusTally,
+      featured,
+      withVariants,
+      simpleStock,
+      variableStock,
+      variantTotal,
+      variantStatusTally,
+    ] = await Promise.all([
+      client.product.count({ where: live }),
+      client.product.count({ where: { deletedAt: { not: null } } }),
+      client.product.groupBy({
+        by: ['status'],
+        where: live,
+        _count: { _all: true },
+      }),
+      client.product.groupBy({
+        by: ['type'],
+        where: live,
+        _count: { _all: true },
+      }),
+      client.product.groupBy({
+        by: ['stockStatus'],
+        where: live,
+        _count: { _all: true },
+      }),
+      client.product.count({ where: { ...live, isFeatured: true } }),
+      client.product.count({ where: { ...live, hasVariants: true } }),
+      //* TWO AGGREGATES, NOT ONE, BECAUSE THE TWO PRODUCT TYPES KEEP THEIR
+      //* STOCK IN DIFFERENT COLUMNS: A SIMPLE PRODUCT COUNTS ITS OWN
+      //* `quantity`, A VARIABLE ONE COUNTS `totalStock` (THE SUM OVER ITS
+      //* *ACTIVE* VARIANTS). SUMMING BOTH COLUMNS OVER ALL ROWS WOULD
+      //* DOUBLE-COUNT NOTHING BUT WOULD STILL BE WRONG — `quantity` IS LEFT
+      //* AT ITS OLD VALUE ON A PRODUCT THAT LATER GREW VARIANTS.
+      client.product.aggregate({
+        where: { ...live, type: ProductType.SIMPLE },
+        _sum: { quantity: true },
+      }),
+      client.product.aggregate({
+        where: { ...live, type: ProductType.VARIABLE },
+        _sum: { totalStock: true },
+      }),
+      //* VARIANTS ARE SCOPED TO A LIVE PARENT TOO — A SOFT-DELETED PRODUCT'S
+      //* VARIANT ROWS SURVIVE (THE CASCADE IS ON HARD DELETE ONLY) AND WOULD
+      //* OTHERWISE INFLATE THE VARIANT COUNT PAST WHAT THE CATALOG HOLDS.
+      client.productVariant.count({ where: { product: live } }),
+      client.productVariant.groupBy({
+        by: ['variantStatus'],
+        where: { product: live },
+        _count: { _all: true },
+      }),
+    ]);
+
+    return {
+      total,
+      deleted,
+      statusTally,
+      typeTally,
+      stockStatusTally,
+      featured,
+      withVariants,
+      simpleStockUnits: simpleStock._sum.quantity ?? 0,
+      variableStockUnits: variableStock._sum.totalStock ?? 0,
+      variantTotal,
+      variantStatusTally,
+    };
+  }
+
+  /**
+   * Variant-heavy products for the dashboard's "variants per product" panel —
+   * the direct answer to "how many variants does this product have?".
+   *
+   * `_count.variants` is unfiltered on purpose: it is the *authoring* number
+   * (how many rows the admin maintains on this product), not the sellable
+   * one. The sellable split lives in `countProductStats`' variant tally.
+   */
+  async findTopProductsByVariantCount(
+    limit: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    return await client.product.findMany({
+      where: { deletedAt: null, hasVariants: true },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        type: true,
+        status: true,
+        totalStock: true,
+        _count: { select: { variants: true } },
+      },
+      orderBy: [{ variants: { _count: 'desc' } }, { name: 'asc' }],
+      take: limit,
+    });
+  }
+
   // ─── Mutations ───────────────────────────────────────────────────────────────
 
   async createProduct(
