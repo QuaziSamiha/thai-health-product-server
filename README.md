@@ -47,6 +47,46 @@ yarn start:prod      # .env.production
 ```
 
 
+### Database & Migration Commands
+
+| Command                          | Env File Loaded     | Runs                                       | Purpose                                                            |
+| -------------------------------- | ------------------- | ------------------------------------------ | ------------------------------------------------------------------ |
+| `yarn db:deploy`                  | `.env.development`  | `prisma migrate deploy`                    | Apply pending migrations to the **dev** DB                          |
+| `yarn db:deploy:prod`             | `.env.production`   | `prisma migrate deploy`                    | **Apply pending migrations to the LIVE DB** (`192.168.0.221:5432`)  |
+| `yarn generate`                   | `.env.development`  | `prisma generate`                          | Regenerate the Prisma client (dev)                                  |
+| `yarn generate:prod`              | `.env.production`   | `prisma generate`                          | Regenerate the Prisma client (prod)                                 |
+| `yarn studio`                     | `.env.development`  | `prisma studio`                            | Browse the dev DB in Prisma Studio                                  |
+| `yarn studio:prod`                | `.env.production`   | `prisma studio`                            | Browse the live DB in Prisma Studio — read carefully, write rarely  |
+| `yarn db:seed`                    | `.env.development`  | `tsx prisma/seed.ts`                       | Seed the dev DB                                                     |
+| `yarn db:seed:prod`               | `.env.production`   | `tsx prisma/seed.ts`                       | Seed the live DB                                                    |
+| `yarn db:seed-delivery-charge`    | `.env.development`  | `tsx prisma/seed-delivery-charge.ts`       | Seed the delivery rate card (dev)                                   |
+| `yarn db:seed-delivery-charge:prod`| `.env.production`  | `tsx prisma/seed-delivery-charge.ts`       | Seed the delivery rate card (prod)                                  |
+| `yarn db:export-products`         | `.env.production`   | `tsx prisma/export-products.ts`            | Export products from the live DB                                    |
+| `yarn db:seed-products`           | `.env.production`   | `tsx prisma/seed-products.ts`              | Import/seed products into the live DB                               |
+
+#### Migrating the live (production) database
+
+```bash
+cd thp-backend-live
+yarn db:deploy:prod      # apply pending migrations to the LIVE DB
+yarn generate:prod       # regenerate the Prisma client against .env.production
+```
+
+> **`migrate deploy` only applies migration files that already exist in `prisma/migrations/`.**
+> It never creates a migration and never resets the database.
+> To author a new migration, create it on **dev** first, commit the generated folder, then deploy:
+>
+> ```bash
+> npx dotenv -e .env.development -- npx prisma migrate dev --name your_migration_name
+> yarn db:deploy           # verify on dev
+> yarn db:deploy:prod      # then apply to live
+> ```
+
+> **Never run `prisma migrate dev`, `migrate reset`, or `db push` against `.env.production`** — each of them can drop or rewrite live data.
+
+See [docs/deploy.md](./docs/deploy.md) for the full deployment sequence.
+
+
 ### User
 - [db schema](./docs/user.md#db-schema)
   - [Entity-Relationship Diagram (ERD)](./docs/user.md#entity-relationship-diagram-erd)
