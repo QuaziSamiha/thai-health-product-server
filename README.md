@@ -146,17 +146,165 @@ yarn generate:prod                            # 5. regenerate the client for pro
 
 > **Never run `prisma migrate dev`, `prisma migrate reset`, or `prisma db push` against `.env.office` or `.env.production`** — each can drop or rewrite live data. That is why no `:office` / `:prod` variants of those commands exist.
 
-Need a one-off Prisma command that has no script? Run `dotenv-cli` directly against the env file you want:
+Need a one-off Prisma command that has no script? Invoke `dotenv-cli` **exactly the way the scripts in
+`package.json` do** — by path:
 
 ```bash
-npx dotenv -e .env.development       -- npx prisma migrate status
-npx dotenv -e .env.development.local -- npx prisma migrate status
-npx dotenv -e .env.office            -- npx prisma migrate status
-npx dotenv -e .env.production        -- npx prisma migrate status
+node node_modules/dotenv-cli/cli.js -e .env.development       -- npx prisma migrate status
+node node_modules/dotenv-cli/cli.js -e .env.development.local -- npx prisma migrate status
+node node_modules/dotenv-cli/cli.js -e .env.office            -- npx prisma migrate status
+node node_modules/dotenv-cli/cli.js -e .env.production        -- npx prisma migrate status
 ```
+
+> **⚠️ Do not use `yarn dotenv -e <file> -- <command>`.** Yarn v1 swallows the `--`, `dotenv-cli` then
+> injects nothing, and [prisma.config.ts](./prisma.config.ts) falls back to `NODE_ENV=development` —
+> so the command silently runs against **`.env.development.local`**, not the file you named. It
+> reports success while touching the wrong database. Verified behaviour:
+>
+> | Invocation | Actually targets |
+> | --- | --- |
+> | `yarn dotenv -e .env.production -- npx prisma migrate status` | ❌ `localhost/thp_ecommerce_local` |
+> | `yarn dotenv -e .env.production npx prisma migrate status` (no `--`) | ✅ `192.168.0.107` |
+> | `node node_modules/dotenv-cli/cli.js -e .env.production -- …` | ✅ `192.168.0.107` |
+>
+> **Always read the `Datasource "db": …` line Prisma prints before trusting the result.** That line
+> is the only reliable statement of which database you just talked to. The `yarn <script>` commands
+> in the matrix above are all safe — they already use the by-path form.
 
 See [docs/commands/prisma.md](./docs/commands/prisma.md) for the full Prisma CLI reference and [docs/deploy.md](./docs/deploy.md) for the deployment sequence.
 
+---
+
+### Bootstrapping a fresh database
+
+Standing up a brand-new environment — a new server, or a database whose old contents are being
+discarded — is **wipe → extensions → deploy → seed**, in that order.
+
+#### 1. Wipe properly: tables are not the whole database
+
+> **⚠️ Dropping every table does not empty a PostgreSQL database.** `DROP TABLE` removes tables,
+> their indexes and their triggers — it leaves **enum types and standalone functions behind.** This
+> schema defines 33 enum types (`UserRole`, `OrderStatus`, `ProductType`, …) and 13 `recompute_*` /
+> `sync_*` functions. Orphan those and the very next deploy dies on its first `CREATE TYPE`, because
+> PostgreSQL has no `CREATE TYPE IF NOT EXISTS`. `_prisma_migrations` is itself a table, so a
+> table-only wipe also resets the history — the deploy restarts at migration #1 and collides with
+> the surviving types, which reads confusingly as "the database is empty but Prisma disagrees".
+
+This wipe needs no superuser — every object belongs to the app role. Run it against the target env:
+
+```sql
+DO $$
+DECLARE r record;
+BEGIN
+  FOR r IN SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+           WHERE n.nspname = 'public' AND c.relkind = 'r'
+  LOOP EXECUTE format('DROP TABLE IF EXISTS public.%I CASCADE', r.relname); END LOOP;
+
+  FOR r IN SELECT p.oid::regprocedure AS sig FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+           WHERE n.nspname = 'public'
+             AND p.oid NOT IN (SELECT objid FROM pg_depend WHERE deptype = 'e' AND classid = 'pg_proc'::regclass)
+  LOOP EXECUTE format('DROP FUNCTION IF EXISTS %s CASCADE', r.sig); END LOOP;
+
+  FOR r IN SELECT t.typname FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+           WHERE n.nspname = 'public' AND t.typtype = 'e'
+  LOOP EXECUTE format('DROP TYPE IF EXISTS public.%I CASCADE', r.typname); END LOOP;
+END $$;
+```
+
+The `pg_depend` filter spares functions owned by extensions, so `pg_trgm` and `btree_gist` survive
+and step 2 stays a no-op. Confirm it took — all three counts must read `0`:
+
+```sql
+SELECT
+  (SELECT count(*)::int FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+    WHERE n.nspname='public' AND c.relkind='r') AS tables,
+  (SELECT count(*)::int FROM pg_type t JOIN pg_namespace n ON n.oid=t.typnamespace
+    WHERE n.nspname='public' AND t.typtype='e') AS enum_types;
+```
+
+**Alternative — drop the whole database.** Cleaner when you can: it takes the schema's grants and
+defaults with it. Requires being the database's owner (or a superuser) plus `CREATEDB`, and it can't
+run from inside the database being dropped. Stop the API and close Prisma Studio first:
+
+```bash
+psql -U <owner> -h <host> -d postgres \
+  -c "DROP DATABASE thp_ecommerce;" \
+  -c "CREATE DATABASE thp_ecommerce OWNER thp_ecommerce;"
+```
+
+Still reporting active sessions? Terminate them, then retry:
+
+```sql
+SELECT pg_terminate_backend(pid) FROM pg_stat_activity
+WHERE datname = 'thp_ecommerce' AND pid <> pg_backend_pid();
+```
+
+Note `DROP SCHEMA public CASCADE` is **not** a substitute here — the `public` schema is typically
+owned by `postgres`, not by the app role, so that statement fails with a permission error.
+
+#### 2. Create the two required extensions
+
+```sql
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+```
+
+Two migrations need them — [`pg_trgm`](./prisma/migrations/20260817130000_trigram_indexes_for_name_search/migration.sql)
+for the trigram name-search indexes and [`btree_gist`](./prisma/migrations/20260823100000_add_delivery_charge_domain/migration.sql)
+for the delivery-charge exclusion constraints. Both are **trusted** extensions on PostgreSQL 13+, so
+any role with `CREATE` on the database can install them — no superuser needed. Creating them up
+front turns both migration statements into no-ops. Skip it and the run dies ~55 migrations deep with
+`42501 permission denied`, and you'll need a superuser to unstick it.
+
+Verify what's installed with `SELECT extname FROM pg_extension;` — expect `btree_gist`, `pg_trgm`
+and `plpgsql`.
+
+#### 3. Deploy and seed
+
+Swap the suffix for the environment you're bootstrapping (`:prod` shown):
+
+```bash
+yarn generate:prod                  # regenerate the client (no DB contact)
+yarn db:deploy:prod                 # apply every migration in order
+yarn db:seed:prod                   # the 3 users
+yarn db:seed-delivery-charge:prod   # Thailand rate card
+yarn db:seed-products               # categories + products from prisma/seed-data/products.json
+```
+
+**The order is load-bearing.** [prisma/seed-products.ts](./prisma/seed-products.ts) looks up the
+super admin with `findFirstOrThrow` to stamp `createdBy` on every category and product — that user
+only exists after `db:seed:prod`, so running the product seed first throws. `db:seed:prod` and
+`db:seed-delivery-charge:*` are idempotent and safe to re-run; both need the `SEED_*` password vars.
+
+#### 4. Verify
+
+```bash
+node node_modules/dotenv-cli/cli.js -e .env.production -- npx prisma migrate status
+```
+
+Expect **"Database schema is up to date!"**, with no divergence block and no "not found locally"
+list. Check the `Datasource "db": …` line names the host you meant — see the `yarn dotenv` warning
+above. To confirm a wipe actually took before you deploy — this should return `0`, and 33 afterwards:
+
+```sql
+SELECT count(*) FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+WHERE n.nspname = 'public' AND t.typtype = 'e';
+```
+
+#### Reading migration failures
+
+`P3018` is Prisma's wrapper — the PostgreSQL code after it is the real diagnosis:
+
+| Code | Means | Cause |
+| --- | --- | --- |
+| `42710` | `type "X" already exists` | Tables were dropped but enum types survived — wipe the schema, not the tables |
+| `42P07` | `relation "X" already exists` | The database was built from a different migration lineage, or a dump was restored over it |
+| `42501` | `permission denied` | Usually `CREATE EXTENSION` without superuser — see step 2 |
+
+Any failed migration is recorded with `finished_at = NULL` and **blocks every subsequent deploy**
+until it is resolved. On a database with no data worth keeping, bootstrap again from step 1. On one
+with real data, reconcile with `prisma migrate resolve` — never `migrate dev` or `migrate reset`,
+which drop and recreate the database.
 
 ### User
 - [db schema](./docs/user.md#db-schema)
