@@ -22,69 +22,140 @@ NestJS backend for the Thai Health Product (Thai Health Product) e-commerce plat
 
 ## Environment & Running Commands
 
-### Command Reference
+### The four environment files
 
-| Command             | Env File Loaded                | Purpose                                                                    |
-| ------------------- | ------------------------------ | -------------------------------------------------------------------------- |
-| `yarn start`        | _(none — reads compiled dist)_ | **Production start** — runs `node dist/main`. Requires `yarn build` first. |
-| `yarn start:dev`    | `.env.development`             | Developer B shared config — standard watch-mode dev server                 |
-| `yarn start:local`  | `.env.development.local`       | Developer A personal local config — watch-mode dev server                  |
-| `yarn start:office` | `.env.office`                  | Office/internal environment — points to `192.168.0.221` DB                 |
-| `yarn start:prod`   | `.env.production`              | Production config loaded locally — watch-mode, for staging verification    |
-| `yarn build`        | _(none)_                       | Compiles TypeScript source to `dist/`                                      |
+Every env-aware script is `dotenv-cli` loading exactly one file, so **the script suffix decides which database and port you hit**. Nothing is inherited or merged between files.
 
-> **Warning:** `yarn start` runs the **compiled production build** (`node dist/main`).
-> It does **not** compile the source. Always run `yarn build` before `yarn start`, otherwise you will execute stale or missing output.
+| Env file                 | Script suffix | `NODE_ENV`  | Port   | Database                                      |
+| ------------------------ | ------------- | ----------- | ------ | --------------------------------------------- |
+| `.env.development`       | `:dev`        | development | `5001` | `localhost:5432/thp_ecommerce`                |
+| `.env.development.local` | `:local`      | development | `8000` | `localhost:5432/thp_ecommerce_local`          |
+| `.env.office`            | `:office`     | production  | `4036` | `192.168.0.221:5432/thp_ecommerce` (office server) |
+| `.env.production`        | `:prod`       | production  | `4036` | `192.168.0.107:5432/thp_ecommerce` (**LIVE**)      |
 
+> **`:office` and `:prod` are two different databases on two different hosts** — office is `192.168.0.221`, live is `192.168.0.107`. They still share the same `PORT` (`4036`), the same `BASE_URL`/`ALLOWED_ORIGINS`, and the same JWT secrets, so a token issued by one is accepted by the other. Check the suffix before running any `db:*` command.
 
-### Running the app itself against a specific env
+Other differences worth knowing:
+
+- `GOOGLE_CLIENT_ID` is set **only** in `.env.development`. Google sign-in will not verify ID tokens under `:local`, `:office`, or `:prod` until it is added to those files.
+- `SEED_ADMIN_PASSWORD` / `SEED_SUPER_ADMIN_PASSWORD` / `SEED_CUSTOMER_PASSWORD` exist **only** in `.env.office` and `.env.production` — `prisma/seed.ts` reads them, so seeding under `:dev` / `:local` falls back to whatever defaults the seed script defines.
+- The `LOG_*` block is **commented out** in `.env.development` (defaults apply) and active in the other three.
+- `DATABASE_POOL_*` sizing vars are commented out everywhere; uncomment them in `.env.production` to tune the live pool.
+
+---
+
+### Full command matrix
+
+Every cell is a `yarn <script>`. A `—` means the command is intentionally not provided for that environment.
+
+| What it does                    | `.env.development`        | `.env.development.local`        | `.env.office`                    | `.env.production`              |
+| ------------------------------- | ------------------------- | ------------------------------- | -------------------------------- | ------------------------------ |
+| **Run the server** (watch mode) | `start:dev`               | `start:local`                   | `start:office`                   | `start:prod`                   |
+| **Prisma generate**             | `generate`                | `generate:local`                | `generate:office`                | `generate:prod`                |
+| **Create a migration**          | `db:migrate`              | `db:migrate:local`              | — *(never)*                      | — *(never)*                    |
+| **Apply migrations**            | `db:deploy`               | `db:deploy:local`               | `db:deploy:office`               | `db:deploy:prod`               |
+| **Prisma Studio**               | `studio`                  | `studio:local`                  | `studio:office`                  | `studio:prod`                  |
+| **Seed core data**              | `db:seed`                 | `db:seed:local`                 | `db:seed:office`                 | `db:seed:prod`                 |
+| **Seed delivery rate card**     | `db:seed-delivery-charge` | `db:seed-delivery-charge:local` | `db:seed-delivery-charge:office` | `db:seed-delivery-charge:prod` |
+| **Export products to JSON**     | —                         | —                               | —                                | `db:export-products`           |
+| **Import/seed products**        | —                         | —                               | —                                | `db:seed-products`             |
+
+Environment-independent scripts (no env file is loaded):
+
+| Command            | Purpose                                                                       |
+| ------------------ | ----------------------------------------------------------------------------- |
+| `yarn build`       | Compile TypeScript to `dist/`                                                  |
+| `yarn start`       | **Production start** — runs `node dist/main`. Requires `yarn build` first.      |
+| `yarn start:debug` | `nest start --debug --watch` — reads the ambient environment, not an env file   |
+| `yarn lint`        | ESLint with `--fix`                                                            |
+| `yarn format`      | Prettier over `src/` and `test/`                                               |
+| `yarn test`        | Jest unit tests (`test:watch`, `test:cov`, `test:debug`, `test:e2e` also exist) |
+
+> **Warning:** `yarn start` runs the **compiled build** (`node dist/main`) and does **not** compile anything.
+> Always `yarn build` first, or you will execute stale or missing output.
+> Note also that `start:prod` runs `nest start --watch` — it is for verifying production config *locally*, not for serving live traffic.
+
+---
+
+### Per-environment quick reference
+
+**`.env.development` — shared developer config (port 5001, local `thp_ecommerce`)**
 
 ```bash
-yarn start:dev      # .env.development
-yarn start:local     # .env.development.local (your personal DB)
-yarn start:office    # .env.office
-yarn start:prod      # .env.production
+yarn generate                     # regenerate the Prisma client
+yarn db:migrate --name my_change  # create + apply a new migration
+yarn db:deploy                    # apply existing migrations
+yarn db:seed                      # seed core data
+yarn db:seed-delivery-charge      # seed the delivery rate card
+yarn studio                       # browse the DB
+yarn start:dev                    # run the API on :5001
 ```
 
-
-### Database & Migration Commands
-
-| Command                          | Env File Loaded     | Runs                                       | Purpose                                                            |
-| -------------------------------- | ------------------- | ------------------------------------------ | ------------------------------------------------------------------ |
-| `yarn db:deploy`                  | `.env.development`  | `prisma migrate deploy`                    | Apply pending migrations to the **dev** DB                          |
-| `yarn db:deploy:prod`             | `.env.production`   | `prisma migrate deploy`                    | **Apply pending migrations to the LIVE DB** (`192.168.0.221:5432`)  |
-| `yarn generate`                   | `.env.development`  | `prisma generate`                          | Regenerate the Prisma client (dev)                                  |
-| `yarn generate:prod`              | `.env.production`   | `prisma generate`                          | Regenerate the Prisma client (prod)                                 |
-| `yarn studio`                     | `.env.development`  | `prisma studio`                            | Browse the dev DB in Prisma Studio                                  |
-| `yarn studio:prod`                | `.env.production`   | `prisma studio`                            | Browse the live DB in Prisma Studio — read carefully, write rarely  |
-| `yarn db:seed`                    | `.env.development`  | `tsx prisma/seed.ts`                       | Seed the dev DB                                                     |
-| `yarn db:seed:prod`               | `.env.production`   | `tsx prisma/seed.ts`                       | Seed the live DB                                                    |
-| `yarn db:seed-delivery-charge`    | `.env.development`  | `tsx prisma/seed-delivery-charge.ts`       | Seed the delivery rate card (dev)                                   |
-| `yarn db:seed-delivery-charge:prod`| `.env.production`  | `tsx prisma/seed-delivery-charge.ts`       | Seed the delivery rate card (prod)                                  |
-| `yarn db:export-products`         | `.env.production`   | `tsx prisma/export-products.ts`            | Export products from the live DB                                    |
-| `yarn db:seed-products`           | `.env.production`   | `tsx prisma/seed-products.ts`              | Import/seed products into the live DB                               |
-
-#### Migrating the live (production) database
+**`.env.development.local` — personal local config (port 8000, local `thp_ecommerce_local`)**
 
 ```bash
-cd thp-backend-live
-yarn db:deploy:prod      # apply pending migrations to the LIVE DB
-yarn generate:prod       # regenerate the Prisma client against .env.production
+yarn generate:local
+yarn db:migrate:local --name my_change
+yarn db:deploy:local
+yarn db:seed:local
+yarn db:seed-delivery-charge:local
+yarn studio:local
+yarn start:local                  # run the API on :8000
 ```
 
-> **`migrate deploy` only applies migration files that already exist in `prisma/migrations/`.**
-> It never creates a migration and never resets the database.
-> To author a new migration, create it on **dev** first, commit the generated folder, then deploy:
->
-> ```bash
-> npx dotenv -e .env.development -- npx prisma migrate dev --name your_migration_name
-> yarn db:deploy           # verify on dev
-> yarn db:deploy:prod      # then apply to live
-> ```
+**`.env.office` — office/internal server (port 4036, `192.168.0.221:5432`)**
 
-> **Never run `prisma migrate dev`, `migrate reset`, or `db push` against `.env.production`** — each of them can drop or rewrite live data.
+```bash
+yarn generate:office
+yarn db:deploy:office             # apply existing migrations only
+yarn db:seed:office
+yarn db:seed-delivery-charge:office
+yarn studio:office                # read carefully, write rarely
+yarn start:office
+```
 
-See [docs/deploy.md](./docs/deploy.md) for the full deployment sequence.
+> There is no `db:migrate:office` by design — migrations are authored on dev and **deployed** here.
+
+**`.env.production` — LIVE (port 4036, `192.168.0.107:5432`)**
+
+```bash
+yarn build                        # compile first
+yarn generate:prod
+yarn db:deploy:prod               # apply pending migrations to the LIVE DB
+yarn db:seed:prod                 # uses SEED_* passwords — rotate after first login
+yarn db:seed-delivery-charge:prod
+yarn db:export-products           # export live products to JSON
+yarn db:seed-products             # import products into the live DB
+yarn studio:prod                  # read carefully, write rarely
+yarn start                        # serve the compiled build
+```
+
+---
+
+### Authoring and deploying a migration
+
+`prisma migrate deploy` only applies migration folders that **already exist** in `prisma/migrations/`. It never creates a migration and never resets the database. So the order is always: author on dev → commit the generated folder → deploy outward.
+
+```bash
+yarn db:migrate --name your_migration_name   # 1. author against .env.development
+git add prisma/migrations && git commit       # 2. commit the generated folder
+yarn db:deploy:office                         # 3. roll out to office
+yarn db:deploy:prod                           # 4. then to live
+yarn generate:prod                            # 5. regenerate the client for prod
+```
+
+> **Never run `prisma migrate dev`, `prisma migrate reset`, or `prisma db push` against `.env.office` or `.env.production`** — each can drop or rewrite live data. That is why no `:office` / `:prod` variants of those commands exist.
+
+Need a one-off Prisma command that has no script? Run `dotenv-cli` directly against the env file you want:
+
+```bash
+npx dotenv -e .env.development       -- npx prisma migrate status
+npx dotenv -e .env.development.local -- npx prisma migrate status
+npx dotenv -e .env.office            -- npx prisma migrate status
+npx dotenv -e .env.production        -- npx prisma migrate status
+```
+
+See [docs/commands/prisma.md](./docs/commands/prisma.md) for the full Prisma CLI reference and [docs/deploy.md](./docs/deploy.md) for the deployment sequence.
 
 
 ### User
