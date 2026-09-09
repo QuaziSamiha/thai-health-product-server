@@ -53,10 +53,14 @@ export class CreateHomeDto {
     example: 'Better Health Made Simple',
     maxLength: 255,
   })
-  //* STILL VALIDATED WHEN PROVIDED, EVEN FOR A TYPE THAT DOESN'T REQUIRE IT
+  //* STILL VALIDATED WHEN PROVIDED, EVEN FOR A TYPE THAT DOESN'T REQUIRE IT.
+  //* THE `|| dto.type === HERO_SLIDER` HALF OF THIS GATE IS COMMENTED OUT WHILE
+  //* THE ADMIN HERO SLIDER FORM HIDES ITS HEADING INPUT — A HERO SLIDER MAY BE
+  //* CREATED IMAGE-ONLY FOR NOW. RESTORE IT WITH THAT INPUT.
   @ValidateIf(
     (dto: CreateHomeDto) =>
-      dto.heading !== undefined || dto.type === HomeContentType.HERO_SLIDER,
+      // || dto.type === HomeContentType.HERO_SLIDER
+      dto.heading !== undefined,
   )
   @Transform(({ value }) => trimString(value))
   @IsNotEmpty({ message: 'Heading is required for hero slider content' })
@@ -70,9 +74,11 @@ export class CreateHomeDto {
     example:
       'Science-backed healthcare products designed to support your daily health',
   })
+  //* SAME TEMPORARY RELAXATION AS `heading` ABOVE — SEE THAT COMMENT.
   @ValidateIf(
     (dto: CreateHomeDto) =>
-      dto.bodyText !== undefined || dto.type === HomeContentType.HERO_SLIDER,
+      // || dto.type === HomeContentType.HERO_SLIDER
+      dto.bodyText !== undefined,
   )
   @Transform(({ value }) => trimString(value))
   @IsNotEmpty({ message: 'Body text is required for hero slider content' })
