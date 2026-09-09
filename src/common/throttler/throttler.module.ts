@@ -12,7 +12,7 @@ import { THROTTLER_LONG, THROTTLER_SHORT } from './throttler.constants';
 //* THIS IS REGISTERED FIRST IN AppModule's imports SO THE THROTTLER IS THE FIRST GUARD IN
 //* THE PIPELINE. IT IS THE ONLY APP_GUARD IN THIS APP TODAY (JwtAuthGuard/RolesGuard ARE
 //* CONTROLLER-SCOPED VIA @UseGuards), SO NOTHING RUNS AHEAD OF IT. SEE
-//* docs/issues/rate-limiting.md §3.9 FOR WHY THROTTLE-BEFORE-AUTH IS THE DELIBERATE CHOICE.
+//* docs/concepts/rate-limiting.md §2.7 FOR WHY THROTTLE-BEFORE-AUTH IS THE DELIBERATE CHOICE.
 @Module({
   imports: [
     ConfigModule.forFeature(throttlerConfig),
@@ -31,7 +31,7 @@ import { THROTTLER_LONG, THROTTLER_SHORT } from './throttler.constants';
         }
 
         //* NEVER LET A SET-BUT-UNUSED REDIS URL LOOK LIKE DISTRIBUTED LIMITING IS ON.
-        //* SEE THE NOTE IN throttler.env.ts AND docs/issues/rate-limiting.md §4.4.
+        //* SEE THE NOTE IN throttler.env.ts AND docs/concepts/rate-limiting.md §7.1.
         if (cfg.redisUrl) {
           logger.warn(
             'THROTTLE_REDIS_URL is set but Redis storage is not wired — falling back to ' +
@@ -56,7 +56,7 @@ import { THROTTLER_LONG, THROTTLER_SHORT } from './throttler.constants';
             },
           ],
           //* ALL TTLs ARE MILLISECONDS. THE CONFIG LAYER NAMES THEM _TTL_MS SPECIFICALLY SO
-          //* THE v5 UNIT CHANGE CANNOT BE MISREAD AGAIN — SEE docs/issues/rate-limiting.md §3.2.
+          //* THE v5 UNIT CHANGE CANNOT BE MISREAD AGAIN — SEE docs/concepts/rate-limiting.md §2.10.
           //*
           //* NO storage: SUPPLIED — THE BUILT-IN IN-PROCESS ThrottlerStorageService (A Map IN
           //* THE NODE HEAP) IS USED. THAT IS AN ACCEPTED, DOCUMENTED CONSTRAINT WHILE THIS APP

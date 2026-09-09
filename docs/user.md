@@ -368,7 +368,7 @@ None of the four enums carries an inline doc comment in `user.prisma` — only t
 **Open — access control & abuse**
 
 - **Nothing reads `assignedIp`.** It is stored, validated, and admin-editable, but no guard, interceptor, or strategy consults it, so the IP allowlist is not enforced anywhere. The column is a placeholder for a control that has not been built.
-- **No per-account lockout.** `UserSecurity.loginAttempts` is incremented on every failed login and never read. Rate limiting is per IP, so an attacker distributing guesses against one account across many IPs defeats it entirely. This is the Phase 2 business layer in [`docs/issues/rate-limiting.md`](./issues/rate-limiting.md) §4.7, and it is the control that actually stops credential stuffing — per-IP limiting cannot substitute for it.
+- **No per-account lockout.** `UserSecurity.loginAttempts` is incremented on every failed login and never read. Rate limiting is per IP, so an attacker distributing guesses against one account across many IPs defeats it entirely. This is the business layer in [`docs/concepts/rate-limiting.md`](./concepts/rate-limiting.md) §7.2, and it is the control that actually stops credential stuffing — per-IP limiting cannot substitute for it.
 - **No per-OTP attempt cap.** Same shape: `POST /otp/verify-otp` and `POST /user/reset-password` are capped per IP, but nothing caps guesses against a *specific* issued code (§4.8).
 - **Rate-limiter storage is in-process.** Correct while single-instance; going multi-instance makes the effective limit `limit × instance count` and needs Redis. See the operational notes under [Rate Limiting](#rate-limiting).
 - **No 429 observability.** Nothing logs or counts throttle events, so there is no signal to alert on and no data to tune the limits with (§4.9). The current numbers are §5's proposals, not measurements.
@@ -928,7 +928,7 @@ Enforced app-wide by `AppThrottlerGuard`, registered as an `APP_GUARD` in `src/c
 - `THROTTLE_TRUST_PROXY_HOPS` must be set to the real hop count in any environment behind a load balancer, or every caller presents as the proxy's IP and the entire internet shares one bucket. Setting it *higher* than reality is worse: it lets a client spoof `X-Forwarded-For` and mint a fresh bucket per request. Cannot be validated locally.
 - Storage is the in-process default (a `Map` in the Node heap). Counters are per-process and reset on restart, so this is only correct while the app is single-instance — going multi-instance makes the effective limit `limit × instance count` and requires Redis. `THROTTLE_REDIS_URL` is accepted but not yet consumed; the module logs a loud warning if it is set, so it can never silently look like distributed limiting is on.
 
-Full design, rejected alternatives, and the Phase 2/3 backlog: [`docs/issues/rate-limiting.md`](./issues/rate-limiting.md).
+Full design, rationale, and the recorded limitations: [`docs/concepts/rate-limiting.md`](./concepts/rate-limiting.md).
 
 ---
 

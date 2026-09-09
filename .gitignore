@@ -58,3 +58,8 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 /generated/prisma
+
+# lockfiles — yarn.lock is the single source of truth for this project.
+# npm would generate a second, unsynchronized lockfile; Dockerfiles and all
+# docs use `yarn install --frozen-lockfile`. Use `yarn add`, never `npm install`.
+package-lock.json

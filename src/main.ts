@@ -30,7 +30,7 @@ async function bootstrap() {
   //* THE ENTIRE INTERNET SHARES ONE RATE-LIMIT BUCKET. NOTE THE OTHER FAILURE DIRECTION IS
   //* WORSE: TRUSTING MORE HOPS THAN EXIST LETS A CLIENT SPOOF X-Forwarded-For AND MINT A
   //* FRESH BUCKET PER REQUEST. THIS CANNOT BE VALIDATED LOCALLY — THERE IS NO PROXY IN
-  //* FRONT OF localhost. SEE docs/issues/rate-limiting.md §4.5 AND §7.
+  //* FRONT OF localhost. SEE docs/concepts/rate-limiting.md §2.6 AND §6.6.
   const trustProxyHops =
     configService.get<number>('throttler.trustProxyHops') ?? 0;
   app.set('trust proxy', trustProxyHops);

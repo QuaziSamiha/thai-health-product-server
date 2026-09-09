@@ -14,7 +14,13 @@ export const appEnvSchema = z.object({
     .default('development'),
   PORT: z.coerce.number().default(8000),
   API_PREFIX: z.string().default('api/v1'),
-  BASE_URL: z.string().url(),
+  //* NORMALIZED AT BOOT — A TRAILING SLASH IN THE ENV VALUE (E.G.
+  //* "https://api.thpwellness.com/") WOULD YIELD "//uploads/..." IN EVERY
+  //* RESPONSE URL, SINCE STORED PATHS ALREADY START WITH "/".
+  BASE_URL: z
+    .string()
+    .url()
+    .transform((value) => value.replace(/\/+$/, '')),
   HASH_SALT_ROUNDS: z.coerce.number().default(10),
 
   // Mail

@@ -64,7 +64,7 @@ export class UserController {
   //* TIGHTLY THROTTLED: THIS IS PUBLIC, UNAUTHENTICATED, AND EVERY ACCEPTED CALL COSTS A
   //* REAL OUTBOUND EMAIL (THE SIGNUP OTP) PLUS A BCRYPT HASH. LEFT OPEN IT IS BOTH A MAIL
   //* -COST/SENDER-REPUTATION SINK AND A CHEAP WAY TO BURN CPU. 3 PER HOUR PER IP — SEE
-  //* SIGNUP_THROTTLE AND docs/issues/rate-limiting.md §5.
+  //* SIGNUP_THROTTLE AND docs/concepts/rate-limiting.md §3.
   @Throttle({ [THROTTLER_SHORT]: SIGNUP_THROTTLE })
   @Post('create-user')
   @ApiConsumes('application/json')

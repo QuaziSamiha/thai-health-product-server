@@ -9,7 +9,7 @@
 #* BOTH FAIL AT *RUNTIME*, NOT BUILD TIME, WHICH IS THE WORST PLACE TO
 #* DISCOVER IT.
 #* ═════════════════════════════════════════════════════════════════════════
-ARG NODE_VERSION=22-bookworm-slim
+ARG NODE_VERSION=20.19-bookworm-slim
 
 
 #* ─────────────────────────────────────────────────────────────────────────
@@ -37,7 +37,9 @@ FROM base AS deps
 RUN apt-get update \
  && apt-get install -y --no-install-recommends python3 make g++ \
  && rm -rf /var/lib/apt/lists/*
-COPY package.json yarn.lock ./
+#* .yarnrc CARRIES `--install.ignore-engines true`, WITHOUT WHICH THIS INSTALL DIES ON
+#* @prisma/streams-local'S engines.node ">=22" — SEE THE COMMENTS IN THAT FILE.
+COPY package.json yarn.lock .yarnrc ./
 RUN --mount=type=cache,target=/root/.yarn-cache \
     yarn install --frozen-lockfile --network-timeout 600000
 

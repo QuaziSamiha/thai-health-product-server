@@ -25,7 +25,7 @@ export class OtpController {
   //* OTP GUESSING IS THE WHOLE THREAT MODEL FOR A 6-DIGIT CODE — 5 TRIES PER 5 MINUTES
   //* PER IP, THEN A 15-MINUTE BLOCK. NOTE THIS IS THE PER-IP HALF ONLY: A GUESSER SPREAD
   //* ACROSS MANY IPs DEFEATS IT, AND THE PER-OTP ATTEMPT CAP THAT WOULD STOP THAT IS
-  //* PHASE 2 WORK — SEE docs/issues/rate-limiting.md §4.8.
+  //* NOT IMPLEMENTED — SEE docs/concepts/rate-limiting.md §7.3.
   @Throttle({ [THROTTLER_SHORT]: OTP_VERIFY_THROTTLE })
   @Post('verify-otp')
   @ApiConsumes('application/x-www-form-urlencoded')

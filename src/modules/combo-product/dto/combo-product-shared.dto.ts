@@ -4,8 +4,9 @@ import {
   MinifiedUser,
   UserMinifiedResponseDto,
 } from '../../user/dto/user-response.dto';
+import { toAbsoluteUrl } from '../../../common/utils/url.util';
 
-export { UserMinifiedResponseDto };
+export { UserMinifiedResponseDto, toAbsoluteUrl };
 export type { MinifiedUser };
 
 //* ═══════════════════════════════════════════════════════════════════════
@@ -65,16 +66,4 @@ export function toSeoMetadataDto(
 
 export function toPrice(value: unknown): number | undefined {
   return value !== null && value !== undefined ? Number(value) : undefined;
-}
-
-//* STORED IMAGE PATHS ARE RELATIVE (E.G. `/uploads/combos/gallery/abc.webp`)
-//* — PREFIX WITH THE CONFIGURED BASE URL SO CLIENTS GET A DIRECTLY-USABLE
-//* ABSOLUTE URL. LEFT UNCHANGED IF ALREADY ABSOLUTE OR IF NO BASE URL WAS
-//* SUPPLIED (E.G. A CALLER THAT DOESN'T HAVE ACCESS TO ConfigService).
-export function toAbsoluteUrl(
-  path: string | null | undefined,
-  baseUrl?: string,
-): string | undefined {
-  if (!path) return undefined;
-  return path.startsWith('http') || !baseUrl ? path : `${baseUrl}${path}`;
 }

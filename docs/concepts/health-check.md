@@ -117,13 +117,15 @@ Orchestrator probe paths are configured once, outside this codebase (in a Helm c
 ### 2.7 Throttling — defensively exempted
 
 ```ts
-@SkipThrottle()
+@SkipThrottle(SKIP_ALL_THROTTLERS)
 @ApiTags('Health')
 @Controller('health')
 export class HealthController { ... }
 ```
 
-There is currently no global `ThrottlerGuard` registered in this app (`ThrottlerModule` is imported, but nothing applies it as `APP_GUARD`), so this isn't fixing an active bug. It's defensive: orchestrators poll `/health/live` and `/health/ready` every few seconds by design. The moment a global throttler guard is added — a common step in a later "hardening" pass — probes would otherwise start getting `429`'d, and a perfectly healthy pod would get killed for the wrong reason. `@SkipThrottle()` makes that failure mode impossible regardless of what throttling config gets added later.
+Orchestrators and load balancers poll `/health/live` and `/health/ready` every few seconds by design — the container's own `HEALTHCHECK` hits readiness every 15 s. A global `ThrottlerGuard` **is** registered today (`AppThrottlerModule`, see [`rate-limiting.md`](./rate-limiting.md) §2.2), so without this exemption a probe would trip the 30-per-10s burst tier and a perfectly healthy container would be killed for the wrong reason.
+
+**The argument is mandatory.** A bare `@SkipThrottle()` defaults to `{ default: true }` and exempts only a throttler *literally named* `default` — which is what an unnamed `forRoot` throttler gets. Under the named `short`/`long` tiers that is no tier at all, and this controller genuinely did start returning `429` under a 35-request burst before `SKIP_ALL_THROTTLERS` was passed explicitly. See [`rate-limiting.md`](./rate-limiting.md) §2.8.
 
 ---
 
@@ -211,5 +213,5 @@ Expect `503` with `error.database.message === "Database unavailable"` in the res
 - **Always** reuse a built-in Terminus indicator (`MemoryHealthIndicator`, `DiskHealthIndicator`, `HttpHealthIndicator`, etc.) before writing a custom one — only write a custom indicator when Terminus has no equivalent, as with Prisma.
 - **Always** keep new thresholds/timeouts env-driven via `health.env.ts` / `health.config.ts` — never hardcode a magic number inline in the controller or an indicator, see §2.2.
 - **Always** keep `/health*` excluded from the global API prefix and from auth — orchestrators don't version their probe config or send credentials.
-- Keep `@SkipThrottle()` on `HealthController` even though no global throttle guard exists today — it costs nothing and prevents a known failure mode the moment one is added later (see §2.7).
+- **Always** keep `@SkipThrottle(SKIP_ALL_THROTTLERS)` on `HealthController`, and never reduce it to the bare `@SkipThrottle()` — the bare form exempts nothing under this app's named tiers (see §2.7). Any new tier must be added to that constant too.
 - `src/health` stays at the top level, alongside `config`/`prisma`/`common`/`shared` — **not** under `src/modules/`. It's infrastructure/ops tooling used by load balancers and orchestrators, not a business domain, and placing it under `modules/` would misrepresent its purpose to anyone navigating the codebase.

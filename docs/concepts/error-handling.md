@@ -395,7 +395,7 @@ Recorded honestly so they're chosen deliberately, not discovered during an incid
 | Filter is `new`-instantiated, so no DI | Can't inject `ConfigService`; reads `process.env` directly | Re-register via `APP_FILTER` when a dependency is first needed |
 | Not RFC 9457 (`application/problem+json`) | Non-standard to external integrators | Only worth it if third parties consume this API |
 | Messages are hardcoded English | No Thai localization of errors | `errorCode` is the enabler — the client can map code → localized string today, which is the better architecture anyway |
-| No `429` mapping | Throttler's default message is passed through | Add a branch + `RATE_LIMIT_EXCEEDED` |
+| Messages are not machine-parseable beyond `errorCode` | Clients that need the *values* behind a message must parse prose | The 429 path shows the alternative — it ships `retryAfter` as a number alongside the sentence (see [`rate-limiting.md`](./rate-limiting.md) §2.9) |
 
 ---
 
