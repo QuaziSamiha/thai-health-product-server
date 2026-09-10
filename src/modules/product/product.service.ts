@@ -20,6 +20,10 @@ import {
 } from './dto/product-response.dto';
 import { ProductDropdownOptionDto } from './dto/product-dropdown-response.dto';
 import { ProductComboInventoryOptionDto } from './dto/product-combo-inventory-response.dto';
+import {
+  MAX_PROMOTIONAL_PRODUCTS,
+  PromotionalProductOptionDto,
+} from './dto/promotional-product.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { CreateProductVariantDto } from './dto/create-product-variant.dto';
 import { UpdateProductVariantDto } from './dto/update-product-variant.dto';
@@ -144,21 +148,21 @@ export class ProductService {
   /**
    * Shared query parsing for the storefront lists — the only parsing that
    * belongs here (not in the repository, per its own contract) is turning
-   * the CSV `categoryIds` query param into `number[]`; everything else is
+   * the CSV `categorySlugs` query param into `string[]`; everything else is
    * passed straight through to the already-filtered repository query.
    */
   private parseStorefrontQuery(query: ActiveProductsQueryDto): {
     paginationParams: PaginationQueryDto;
     filters: StorefrontListFilters;
   } {
-    const { categoryIds, productType, sortBy, ...paginationParams } = query;
+    const { categorySlugs, productType, sortBy, ...paginationParams } = query;
     return {
       paginationParams,
       filters: {
-        categoryIds: categoryIds
+        categorySlugs: categorySlugs
           ?.split(',')
-          .map((id) => Number(id.trim()))
-          .filter((id) => Number.isInteger(id)),
+          .map((slug) => slug.trim())
+          .filter(Boolean),
         type: productType,
         sortBy,
       },
@@ -229,12 +233,200 @@ export class ProductService {
     );
   }
 
-  /** "Best" products — see `findBestProducts` for the ranking caveat. */
+  /** Active products flagged `isBest`. */
   async getBestProducts(
     limit = DEFAULT_HOME_SECTION_LIMIT,
   ): Promise<ProductResponsePublicDto[]> {
     return this.toPublicDtoList(
       await this.productRepository.findBestProducts(limit),
+    );
+  }
+
+  /** The (at most two) ACTIVE products flagged `isPromotional`. */
+  async getActivePromotionalProducts(): Promise<ProductResponsePublicDto[]> {
+    return this.toPublicDtoList(
+      await this.productRepository.findActivePromotionalProducts(
+        MAX_PROMOTIONAL_PRODUCTS,
+      ),
+    );
+  }
+
+  //* ═══════════════════════════════════════════════════════════════════════
+  //* PROMOTIONAL PRODUCTS — AT MOST MAX_PROMOTIONAL_PRODUCTS PRODUCTS CARRY
+  //* isPromotional = true AT ONCE, AND EACH OF THEM MUST STAY ACTIVE WHILE IT
+  //* DOES (SEE assertNotPromotional). A SLOT IS FILLED BY add, SWAPPED BY
+  //* replace, AND FREED BY remove — THE ONLY WAYS THE FLAG EVER CHANGES.
+  //* ═══════════════════════════════════════════════════════════════════════
+
+  async getPromotionalProducts(): Promise<ProductResponseDto[]> {
+    const baseUrl = this.configService.get<string>('app.baseUrl');
+    const rows = await this.productRepository.findPromotionalProductsAdmin();
+    return rows.map((product) => new ProductResponseDto(product, baseUrl));
+  }
+
+  async getPromotionalProductOptions(): Promise<PromotionalProductOptionDto[]> {
+    const baseUrl = this.configService.get<string>('app.baseUrl');
+    const rows = await this.productRepository.findPromotionalProductOptions();
+    return rows.map(
+      (product) => new PromotionalProductOptionDto(product, baseUrl),
+    );
+  }
+
+  /**
+   * Puts an ACTIVE product into a free promotional slot. The slot count is
+   * read and written under `lockPromotionalSlots`, so two concurrent adds
+   * can never push the total past MAX_PROMOTIONAL_PRODUCTS.
+   */
+  async addPromotionalProduct(
+    productId: number,
+    userId: number,
+  ): Promise<ProductResponseDto> {
+    const updated = await this.productRepository.withTransaction(async (tx) => {
+      await this.productRepository.lockPromotionalSlots(tx);
+      this.requirePromotable(
+        await this.productRepository.findByIdAdmin(productId, tx),
+      );
+
+      const taken = await this.productRepository.countPromotionalProducts(tx);
+      if (taken >= MAX_PROMOTIONAL_PRODUCTS) {
+        throw new ConflictException(
+          `Only ${MAX_PROMOTIONAL_PRODUCTS} products can be promotional at a time — replace or remove one first`,
+        );
+      }
+
+      return this.productRepository.updateProduct(
+        productId,
+        { isPromotional: true, updatedBy: userId },
+        tx,
+      );
+    });
+
+    return new ProductResponseDto(
+      updated,
+      this.configService.get<string>('app.baseUrl'),
+    );
+  }
+
+  /**
+   * Hands `currentId`'s promotional slot to `productId` in one transaction —
+   * the way to promote something else while both slots are taken, and the
+   * way to free a promotional product so it can be deactivated without the
+   * home page ever dropping a card in between.
+   */
+  async replacePromotionalProduct(
+    currentId: number,
+    productId: number,
+    userId: number,
+  ): Promise<ProductResponseDto> {
+    if (currentId === productId) {
+      throw new BadRequestException(
+        'Select a different product to replace this promotional product with',
+      );
+    }
+
+    const updated = await this.productRepository.withTransaction(async (tx) => {
+      await this.productRepository.lockPromotionalSlots(tx);
+      this.requirePromotional(
+        await this.productRepository.findByIdAdmin(currentId, tx),
+      );
+      this.requirePromotable(
+        await this.productRepository.findByIdAdmin(productId, tx),
+      );
+
+      await this.productRepository.updateProduct(
+        currentId,
+        { isPromotional: false, updatedBy: userId },
+        tx,
+      );
+      return this.productRepository.updateProduct(
+        productId,
+        { isPromotional: true, updatedBy: userId },
+        tx,
+      );
+    });
+
+    return new ProductResponseDto(
+      updated,
+      this.configService.get<string>('app.baseUrl'),
+    );
+  }
+
+  /** Frees a promotional slot — the product itself is otherwise untouched. */
+  async removePromotionalProduct(
+    productId: number,
+    userId: number,
+  ): Promise<ProductResponseDto> {
+    const updated = await this.productRepository.withTransaction(async (tx) => {
+      await this.productRepository.lockPromotionalSlots(tx);
+      this.requirePromotional(
+        await this.productRepository.findByIdAdmin(productId, tx),
+      );
+      return this.productRepository.updateProduct(
+        productId,
+        { isPromotional: false, updatedBy: userId },
+        tx,
+      );
+    });
+
+    return new ProductResponseDto(
+      updated,
+      this.configService.get<string>('app.baseUrl'),
+    );
+  }
+
+  /** A product may take a promotional slot only while ACTIVE and not already in one. */
+  private requirePromotable<
+    T extends {
+      name: string;
+      status: CategoryProductStatus;
+      deletedAt: Date | null;
+      isPromotional: boolean;
+    },
+  >(product: T | null): T {
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    if (product.deletedAt || product.status !== CategoryProductStatus.ACTIVE) {
+      throw new BadRequestException(
+        `"${product.name}" is not active — only an active product can be promotional`,
+      );
+    }
+    if (product.isPromotional) {
+      throw new ConflictException(
+        `"${product.name}" is already a promotional product`,
+      );
+    }
+    return product;
+  }
+
+  private requirePromotional<
+    T extends { name: string; isPromotional: boolean },
+  >(product: T | null): T {
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    if (!product.isPromotional) {
+      throw new ConflictException(
+        `"${product.name}" is not a promotional product`,
+      );
+    }
+    return product;
+  }
+
+  /**
+   * A promotional product holds a home-page slot, so it must stay ACTIVE and
+   * undeleted until its slot is handed to another product (replace) or freed
+   * (remove). Called on every path that can take a product out of ACTIVE:
+   * a direct status edit, retiring a VARIABLE product's last ACTIVE variant,
+   * and soft/hard delete.
+   */
+  private assertNotPromotional(
+    product: { name: string; isPromotional?: boolean | null },
+    action: 'deactivate' | 'delete',
+  ): void {
+    if (!product.isPromotional) return;
+    throw new ConflictException(
+      `"${product.name}" is a promotional product on the home page — replace it or remove it from Home → Promotional Product before you ${action} it`,
     );
   }
 
@@ -492,6 +684,7 @@ export class ProductService {
         type: dto.type ?? ProductType.VARIABLE,
         status,
         isFeatured: dto.isFeatured,
+        isBest: dto.isBest,
         //* THE PUBLIC VISIBILITY GATE IS status = ACTIVE AND publishedAt <=
         //* now(), AND A null publishedAt NEVER MATCHES — SO AN ACTIVE
         //* PRODUCT CREATED WITHOUT AN EXPLICIT LAUNCH DATE MUST GO LIVE
@@ -1046,6 +1239,13 @@ export class ProductService {
             )
           : dto.status;
 
+      if (
+        existing.status === CategoryProductStatus.ACTIVE &&
+        (resolvedStatus ?? existing.status) !== CategoryProductStatus.ACTIVE
+      ) {
+        this.assertNotPromotional(existing, 'deactivate');
+      }
+
       const pricingFields = this.resolvePricingUpdate(existing, dto);
 
       //* combo_items_variant_id_fkey IS ON DELETE RESTRICT, SO DROPPING A
@@ -1112,6 +1312,7 @@ export class ProductService {
               type: dto.type,
               status: resolvedStatus,
               isFeatured: dto.isFeatured,
+              isBest: dto.isBest,
               //* SAME RULE AS CREATE: A PRODUCT THAT IS (OR BECOMES) ACTIVE
               //* WITH NO LAUNCH DATE ON RECORD IS PUBLISHED IMMEDIATELY —
               //* null NEVER PASSES THE PUBLIC publishedAt <= now() GATE.
@@ -1707,6 +1908,29 @@ export class ProductService {
       promoteDefaultVariantId = variantId;
     }
 
+    //* THE VARIANT SET *AFTER* THIS WRITE — THE ROW BEING EDITED TAKES ITS
+    //* NEW STATUS, EVERY SIBLING KEEPS ITS STORED ONE. BUILT HERE RATHER
+    //* THAN RE-READ SO THE STATUS LANDS IN THE SAME STATEMENT AS THE AUDIT
+    //* STAMP, IN THE SAME TRANSACTION AS THE VARIANT WRITE — AND RESOLVED
+    //* BEFORE THAT TRANSACTION, SO A CHANGE THAT WOULD DEACTIVATE A
+    //* PROMOTIONAL PRODUCT IS REFUSED BEFORE ANYTHING IS WRITTEN.
+    const nextStatuses = siblings.map((sibling) =>
+      sibling.id === variantId ? target : sibling.variantStatus,
+    );
+    const resolvedStatus = this.resolveVariableProductStatus(
+      undefined,
+      variant.product.status,
+      nextStatuses,
+    );
+
+    if (
+      variant.product.status === CategoryProductStatus.ACTIVE &&
+      (resolvedStatus ?? variant.product.status) !==
+        CategoryProductStatus.ACTIVE
+    ) {
+      this.assertNotPromotional(variant.product, 'deactivate');
+    }
+
     const affectedCombos = isRetiring
       ? await this.productRepository.findDormantCombosUsingVariants([variantId])
       : [];
@@ -1724,19 +1948,6 @@ export class ProductService {
       //* VARIANT-LEVEL EDIT LIVES ON THE PARENT — SAME PLACE AN ADMIN LOOKS
       //* AFTER ANY OTHER CHANGE TO THIS PRODUCT. THE PRICING RE-MIRROR RIDES
       //* ALONG IN THE SAME STATEMENT WHEN THE DEFAULT MOVED.
-      //* THE VARIANT SET *AFTER* THIS WRITE — THE ROW BEING EDITED TAKES ITS
-      //* NEW STATUS, EVERY SIBLING KEEPS ITS STORED ONE. BUILT HERE RATHER
-      //* THAN RE-READ SO THE STATUS LANDS IN THE SAME STATEMENT AS THE AUDIT
-      //* STAMP, IN THE SAME TRANSACTION AS THE VARIANT WRITE.
-      const nextStatuses = siblings.map((sibling) =>
-        sibling.id === variantId ? target : sibling.variantStatus,
-      );
-      const resolvedStatus = this.resolveVariableProductStatus(
-        undefined,
-        variant.product.status,
-        nextStatuses,
-      );
-
       await this.productRepository.updateProduct(
         variant.productId,
         {
@@ -1846,6 +2057,7 @@ export class ProductService {
     if (product.deletedAt) {
       throw new ConflictException('Product is already deleted');
     }
+    this.assertNotPromotional(product, 'delete');
 
     await this.productRepository.softDeleteProduct(id, deletedBy);
   }
@@ -1861,6 +2073,7 @@ export class ProductService {
     if (!product) {
       throw new NotFoundException('Product not found');
     }
+    this.assertNotPromotional(product, 'delete');
 
     await this.productRepository.hardDeleteProduct(id);
 

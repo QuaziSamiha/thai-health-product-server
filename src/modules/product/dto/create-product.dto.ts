@@ -241,6 +241,21 @@ export class CreateProductDto {
   @IsBoolean({ message: 'isFeatured must be true or false' })
   isFeatured?: boolean;
 
+  @ApiPropertyOptional({
+    description:
+      'Whether to list this product in the "best products" section. Admin-curated, not a sales ranking. Defaults to false.',
+    example: false,
+    default: false,
+  })
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'string') return value === 'true' || value === '1';
+    return Boolean(value);
+  })
+  @IsBoolean({ message: 'isBest must be true or false' })
+  isBest?: boolean;
+
   // ─── Pricing ─────────────────────────────────────────────────────────────────
 
   @ApiPropertyOptional({

@@ -73,6 +73,8 @@ export type ProductMinAggregateOutputType = {
   type: $Enums.ProductType | null
   status: $Enums.CategoryProductStatus | null
   isFeatured: boolean | null
+  isBest: boolean | null
+  isPromotional: boolean | null
   hasVariants: boolean | null
   costPrice: runtime.Decimal | null
   discountType: $Enums.DiscountType | null
@@ -122,6 +124,8 @@ export type ProductMaxAggregateOutputType = {
   type: $Enums.ProductType | null
   status: $Enums.CategoryProductStatus | null
   isFeatured: boolean | null
+  isBest: boolean | null
+  isPromotional: boolean | null
   hasVariants: boolean | null
   costPrice: runtime.Decimal | null
   discountType: $Enums.DiscountType | null
@@ -171,6 +175,8 @@ export type ProductCountAggregateOutputType = {
   type: number
   status: number
   isFeatured: number
+  isBest: number
+  isPromotional: number
   hasVariants: number
   costPrice: number
   discountType: number
@@ -257,6 +263,8 @@ export type ProductMinAggregateInputType = {
   type?: true
   status?: true
   isFeatured?: true
+  isBest?: true
+  isPromotional?: true
   hasVariants?: true
   costPrice?: true
   discountType?: true
@@ -306,6 +314,8 @@ export type ProductMaxAggregateInputType = {
   type?: true
   status?: true
   isFeatured?: true
+  isBest?: true
+  isPromotional?: true
   hasVariants?: true
   costPrice?: true
   discountType?: true
@@ -355,6 +365,8 @@ export type ProductCountAggregateInputType = {
   type?: true
   status?: true
   isFeatured?: true
+  isBest?: true
+  isPromotional?: true
   hasVariants?: true
   costPrice?: true
   discountType?: true
@@ -494,6 +506,8 @@ export type ProductGroupByOutputType = {
   type: $Enums.ProductType
   status: $Enums.CategoryProductStatus
   isFeatured: boolean
+  isBest: boolean
+  isPromotional: boolean
   hasVariants: boolean
   costPrice: runtime.Decimal | null
   discountType: $Enums.DiscountType
@@ -569,6 +583,8 @@ export type ProductWhereInput = {
   type?: Prisma.EnumProductTypeFilter<"Product"> | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFilter<"Product"> | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFilter<"Product"> | boolean
+  isBest?: Prisma.BoolFilter<"Product"> | boolean
+  isPromotional?: Prisma.BoolFilter<"Product"> | boolean
   hasVariants?: Prisma.BoolFilter<"Product"> | boolean
   costPrice?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFilter<"Product"> | $Enums.DiscountType
@@ -632,6 +648,8 @@ export type ProductOrderByWithRelationInput = {
   type?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
+  isBest?: Prisma.SortOrder
+  isPromotional?: Prisma.SortOrder
   hasVariants?: Prisma.SortOrder
   costPrice?: Prisma.SortOrderInput | Prisma.SortOrder
   discountType?: Prisma.SortOrder
@@ -698,6 +716,8 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   type?: Prisma.EnumProductTypeFilter<"Product"> | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFilter<"Product"> | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFilter<"Product"> | boolean
+  isBest?: Prisma.BoolFilter<"Product"> | boolean
+  isPromotional?: Prisma.BoolFilter<"Product"> | boolean
   hasVariants?: Prisma.BoolFilter<"Product"> | boolean
   costPrice?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFilter<"Product"> | $Enums.DiscountType
@@ -761,6 +781,8 @@ export type ProductOrderByWithAggregationInput = {
   type?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
+  isBest?: Prisma.SortOrder
+  isPromotional?: Prisma.SortOrder
   hasVariants?: Prisma.SortOrder
   costPrice?: Prisma.SortOrderInput | Prisma.SortOrder
   discountType?: Prisma.SortOrder
@@ -821,6 +843,8 @@ export type ProductScalarWhereWithAggregatesInput = {
   type?: Prisma.EnumProductTypeWithAggregatesFilter<"Product"> | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusWithAggregatesFilter<"Product"> | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolWithAggregatesFilter<"Product"> | boolean
+  isBest?: Prisma.BoolWithAggregatesFilter<"Product"> | boolean
+  isPromotional?: Prisma.BoolWithAggregatesFilter<"Product"> | boolean
   hasVariants?: Prisma.BoolWithAggregatesFilter<"Product"> | boolean
   costPrice?: Prisma.DecimalNullableWithAggregatesFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeWithAggregatesFilter<"Product"> | $Enums.DiscountType
@@ -872,6 +896,8 @@ export type ProductCreateInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -931,6 +957,8 @@ export type ProductUncheckedCreateInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -989,6 +1017,8 @@ export type ProductUpdateInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -1048,6 +1078,8 @@ export type ProductUncheckedUpdateInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -1107,6 +1139,8 @@ export type ProductCreateManyInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -1158,6 +1192,8 @@ export type ProductUpdateManyMutationInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -1206,6 +1242,8 @@ export type ProductUncheckedUpdateManyInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -1286,6 +1324,8 @@ export type ProductCountOrderByAggregateInput = {
   type?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
+  isBest?: Prisma.SortOrder
+  isPromotional?: Prisma.SortOrder
   hasVariants?: Prisma.SortOrder
   costPrice?: Prisma.SortOrder
   discountType?: Prisma.SortOrder
@@ -1354,6 +1394,8 @@ export type ProductMaxOrderByAggregateInput = {
   type?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
+  isBest?: Prisma.SortOrder
+  isPromotional?: Prisma.SortOrder
   hasVariants?: Prisma.SortOrder
   costPrice?: Prisma.SortOrder
   discountType?: Prisma.SortOrder
@@ -1403,6 +1445,8 @@ export type ProductMinOrderByAggregateInput = {
   type?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
+  isBest?: Prisma.SortOrder
+  isPromotional?: Prisma.SortOrder
   hasVariants?: Prisma.SortOrder
   costPrice?: Prisma.SortOrder
   discountType?: Prisma.SortOrder
@@ -1758,6 +1802,8 @@ export type ProductCreateWithoutCartItemsInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -1816,6 +1862,8 @@ export type ProductUncheckedCreateWithoutCartItemsInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -1889,6 +1937,8 @@ export type ProductUpdateWithoutCartItemsInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -1947,6 +1997,8 @@ export type ProductUncheckedUpdateWithoutCartItemsInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -2004,6 +2056,8 @@ export type ProductCreateWithoutCategoryInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -2062,6 +2116,8 @@ export type ProductUncheckedCreateWithoutCategoryInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -2149,6 +2205,8 @@ export type ProductScalarWhereInput = {
   type?: Prisma.EnumProductTypeFilter<"Product"> | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFilter<"Product"> | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFilter<"Product"> | boolean
+  isBest?: Prisma.BoolFilter<"Product"> | boolean
+  isPromotional?: Prisma.BoolFilter<"Product"> | boolean
   hasVariants?: Prisma.BoolFilter<"Product"> | boolean
   costPrice?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFilter<"Product"> | $Enums.DiscountType
@@ -2200,6 +2258,8 @@ export type ProductCreateWithoutComboItemsInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -2258,6 +2318,8 @@ export type ProductUncheckedCreateWithoutComboItemsInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -2331,6 +2393,8 @@ export type ProductUpdateWithoutComboItemsInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -2389,6 +2453,8 @@ export type ProductUncheckedUpdateWithoutComboItemsInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -2446,6 +2512,8 @@ export type ProductCreateWithoutBatchesInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -2504,6 +2572,8 @@ export type ProductUncheckedCreateWithoutBatchesInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -2577,6 +2647,8 @@ export type ProductUpdateWithoutBatchesInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -2635,6 +2707,8 @@ export type ProductUncheckedUpdateWithoutBatchesInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -2692,6 +2766,8 @@ export type ProductCreateWithoutInventoryLogsInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -2750,6 +2826,8 @@ export type ProductUncheckedCreateWithoutInventoryLogsInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -2823,6 +2901,8 @@ export type ProductUpdateWithoutInventoryLogsInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -2881,6 +2961,8 @@ export type ProductUncheckedUpdateWithoutInventoryLogsInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -2938,6 +3020,8 @@ export type ProductCreateWithoutOrderItemsInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -2996,6 +3080,8 @@ export type ProductUncheckedCreateWithoutOrderItemsInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -3069,6 +3155,8 @@ export type ProductUpdateWithoutOrderItemsInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -3127,6 +3215,8 @@ export type ProductUncheckedUpdateWithoutOrderItemsInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -3184,6 +3274,8 @@ export type ProductCreateWithoutVariantsInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -3242,6 +3334,8 @@ export type ProductUncheckedCreateWithoutVariantsInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -3315,6 +3409,8 @@ export type ProductUpdateWithoutVariantsInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -3373,6 +3469,8 @@ export type ProductUncheckedUpdateWithoutVariantsInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -3430,6 +3528,8 @@ export type ProductCreateWithoutImagesInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -3488,6 +3588,8 @@ export type ProductUncheckedCreateWithoutImagesInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -3561,6 +3663,8 @@ export type ProductUpdateWithoutImagesInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -3619,6 +3723,8 @@ export type ProductUncheckedUpdateWithoutImagesInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -3676,6 +3782,8 @@ export type ProductCreateWithoutCreatedByUserInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -3734,6 +3842,8 @@ export type ProductUncheckedCreateWithoutCreatedByUserInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -3801,6 +3911,8 @@ export type ProductCreateWithoutUpdatedByUserInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -3859,6 +3971,8 @@ export type ProductUncheckedCreateWithoutUpdatedByUserInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -3926,6 +4040,8 @@ export type ProductCreateWithoutDeletedByUserInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -3984,6 +4100,8 @@ export type ProductUncheckedCreateWithoutDeletedByUserInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -4100,6 +4218,8 @@ export type ProductCreateManyCategoryInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -4150,6 +4270,8 @@ export type ProductUpdateWithoutCategoryInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -4208,6 +4330,8 @@ export type ProductUncheckedUpdateWithoutCategoryInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -4266,6 +4390,8 @@ export type ProductUncheckedUpdateManyWithoutCategoryInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -4317,6 +4443,8 @@ export type ProductCreateManyCreatedByUserInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -4368,6 +4496,8 @@ export type ProductCreateManyUpdatedByUserInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -4419,6 +4549,8 @@ export type ProductCreateManyDeletedByUserInput = {
   type?: $Enums.ProductType
   status?: $Enums.CategoryProductStatus
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: $Enums.DiscountType
@@ -4469,6 +4601,8 @@ export type ProductUpdateWithoutCreatedByUserInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -4527,6 +4661,8 @@ export type ProductUncheckedUpdateWithoutCreatedByUserInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -4585,6 +4721,8 @@ export type ProductUncheckedUpdateManyWithoutCreatedByUserInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -4635,6 +4773,8 @@ export type ProductUpdateWithoutUpdatedByUserInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -4693,6 +4833,8 @@ export type ProductUncheckedUpdateWithoutUpdatedByUserInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -4751,6 +4893,8 @@ export type ProductUncheckedUpdateManyWithoutUpdatedByUserInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -4801,6 +4945,8 @@ export type ProductUpdateWithoutDeletedByUserInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -4859,6 +5005,8 @@ export type ProductUncheckedUpdateWithoutDeletedByUserInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -4917,6 +5065,8 @@ export type ProductUncheckedUpdateManyWithoutDeletedByUserInput = {
   type?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
   status?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasVariants?: Prisma.BoolFieldUpdateOperationsInput | boolean
   costPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
@@ -5053,6 +5203,8 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   type?: boolean
   status?: boolean
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: boolean
   discountType?: boolean
@@ -5117,6 +5269,8 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   type?: boolean
   status?: boolean
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: boolean
   discountType?: boolean
@@ -5173,6 +5327,8 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   type?: boolean
   status?: boolean
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: boolean
   discountType?: boolean
@@ -5229,6 +5385,8 @@ export type ProductSelectScalar = {
   type?: boolean
   status?: boolean
   isFeatured?: boolean
+  isBest?: boolean
+  isPromotional?: boolean
   hasVariants?: boolean
   costPrice?: boolean
   discountType?: boolean
@@ -5266,7 +5424,7 @@ export type ProductSelectScalar = {
   deletedBy?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "name" | "slug" | "sku" | "barcode" | "description" | "shortDescription" | "nameTh" | "descriptionTh" | "shortDescTh" | "type" | "status" | "isFeatured" | "hasVariants" | "costPrice" | "discountType" | "discountValue" | "basePrice" | "salePrice" | "quantity" | "totalStock" | "stockStatus" | "lowStockThreshold" | "weight" | "dimensions" | "size" | "seoMetadata" | "tags" | "dosage" | "dosageTh" | "ingredients" | "ingredientsTh" | "healthBenefits" | "healthBenefitsTh" | "warning" | "warningTh" | "storageInstructions" | "storageInstructionsTh" | "origin" | "genericName" | "categoryId" | "createdAt" | "updatedAt" | "deletedAt" | "publishedAt" | "createdBy" | "updatedBy" | "deletedBy", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "name" | "slug" | "sku" | "barcode" | "description" | "shortDescription" | "nameTh" | "descriptionTh" | "shortDescTh" | "type" | "status" | "isFeatured" | "isBest" | "isPromotional" | "hasVariants" | "costPrice" | "discountType" | "discountValue" | "basePrice" | "salePrice" | "quantity" | "totalStock" | "stockStatus" | "lowStockThreshold" | "weight" | "dimensions" | "size" | "seoMetadata" | "tags" | "dosage" | "dosageTh" | "ingredients" | "ingredientsTh" | "healthBenefits" | "healthBenefitsTh" | "warning" | "warningTh" | "storageInstructions" | "storageInstructionsTh" | "origin" | "genericName" | "categoryId" | "createdAt" | "updatedAt" | "deletedAt" | "publishedAt" | "createdBy" | "updatedBy" | "deletedBy", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   images?: boolean | Prisma.Product$imagesArgs<ExtArgs>
@@ -5324,6 +5482,8 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     type: $Enums.ProductType
     status: $Enums.CategoryProductStatus
     isFeatured: boolean
+    isBest: boolean
+    isPromotional: boolean
     hasVariants: boolean
     costPrice: runtime.Decimal | null
     discountType: $Enums.DiscountType
@@ -5807,6 +5967,8 @@ export interface ProductFieldRefs {
   readonly type: Prisma.FieldRef<"Product", 'ProductType'>
   readonly status: Prisma.FieldRef<"Product", 'CategoryProductStatus'>
   readonly isFeatured: Prisma.FieldRef<"Product", 'Boolean'>
+  readonly isBest: Prisma.FieldRef<"Product", 'Boolean'>
+  readonly isPromotional: Prisma.FieldRef<"Product", 'Boolean'>
   readonly hasVariants: Prisma.FieldRef<"Product", 'Boolean'>
   readonly costPrice: Prisma.FieldRef<"Product", 'Decimal'>
   readonly discountType: Prisma.FieldRef<"Product", 'DiscountType'>

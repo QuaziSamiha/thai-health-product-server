@@ -39,6 +39,23 @@ export class CreateBatchDto {
   @Min(0, { message: 'Cost price cannot be negative' })
   costPrice!: number;
 
+  //* THE ONLY BATCH-NUMBER FIELD A CLIENT MAY SEND. OUR OWN `batchNo` IS
+  //* SERVER-GENERATED (InventoryService.createBatchWithGeneratedNumber) AND IS
+  //* DELIBERATELY ABSENT FROM THIS DTO; THIS ONE IS THE FACTORY'S OWN LOT
+  //* NUMBER, READ OFF THE PACK BY WHOEVER RECEIVES THE GOODS.
+  @ApiPropertyOptional({
+    description:
+      "Batch/lot number printed on the goods by the manufacturer. Separate from the system-generated batchNo — this is the supplier's own number, used for recall and traceability.",
+    example: 'LOT-2026-0142',
+    maxLength: 100,
+  })
+  @IsOptional()
+  @IsString({ message: 'Manufacturer batch number must be a valid text string' })
+  @MaxLength(100, {
+    message: 'Manufacturer batch number cannot exceed 100 characters',
+  })
+  manufacturerBatchNo?: string;
+
   @ApiPropertyOptional({
     description: 'Selling price snapshot at the time this batch was recorded.',
     example: 450.0,

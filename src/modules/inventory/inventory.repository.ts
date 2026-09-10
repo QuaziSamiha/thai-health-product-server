@@ -19,6 +19,7 @@ export class InventoryRepository extends BaseRepository {
     id: true,
     sid: true,
     batchNo: true,
+    manufacturerBatchNo: true,
     quantity: true,
     remaining: true,
     costPrice: true,
@@ -102,7 +103,9 @@ export class InventoryRepository extends BaseRepository {
       typeof client.batch
     >(client.batch, params, {
       select: this.BATCH_SELECT,
-      searchableFields: ['batchNo'],
+      //* STAFF CHASING A RECALL SEARCH THE NUMBER PRINTED ON THE PACK, WHICH IS
+      //* THE FACTORY'S — NOT OURS — SO BOTH HAVE TO BE SEARCHABLE HERE.
+      searchableFields: ['batchNo', 'manufacturerBatchNo'],
       defaultSortField: 'createdAt',
     });
   }

@@ -11,6 +11,7 @@ import {
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiConflictResponse,
 } from '@nestjs/swagger';
 import { CreateHomeDto } from './dto/create-home.dto';
 import { UpdateHomeDto } from './dto/update-home.dto';
@@ -19,6 +20,11 @@ import {
   HomeResponseDto,
   FeaturedHomeContentsResponseDto,
 } from './dto/home-response.dto';
+import {
+  PromotionalProductDto,
+  PromotionalProductOptionDto,
+} from '../product/dto/promotional-product.dto';
+import { ProductResponseDto } from '../product/dto/product-response.dto';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -113,7 +119,7 @@ export class HomeController {
   @ApiOperation({
     summary: 'Get featured home page content (Public)',
     description:
-      'Everything the public storefront homepage needs in one call: the single ACTIVE hero slider and single ACTIVE promotion banner with the lowest displayOrder each (either null if that type has no ACTIVE row), every ACTIVE root category, and three product sections — combo (type=COMBO), featured (isFeatured=true), and general (isFeatured=false). Categories/products are sourced from CategoryService/ProductService, not queried directly by this module.',
+      'Everything the public storefront homepage needs in one call: the single ACTIVE hero slider and single ACTIVE promotion banner with the lowest displayOrder each (either null if that type has no ACTIVE row), every ACTIVE root category, the (at most two) ACTIVE promotional products (isPromotional=true), the combo section, and three product sections — featured (isFeatured=true), best (isBest=true), and general (isFeatured=false). Categories/products are sourced from CategoryService/ProductService, not queried directly by this module.',
   })
   @ApiOkResponse({
     description: 'Featured home contents retrieved successfully.',
@@ -122,6 +128,146 @@ export class HomeController {
   @ResponseMessage('Featured home contents retrieved successfully')
   async getFeaturedHomeContents() {
     return this.homeService.getFeaturedHomeContents();
+  }
+
+  @Get('promotional-products')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.MARKETING)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get the promotional products',
+    description:
+      'Every non-deleted product currently flagged isPromotional (at most two) — the rows of the "Promotional Product" admin tab.',
+  })
+  @ApiOkResponse({
+    description: 'Promotional products retrieved successfully.',
+    type: [ProductResponseDto],
+  })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
+  @ApiForbiddenResponse({ description: 'Admin or Marketing role required.' })
+  @ResponseMessage('Promotional products retrieved successfully')
+  async getPromotionalProducts() {
+    return this.homeService.getPromotionalProducts();
+  }
+
+  @Get('promotional-product-options')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.MARKETING)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get products that can be made promotional',
+    description:
+      'Every ACTIVE, non-deleted product that is not already promotional — the options of the add/replace product select.',
+  })
+  @ApiOkResponse({
+    description: 'Promotional product options retrieved successfully.',
+    type: [PromotionalProductOptionDto],
+  })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
+  @ApiForbiddenResponse({ description: 'Admin or Marketing role required.' })
+  @ResponseMessage('Promotional product options retrieved successfully')
+  async getPromotionalProductOptions() {
+    return this.homeService.getPromotionalProductOptions();
+  }
+
+  @Post('add-promotional-product')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.MARKETING)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Make a product promotional',
+    description:
+      'Sets isPromotional = true on an ACTIVE product. At most two products can be promotional at a time — rejected with 409 once both slots are taken (replace one instead).',
+  })
+  @ApiBody({ type: PromotionalProductDto })
+  @ApiCreatedResponse({
+    description: 'Promotional product added successfully.',
+    type: ProductResponseDto,
+  })
+  @ApiBadRequestResponse({ description: 'The product is not active.' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
+  @ApiForbiddenResponse({ description: 'Admin or Marketing role required.' })
+  @ApiNotFoundResponse({ description: 'Product not found.' })
+  @ApiConflictResponse({
+    description:
+      'Both promotional slots are taken, or the product is already promotional.',
+  })
+  @ResponseMessage('Promotional product added successfully')
+  async addPromotionalProduct(
+    @Body() dto: PromotionalProductDto,
+    @Req() req: Request & { user?: { id: number } },
+  ) {
+    if (!req.user?.id) {
+      throw new UnauthorizedException('User identity missing from request');
+    }
+    return this.homeService.addPromotionalProduct(dto.productId, req.user.id);
+  }
+
+  @Patch('replace-promotional-product/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.MARKETING)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Replace a promotional product',
+    description:
+      'Atomically hands the promotional slot held by product :id to the ACTIVE product in the body — :id becomes isPromotional = false (and can then be deactivated), the new product becomes isPromotional = true.',
+  })
+  @ApiBody({ type: PromotionalProductDto })
+  @ApiOkResponse({
+    description: 'Promotional product replaced successfully.',
+    type: ProductResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'The new product is not active, or is the same product.',
+  })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
+  @ApiForbiddenResponse({ description: 'Admin or Marketing role required.' })
+  @ApiNotFoundResponse({ description: 'Product not found.' })
+  @ApiConflictResponse({
+    description: ':id is not promotional, or the new product already is.',
+  })
+  @ResponseMessage('Promotional product replaced successfully')
+  async replacePromotionalProduct(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: PromotionalProductDto,
+    @Req() req: Request & { user?: { id: number } },
+  ) {
+    if (!req.user?.id) {
+      throw new UnauthorizedException('User identity missing from request');
+    }
+    return this.homeService.replacePromotionalProduct(
+      id,
+      dto.productId,
+      req.user.id,
+    );
+  }
+
+  @Patch('remove-promotional-product/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.MARKETING)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Remove a product from promotion',
+    description:
+      'Sets isPromotional = false on product :id, freeing its slot. Nothing else about the product changes.',
+  })
+  @ApiOkResponse({
+    description: 'Product removed from promotion successfully.',
+    type: ProductResponseDto,
+  })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
+  @ApiForbiddenResponse({ description: 'Admin or Marketing role required.' })
+  @ApiNotFoundResponse({ description: 'Product not found.' })
+  @ApiConflictResponse({ description: 'The product is not promotional.' })
+  @ResponseMessage('Product removed from promotion successfully')
+  async removePromotionalProduct(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request & { user?: { id: number } },
+  ) {
+    if (!req.user?.id) {
+      throw new UnauthorizedException('User identity missing from request');
+    }
+    return this.homeService.removePromotionalProduct(id, req.user.id);
   }
 
   @Patch('update-home-content/:id')

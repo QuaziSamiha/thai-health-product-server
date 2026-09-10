@@ -48,6 +48,7 @@ export type BatchMinAggregateOutputType = {
   id: number | null
   sid: string | null
   batchNo: string | null
+  manufacturerBatchNo: string | null
   quantity: number | null
   remaining: number | null
   costPrice: runtime.Decimal | null
@@ -63,6 +64,7 @@ export type BatchMaxAggregateOutputType = {
   id: number | null
   sid: string | null
   batchNo: string | null
+  manufacturerBatchNo: string | null
   quantity: number | null
   remaining: number | null
   costPrice: runtime.Decimal | null
@@ -78,6 +80,7 @@ export type BatchCountAggregateOutputType = {
   id: number
   sid: number
   batchNo: number
+  manufacturerBatchNo: number
   quantity: number
   remaining: number
   costPrice: number
@@ -113,6 +116,7 @@ export type BatchMinAggregateInputType = {
   id?: true
   sid?: true
   batchNo?: true
+  manufacturerBatchNo?: true
   quantity?: true
   remaining?: true
   costPrice?: true
@@ -128,6 +132,7 @@ export type BatchMaxAggregateInputType = {
   id?: true
   sid?: true
   batchNo?: true
+  manufacturerBatchNo?: true
   quantity?: true
   remaining?: true
   costPrice?: true
@@ -143,6 +148,7 @@ export type BatchCountAggregateInputType = {
   id?: true
   sid?: true
   batchNo?: true
+  manufacturerBatchNo?: true
   quantity?: true
   remaining?: true
   costPrice?: true
@@ -245,6 +251,7 @@ export type BatchGroupByOutputType = {
   id: number
   sid: string
   batchNo: string
+  manufacturerBatchNo: string | null
   quantity: number
   remaining: number
   costPrice: runtime.Decimal
@@ -283,6 +290,7 @@ export type BatchWhereInput = {
   id?: Prisma.IntFilter<"Batch"> | number
   sid?: Prisma.UuidFilter<"Batch"> | string
   batchNo?: Prisma.StringFilter<"Batch"> | string
+  manufacturerBatchNo?: Prisma.StringNullableFilter<"Batch"> | string | null
   quantity?: Prisma.IntFilter<"Batch"> | number
   remaining?: Prisma.IntFilter<"Batch"> | number
   costPrice?: Prisma.DecimalFilter<"Batch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -300,6 +308,7 @@ export type BatchOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   sid?: Prisma.SortOrder
   batchNo?: Prisma.SortOrder
+  manufacturerBatchNo?: Prisma.SortOrderInput | Prisma.SortOrder
   quantity?: Prisma.SortOrder
   remaining?: Prisma.SortOrder
   costPrice?: Prisma.SortOrder
@@ -320,6 +329,7 @@ export type BatchWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.BatchWhereInput | Prisma.BatchWhereInput[]
   OR?: Prisma.BatchWhereInput[]
   NOT?: Prisma.BatchWhereInput | Prisma.BatchWhereInput[]
+  manufacturerBatchNo?: Prisma.StringNullableFilter<"Batch"> | string | null
   quantity?: Prisma.IntFilter<"Batch"> | number
   remaining?: Prisma.IntFilter<"Batch"> | number
   costPrice?: Prisma.DecimalFilter<"Batch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -337,6 +347,7 @@ export type BatchOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   sid?: Prisma.SortOrder
   batchNo?: Prisma.SortOrder
+  manufacturerBatchNo?: Prisma.SortOrderInput | Prisma.SortOrder
   quantity?: Prisma.SortOrder
   remaining?: Prisma.SortOrder
   costPrice?: Prisma.SortOrder
@@ -360,6 +371,7 @@ export type BatchScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"Batch"> | number
   sid?: Prisma.UuidWithAggregatesFilter<"Batch"> | string
   batchNo?: Prisma.StringWithAggregatesFilter<"Batch"> | string
+  manufacturerBatchNo?: Prisma.StringNullableWithAggregatesFilter<"Batch"> | string | null
   quantity?: Prisma.IntWithAggregatesFilter<"Batch"> | number
   remaining?: Prisma.IntWithAggregatesFilter<"Batch"> | number
   costPrice?: Prisma.DecimalWithAggregatesFilter<"Batch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -374,6 +386,7 @@ export type BatchScalarWhereWithAggregatesInput = {
 export type BatchCreateInput = {
   sid?: string
   batchNo: string
+  manufacturerBatchNo?: string | null
   quantity?: number
   remaining?: number
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -389,6 +402,7 @@ export type BatchUncheckedCreateInput = {
   id?: number
   sid?: string
   batchNo: string
+  manufacturerBatchNo?: string | null
   quantity?: number
   remaining?: number
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -403,6 +417,7 @@ export type BatchUncheckedCreateInput = {
 export type BatchUpdateInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
+  manufacturerBatchNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -418,6 +433,7 @@ export type BatchUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
+  manufacturerBatchNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -433,6 +449,7 @@ export type BatchCreateManyInput = {
   id?: number
   sid?: string
   batchNo: string
+  manufacturerBatchNo?: string | null
   quantity?: number
   remaining?: number
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -447,6 +464,7 @@ export type BatchCreateManyInput = {
 export type BatchUpdateManyMutationInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
+  manufacturerBatchNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -460,6 +478,7 @@ export type BatchUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
+  manufacturerBatchNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -475,6 +494,7 @@ export type BatchCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   sid?: Prisma.SortOrder
   batchNo?: Prisma.SortOrder
+  manufacturerBatchNo?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   remaining?: Prisma.SortOrder
   costPrice?: Prisma.SortOrder
@@ -499,6 +519,7 @@ export type BatchMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   sid?: Prisma.SortOrder
   batchNo?: Prisma.SortOrder
+  manufacturerBatchNo?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   remaining?: Prisma.SortOrder
   costPrice?: Prisma.SortOrder
@@ -514,6 +535,7 @@ export type BatchMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   sid?: Prisma.SortOrder
   batchNo?: Prisma.SortOrder
+  manufacturerBatchNo?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   remaining?: Prisma.SortOrder
   costPrice?: Prisma.SortOrder
@@ -631,6 +653,7 @@ export type BatchUncheckedUpdateManyWithoutVariantNestedInput = {
 export type BatchCreateWithoutProductInput = {
   sid?: string
   batchNo: string
+  manufacturerBatchNo?: string | null
   quantity?: number
   remaining?: number
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -645,6 +668,7 @@ export type BatchUncheckedCreateWithoutProductInput = {
   id?: number
   sid?: string
   batchNo: string
+  manufacturerBatchNo?: string | null
   quantity?: number
   remaining?: number
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -688,6 +712,7 @@ export type BatchScalarWhereInput = {
   id?: Prisma.IntFilter<"Batch"> | number
   sid?: Prisma.UuidFilter<"Batch"> | string
   batchNo?: Prisma.StringFilter<"Batch"> | string
+  manufacturerBatchNo?: Prisma.StringNullableFilter<"Batch"> | string | null
   quantity?: Prisma.IntFilter<"Batch"> | number
   remaining?: Prisma.IntFilter<"Batch"> | number
   costPrice?: Prisma.DecimalFilter<"Batch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -702,6 +727,7 @@ export type BatchScalarWhereInput = {
 export type BatchCreateWithoutVariantInput = {
   sid?: string
   batchNo: string
+  manufacturerBatchNo?: string | null
   quantity?: number
   remaining?: number
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -716,6 +742,7 @@ export type BatchUncheckedCreateWithoutVariantInput = {
   id?: number
   sid?: string
   batchNo: string
+  manufacturerBatchNo?: string | null
   quantity?: number
   remaining?: number
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -756,6 +783,7 @@ export type BatchCreateManyProductInput = {
   id?: number
   sid?: string
   batchNo: string
+  manufacturerBatchNo?: string | null
   quantity?: number
   remaining?: number
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -769,6 +797,7 @@ export type BatchCreateManyProductInput = {
 export type BatchUpdateWithoutProductInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
+  manufacturerBatchNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -783,6 +812,7 @@ export type BatchUncheckedUpdateWithoutProductInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
+  manufacturerBatchNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -797,6 +827,7 @@ export type BatchUncheckedUpdateManyWithoutProductInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
+  manufacturerBatchNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -811,6 +842,7 @@ export type BatchCreateManyVariantInput = {
   id?: number
   sid?: string
   batchNo: string
+  manufacturerBatchNo?: string | null
   quantity?: number
   remaining?: number
   costPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -824,6 +856,7 @@ export type BatchCreateManyVariantInput = {
 export type BatchUpdateWithoutVariantInput = {
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
+  manufacturerBatchNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -838,6 +871,7 @@ export type BatchUncheckedUpdateWithoutVariantInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
+  manufacturerBatchNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -852,6 +886,7 @@ export type BatchUncheckedUpdateManyWithoutVariantInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   sid?: Prisma.StringFieldUpdateOperationsInput | string
   batchNo?: Prisma.StringFieldUpdateOperationsInput | string
+  manufacturerBatchNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   costPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -868,6 +903,7 @@ export type BatchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   id?: boolean
   sid?: boolean
   batchNo?: boolean
+  manufacturerBatchNo?: boolean
   quantity?: boolean
   remaining?: boolean
   costPrice?: boolean
@@ -885,6 +921,7 @@ export type BatchSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id?: boolean
   sid?: boolean
   batchNo?: boolean
+  manufacturerBatchNo?: boolean
   quantity?: boolean
   remaining?: boolean
   costPrice?: boolean
@@ -902,6 +939,7 @@ export type BatchSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id?: boolean
   sid?: boolean
   batchNo?: boolean
+  manufacturerBatchNo?: boolean
   quantity?: boolean
   remaining?: boolean
   costPrice?: boolean
@@ -919,6 +957,7 @@ export type BatchSelectScalar = {
   id?: boolean
   sid?: boolean
   batchNo?: boolean
+  manufacturerBatchNo?: boolean
   quantity?: boolean
   remaining?: boolean
   costPrice?: boolean
@@ -930,7 +969,7 @@ export type BatchSelectScalar = {
   variantId?: boolean
 }
 
-export type BatchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "batchNo" | "quantity" | "remaining" | "costPrice" | "manufacturingDate" | "expiryDate" | "createdAt" | "updatedAt" | "productId" | "variantId", ExtArgs["result"]["batch"]>
+export type BatchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "batchNo" | "manufacturerBatchNo" | "quantity" | "remaining" | "costPrice" | "manufacturingDate" | "expiryDate" | "createdAt" | "updatedAt" | "productId" | "variantId", ExtArgs["result"]["batch"]>
 export type BatchInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product?: boolean | Prisma.Batch$productArgs<ExtArgs>
   variant?: boolean | Prisma.Batch$variantArgs<ExtArgs>
@@ -954,6 +993,7 @@ export type $BatchPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     id: number
     sid: string
     batchNo: string
+    manufacturerBatchNo: string | null
     quantity: number
     remaining: number
     costPrice: runtime.Decimal
@@ -1391,6 +1431,7 @@ export interface BatchFieldRefs {
   readonly id: Prisma.FieldRef<"Batch", 'Int'>
   readonly sid: Prisma.FieldRef<"Batch", 'String'>
   readonly batchNo: Prisma.FieldRef<"Batch", 'String'>
+  readonly manufacturerBatchNo: Prisma.FieldRef<"Batch", 'String'>
   readonly quantity: Prisma.FieldRef<"Batch", 'Int'>
   readonly remaining: Prisma.FieldRef<"Batch", 'Int'>
   readonly costPrice: Prisma.FieldRef<"Batch", 'Decimal'>

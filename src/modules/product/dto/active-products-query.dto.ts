@@ -10,16 +10,21 @@ export type ProductSortField = (typeof PRODUCT_SORT_FIELDS)[number];
 
 //* EXTENDS THE SHARED PAGE/LIMIT/SORT-ORDER/SEARCH CONTRACT WITH STOREFRONT-ONLY FILTERS.
 export class ActiveProductsQueryDto extends PaginationQueryDto {
+  //* SLUGS, NOT IDS — THE STOREFRONT MIRRORS THIS VALUE INTO ITS PUBLIC
+  //* /product URL, AND generateSlug() ONLY EVER EMITS [\w-], SO A COMMA CAN
+  //* NEVER APPEAR INSIDE ONE SLUG AND IS SAFE AS THE SEPARATOR.
   @ApiPropertyOptional({
-    description: 'Comma-separated category IDs to filter by',
-    example: '1,2,3',
+    description: 'Comma-separated category slugs to filter by',
+    example: 'anti-aging,vitamins',
   })
   @IsOptional()
-  @IsString({ message: 'categoryIds must be a comma-separated string of IDs' })
-  @Matches(/^\d+(,\d+)*$/, {
-    message: 'categoryIds must be a comma-separated list of positive integers',
+  @IsString({
+    message: 'categorySlugs must be a comma-separated string of slugs',
   })
-  categoryIds?: string;
+  @Matches(/^[\w-]+(,[\w-]+)*$/, {
+    message: 'categorySlugs must be a comma-separated list of category slugs',
+  })
+  categorySlugs?: string;
 
   @ApiPropertyOptional({
     enum: ProductType,

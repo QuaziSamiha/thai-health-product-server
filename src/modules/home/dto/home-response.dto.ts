@@ -271,6 +271,15 @@ export class FeaturedHomeContentsResponseDto {
 
   @Expose()
   @ApiProperty({
+    type: () => [ProductResponsePublicDto],
+    description:
+      'The (at most two) ACTIVE products flagged isPromotional, for the promotional product cards.',
+  })
+  @Type(() => ProductResponsePublicDto)
+  promotionalProducts!: ProductResponsePublicDto[];
+
+  @Expose()
+  @ApiProperty({
     type: () => [ComboProductResponsePublicDto],
     description: 'Active combos, for a "Combo Deals" section.',
   })
@@ -288,6 +297,15 @@ export class FeaturedHomeContentsResponseDto {
   @Expose()
   @ApiProperty({
     type: () => [ProductResponsePublicDto],
+    description:
+      'Active products flagged isBest (admin-curated, newest first, max 4) — the "Best Products" section. Empty when no product is flagged.',
+  })
+  @Type(() => ProductResponsePublicDto)
+  bestProducts!: ProductResponsePublicDto[];
+
+  @Expose()
+  @ApiProperty({
+    type: () => [ProductResponsePublicDto],
     description: 'Active products NOT flagged isFeatured — the general product grid.',
   })
   @Type(() => ProductResponsePublicDto)
@@ -299,13 +317,17 @@ export class FeaturedHomeContentsResponseDto {
     categories: CategoryHomeResponseDto[],
     comboProducts: ComboProductResponsePublicDto[],
     featuredProducts: ProductResponsePublicDto[],
+    bestProducts: ProductResponsePublicDto[],
     products: ProductResponsePublicDto[],
+    promotionalProducts: ProductResponsePublicDto[],
   ) {
     this.heroSlider = heroSlider;
     this.promotionBanner = promotionBanner;
     this.categories = categories;
     this.comboProducts = comboProducts;
     this.featuredProducts = featuredProducts;
+    this.bestProducts = bestProducts;
     this.products = products;
+    this.promotionalProducts = promotionalProducts;
   }
 }

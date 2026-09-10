@@ -111,6 +111,8 @@ const PRODUCT_SELECT_COMMON = {
   shortDescTh: true,
   type: true,
   isFeatured: true,
+  isBest: true,
+  isPromotional: true,
   hasVariants: true,
   basePrice: true,
   salePrice: true,

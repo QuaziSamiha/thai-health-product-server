@@ -38,6 +38,9 @@ erDiagram
         string barcode UK "nullable"
         enum type "SIMPLE | VARIABLE"
         enum status
+        boolean isFeatured
+        boolean isBest "admin-curated best products"
+        boolean isPromotional "home-page slot, max 2 true"
         decimal basePrice
         decimal salePrice "server-derived"
         int quantity "authoritative for SIMPLE"
@@ -67,6 +70,7 @@ erDiagram
         enum stockStatus
         json attributes "e.g. {color, size}"
         boolean isDefault
+        boolean isPromotional "stored, read by nothing yet"
     }
 
     PRODUCT_IMAGE {
@@ -177,6 +181,8 @@ erDiagram
 | `type`                  | `ENUM(ProductType)`           | NOT NULL, DEFAULT `SIMPLE`                                                       | Discriminates single-unit vs. multi-variant products. **The service defaults an omitted value to `VARIABLE` instead.**                                                                                  |
 | `status`                | `ENUM(CategoryProductStatus)` | NOT NULL, DEFAULT `ACTIVE`                                                       | Lifecycle/visibility state.                                                                                                                                                                             |
 | `isFeatured`            | `BOOLEAN`                     | NOT NULL, DEFAULT `false`, `@map("is_featured")`                                 | Drives homepage/featured sections.                                                                                                                                                                      |
+| `isBest`                | `BOOLEAN`                     | NOT NULL, DEFAULT `false`, `@map("is_best")`                                     | Drives the home page "Best Products" section (`bestProducts` on `GET /home/featured-home-contents`, via `findBestProducts`). **Admin-curated** — a toggle on the product form, exactly like `isFeatured`; not a sales ranking, since nothing computes it from orders. Writable on create/update. |
+| `isPromotional`         | `BOOLEAN`                     | NOT NULL, DEFAULT `false`, `@map("is_promotional")`                              | Holds one of the (at most two) home-page promotional product slots. Independent of `isFeatured` and of pricing — it implies no discount. **Not writable through create/update** — only the `/home/*-promotional-product` routes flip it, and while `true` the product cannot leave `ACTIVE` or be deleted. See [Promotional Products](#promotional-products--home-page-slots). |
 | `hasVariants`           | `BOOLEAN`                     | NOT NULL, DEFAULT `false`, `@map("has_variants")`                                | **Denormalized cache** of `variants.length > 0` — read-fast flag for UI branching (Add-to-Cart vs. Select-Options). No trigger; application code must set it.                                           |
 | `costPrice`             | `DECIMAL(12,2)`               | NULLABLE, `@map("cost_price")`                                                   | Internal cost basis for margin reporting. **Never expose on a public API.**                                                                                                                             |
 | `discountType`          | `ENUM(DiscountType)`          | NOT NULL, DEFAULT `PERCENTAGE`, `@map("discount_type")`                          | `FIXED` or `PERCENTAGE` — how `discountValue` should be read.                                                                                                                                           |
@@ -241,6 +247,7 @@ erDiagram
 | `salePrice`                                | `DECIMAL(12,2)`       | NOT NULL, DEFAULT `0`, `@map("sale_price")`, `CHECK 0 <= salePrice <= basePrice` | Final price for this variant. Server-derived, never client input.                                                                                              |
 | `attributes`                               | `JSONB`               | NOT NULL, DEFAULT `{}`                                                           | Free-form key/value pairs, e.g. `{"color": "Red", "size": "XL"}`. Defaults to `{}` when omitted.                                                               |
 | `isDefault`                                | `BOOLEAN`             | NOT NULL, DEFAULT `false`, `@map("is_default")`                                  | Marks the variant pre-selected on the PDP. **No DB constraint** prevents multiple defaults per product — see [Known Gaps](#known-gaps--recommended-hardening). |
+| `isPromotional`                            | `BOOLEAN`             | NOT NULL, DEFAULT `false`, `@map("is_promotional")`                              | Variant-level twin of `Product.isPromotional`. **Stored only** — no select, DTO, or service method reads or writes it yet, so it is `false` on every row. The promotional-slot feature is product-level; see [Known Gaps](#known-gaps--recommended-hardening). |
 | `variantStatus`                            | `ENUM`                | NOT NULL, DEFAULT `ACTIVE`, `@map("variant_status")`                             | **This variant's own visibility gate** (`CategoryProductStatus`), independent of the parent `Product.status` — retire one size without taking the whole product down. Named `variantStatus` rather than `status` so a joined row, or a flattened product/variant dropdown option, can carry both without either shadowing the other. See [Variant Status](#variant-status--per-variant-retirement). |
 | `productId`                                | `INT`                 | FK → `products.id`, NOT NULL, **ON DELETE CASCADE**, `@map("product_id")`        | Parent product. Deleting the parent deletes all variants.                                                                                                      |
 
@@ -320,6 +327,7 @@ erDiagram
 | `@@index([status, type, publishedAt])` (`Product`)                                                                          | B-Tree (composite)                         | Storefront listing query: active + correct type + already-published.                                                                                                                                                            |
 | `@@index([categoryId, status])` (`Product`)                                                                                 | B-Tree (composite)                         | Category browsing pages.                                                                                                                                                                                                        |
 | `@@index([status, isFeatured])` (`Product`)                                                                                 | B-Tree (composite)                         | Homepage "Featured" sections.                                                                                                                                                                                                   |
+| `@@index([status, isBest])` (`Product`)                                                                                     | B-Tree (composite)                         | "Best products" section — same shape as the `isFeatured` index (`prisma/migrations/20260910120000_add_product_is_best`).                                                                                                        |
 | `@@index([createdAt])` (`Product`)                                                                                          | B-Tree                                     | "Newest" sort order — the default `orderBy` on both list endpoints.                                                                                                                                                             |
 | `@@index([tags], type: Gin)` (`Product`, mapped `products_tags_gin_idx`)                                                    | GIN                                        | `tags @> ARRAY[...]` containment filtering.                                                                                                                                                                                     |
 | `@@index([productId])` (`ProductVariant`)                                                                                   | B-Tree                                     | FK lookup for `Product → variants` joins.                                                                                                                                                                                       |
@@ -561,6 +569,39 @@ A retired variant and a live combo cannot coexist. Three checks close the three 
 
 The DB is the backstop under all three. Even if a status change reached the column by some other path, `recompute_combo_available_quantity` reads a non-`ACTIVE` variant's stock as `0`, so no combo containing one can ever be sellable.
 
+##### Promotional Products — Home-Page Slots
+
+`Product.isPromotional` (added in `prisma/migrations/20260910110000_add_is_promotional`) marks a product as filling one of the promotional product cards on the storefront home page. The home page renders exactly two of those cards side by side, so the flag is a **slot**, not a free-form label: `MAX_PROMOTIONAL_PRODUCTS = 2` (`dto/promotional-product.dto.ts`).
+
+It is independent of the other flags. It is not `isFeatured` — a product can be both, either, or neither. And it is not a discount — the pricing block still decides what the buyer pays, so a promoted product at full price is a valid state.
+
+**Who writes it.** `CreateProductDto`/`UpdateProductDto` don't declare `isPromotional`, and the global `ValidationPipe` runs with `forbidNonWhitelisted`, so sending it to `create-product`/`update-product` is a `400`. The flag only changes through the Home module (`HomeController` → `HomeService` → `ProductService`, which owns every rule; `ADMIN` or `MARKETING` role, Bearer token):
+
+| Route                                         | Service method                 | What it does                                                                                                                                                                          |
+| :-------------------------------------------- | :----------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `GET /home/promotional-products`              | `getPromotionalProducts`       | Admin tab rows — every non-deleted product with the flag, **whatever its status**, as `ProductResponseDto[]`, ordered by `id`.                                                        |
+| `GET /home/promotional-product-options`       | `getPromotionalProductOptions` | Add/replace select options — `ACTIVE`, non-deleted, not already promotional, as the lean `PromotionalProductOptionDto[]`, ordered by `name`.                                          |
+| `POST /home/add-promotional-product`          | `addPromotionalProduct`        | Body `{ productId }` → `true`. `400` not `ACTIVE`; `404` no such product; `409` already promotional, or both slots taken.                                                              |
+| `PATCH /home/replace-promotional-product/:id` | `replacePromotionalProduct`    | `:id` → `false` and body `productId` → `true`, in one transaction. `400` same product, or the new one isn't `ACTIVE`; `409` `:id` isn't promotional, or the new one already is.       |
+| `PATCH /home/remove-promotional-product/:id`  | `removePromotionalProduct`     | `:id` → `false`; nothing else about the product changes. `409` not promotional.                                                                                                       |
+
+**Who reads it on the storefront.** `GET /home/featured-home-contents` returns `promotionalProducts` from `ProductService.getActivePromotionalProducts` → `ProductRepository.findActivePromotionalProducts(2)` — the same `findActiveProductsList` helper as the featured/general sections (`activeVisibilityWhere()` + `isPromotional: true`, newest `createdAt` first), mapped to `ProductResponsePublicDto[]`. `isPromotional` is also returned on every `ProductResponseDto`/`ProductResponsePublicDto`, since it is in the shared product select.
+
+###### Invariants
+
+1. **At most two products hold a slot.** Every slot write — add, replace, remove — first takes `pg_advisory_xact_lock(7140001)` (`ProductRepository.lockPromotionalSlots`, released on commit/rollback), then reads the count. Two admins adding at the same moment serialize instead of both seeing "1 slot taken" and leaving three promoted. This is **service-enforced only** — there is no DB constraint or trigger behind it.
+2. **Only an `ACTIVE`, non-deleted product can take a slot** (`requirePromotable`).
+3. **A promotional product stays `ACTIVE` and undeleted** (`assertNotPromotional`). Every path that could take it out of `ACTIVE` answers `409` — _"… is a promotional product on the home page — replace it or remove it from Home → Promotional Product before you deactivate/delete it"_:
+   - `PATCH /product/update-product/:id` when the resolved `status` leaves `ACTIVE` — whether sent directly or derived because the reconciled variants leave none `ACTIVE`;
+   - `PATCH /product/update-variant-status/:variantId` retiring the product's last `ACTIVE` variant;
+   - soft delete and permanent delete.
+
+   To take a promoted product down, **replace** it first (the home page never drops a card in between) or **remove** it, then deactivate/delete.
+
+4. **The storefront still gates on `ACTIVE`** as defence in depth: if a promotional row ever did end up non-`ACTIVE`, it drops off the home page instead of rendering an unbuyable card — while the admin list, which ignores status, still shows it so it can be cleared.
+
+**Product-level only.** A `VARIABLE` product takes one slot as a whole — it is one option in the select, not one per variant. `ProductVariant.isPromotional` exists in the schema with the same default, but nothing reads or writes it.
+
 ##### Inventory & Cache Sync Logic
 
 `hasVariants`, `totalStock`, and `stockStatus` on `Product` are **denormalized caches**. `totalStock` and `stockStatus` (on both `Product` and `ProductVariant`) _are_ kept in sync by DB triggers (`sync_variant_stock_status`, `sync_product_stock_fields`, `sync_product_total_stock_from_variants` — `prisma/migrations/20260714200002_backfill_stock_sync_triggers` and `20260715130000_add_low_stock_threshold`) as a safety net, but service code still sets them explicitly rather than relying on the trigger alone. **`hasVariants` has no trigger and must be set by application code.**
@@ -609,6 +650,9 @@ Schema-level issues worth fixing before the `product` module goes to production 
 - **Soft-deleted products permanently reserve their `slug`/`sku`/`barcode`/`name`** due to global (not partial) unique indexes, so a discontinued product can never be re-launched under the same identifiers.
 - **`ProductVariant` has no timestamps of its own** — there is no way to tell when an individual variant was last edited; every consumer falls back to the parent product's `updatedAt`. This is why `PATCH /update-variant-status/:variantId` stamps `updatedBy`/`updatedAt` on the **parent product** instead.
 - **Nothing stops `ProductVariant.variantStatus` from exceeding its parent's `Product.status`** at the column level — an `ACTIVE` variant of a `DRAFT` product is a representable state. It is harmless because every read applies the parent gate first (the variant gate can only narrow further), but a `CHECK` cannot express it and no trigger enforces it.
+- **The two-slot promotional cap is service-enforced only.** No constraint or trigger stops a third `is_promotional = true` row — a hand-written SQL update, a seed, or a future code path that skips `lockPromotionalSlots` can exceed it. The storefront would still show only two (`take: 2`), silently hiding the rest.
+- **The "promotional stays `ACTIVE`" guard doesn't take the slot lock.** `assertNotPromotional` reads `isPromotional` outside `lockPromotionalSlots`, so a deactivate/delete racing an `add-promotional-product` on the same product can both pass — leaving a promoted, non-`ACTIVE` row. Invariant 4 of [Promotional Products](#promotional-products--home-page-slots) keeps it off the storefront and the admin tab still lists it for clearing, but the invariant itself is broken until then.
+- **`ProductVariant.isPromotional` is a dead column.** It shipped alongside `Product.isPromotional`, but no select, DTO, or service touches it. Either wire a variant-level feature to it or drop it before something starts depending on an always-`false` value.
 - **Mixed `@map()` coverage** (see [Conventions](#conventions)) — camelCase and snake_case column names coexist in the same table, which makes hand-written SQL and migrations error-prone.
 
 ---
@@ -757,15 +801,15 @@ The projections in `product.select.ts` each feed exactly one DTO and must be kep
 | :--------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Controller | `getActiveProducts(query)` — binds `ActiveProductsQueryDto`; no other logic.                                                                                                                                                                                    |
 | Service    | `getActiveProducts(query)` — delegates CSV/filter parsing to `parseStorefrontQuery(query)`, calls the repository, wraps each row in `ProductResponsePublicDto`.                                                                                                 |
-| Repository | `findAllProductsActive(paginationParams, { categoryIds, type, sortBy })` — builds the `where` from `activeVisibilityWhere()` plus optional `categoryId: { in }` / `type`, applies `sortBy` (or `createdAt`) as `orderBy`, calls `PaginationService.paginate()`. |
+| Repository | `findAllProductsActive(paginationParams, { categorySlugs, type, sortBy })` — builds the `where` from `activeVisibilityWhere()` plus optional `category: { slug: { in } }` / `type`, applies `sortBy` (or `createdAt`) as `orderBy`, calls `PaginationService.paginate()`. |
 
 **Business logic — in order:**
 
 1. **Query binding.** `ActiveProductsQueryDto` extends the shared `PaginationQueryDto` (`page`, `limit`, `sortOrder`, `search`, `cursor`) with three storefront-only filters:
-   - `categoryIds` — a comma-separated string of positive integers, regex-validated (e.g. `"1,2,3"`).
+   - `categorySlugs` — a comma-separated string of category slugs, regex-validated against `[\w-]` (e.g. `"anti-aging,vitamins"`). Slugs rather than ids because the storefront mirrors this value into its public `/product?category=…` URL; `generateSlug()` never emits a comma, so it is a safe separator.
    - `productType` — `SIMPLE` or `VARIABLE`, validated with `@IsEnum`. (The enum no longer has a `COMBO` value — combo products are a separate model merged into listings at the response/search layer, not filterable through this param.)
    - `sortBy` — whitelisted against `PRODUCT_SORT_FIELDS = ['createdAt', 'basePrice', 'name']` via `@IsIn`. **This whitelist is a hard security boundary, not documentation**: the value is interpolated directly into a Prisma `orderBy` key downstream, so only columns validated here may ever reach it.
-2. **CSV/filter parsing happens in the service** (`parseStorefrontQuery`), **not the repository** — `findAllProductsActive`'s contract expects an already-parsed `StorefrontListFilters` (`categoryIds: number[]`, `type`, `sortBy`), so this is the one place request-shape parsing belongs. `categoryIds` is split on `,`, each piece `Number()`-coerced and trimmed, and any non-integer result filtered out defensively.
+2. **CSV/filter parsing happens in the service** (`parseStorefrontQuery`), **not the repository** — `findAllProductsActive`'s contract expects an already-parsed `StorefrontListFilters` (`categorySlugs: string[]`, `type`, `sortBy`), so this is the one place request-shape parsing belongs. `categorySlugs` is split on `,`, each piece trimmed, and any empty result filtered out defensively.
 3. **Visibility gate** — `activeVisibilityWhere()`: `deletedAt IS NULL` **and** `status = ACTIVE`. Applied unconditionally; the extra filters only narrow it further, never bypass it. The gate is always composed via `AND`, never object-spread-merged with caller conditions — spreading would let a later key silently overwrite `status`/`deletedAt`, while `AND` makes widening structurally impossible.
    > **`publishedAt` is NOT part of this gate.** The column is recorded on create/update, but the storefront shows every `ACTIVE` product regardless of its scheduled launch date. `product-by-slug` shares the exact same two-condition gate. See [Known Gaps](#known-gaps--recommended-hardening).
 4. **Search** — matches `name`, `slug`, `sku`, `nameTh` (same `searchableFields` as the admin list), handled inside `PaginationService.paginate()`.
@@ -777,7 +821,7 @@ The projections in `product.select.ts` each feed exactly one DTO and must be kep
 | Status | Cause                                                                                                                                                        |
 | :----- | :----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `200`  | Always — an empty `data` array (with accurate `meta.totalItems: 0`) is a valid, successful response, not a `404`.                                            |
-| `400`  | Query validation failed (`categoryIds` not a comma-separated integer list, `productType` not an enum value, `sortBy` not whitelisted, `limit` over the max). |
+| `400`  | Query validation failed (`categorySlugs` not a comma-separated slug list, `productType` not an enum value, `sortBy` not whitelisted, `limit` over the max). |
 
 ---
 
@@ -963,7 +1007,7 @@ A product that's `DRAFT`, `ARCHIVED`, `HIDDEN`, `INACTIVE`, or soft-deleted retu
 | `401`  | Missing/invalid JWT.                                                                                                                                                                                                                                                                                           |
 | `403`  | Authenticated but not `ADMIN`.                                                                                                                                                                                                                                                                                 |
 | `404`  | Product doesn't exist; **or** `categoryId` doesn't exist; **or** a `variants[].id` doesn't belong to this product.                                                                                                                                                                                             |
-| `409`  | The new `name` (or its derived slug) collides with a _different_ product; **or** the update would delete a variant still bundled in a combo.                                                                                                                                                                   |
+| `409`  | The new `name` (or its derived slug) collides with a _different_ product; **or** the update would delete a variant still bundled in a combo; **or** the product is promotional and the resolved `status` would leave `ACTIVE` (see [Promotional Products](#promotional-products--home-page-slots)). |
 
 ---
 
@@ -1005,7 +1049,7 @@ The response reports the three things the write actually moved rather than re-se
 **Behaviour**
 
 - Re-sending the status a variant already has is a **no-op** — no write, no audit bump — so a double-clicked toggle can't trip the guards below.
-- `404` — variant not found. `409` — the product is soft-deleted, this is its last `ACTIVE` variant, or a live combo still bundles it (the message names the combos).
+- `404` — variant not found. `409` — the product is soft-deleted, this is its last `ACTIVE` variant, a live combo still bundles it (the message names the combos), or retiring it would deactivate a promotional product.
 - Only non-live combos reach `affectedCombos`; it is empty on reactivation and when the variant is in no combos.
 - `ProductVariant` has no audit columns of its own, so `updatedBy`/`updatedAt` are stamped on the **parent product** — the same place an admin looks after any other change to it.
 
@@ -1024,7 +1068,7 @@ See [Variant Status](#variant-status--per-variant-retirement) for the full rule 
 | Layer      | What happens                                                                                                                                                                                                   |
 | :--------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Controller | `softDeleteProduct(id, req)` — `ParseIntPipe` on `:id`; reads the acting admin's id off `req.user.id` (guaranteed past `JwtAuthGuard`, but still re-checked and thrown as `UnauthorizedException` if missing). |
-| Service    | `softDeleteProduct(id, deletedBy)` — existence check via `findByIdAdmin`, idempotency check (`ConflictException` if `deletedAt` is already set), then delegates.                                               |
+| Service    | `softDeleteProduct(id, deletedBy)` — existence check via `findByIdAdmin`, idempotency check (`ConflictException` if `deletedAt` is already set), promotional check (`assertNotPromotional`), then delegates.                                               |
 | Repository | `softDeleteProduct(id, deletedBy)` — a transaction: updates the `Product` row **and** `productImage.updateMany({ where: { productId: id } }, { isActive: false })`.                                            |
 
 **Business logic — what "soft delete" actually touches:**
@@ -1042,7 +1086,7 @@ See [Variant Status](#variant-status--per-variant-retirement) for the full rule 
 | `401`  | Missing/invalid JWT.                      |
 | `403`  | Authenticated but not `ADMIN`.            |
 | `404`  | Product doesn't exist.                    |
-| `409`  | Product's `deletedAt` is already set.     |
+| `409`  | Product's `deletedAt` is already set; **or** the product holds a promotional slot — replace/remove it first. |
 
 ---
 
@@ -1062,7 +1106,7 @@ See [Variant Status](#variant-status--per-variant-retirement) for the full rule 
 
 **Business logic — the three-step sequence, in order:**
 
-1. **`findImagePathsForDeletion(id)`** — a lean `findUnique` selecting only `{ id, images: { url, thumbnailUrl, bannerUrl, iconUrl } }`. This both confirms the product exists (`null` → `404`) and captures every stored file path _before_ anything is deleted, since the rows won't exist to query afterward.
+1. **`findImagePathsForDeletion(id)`** — a lean `findUnique` selecting only `{ id, name, isPromotional, images: { url, thumbnailUrl, bannerUrl, iconUrl } }`. This confirms the product exists (`null` → `404`), rejects a promotional product with `409` (`assertNotPromotional`) before anything is touched, and captures every stored file path _before_ anything is deleted, since the rows won't exist to query afterward.
 2. **`hardDeleteProduct(id)`** — `product.delete()`. The schema's `onDelete: Cascade` on `ProductImage.product` and `ProductVariant.product` means Postgres removes every associated `product_images` and `product_variants` row automatically; the application issues no separate deletes. `Inventory` and `Batch` rows cascade away too — **this destroys stock-movement and expiry history**.
 3. **File cleanup** — for every collected path (`url`, `thumbnailUrl`, `bannerUrl`, `iconUrl` across all images), `parseStoragePath()` splits it back into `{ filename, folder }` and `StorageService.deleteFile()` removes it from disk. Best-effort: a failed unlink is caught and logged (`logger.warn`), never thrown — the DB delete has already committed, so failing the HTTP request over a stray file would be misleading. All deletions run concurrently via `Promise.all`.
 
@@ -1076,6 +1120,7 @@ See [Variant Status](#variant-status--per-variant-retirement) for the full rule 
 | `401`  | Missing/invalid JWT.                                                                                      |
 | `403`  | Authenticated but not `ADMIN`.                                                                            |
 | `404`  | Product doesn't exist.                                                                                    |
+| `409`  | The product holds a promotional slot — replace/remove it first.                                           |
 
 ---
 
@@ -1088,7 +1133,7 @@ These exist in `ProductRepository`/`ProductService` (or have a DTO already) but 
 | Admin lookup by slug                             | `findBySlugAdmin`                                                                 | Used internally only, for the create/update slug-conflict check — there's no "get by slug as admin" route.                                                                                                                                                                                                                  |
 | Minified lookups (cart/order/wishlist embedding) | `findByIdMinified`, `findByIdPublic`                                              | Feed `ProductMinifiedResponseDto`; intended for other modules to consume, not for a product route.                                                                                                                                                                                                                          |
 | Standalone image management                      | `findImagesByIds`                                                                 | `createImages`, `deleteImages`, and `reorderImages` are all used internally by create/update now.                                                                                                                                                                                                                           |
-| Home-section listings                            | `ProductService.getFeaturedProducts`, `getNonFeaturedProducts`, `getBestProducts` | Not dead code — reachable indirectly via `GET /home/featured-home-contents` (`HomeService`), just never through a `ProductController` route. `getBestProducts` is built but unused even by `HomeService`: there's no sales/order-volume ranking yet, so it's the same active-product pool as everything else, newest first. |
+| Home-section listings                            | `ProductService.getFeaturedProducts`, `getNonFeaturedProducts`, `getActivePromotionalProducts`, `getBestProducts` | Not dead code — reachable indirectly via `GET /home/featured-home-contents` (`HomeService`), just never through a `ProductController` route. The promotional-slot admin methods (`getPromotionalProducts`, `getPromotionalProductOptions`, `add`/`replace`/`removePromotionalProduct`) are likewise served only by `/home/*` routes — see [Promotional Products](#promotional-products--home-page-slots). `getBestProducts` feeds `bestProducts` there — active products flagged `isBest`, newest first, max 4; an empty array when none are flagged. |
 
 > `findByIdAdmin` and `findProductDropdownOptions` are **not** in this list — they now power [`GET /product-by-id/:id`](#get-product-by-id-admin) and [`GET /product-inventory`](#get-product-dropdown-options-admin) respectively.
 

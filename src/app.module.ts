@@ -32,6 +32,7 @@ import { DeliveryModule } from './modules/delivery/delivery.module';
 import { DeliveryChargeModule } from './modules/delivery-charge/delivery-charge.module';
 import { AuditLogModule } from './modules/audit-log/audit-log.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { HealthModule } from './health/health.module';
 import { validate } from './config/env.validation';
 import appConfig from './config/app.config';
@@ -116,6 +117,10 @@ import {
     //* THE SERVICE OF THE MODULE THAT OWNS IT. REGISTERED LAST BECAUSE IT
     //* DEPENDS ON EIGHT OF THE MODULES ABOVE AND ON NOTHING BELOW.
     DashboardModule,
+
+    //* GA4 DATA API READER FOR THE ADMIN ANALYTICS PAGE — DEPENDS ON NO
+    //* OTHER DOMAIN MODULE
+    AnalyticsModule,
   ],
   controllers: [AppController],
   providers: [

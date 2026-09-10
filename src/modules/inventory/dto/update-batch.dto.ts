@@ -21,6 +21,19 @@ export class UpdateBatchDto {
   batchNo?: string;
 
   @ApiPropertyOptional({
+    description:
+      "Batch/lot number printed on the goods by the manufacturer. Separate from the system-generated batchNo — this is the supplier's own number, used for recall and traceability.",
+    example: 'LOT-2026-0142',
+    maxLength: 100,
+  })
+  @IsOptional()
+  @IsString({ message: 'Manufacturer batch number must be a valid text string' })
+  @MaxLength(100, {
+    message: 'Manufacturer batch number cannot exceed 100 characters',
+  })
+  manufacturerBatchNo?: string;
+
+  @ApiPropertyOptional({
     description: 'Quantity remaining from this batch.',
     example: 120,
     minimum: 0,

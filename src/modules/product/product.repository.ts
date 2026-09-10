@@ -14,11 +14,16 @@ import {
 } from './product.select';
 import type { ProductSortField } from './dto/active-products-query.dto';
 
+//* ARBITRARY BUT FIXED pg_advisory_xact_lock KEY GUARDING THE PROMOTIONAL
+//* SLOTS (SEE lockPromotionalSlots). ANY OTHER ADVISORY LOCK IN THIS DB MUST
+//* PICK A DIFFERENT KEY.
+const PROMOTIONAL_SLOTS_LOCK_KEY = 7_140_001;
+
 //* ALREADY-PARSED STOREFRONT LIST FILTERS — CSV/QUERY-STRING PARSING IS THE
 //* SERVICE'S JOB; sortBy IS SAFE TO INTERPOLATE INTO orderBy BECAUSE THE
 //* QUERY DTO WHITELISTS ITS VALUES.
 export interface StorefrontListFilters {
-  categoryIds?: number[];
+  categorySlugs?: string[];
   type?: ProductType;
   sortBy?: ProductSortField;
 }
@@ -145,8 +150,10 @@ export class ProductRepository extends BaseRepository {
     const where: Prisma.ProductWhereInput = {
       AND: [
         baseWhere,
-        ...(filters.categoryIds?.length
-          ? [{ categoryId: { in: filters.categoryIds } }]
+        //* RELATION FILTER ON THE UNIQUE (BTREE-INDEXED) Category.slug —
+        //* RESOLVES TO THE SAME categoryId MATCH WITHOUT A SEPARATE LOOKUP.
+        ...(filters.categorySlugs?.length
+          ? [{ category: { slug: { in: filters.categorySlugs } } }]
           : []),
         ...(filters.type ? [{ type: filters.type }] : []),
       ],
@@ -165,7 +172,7 @@ export class ProductRepository extends BaseRepository {
 
   /**
    * Storefront listing — every ACTIVE, non-deleted product, optionally
-   * narrowed by category IDs / type and sorted by a whitelisted column.
+   * narrowed by category slugs / type and sorted by a whitelisted column.
    */
   async findAllProductsActive(
     params: PaginationQueryDto,
@@ -212,14 +219,95 @@ export class ProductRepository extends BaseRepository {
   }
 
   /**
-   * "Best" products — no sales/order-volume ranking exists yet in this
-   * schema, so this is the same active-product pool as everything else,
-   * newest first. Swap the `orderBy` here for a real popularity metric
-   * (e.g. order-line aggregation) once that data is available; callers
-   * don't need to change.
+   * Active products flagged `isBest`, newest first. `isBest` is
+   * admin-curated from the product form (same toggle as `isFeatured`) — not
+   * a sales ranking, since no order-volume metric exists in this schema.
    */
   async findBestProducts(limit: number, tx?: Prisma.TransactionClient) {
-    return await this.findActiveProductsList({}, limit, tx);
+    return await this.findActiveProductsList({ isBest: true }, limit, tx);
+  }
+
+  // ─── Promotional Products ────────────────────────────────────────────────────
+
+  /**
+   * Storefront promotional slots — ACTIVE products flagged `isPromotional`.
+   * The visibility gate still applies: a promotional product can't normally
+   * leave ACTIVE (see ProductService.assertNotPromotional), but if one ever
+   * did it drops off the home page instead of being shown unbuyable.
+   */
+  async findActivePromotionalProducts(
+    limit: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    return await this.findActiveProductsList(
+      { isPromotional: true },
+      limit,
+      tx,
+    );
+  }
+
+  /**
+   * Admin view of the promotional slots — every non-deleted product flagged
+   * `isPromotional`, whatever its status, so an admin can always see (and
+   * clear) a slot, even one the storefront has stopped showing.
+   */
+  async findPromotionalProductsAdmin(tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.product.findMany({
+      where: { isPromotional: true, deletedAt: null },
+      select: PRODUCT_SELECT_ADMIN,
+      orderBy: { id: 'asc' },
+    });
+  }
+
+  /**
+   * Products an admin can put into a promotional slot right now: ACTIVE,
+   * not soft-deleted, and not already promotional. Lean on purpose — this
+   * only feeds a select field.
+   */
+  async findPromotionalProductOptions(tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.product.findMany({
+      where: {
+        AND: [this.activeVisibilityWhere(), { isPromotional: false }],
+      },
+      select: {
+        id: true,
+        name: true,
+        nameTh: true,
+        sku: true,
+        type: true,
+        stockStatus: true,
+        basePrice: true,
+        salePrice: true,
+        //* SAME PRIMARY-THEN-FIRST PICK AS findProductDropdownOptions.
+        images: {
+          where: { variantId: null },
+          select: { url: true },
+          orderBy: [{ isPrimary: 'desc' }, { displayOrder: 'asc' }],
+          take: 1,
+        },
+      },
+      orderBy: { name: 'asc' },
+    });
+  }
+
+  async countPromotionalProducts(tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.product.count({
+      where: { isPromotional: true, deletedAt: null },
+    });
+  }
+
+  /**
+   * Serializes every write that changes which products hold a promotional
+   * slot. Two admins adding a product at the same moment would otherwise
+   * both read "1 slot taken", both write, and leave three promoted. The
+   * lock is transaction-scoped, so it is released on commit/rollback — MUST
+   * be called with the `tx` of the transaction doing the write.
+   */
+  async lockPromotionalSlots(tx: Prisma.TransactionClient) {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(${PROMOTIONAL_SLOTS_LOCK_KEY}::bigint)`;
   }
 
   /**
@@ -570,6 +658,8 @@ export class ProductRepository extends BaseRepository {
       where: { id },
       select: {
         id: true,
+        name: true,
+        isPromotional: true,
         images: {
           select: {
             url: true,
@@ -738,6 +828,9 @@ export class ProductRepository extends BaseRepository {
             //* LAUNCH STAMP — SEE ProductService.updateVariantStatus.
             publishedAt: true,
             deletedAt: true,
+            //* A PROMOTIONAL PRODUCT MUST STAY ACTIVE — RETIRING ITS LAST
+            //* ACTIVE VARIANT WOULD DEACTIVATE IT (SEE assertNotPromotional).
+            isPromotional: true,
             variants: {
               select: {
                 id: true,

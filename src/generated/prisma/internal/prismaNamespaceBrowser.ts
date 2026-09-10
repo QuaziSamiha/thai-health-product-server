@@ -521,6 +521,7 @@ export const BatchScalarFieldEnum = {
   id: 'id',
   sid: 'sid',
   batchNo: 'batchNo',
+  manufacturerBatchNo: 'manufacturerBatchNo',
   quantity: 'quantity',
   remaining: 'remaining',
   costPrice: 'costPrice',
@@ -680,6 +681,8 @@ export const ProductScalarFieldEnum = {
   type: 'type',
   status: 'status',
   isFeatured: 'isFeatured',
+  isBest: 'isBest',
+  isPromotional: 'isPromotional',
   hasVariants: 'hasVariants',
   costPrice: 'costPrice',
   discountType: 'discountType',
@@ -743,6 +746,7 @@ export const ProductVariantScalarFieldEnum = {
   salePrice: 'salePrice',
   attributes: 'attributes',
   isDefault: 'isDefault',
+  isPromotional: 'isPromotional',
   variantStatus: 'variantStatus',
   productId: 'productId'
 } as const

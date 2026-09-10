@@ -33,10 +33,12 @@ model Product {
   shortDescTh   String? @map("short_desc_th") @db.VarChar(500)
 
   //* CONFIGURATIONS
-  type        ProductType           @default(SIMPLE)
-  status      CategoryProductStatus @default(ACTIVE)
-  isFeatured  Boolean               @default(false) @map("is_featured")
-  hasVariants Boolean               @default(false) @map("has_variants") //* DERIVED FIELD TO READ FASTER (variants.length)
+  type          ProductType           @default(SIMPLE)
+  status        CategoryProductStatus @default(ACTIVE)
+  isFeatured    Boolean               @default(false) @map("is_featured")
+  isBest        Boolean               @default(false) @map("is_best") //* ADMIN-CURATED "BEST PRODUCT" FLAG, TOGGLED FROM THE PRODUCT FORM EXACTLY LIKE isFeatured. NOT A SALES RANKING — NOTHING COMPUTES IT; ProductRepository.findBestProducts READS IT.
+  isPromotional Boolean               @default(false) @map("is_promotional") //* MARKETING FLAG — OFF UNTIL AN ADMIN TURNS IT ON. INDEPENDENT OF isFeatured AND OF THE PRICING BLOCK: IT DOES NOT SET, IMPLY OR REQUIRE A DISCOUNT, IT ONLY MARKS THE PRODUCT FOR PROMOTIONAL PLACEMENT. FOR A VARIABLE PRODUCT THE VARIANTS CARRY THEIR OWN FLAG (SEE ProductVariant.isPromotional) — THIS ONE IS NOT DERIVED FROM THEM.
+  hasVariants   Boolean               @default(false) @map("has_variants") //* DERIVED FIELD TO READ FASTER (variants.length)
 
   //* PRICING (USE DECIMAL FOR FINANCIAL ACCURACY)
   costPrice     Decimal?     @map("cost_price") @db.Decimal(12, 2) //* FOR PROFIT CALCULATION
@@ -110,6 +112,7 @@ model Product {
   @@index([status, type, publishedAt]) //* Fast filtering for shop listing
   @@index([categoryId, status]) //* Optimized category browsing
   @@index([status, isFeatured]) //* Homepage performance
+  @@index([status, isBest]) //* "Best products" section — same shape as the isFeatured index
   @@index([createdAt]) //* Sorting by "Newest"
   @@index([tags], type: Gin, map: "products_tags_gin_idx") //* Fast tags @> ARRAY[...] filtering
   @@map("products")
@@ -144,8 +147,9 @@ model ProductVariant {
   basePrice     Decimal      @default(0) @map("base_price") @db.Decimal(12, 2)
   salePrice     Decimal      @default(0) @map("sale_price") @db.Decimal(12, 2) //* SERVER-DERIVED FROM basePrice + discountType/discountValue — NEVER CLIENT INPUT
 
-  attributes Json    @default("{}") // The JSON structure for attributes (e.g., {"color": "Red", "size": "XL"})  //* E.G. { "size": "500ml", "flavor": "Honey" }
-  isDefault  Boolean @default(false) @map("is_default")
+  attributes    Json    @default("{}") // The JSON structure for attributes (e.g., {"color": "Red", "size": "XL"})  //* E.G. { "size": "500ml", "flavor": "Honey" }
+  isDefault     Boolean @default(false) @map("is_default")
+  isPromotional Boolean @default(false) @map("is_promotional") //* SAME MEANING AS Product.isPromotional, SCOPED TO THIS ONE VARIANT. NEITHER FLAG IMPLIES THE OTHER: A PROMOTED PRODUCT DOES NOT PROMOTE ITS VARIANTS, AND A PROMOTED VARIANT DOES NOT PROMOTE ITS PARENT.
 
   //* CONFIGURATION
   //* PER-VARIANT VISIBILITY GATE — SAME ENUM AS Product.status BUT SCOPED TO

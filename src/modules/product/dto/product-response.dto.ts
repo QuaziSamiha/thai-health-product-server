@@ -155,6 +155,22 @@ export class ProductResponseDto {
   @Expose()
   @ApiProperty({
     description:
+      'Whether this product is listed in the "best products" section (admin-curated)',
+    example: false,
+  })
+  isBest!: boolean;
+
+  @Expose()
+  @ApiProperty({
+    description:
+      'Whether this product fills one of the (at most two) promotional product slots on the home page',
+    example: false,
+  })
+  isPromotional!: boolean;
+
+  @Expose()
+  @ApiProperty({
+    description:
       'Denormalized cache of `variants.length > 0` — lets the UI branch between "Add to Cart" and "Select Options" without an extra query',
     example: false,
   })
@@ -457,6 +473,8 @@ export class ProductResponseDto {
     this.type = product.type!;
     this.status = product.status!;
     this.isFeatured = product.isFeatured!;
+    this.isBest = product.isBest ?? false;
+    this.isPromotional = product.isPromotional ?? false;
     this.hasVariants = product.hasVariants!;
     this.basePrice = Number(product.basePrice);
     this.discountType = product.discountType!;
@@ -604,6 +622,22 @@ export class ProductResponsePublicDto {
     example: false,
   })
   isFeatured!: boolean;
+
+  @Expose()
+  @ApiProperty({
+    description:
+      'Whether this product is listed in the "best products" section (admin-curated)',
+    example: false,
+  })
+  isBest!: boolean;
+
+  @Expose()
+  @ApiProperty({
+    description:
+      'Whether this product fills one of the (at most two) promotional product slots on the home page',
+    example: false,
+  })
+  isPromotional!: boolean;
 
   @Expose()
   @ApiProperty({
@@ -794,6 +828,8 @@ export class ProductResponsePublicDto {
     this.shortDescTh = product.shortDescTh ?? undefined;
     this.type = product.type!;
     this.isFeatured = product.isFeatured!;
+    this.isBest = product.isBest ?? false;
+    this.isPromotional = product.isPromotional ?? false;
     this.hasVariants = product.hasVariants!;
     this.basePrice = Number(product.basePrice);
     this.salePrice = toPrice(product.salePrice);

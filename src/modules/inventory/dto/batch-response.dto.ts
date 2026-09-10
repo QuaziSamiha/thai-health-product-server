@@ -22,6 +22,14 @@ export class BatchResponseDto {
   batchNo!: string;
 
   @Expose()
+  @ApiPropertyOptional({
+    description:
+      "Batch/lot number printed on the goods by the manufacturer — the supplier's own number, as opposed to the system-generated batchNo above",
+    example: 'LOT-2026-0142',
+  })
+  manufacturerBatchNo?: string | null;
+
+  @Expose()
   @ApiProperty({
     description: 'Quantity added when this batch was received',
     example: 500,
@@ -70,6 +78,7 @@ export class BatchResponseDto {
     this.id = batch.id!;
     this.sid = batch.sid!;
     this.batchNo = batch.batchNo!;
+    this.manufacturerBatchNo = batch.manufacturerBatchNo ?? undefined;
     this.quantity = batch.quantity!;
     this.remaining = batch.remaining!;
     this.costPrice = batch.costPrice;

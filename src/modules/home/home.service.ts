@@ -23,6 +23,8 @@ import { Prisma } from '../../generated/prisma/client';
 import { CategoryService } from '../category/category.service';
 import { ProductService } from '../product/product.service';
 import { ComboProductService } from '../combo-product/combo-product.service';
+import { ProductResponseDto } from '../product/dto/product-response.dto';
+import { PromotionalProductOptionDto } from '../product/dto/promotional-product.dto';
 
 const HOME_IMAGE_FOLDER = 'home/images';
 
@@ -153,11 +155,13 @@ export class HomeService {
 
   /**
    * Everything the public storefront homepage needs in one call: the two
-   * "above the fold" slots, the root category list, the combo section, and
-   * two product sections. Fetched via CategoryService/ComboProductService/
-   * ProductService, never queried directly here — this method only
+   * "above the fold" slots, the root category list, the promotional product
+   * cards, the combo section, and three product sections (featured, best,
+ * general). Fetched via
+   * CategoryService/ComboProductService/ProductService, never queried
+   * directly here — this method only
    * composes what those modules already expose, in parallel since none of
-   * the six lookups depend on another.
+   * the eight lookups depend on another.
    */
   async getFeaturedHomeContents(): Promise<FeaturedHomeContentsResponseDto> {
     const baseUrl = this.configService.get<string>('app.baseUrl');
@@ -167,14 +171,19 @@ export class HomeService {
       categories,
       comboProducts,
       featuredProducts,
+      bestProducts,
       products,
+      promotionalProducts,
     ] = await Promise.all([
       this.homeRepository.findFeaturedByType(HomeContentType.HERO_SLIDER),
       this.homeRepository.findFeaturedByType(HomeContentType.PROMOTION_BANNER),
       this.categoryService.getActiveRootCategoriesForHome(),
       this.comboProductService.getActiveCombosForHome(),
       this.productService.getFeaturedProducts(),
+      //* ONLY ACTIVE PRODUCTS AN ADMIN FLAGGED isBest — SEE findBestProducts.
+      this.productService.getBestProducts(),
       this.productService.getNonFeaturedProducts(),
+      this.productService.getActivePromotionalProducts(),
     ]);
 
     return new FeaturedHomeContentsResponseDto(
@@ -185,8 +194,51 @@ export class HomeService {
       categories,
       comboProducts,
       featuredProducts,
+      bestProducts,
       products,
+      promotionalProducts,
     );
+  }
+
+  //* ═══════════════════════════════════════════════════════════════════════
+  //* PROMOTIONAL PRODUCTS — THE "Promotional Product" TAB OF THE HOME ADMIN.
+  //* isPromotional IS A PRODUCT COLUMN, SO EVERY RULE (MAX TWO SLOTS, ONLY
+  //* ACTIVE PRODUCTS, NO DEACTIVATING A PROMOTED ONE) LIVES IN ProductService;
+  //* THIS MODULE ONLY EXPOSES IT UNDER /home ALONGSIDE THE OTHER TABS.
+  //* ═══════════════════════════════════════════════════════════════════════
+
+  async getPromotionalProducts(): Promise<ProductResponseDto[]> {
+    return this.productService.getPromotionalProducts();
+  }
+
+  async getPromotionalProductOptions(): Promise<PromotionalProductOptionDto[]> {
+    return this.productService.getPromotionalProductOptions();
+  }
+
+  async addPromotionalProduct(
+    productId: number,
+    userId: number,
+  ): Promise<ProductResponseDto> {
+    return this.productService.addPromotionalProduct(productId, userId);
+  }
+
+  async replacePromotionalProduct(
+    currentId: number,
+    productId: number,
+    userId: number,
+  ): Promise<ProductResponseDto> {
+    return this.productService.replacePromotionalProduct(
+      currentId,
+      productId,
+      userId,
+    );
+  }
+
+  async removePromotionalProduct(
+    productId: number,
+    userId: number,
+  ): Promise<ProductResponseDto> {
+    return this.productService.removePromotionalProduct(productId, userId);
   }
 
   async updateHome(

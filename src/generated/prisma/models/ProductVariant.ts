@@ -72,6 +72,7 @@ export type ProductVariantMinAggregateOutputType = {
   basePrice: runtime.Decimal | null
   salePrice: runtime.Decimal | null
   isDefault: boolean | null
+  isPromotional: boolean | null
   variantStatus: $Enums.CategoryProductStatus | null
   productId: number | null
 }
@@ -98,6 +99,7 @@ export type ProductVariantMaxAggregateOutputType = {
   basePrice: runtime.Decimal | null
   salePrice: runtime.Decimal | null
   isDefault: boolean | null
+  isPromotional: boolean | null
   variantStatus: $Enums.CategoryProductStatus | null
   productId: number | null
 }
@@ -125,6 +127,7 @@ export type ProductVariantCountAggregateOutputType = {
   salePrice: number
   attributes: number
   isDefault: number
+  isPromotional: number
   variantStatus: number
   productId: number
   _all: number
@@ -177,6 +180,7 @@ export type ProductVariantMinAggregateInputType = {
   basePrice?: true
   salePrice?: true
   isDefault?: true
+  isPromotional?: true
   variantStatus?: true
   productId?: true
 }
@@ -203,6 +207,7 @@ export type ProductVariantMaxAggregateInputType = {
   basePrice?: true
   salePrice?: true
   isDefault?: true
+  isPromotional?: true
   variantStatus?: true
   productId?: true
 }
@@ -230,6 +235,7 @@ export type ProductVariantCountAggregateInputType = {
   salePrice?: true
   attributes?: true
   isDefault?: true
+  isPromotional?: true
   variantStatus?: true
   productId?: true
   _all?: true
@@ -344,6 +350,7 @@ export type ProductVariantGroupByOutputType = {
   salePrice: runtime.Decimal
   attributes: runtime.JsonValue
   isDefault: boolean
+  isPromotional: boolean
   variantStatus: $Enums.CategoryProductStatus
   productId: number
   _count: ProductVariantCountAggregateOutputType | null
@@ -394,6 +401,7 @@ export type ProductVariantWhereInput = {
   salePrice?: Prisma.DecimalFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonFilter<"ProductVariant">
   isDefault?: Prisma.BoolFilter<"ProductVariant"> | boolean
+  isPromotional?: Prisma.BoolFilter<"ProductVariant"> | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFilter<"ProductVariant"> | $Enums.CategoryProductStatus
   productId?: Prisma.IntFilter<"ProductVariant"> | number
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
@@ -428,6 +436,7 @@ export type ProductVariantOrderByWithRelationInput = {
   salePrice?: Prisma.SortOrder
   attributes?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
+  isPromotional?: Prisma.SortOrder
   variantStatus?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   product?: Prisma.ProductOrderByWithRelationInput
@@ -465,6 +474,7 @@ export type ProductVariantWhereUniqueInput = Prisma.AtLeast<{
   salePrice?: Prisma.DecimalFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonFilter<"ProductVariant">
   isDefault?: Prisma.BoolFilter<"ProductVariant"> | boolean
+  isPromotional?: Prisma.BoolFilter<"ProductVariant"> | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFilter<"ProductVariant"> | $Enums.CategoryProductStatus
   productId?: Prisma.IntFilter<"ProductVariant"> | number
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
@@ -499,6 +509,7 @@ export type ProductVariantOrderByWithAggregationInput = {
   salePrice?: Prisma.SortOrder
   attributes?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
+  isPromotional?: Prisma.SortOrder
   variantStatus?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   _count?: Prisma.ProductVariantCountOrderByAggregateInput
@@ -534,6 +545,7 @@ export type ProductVariantScalarWhereWithAggregatesInput = {
   salePrice?: Prisma.DecimalWithAggregatesFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonWithAggregatesFilter<"ProductVariant">
   isDefault?: Prisma.BoolWithAggregatesFilter<"ProductVariant"> | boolean
+  isPromotional?: Prisma.BoolWithAggregatesFilter<"ProductVariant"> | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusWithAggregatesFilter<"ProductVariant"> | $Enums.CategoryProductStatus
   productId?: Prisma.IntWithAggregatesFilter<"ProductVariant"> | number
 }
@@ -560,6 +572,7 @@ export type ProductVariantCreateInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: $Enums.CategoryProductStatus
   product: Prisma.ProductCreateNestedOneWithoutVariantsInput
   images?: Prisma.ProductImageCreateNestedManyWithoutVariantInput
@@ -593,6 +606,7 @@ export type ProductVariantUncheckedCreateInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: $Enums.CategoryProductStatus
   productId: number
   images?: Prisma.ProductImageUncheckedCreateNestedManyWithoutVariantInput
@@ -625,6 +639,7 @@ export type ProductVariantUpdateInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   product?: Prisma.ProductUpdateOneRequiredWithoutVariantsNestedInput
   images?: Prisma.ProductImageUpdateManyWithoutVariantNestedInput
@@ -658,6 +673,7 @@ export type ProductVariantUncheckedUpdateInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ProductImageUncheckedUpdateManyWithoutVariantNestedInput
@@ -691,6 +707,7 @@ export type ProductVariantCreateManyInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: $Enums.CategoryProductStatus
   productId: number
 }
@@ -717,6 +734,7 @@ export type ProductVariantUpdateManyMutationInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
 }
 
@@ -743,6 +761,7 @@ export type ProductVariantUncheckedUpdateManyInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   productId?: Prisma.IntFieldUpdateOperationsInput | number
 }
@@ -785,6 +804,7 @@ export type ProductVariantCountOrderByAggregateInput = {
   salePrice?: Prisma.SortOrder
   attributes?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
+  isPromotional?: Prisma.SortOrder
   variantStatus?: Prisma.SortOrder
   productId?: Prisma.SortOrder
 }
@@ -823,6 +843,7 @@ export type ProductVariantMaxOrderByAggregateInput = {
   basePrice?: Prisma.SortOrder
   salePrice?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
+  isPromotional?: Prisma.SortOrder
   variantStatus?: Prisma.SortOrder
   productId?: Prisma.SortOrder
 }
@@ -849,6 +870,7 @@ export type ProductVariantMinOrderByAggregateInput = {
   basePrice?: Prisma.SortOrder
   salePrice?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
+  isPromotional?: Prisma.SortOrder
   variantStatus?: Prisma.SortOrder
   productId?: Prisma.SortOrder
 }
@@ -1025,6 +1047,7 @@ export type ProductVariantCreateWithoutCartItemsInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: $Enums.CategoryProductStatus
   product: Prisma.ProductCreateNestedOneWithoutVariantsInput
   images?: Prisma.ProductImageCreateNestedManyWithoutVariantInput
@@ -1057,6 +1080,7 @@ export type ProductVariantUncheckedCreateWithoutCartItemsInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: $Enums.CategoryProductStatus
   productId: number
   images?: Prisma.ProductImageUncheckedCreateNestedManyWithoutVariantInput
@@ -1104,6 +1128,7 @@ export type ProductVariantUpdateWithoutCartItemsInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   product?: Prisma.ProductUpdateOneRequiredWithoutVariantsNestedInput
   images?: Prisma.ProductImageUpdateManyWithoutVariantNestedInput
@@ -1136,6 +1161,7 @@ export type ProductVariantUncheckedUpdateWithoutCartItemsInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ProductImageUncheckedUpdateManyWithoutVariantNestedInput
@@ -1167,6 +1193,7 @@ export type ProductVariantCreateWithoutComboItemsInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: $Enums.CategoryProductStatus
   product: Prisma.ProductCreateNestedOneWithoutVariantsInput
   images?: Prisma.ProductImageCreateNestedManyWithoutVariantInput
@@ -1199,6 +1226,7 @@ export type ProductVariantUncheckedCreateWithoutComboItemsInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: $Enums.CategoryProductStatus
   productId: number
   images?: Prisma.ProductImageUncheckedCreateNestedManyWithoutVariantInput
@@ -1246,6 +1274,7 @@ export type ProductVariantUpdateWithoutComboItemsInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   product?: Prisma.ProductUpdateOneRequiredWithoutVariantsNestedInput
   images?: Prisma.ProductImageUpdateManyWithoutVariantNestedInput
@@ -1278,6 +1307,7 @@ export type ProductVariantUncheckedUpdateWithoutComboItemsInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ProductImageUncheckedUpdateManyWithoutVariantNestedInput
@@ -1309,6 +1339,7 @@ export type ProductVariantCreateWithoutBatchesInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: $Enums.CategoryProductStatus
   product: Prisma.ProductCreateNestedOneWithoutVariantsInput
   images?: Prisma.ProductImageCreateNestedManyWithoutVariantInput
@@ -1341,6 +1372,7 @@ export type ProductVariantUncheckedCreateWithoutBatchesInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: $Enums.CategoryProductStatus
   productId: number
   images?: Prisma.ProductImageUncheckedCreateNestedManyWithoutVariantInput
@@ -1388,6 +1420,7 @@ export type ProductVariantUpdateWithoutBatchesInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   product?: Prisma.ProductUpdateOneRequiredWithoutVariantsNestedInput
   images?: Prisma.ProductImageUpdateManyWithoutVariantNestedInput
@@ -1420,6 +1453,7 @@ export type ProductVariantUncheckedUpdateWithoutBatchesInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ProductImageUncheckedUpdateManyWithoutVariantNestedInput
@@ -1451,6 +1485,7 @@ export type ProductVariantCreateWithoutInventoryLogsInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: $Enums.CategoryProductStatus
   product: Prisma.ProductCreateNestedOneWithoutVariantsInput
   images?: Prisma.ProductImageCreateNestedManyWithoutVariantInput
@@ -1483,6 +1518,7 @@ export type ProductVariantUncheckedCreateWithoutInventoryLogsInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: $Enums.CategoryProductStatus
   productId: number
   images?: Prisma.ProductImageUncheckedCreateNestedManyWithoutVariantInput
@@ -1530,6 +1566,7 @@ export type ProductVariantUpdateWithoutInventoryLogsInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   product?: Prisma.ProductUpdateOneRequiredWithoutVariantsNestedInput
   images?: Prisma.ProductImageUpdateManyWithoutVariantNestedInput
@@ -1562,6 +1599,7 @@ export type ProductVariantUncheckedUpdateWithoutInventoryLogsInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ProductImageUncheckedUpdateManyWithoutVariantNestedInput
@@ -1593,6 +1631,7 @@ export type ProductVariantCreateWithoutOrderItemsInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: $Enums.CategoryProductStatus
   product: Prisma.ProductCreateNestedOneWithoutVariantsInput
   images?: Prisma.ProductImageCreateNestedManyWithoutVariantInput
@@ -1625,6 +1664,7 @@ export type ProductVariantUncheckedCreateWithoutOrderItemsInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: $Enums.CategoryProductStatus
   productId: number
   images?: Prisma.ProductImageUncheckedCreateNestedManyWithoutVariantInput
@@ -1672,6 +1712,7 @@ export type ProductVariantUpdateWithoutOrderItemsInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   product?: Prisma.ProductUpdateOneRequiredWithoutVariantsNestedInput
   images?: Prisma.ProductImageUpdateManyWithoutVariantNestedInput
@@ -1704,6 +1745,7 @@ export type ProductVariantUncheckedUpdateWithoutOrderItemsInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ProductImageUncheckedUpdateManyWithoutVariantNestedInput
@@ -1735,6 +1777,7 @@ export type ProductVariantCreateWithoutProductInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: $Enums.CategoryProductStatus
   images?: Prisma.ProductImageCreateNestedManyWithoutVariantInput
   inventoryLogs?: Prisma.InventoryCreateNestedManyWithoutVariantInput
@@ -1767,6 +1810,7 @@ export type ProductVariantUncheckedCreateWithoutProductInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: $Enums.CategoryProductStatus
   images?: Prisma.ProductImageUncheckedCreateNestedManyWithoutVariantInput
   inventoryLogs?: Prisma.InventoryUncheckedCreateNestedManyWithoutVariantInput
@@ -1828,6 +1872,7 @@ export type ProductVariantScalarWhereInput = {
   salePrice?: Prisma.DecimalFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonFilter<"ProductVariant">
   isDefault?: Prisma.BoolFilter<"ProductVariant"> | boolean
+  isPromotional?: Prisma.BoolFilter<"ProductVariant"> | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFilter<"ProductVariant"> | $Enums.CategoryProductStatus
   productId?: Prisma.IntFilter<"ProductVariant"> | number
 }
@@ -1854,6 +1899,7 @@ export type ProductVariantCreateWithoutImagesInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: $Enums.CategoryProductStatus
   product: Prisma.ProductCreateNestedOneWithoutVariantsInput
   inventoryLogs?: Prisma.InventoryCreateNestedManyWithoutVariantInput
@@ -1886,6 +1932,7 @@ export type ProductVariantUncheckedCreateWithoutImagesInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: $Enums.CategoryProductStatus
   productId: number
   inventoryLogs?: Prisma.InventoryUncheckedCreateNestedManyWithoutVariantInput
@@ -1933,6 +1980,7 @@ export type ProductVariantUpdateWithoutImagesInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   product?: Prisma.ProductUpdateOneRequiredWithoutVariantsNestedInput
   inventoryLogs?: Prisma.InventoryUpdateManyWithoutVariantNestedInput
@@ -1965,6 +2013,7 @@ export type ProductVariantUncheckedUpdateWithoutImagesInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   inventoryLogs?: Prisma.InventoryUncheckedUpdateManyWithoutVariantNestedInput
@@ -1997,6 +2046,7 @@ export type ProductVariantCreateManyProductInput = {
   salePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: $Enums.CategoryProductStatus
 }
 
@@ -2022,6 +2072,7 @@ export type ProductVariantUpdateWithoutProductInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   images?: Prisma.ProductImageUpdateManyWithoutVariantNestedInput
   inventoryLogs?: Prisma.InventoryUpdateManyWithoutVariantNestedInput
@@ -2054,6 +2105,7 @@ export type ProductVariantUncheckedUpdateWithoutProductInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
   images?: Prisma.ProductImageUncheckedUpdateManyWithoutVariantNestedInput
   inventoryLogs?: Prisma.InventoryUncheckedUpdateManyWithoutVariantNestedInput
@@ -2086,6 +2138,7 @@ export type ProductVariantUncheckedUpdateManyWithoutProductInput = {
   salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPromotional?: Prisma.BoolFieldUpdateOperationsInput | boolean
   variantStatus?: Prisma.EnumCategoryProductStatusFieldUpdateOperationsInput | $Enums.CategoryProductStatus
 }
 
@@ -2188,6 +2241,7 @@ export type ProductVariantSelect<ExtArgs extends runtime.Types.Extensions.Intern
   salePrice?: boolean
   attributes?: boolean
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: boolean
   productId?: boolean
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -2223,6 +2277,7 @@ export type ProductVariantSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   salePrice?: boolean
   attributes?: boolean
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: boolean
   productId?: boolean
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -2251,6 +2306,7 @@ export type ProductVariantSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   salePrice?: boolean
   attributes?: boolean
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: boolean
   productId?: boolean
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -2279,11 +2335,12 @@ export type ProductVariantSelectScalar = {
   salePrice?: boolean
   attributes?: boolean
   isDefault?: boolean
+  isPromotional?: boolean
   variantStatus?: boolean
   productId?: boolean
 }
 
-export type ProductVariantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "description" | "shortDescription" | "nameTh" | "descriptionTh" | "shortDescTh" | "sku" | "barcode" | "quantity" | "stockStatus" | "lowStockThreshold" | "weight" | "size" | "costPrice" | "discountType" | "discountValue" | "basePrice" | "salePrice" | "attributes" | "isDefault" | "variantStatus" | "productId", ExtArgs["result"]["productVariant"]>
+export type ProductVariantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "description" | "shortDescription" | "nameTh" | "descriptionTh" | "shortDescTh" | "sku" | "barcode" | "quantity" | "stockStatus" | "lowStockThreshold" | "weight" | "size" | "costPrice" | "discountType" | "discountValue" | "basePrice" | "salePrice" | "attributes" | "isDefault" | "isPromotional" | "variantStatus" | "productId", ExtArgs["result"]["productVariant"]>
 export type ProductVariantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   images?: boolean | Prisma.ProductVariant$imagesArgs<ExtArgs>
@@ -2335,6 +2392,7 @@ export type $ProductVariantPayload<ExtArgs extends runtime.Types.Extensions.Inte
     salePrice: runtime.Decimal
     attributes: runtime.JsonValue
     isDefault: boolean
+    isPromotional: boolean
     variantStatus: $Enums.CategoryProductStatus
     productId: number
   }, ExtArgs["result"]["productVariant"]>
@@ -2789,6 +2847,7 @@ export interface ProductVariantFieldRefs {
   readonly salePrice: Prisma.FieldRef<"ProductVariant", 'Decimal'>
   readonly attributes: Prisma.FieldRef<"ProductVariant", 'Json'>
   readonly isDefault: Prisma.FieldRef<"ProductVariant", 'Boolean'>
+  readonly isPromotional: Prisma.FieldRef<"ProductVariant", 'Boolean'>
   readonly variantStatus: Prisma.FieldRef<"ProductVariant", 'CategoryProductStatus'>
   readonly productId: Prisma.FieldRef<"ProductVariant", 'Int'>
 }

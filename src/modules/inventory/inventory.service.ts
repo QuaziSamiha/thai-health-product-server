@@ -92,6 +92,9 @@ export class InventoryService {
     input: {
       quantity: number;
       costPrice: number;
+      //* THE FACTORY'S OWN LOT NUMBER, STORED AS GIVEN — UNLIKE batchNo BELOW,
+      //* NOTHING ABOUT IT IS DERIVED OR VALIDATED AGAINST OUR OWN NUMBERING.
+      manufacturerBatchNo?: string;
       manufacturingDate?: string;
       expiryDate?: string;
       productId?: number;
@@ -105,6 +108,7 @@ export class InventoryService {
         //* SATISFIES batchNo's NOT NULL + UNIQUE CONSTRAINTS FOR THE INSTANT
         //* BEFORE THE REAL NUMBER IS WRITTEN BELOW.
         batchNo: `PENDING-${randomUUID()}`,
+        manufacturerBatchNo: input.manufacturerBatchNo,
         quantity: input.quantity,
         remaining: input.quantity,
         costPrice: input.costPrice,
@@ -678,6 +682,7 @@ export class InventoryService {
           {
             quantity: item.quantity,
             costPrice: item.costPrice,
+            manufacturerBatchNo: item.manufacturerBatchNo,
             manufacturingDate: item.manufacturingDate,
             expiryDate: item.expiryDate,
             productId,
