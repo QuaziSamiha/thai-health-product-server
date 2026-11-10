@@ -84,7 +84,8 @@ export class NewsEventTypeController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Get all news & event types (paginated)',
-    description: 'Admin list incl. inactive types and per-type post counts.',
+    description:
+      'Admin list incl. inactive and archived types (deletedAt set) and per-type post counts.',
   })
   @ApiPaginatedResponse(
     NewsEventTypeResponseDto,
@@ -154,23 +155,28 @@ export class NewsEventTypeController {
     return this.typeService.updateType(id, this.userId(req), dto);
   }
 
-  @Delete('delete-news-event-type/:id')
+  @Delete('soft-delete-news-event-type/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
-    summary: 'Delete a news & event type',
+    summary: 'Archive a news & event type',
     description:
-      'Permanently deletes an unused type. A type used by any post (deleted posts included) cannot be deleted — deactivate it instead. Admin only.',
+      'Soft delete (archive). Refused while any ACTIVE post uses the type — inactive, draft and archived posts do not block it. One-way: an archived type cannot be restored or edited, and its name becomes free to reuse. Admin only.',
   })
   @ApiNotFoundResponse({ description: 'Type not found.' })
-  @ApiConflictResponse({ description: 'Type is still used by posts.' })
+  @ApiConflictResponse({
+    description: 'Type has active posts, or is already archived.',
+  })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
   @ApiForbiddenResponse({ description: 'Admin role required.' })
-  @ResponseMessage('News & event type deleted successfully')
-  async deleteType(@Param('id', ParseIntPipe) id: number) {
-    return this.typeService.deleteType(id);
+  @ResponseMessage('News & event type archived successfully')
+  async archiveType(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: AuthedRequest,
+  ) {
+    return this.typeService.archiveType(id, this.userId(req));
   }
 
   // ─── Public ──────────────────────────────────────────────────────────────────

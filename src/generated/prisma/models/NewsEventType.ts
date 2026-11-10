@@ -52,6 +52,7 @@ export type NewsEventTypeMinAggregateOutputType = {
   updatedAt: Date | null
   createdBy: number | null
   updatedBy: number | null
+  deletedAt: Date | null
 }
 
 export type NewsEventTypeMaxAggregateOutputType = {
@@ -66,6 +67,7 @@ export type NewsEventTypeMaxAggregateOutputType = {
   updatedAt: Date | null
   createdBy: number | null
   updatedBy: number | null
+  deletedAt: Date | null
 }
 
 export type NewsEventTypeCountAggregateOutputType = {
@@ -80,6 +82,7 @@ export type NewsEventTypeCountAggregateOutputType = {
   updatedAt: number
   createdBy: number
   updatedBy: number
+  deletedAt: number
   _all: number
 }
 
@@ -110,6 +113,7 @@ export type NewsEventTypeMinAggregateInputType = {
   updatedAt?: true
   createdBy?: true
   updatedBy?: true
+  deletedAt?: true
 }
 
 export type NewsEventTypeMaxAggregateInputType = {
@@ -124,6 +128,7 @@ export type NewsEventTypeMaxAggregateInputType = {
   updatedAt?: true
   createdBy?: true
   updatedBy?: true
+  deletedAt?: true
 }
 
 export type NewsEventTypeCountAggregateInputType = {
@@ -138,6 +143,7 @@ export type NewsEventTypeCountAggregateInputType = {
   updatedAt?: true
   createdBy?: true
   updatedBy?: true
+  deletedAt?: true
   _all?: true
 }
 
@@ -239,6 +245,7 @@ export type NewsEventTypeGroupByOutputType = {
   updatedAt: Date
   createdBy: number | null
   updatedBy: number | null
+  deletedAt: Date | null
   _count: NewsEventTypeCountAggregateOutputType | null
   _avg: NewsEventTypeAvgAggregateOutputType | null
   _sum: NewsEventTypeSumAggregateOutputType | null
@@ -276,6 +283,7 @@ export type NewsEventTypeWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"NewsEventType"> | Date | string
   createdBy?: Prisma.IntNullableFilter<"NewsEventType"> | number | null
   updatedBy?: Prisma.IntNullableFilter<"NewsEventType"> | number | null
+  deletedAt?: Prisma.DateTimeNullableFilter<"NewsEventType"> | Date | string | null
   newsEvents?: Prisma.NewsEventListRelationFilter
   createdByUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   updatedByUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
@@ -293,6 +301,7 @@ export type NewsEventTypeOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   createdBy?: Prisma.SortOrderInput | Prisma.SortOrder
   updatedBy?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   newsEvents?: Prisma.NewsEventOrderByRelationAggregateInput
   createdByUser?: Prisma.UserOrderByWithRelationInput
   updatedByUser?: Prisma.UserOrderByWithRelationInput
@@ -301,22 +310,23 @@ export type NewsEventTypeOrderByWithRelationInput = {
 export type NewsEventTypeWhereUniqueInput = Prisma.AtLeast<{
   id?: number
   sid?: string
-  name?: string
-  slug?: string
   AND?: Prisma.NewsEventTypeWhereInput | Prisma.NewsEventTypeWhereInput[]
   OR?: Prisma.NewsEventTypeWhereInput[]
   NOT?: Prisma.NewsEventTypeWhereInput | Prisma.NewsEventTypeWhereInput[]
+  name?: Prisma.StringFilter<"NewsEventType"> | string
   nameTh?: Prisma.StringNullableFilter<"NewsEventType"> | string | null
+  slug?: Prisma.StringFilter<"NewsEventType"> | string
   isActive?: Prisma.BoolFilter<"NewsEventType"> | boolean
   displayOrder?: Prisma.IntFilter<"NewsEventType"> | number
   createdAt?: Prisma.DateTimeFilter<"NewsEventType"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"NewsEventType"> | Date | string
   createdBy?: Prisma.IntNullableFilter<"NewsEventType"> | number | null
   updatedBy?: Prisma.IntNullableFilter<"NewsEventType"> | number | null
+  deletedAt?: Prisma.DateTimeNullableFilter<"NewsEventType"> | Date | string | null
   newsEvents?: Prisma.NewsEventListRelationFilter
   createdByUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   updatedByUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
-}, "id" | "sid" | "name" | "slug">
+}, "id" | "sid">
 
 export type NewsEventTypeOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -330,6 +340,7 @@ export type NewsEventTypeOrderByWithAggregationInput = {
   updatedAt?: Prisma.SortOrder
   createdBy?: Prisma.SortOrderInput | Prisma.SortOrder
   updatedBy?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.NewsEventTypeCountOrderByAggregateInput
   _avg?: Prisma.NewsEventTypeAvgOrderByAggregateInput
   _max?: Prisma.NewsEventTypeMaxOrderByAggregateInput
@@ -352,6 +363,7 @@ export type NewsEventTypeScalarWhereWithAggregatesInput = {
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"NewsEventType"> | Date | string
   createdBy?: Prisma.IntNullableWithAggregatesFilter<"NewsEventType"> | number | null
   updatedBy?: Prisma.IntNullableWithAggregatesFilter<"NewsEventType"> | number | null
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"NewsEventType"> | Date | string | null
 }
 
 export type NewsEventTypeCreateInput = {
@@ -363,6 +375,7 @@ export type NewsEventTypeCreateInput = {
   displayOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   newsEvents?: Prisma.NewsEventCreateNestedManyWithoutTypeInput
   createdByUser?: Prisma.UserCreateNestedOneWithoutCreatedNewsEventTypesInput
   updatedByUser?: Prisma.UserCreateNestedOneWithoutUpdatedNewsEventTypesInput
@@ -380,6 +393,7 @@ export type NewsEventTypeUncheckedCreateInput = {
   updatedAt?: Date | string
   createdBy?: number | null
   updatedBy?: number | null
+  deletedAt?: Date | string | null
   newsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutTypeInput
 }
 
@@ -392,6 +406,7 @@ export type NewsEventTypeUpdateInput = {
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   newsEvents?: Prisma.NewsEventUpdateManyWithoutTypeNestedInput
   createdByUser?: Prisma.UserUpdateOneWithoutCreatedNewsEventTypesNestedInput
   updatedByUser?: Prisma.UserUpdateOneWithoutUpdatedNewsEventTypesNestedInput
@@ -409,6 +424,7 @@ export type NewsEventTypeUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   updatedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   newsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutTypeNestedInput
 }
 
@@ -424,6 +440,7 @@ export type NewsEventTypeCreateManyInput = {
   updatedAt?: Date | string
   createdBy?: number | null
   updatedBy?: number | null
+  deletedAt?: Date | string | null
 }
 
 export type NewsEventTypeUpdateManyMutationInput = {
@@ -435,6 +452,7 @@ export type NewsEventTypeUpdateManyMutationInput = {
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type NewsEventTypeUncheckedUpdateManyInput = {
@@ -449,6 +467,7 @@ export type NewsEventTypeUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   updatedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type NewsEventTypeCountOrderByAggregateInput = {
@@ -463,6 +482,7 @@ export type NewsEventTypeCountOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
   updatedBy?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type NewsEventTypeAvgOrderByAggregateInput = {
@@ -484,6 +504,7 @@ export type NewsEventTypeMaxOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
   updatedBy?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type NewsEventTypeMinOrderByAggregateInput = {
@@ -498,6 +519,7 @@ export type NewsEventTypeMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
   updatedBy?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type NewsEventTypeSumOrderByAggregateInput = {
@@ -629,6 +651,7 @@ export type NewsEventTypeCreateWithoutNewsEventsInput = {
   displayOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   createdByUser?: Prisma.UserCreateNestedOneWithoutCreatedNewsEventTypesInput
   updatedByUser?: Prisma.UserCreateNestedOneWithoutUpdatedNewsEventTypesInput
 }
@@ -645,6 +668,7 @@ export type NewsEventTypeUncheckedCreateWithoutNewsEventsInput = {
   updatedAt?: Date | string
   createdBy?: number | null
   updatedBy?: number | null
+  deletedAt?: Date | string | null
 }
 
 export type NewsEventTypeCreateOrConnectWithoutNewsEventsInput = {
@@ -672,6 +696,7 @@ export type NewsEventTypeUpdateWithoutNewsEventsInput = {
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdByUser?: Prisma.UserUpdateOneWithoutCreatedNewsEventTypesNestedInput
   updatedByUser?: Prisma.UserUpdateOneWithoutUpdatedNewsEventTypesNestedInput
 }
@@ -688,6 +713,7 @@ export type NewsEventTypeUncheckedUpdateWithoutNewsEventsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   updatedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type NewsEventTypeCreateWithoutCreatedByUserInput = {
@@ -699,6 +725,7 @@ export type NewsEventTypeCreateWithoutCreatedByUserInput = {
   displayOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   newsEvents?: Prisma.NewsEventCreateNestedManyWithoutTypeInput
   updatedByUser?: Prisma.UserCreateNestedOneWithoutUpdatedNewsEventTypesInput
 }
@@ -714,6 +741,7 @@ export type NewsEventTypeUncheckedCreateWithoutCreatedByUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   updatedBy?: number | null
+  deletedAt?: Date | string | null
   newsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutTypeInput
 }
 
@@ -736,6 +764,7 @@ export type NewsEventTypeCreateWithoutUpdatedByUserInput = {
   displayOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   newsEvents?: Prisma.NewsEventCreateNestedManyWithoutTypeInput
   createdByUser?: Prisma.UserCreateNestedOneWithoutCreatedNewsEventTypesInput
 }
@@ -751,6 +780,7 @@ export type NewsEventTypeUncheckedCreateWithoutUpdatedByUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: number | null
+  deletedAt?: Date | string | null
   newsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutTypeInput
 }
 
@@ -795,6 +825,7 @@ export type NewsEventTypeScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"NewsEventType"> | Date | string
   createdBy?: Prisma.IntNullableFilter<"NewsEventType"> | number | null
   updatedBy?: Prisma.IntNullableFilter<"NewsEventType"> | number | null
+  deletedAt?: Prisma.DateTimeNullableFilter<"NewsEventType"> | Date | string | null
 }
 
 export type NewsEventTypeUpsertWithWhereUniqueWithoutUpdatedByUserInput = {
@@ -824,6 +855,7 @@ export type NewsEventTypeCreateManyCreatedByUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   updatedBy?: number | null
+  deletedAt?: Date | string | null
 }
 
 export type NewsEventTypeCreateManyUpdatedByUserInput = {
@@ -837,6 +869,7 @@ export type NewsEventTypeCreateManyUpdatedByUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: number | null
+  deletedAt?: Date | string | null
 }
 
 export type NewsEventTypeUpdateWithoutCreatedByUserInput = {
@@ -848,6 +881,7 @@ export type NewsEventTypeUpdateWithoutCreatedByUserInput = {
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   newsEvents?: Prisma.NewsEventUpdateManyWithoutTypeNestedInput
   updatedByUser?: Prisma.UserUpdateOneWithoutUpdatedNewsEventTypesNestedInput
 }
@@ -863,6 +897,7 @@ export type NewsEventTypeUncheckedUpdateWithoutCreatedByUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   newsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutTypeNestedInput
 }
 
@@ -877,6 +912,7 @@ export type NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type NewsEventTypeUpdateWithoutUpdatedByUserInput = {
@@ -888,6 +924,7 @@ export type NewsEventTypeUpdateWithoutUpdatedByUserInput = {
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   newsEvents?: Prisma.NewsEventUpdateManyWithoutTypeNestedInput
   createdByUser?: Prisma.UserUpdateOneWithoutCreatedNewsEventTypesNestedInput
 }
@@ -903,6 +940,7 @@ export type NewsEventTypeUncheckedUpdateWithoutUpdatedByUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   newsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutTypeNestedInput
 }
 
@@ -917,6 +955,7 @@ export type NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -962,6 +1001,7 @@ export type NewsEventTypeSelect<ExtArgs extends runtime.Types.Extensions.Interna
   updatedAt?: boolean
   createdBy?: boolean
   updatedBy?: boolean
+  deletedAt?: boolean
   newsEvents?: boolean | Prisma.NewsEventType$newsEventsArgs<ExtArgs>
   createdByUser?: boolean | Prisma.NewsEventType$createdByUserArgs<ExtArgs>
   updatedByUser?: boolean | Prisma.NewsEventType$updatedByUserArgs<ExtArgs>
@@ -980,6 +1020,7 @@ export type NewsEventTypeSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   updatedAt?: boolean
   createdBy?: boolean
   updatedBy?: boolean
+  deletedAt?: boolean
   createdByUser?: boolean | Prisma.NewsEventType$createdByUserArgs<ExtArgs>
   updatedByUser?: boolean | Prisma.NewsEventType$updatedByUserArgs<ExtArgs>
 }, ExtArgs["result"]["newsEventType"]>
@@ -996,6 +1037,7 @@ export type NewsEventTypeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   updatedAt?: boolean
   createdBy?: boolean
   updatedBy?: boolean
+  deletedAt?: boolean
   createdByUser?: boolean | Prisma.NewsEventType$createdByUserArgs<ExtArgs>
   updatedByUser?: boolean | Prisma.NewsEventType$updatedByUserArgs<ExtArgs>
 }, ExtArgs["result"]["newsEventType"]>
@@ -1012,9 +1054,10 @@ export type NewsEventTypeSelectScalar = {
   updatedAt?: boolean
   createdBy?: boolean
   updatedBy?: boolean
+  deletedAt?: boolean
 }
 
-export type NewsEventTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "name" | "nameTh" | "slug" | "isActive" | "displayOrder" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy", ExtArgs["result"]["newsEventType"]>
+export type NewsEventTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "name" | "nameTh" | "slug" | "isActive" | "displayOrder" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy" | "deletedAt", ExtArgs["result"]["newsEventType"]>
 export type NewsEventTypeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   newsEvents?: boolean | Prisma.NewsEventType$newsEventsArgs<ExtArgs>
   createdByUser?: boolean | Prisma.NewsEventType$createdByUserArgs<ExtArgs>
@@ -1049,6 +1092,7 @@ export type $NewsEventTypePayload<ExtArgs extends runtime.Types.Extensions.Inter
     updatedAt: Date
     createdBy: number | null
     updatedBy: number | null
+    deletedAt: Date | null
   }, ExtArgs["result"]["newsEventType"]>
   composites: {}
 }
@@ -1486,6 +1530,7 @@ export interface NewsEventTypeFieldRefs {
   readonly updatedAt: Prisma.FieldRef<"NewsEventType", 'DateTime'>
   readonly createdBy: Prisma.FieldRef<"NewsEventType", 'Int'>
   readonly updatedBy: Prisma.FieldRef<"NewsEventType", 'Int'>
+  readonly deletedAt: Prisma.FieldRef<"NewsEventType", 'DateTime'>
 }
     
 

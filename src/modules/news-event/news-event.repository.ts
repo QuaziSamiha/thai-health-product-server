@@ -34,7 +34,14 @@ const NEWS_EVENT_SELECT_ADMIN = {
   updatedAt: true,
   deletedAt: true,
   type: {
-    select: { id: true, name: true, nameTh: true, slug: true, isActive: true },
+    select: {
+      id: true,
+      name: true,
+      nameTh: true,
+      slug: true,
+      isActive: true,
+      deletedAt: true,
+    },
   },
   author: {
     select: {
@@ -272,7 +279,7 @@ export class NewsEventRepository extends BaseRepository {
     });
   }
 
-  //* SOFT DELETE — ROW, IMAGES AND FILES ARE KEPT SO restore IS LOSSLESS.
+  //* SOFT DELETE — ONE-WAY (NO RESTORE). ROW, IMAGES AND FILES ARE KEPT FOR THE RECORD.
   //* status ARCHIVED IS WHAT THE ADMIN TABLE SHOWS; deletedAt IS WHAT THE
   //* AuditLog EXTENSION READS TO RECORD A SOFT_DELETE (AND WHEN IT HAPPENED).
   async softDeleteNewsEvent(id: number, tx?: Prisma.TransactionClient) {
@@ -281,17 +288,6 @@ export class NewsEventRepository extends BaseRepository {
       where: { id },
       data: { deletedAt: new Date(), status: NewsEventStatus.ARCHIVED },
       select: { id: true },
-    });
-  }
-
-  //* COMES BACK INACTIVE, NOT ACTIVE — AN ADMIN RE-PUBLISHES IT DELIBERATELY
-  //* RATHER THAN A RESTORE PUTTING OLD CONTENT STRAIGHT BACK ON THE STOREFRONT
-  async restoreNewsEvent(id: number, tx?: Prisma.TransactionClient) {
-    const client = tx || this.prisma;
-    return client.newsEvent.update({
-      where: { id },
-      data: { deletedAt: null, status: NewsEventStatus.INACTIVE },
-      select: NEWS_EVENT_SELECT_ADMIN,
     });
   }
 

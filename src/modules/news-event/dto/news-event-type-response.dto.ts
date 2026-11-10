@@ -53,6 +53,13 @@ export class NewsEventTypeResponseDto {
   newsEventCount!: number;
 
   @Expose()
+  @ApiPropertyOptional({
+    description:
+      'Set when the type was archived (soft-deleted). One-way — archived types are read-only.',
+  })
+  deletedAt?: Date;
+
+  @Expose()
   @ApiProperty({ description: 'ISO timestamp when the record was created' })
   createdAt!: Date;
 
@@ -92,6 +99,7 @@ export class NewsEventTypeResponseDto {
     this.isActive = type.isActive!;
     this.displayOrder = type.displayOrder!;
     this.newsEventCount = type._count?.newsEvents ?? 0;
+    this.deletedAt = type.deletedAt ?? undefined;
     this.createdAt = type.createdAt!;
     this.updatedAt = type.updatedAt!;
     this.createdByUser = type.createdByUser

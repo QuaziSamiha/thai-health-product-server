@@ -82,6 +82,9 @@ export class NewsEventTypeService {
     if (!existing) {
       throw new NotFoundException(`News & event type with ID ${id} not found`);
     }
+    if (existing.deletedAt) {
+      throw new ConflictException('Archived types cannot be edited');
+    }
 
     let slug: string | undefined;
     if (dto.name && dto.name !== existing.name) {
@@ -102,22 +105,27 @@ export class NewsEventTypeService {
   }
 
   /**
-   * Hard delete, allowed only while no post (soft-deleted ones included —
-   * they still reference it) uses the type. Otherwise deactivate it instead.
+   * Archive (soft delete) — one-way, there is no restore. Refused while any
+   * ACTIVE post uses the type; inactive, draft and archived posts don't block
+   * it. Its posts stay in the admin table (the type is inactive, so they are
+   * already hidden from the storefront).
    */
-  async deleteType(id: number): Promise<void> {
+  async archiveType(id: number, userId: number): Promise<void> {
     const type = await this.typeRepository.findIdById(id);
     if (!type) {
       throw new NotFoundException(`News & event type with ID ${id} not found`);
     }
+    if (type.deletedAt) {
+      throw new ConflictException('This type is already archived');
+    }
 
-    const usage = await this.typeRepository.countAllNewsEvents(id);
-    if (usage > 0) {
+    const activePosts = await this.typeRepository.countActiveNewsEvents(id);
+    if (activePosts > 0) {
       throw new ConflictException(
-        `This type is used by ${usage} post(s), including deleted ones. Deactivate it instead.`,
+        `This type has ${activePosts} active post(s). Set them to Inactive or Draft, or move them to another type, before archiving it.`,
       );
     }
-    await this.typeRepository.deleteType(id);
+    await this.typeRepository.archiveType(id, userId);
   }
 
   /**
@@ -131,6 +139,11 @@ export class NewsEventTypeService {
     if (!type) {
       throw new BadRequestException(
         `News & event type with ID ${id} does not exist`,
+      );
+    }
+    if (type.deletedAt) {
+      throw new BadRequestException(
+        'This type is archived. Choose an active type.',
       );
     }
     if (!type.isActive) {

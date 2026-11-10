@@ -94,6 +94,13 @@ export class NewsEventTypeMinifiedAdminDto {
   @Expose() @ApiPropertyOptional({ example: 'กิจกรรม' }) nameTh?: string;
   @Expose() @ApiProperty({ example: 'event' }) slug!: string;
   @Expose() @ApiProperty({ example: true }) isActive!: boolean;
+  @Expose()
+  @ApiProperty({
+    description:
+      'Type was archived — the post must move to another type to go Active',
+    example: false,
+  })
+  isArchived!: boolean;
 
   constructor(type: Partial<NewsEventTypeModel>) {
     this.id = type.id!;
@@ -101,6 +108,7 @@ export class NewsEventTypeMinifiedAdminDto {
     this.nameTh = type.nameTh ?? undefined;
     this.slug = type.slug!;
     this.isActive = type.isActive!;
+    this.isArchived = Boolean(type.deletedAt);
   }
 }
 

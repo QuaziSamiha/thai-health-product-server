@@ -568,7 +568,8 @@ export const NewsEventTypeScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   createdBy: 'createdBy',
-  updatedBy: 'updatedBy'
+  updatedBy: 'updatedBy',
+  deletedAt: 'deletedAt'
 } as const
 
 export type NewsEventTypeScalarFieldEnum = (typeof NewsEventTypeScalarFieldEnum)[keyof typeof NewsEventTypeScalarFieldEnum]

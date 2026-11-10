@@ -151,14 +151,29 @@ export class NewsEventService {
   ): Promise<NewsEventResponseDto> {
     const existing = await this.findOrThrow(id);
     if (existing.deletedAt) {
-      throw new ConflictException('Restore this post before editing it');
+      throw new ConflictException('Archived posts cannot be edited');
     }
 
     //* FILES ARRIVE VIA @UploadedFiles (newImages), NEVER IN THE BODY
     const { deleteImageIds, coverImage, ...fields } = dto;
 
-    if (fields.typeId && fields.typeId !== existing.typeId) {
-      await this.newsEventTypeService.assertTypeAssignable(fields.typeId);
+    const changesType = Boolean(
+      fields.typeId && fields.typeId !== existing.typeId,
+    );
+    if (changesType) {
+      await this.newsEventTypeService.assertTypeAssignable(fields.typeId!);
+    }
+
+    //* AN ARCHIVED TYPE HOLDS NO ACTIVE POSTS (THAT IS WHAT LET IT BE ARCHIVED).
+    //* STAYING ON IT IS FINE; GOING ACTIVE ON IT IS NOT — MOVE TYPE FIRST.
+    if (
+      !changesType &&
+      existing.type?.deletedAt &&
+      (fields.status ?? existing.status) === NewsEventStatus.ACTIVE
+    ) {
+      throw new BadRequestException(
+        'This post’s type is archived. Move it to an active type before setting it Active.',
+      );
     }
 
     this.assertEventWindow(
@@ -290,7 +305,8 @@ export class NewsEventService {
 
   /**
    * Soft delete: sets `deletedAt` only. The row, its images and files stay,
-   * so it disappears from every public route but can be restored losslessly.
+   * so it disappears from every public route. One-way: there is no restore,
+   * and an archived post can no longer be edited or deleted again.
    * Who deleted it is recorded by the AuditLog extension (SOFT_DELETE).
    */
   async softDeleteNewsEvent(id: number): Promise<void> {
@@ -299,15 +315,6 @@ export class NewsEventService {
       throw new ConflictException('This post is already deleted');
     }
     await this.newsEventRepository.softDeleteNewsEvent(id);
-  }
-
-  async restoreNewsEvent(id: number): Promise<NewsEventResponseDto> {
-    const newsEvent = await this.findOrThrow(id);
-    if (!newsEvent.deletedAt) {
-      throw new ConflictException('This post is not deleted');
-    }
-    const restored = await this.newsEventRepository.restoreNewsEvent(id);
-    return new NewsEventResponseDto(restored, this.baseUrl);
   }
 
   // ═══════════════════════════════════════════════════════════════════════

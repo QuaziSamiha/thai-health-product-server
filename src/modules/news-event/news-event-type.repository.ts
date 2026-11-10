@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { BaseRepository } from '../../prisma/base.repository';
 import { Prisma } from '../../generated/prisma/client';
+import { NewsEventStatus } from '../../generated/prisma/enums';
 import { PaginationService, PaginationQueryDto } from '../../shared/pagination';
 
 //* MATCHES UserMinifiedResponseDto / MinifiedUser (user/dto/user-response.dto.ts)
@@ -33,6 +34,7 @@ export class NewsEventTypeRepository extends BaseRepository {
     slug: true,
     isActive: true,
     displayOrder: true,
+    deletedAt: true,
     createdAt: true,
     updatedAt: true,
     createdByUser: MINIFIED_USER_SELECT,
@@ -63,11 +65,12 @@ export class NewsEventTypeRepository extends BaseRepository {
     const client = tx || this.prisma;
     return client.newsEventType.findUnique({
       where: { id },
-      select: { id: true, isActive: true },
+      select: { id: true, isActive: true, deletedAt: true },
     });
   }
 
-  //* NAME OR SLUG CLASH — CASE-INSENSITIVE ON NAME ("Event" vs "event")
+  //* NAME OR SLUG CLASH AMONG NON-ARCHIVED TYPES — CASE-INSENSITIVE ON NAME
+  //* ("Event" vs "event"). ARCHIVED TYPES FREE THEIR NAME (PARTIAL UNIQUE INDEXES)
   async findConflicting(
     name: string,
     slug: string,
@@ -76,6 +79,7 @@ export class NewsEventTypeRepository extends BaseRepository {
     const client = tx || this.prisma;
     return client.newsEventType.findFirst({
       where: {
+        deletedAt: null,
         OR: [{ name: { equals: name, mode: 'insensitive' } }, { slug }],
       },
       select: { id: true },
@@ -103,7 +107,7 @@ export class NewsEventTypeRepository extends BaseRepository {
   async findAllActive(tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return client.newsEventType.findMany({
-      where: { isActive: true },
+      where: { isActive: true, deletedAt: null },
       select: this.TYPE_SELECT_PUBLIC,
       orderBy: [{ displayOrder: 'asc' }, { name: 'asc' }],
     });
@@ -114,17 +118,19 @@ export class NewsEventTypeRepository extends BaseRepository {
   async findActiveOptions(tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
     return client.newsEventType.findMany({
-      where: { isActive: true },
+      where: { isActive: true, deletedAt: null },
       select: { id: true, name: true, nameTh: true },
       orderBy: [{ displayOrder: 'asc' }, { name: 'asc' }],
     });
   }
 
-  //* COUNTS SOFT-DELETED POSTS TOO — THEY STILL HOLD THE FK, SO A HARD
-  //* DELETE OF THE TYPE WOULD FAIL (onDelete: Restrict)
-  async countAllNewsEvents(typeId: number, tx?: Prisma.TransactionClient) {
+  //* POSTS THAT BLOCK ARCHIVING A TYPE: status ACTIVE AND NOT ARCHIVED.
+  //* INACTIVE / DRAFT / ARCHIVED POSTS DO NOT BLOCK IT.
+  async countActiveNewsEvents(typeId: number, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
-    return client.newsEvent.count({ where: { typeId } });
+    return client.newsEvent.count({
+      where: { typeId, status: NewsEventStatus.ACTIVE, deletedAt: null },
+    });
   }
 
   // ─── Mutations ───────────────────────────────────────────────────────────────
@@ -153,10 +159,13 @@ export class NewsEventTypeRepository extends BaseRepository {
     });
   }
 
-  async deleteType(id: number, tx?: Prisma.TransactionClient) {
+  //* ARCHIVE (SOFT DELETE) — ONE-WAY. isActive IS FORCED OFF SO EVERY
+  //* isActive FILTER (STOREFRONT, POST VISIBILITY) ALREADY EXCLUDES IT.
+  async archiveType(id: number, userId: number, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
-    return client.newsEventType.delete({
+    return client.newsEventType.update({
       where: { id },
+      data: { deletedAt: new Date(), isActive: false, updatedBy: userId },
       select: { id: true },
     });
   }

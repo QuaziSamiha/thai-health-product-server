@@ -2,7 +2,7 @@
  * Seeds News & Events types and posts so the admin panel and the storefront
  * have realistic content to show.
  *
- * Idempotent: types are upserted by `slug`, posts by `slug`, and each post's
+ * Idempotent: types are matched by `slug` (non-archived ones), posts by `slug`, and each post's
  * images are replaced wholesale (they have no natural unique key — same
  * approach as seed-products.ts). Rows whose slug is not listed here are never
  * touched, so posts an admin created survive a re-run.
@@ -34,7 +34,10 @@ import { NewsEventStatus } from '../src/generated/prisma/enums';
 const { Pool } = pkg;
 
 const SUPER_ADMIN_EMAIL = 'mahfuzislam1695@gmail.com';
-const UPLOAD_ROOT = join(process.cwd(), process.env.STORAGE_DESTINATION ?? 'uploads');
+const UPLOAD_ROOT = join(
+  process.cwd(),
+  process.env.STORAGE_DESTINATION ?? 'uploads',
+);
 const IMAGE_FOLDER = 'news-events/images';
 
 // ─── Images ──────────────────────────────────────────────────────────────────
@@ -67,7 +70,10 @@ async function prepareImages(): Promise<Map<ImageKey, string>> {
   await mkdir(targetDir, { recursive: true });
 
   const urls = new Map<ImageKey, string>();
-  for (const [key, source] of Object.entries(SOURCE_IMAGES) as [ImageKey, string][]) {
+  for (const [key, source] of Object.entries(SOURCE_IMAGES) as [
+    ImageKey,
+    string,
+  ][]) {
     const ext = source.slice(source.lastIndexOf('.'));
     const filename = `seed-${key}${ext}`;
     const sourcePath = join(UPLOAD_ROOT, source);
@@ -88,12 +94,42 @@ async function prepareImages(): Promise<Map<ImageKey, string>> {
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 const SEED_TYPES = [
-  { slug: 'news', name: 'News', nameTh: 'ข่าวสาร', displayOrder: 0, isActive: true },
-  { slug: 'event', name: 'Event', nameTh: 'กิจกรรม', displayOrder: 1, isActive: true },
-  { slug: 'press-release', name: 'Press Release', nameTh: 'ข่าวประชาสัมพันธ์', displayOrder: 2, isActive: true },
-  { slug: 'promotion', name: 'Promotion', nameTh: 'โปรโมชั่น', displayOrder: 3, isActive: true },
+  {
+    slug: 'news',
+    name: 'News',
+    nameTh: 'ข่าวสาร',
+    displayOrder: 0,
+    isActive: true,
+  },
+  {
+    slug: 'event',
+    name: 'Event',
+    nameTh: 'กิจกรรม',
+    displayOrder: 1,
+    isActive: true,
+  },
+  {
+    slug: 'press-release',
+    name: 'Press Release',
+    nameTh: 'ข่าวประชาสัมพันธ์',
+    displayOrder: 2,
+    isActive: true,
+  },
+  {
+    slug: 'promotion',
+    name: 'Promotion',
+    nameTh: 'โปรโมชั่น',
+    displayOrder: 3,
+    isActive: true,
+  },
   //* INACTIVE — HIDDEN FROM THE STOREFRONT FILTER, STILL LISTED IN ADMIN
-  { slug: 'announcement', name: 'Announcement', nameTh: 'ประกาศ', displayOrder: 4, isActive: false },
+  {
+    slug: 'announcement',
+    name: 'Announcement',
+    nameTh: 'ประกาศ',
+    displayOrder: 4,
+    isActive: false,
+  },
 ] as const;
 type TypeSlug = (typeof SEED_TYPES)[number]['slug'];
 
@@ -119,7 +155,8 @@ interface SeedPost {
   deleted?: boolean; //* SOFT-DELETED (TRASH)
 }
 
-const p = (...paragraphs: string[]) => paragraphs.map((text) => `<p>${text}</p>`).join('');
+const p = (...paragraphs: string[]) =>
+  paragraphs.map((text) => `<p>${text}</p>`).join('');
 
 const SEED_POSTS: SeedPost[] = [
   {
@@ -127,11 +164,14 @@ const SEED_POSTS: SeedPost[] = [
     type: 'news',
     status: NewsEventStatus.ACTIVE,
     isFeatured: true,
-    title: 'Expanding Access to Premium Wellness: THP Introduces New Imported Supplements',
-    titleTh: 'ขยายการเข้าถึงสุขภาพระดับพรีเมียม: THP เปิดตัวผลิตภัณฑ์เสริมอาหารนำเข้าใหม่',
+    title:
+      'Expanding Access to Premium Wellness: THP Introduces New Imported Supplements',
+    titleTh:
+      'ขยายการเข้าถึงสุขภาพระดับพรีเมียม: THP เปิดตัวผลิตภัณฑ์เสริมอาหารนำเข้าใหม่',
     excerpt:
       'A new line of imported dietary supplements arrives on THP, backed by Thai FDA registration and temperature-controlled delivery.',
-    excerptTh: 'ผลิตภัณฑ์เสริมอาหารนำเข้าไลน์ใหม่ ขึ้นทะเบียน อย. พร้อมการจัดส่งแบบควบคุมอุณหภูมิ',
+    excerptTh:
+      'ผลิตภัณฑ์เสริมอาหารนำเข้าไลน์ใหม่ ขึ้นทะเบียน อย. พร้อมการจัดส่งแบบควบคุมอุณหภูมิ',
     content:
       '<h2>A wider shelf, the same standards</h2>' +
       p(
@@ -154,7 +194,8 @@ const SEED_POSTS: SeedPost[] = [
     titleTh: 'วิทยาศาสตร์เบื้องหลังผลิตภัณฑ์ของเรา',
     excerpt:
       'How THP formulates, tests and certifies every capsule — from raw material sourcing to GMP-certified production.',
-    excerptTh: 'THP คิดค้น ทดสอบ และรับรองทุกแคปซูลอย่างไร ตั้งแต่การคัดเลือกวัตถุดิบจนถึงการผลิตตามมาตรฐาน GMP',
+    excerptTh:
+      'THP คิดค้น ทดสอบ และรับรองทุกแคปซูลอย่างไร ตั้งแต่การคัดเลือกวัตถุดิบจนถึงการผลิตตามมาตรฐาน GMP',
     content:
       '<h2>Research first</h2>' +
       p(
@@ -177,7 +218,8 @@ const SEED_POSTS: SeedPost[] = [
     titleTh: 'THP จับมือฟาร์มออร์แกนิกที่ได้รับการรับรอง',
     excerpt:
       'A new sourcing partnership with certified organic growers in Northern Thailand secures traceable herbal ingredients.',
-    excerptTh: 'ความร่วมมือใหม่กับเกษตรกรออร์แกนิกในภาคเหนือ เพื่อวัตถุดิบสมุนไพรที่ตรวจสอบย้อนกลับได้',
+    excerptTh:
+      'ความร่วมมือใหม่กับเกษตรกรออร์แกนิกในภาคเหนือ เพื่อวัตถุดิบสมุนไพรที่ตรวจสอบย้อนกลับได้',
     content: p(
       'Thai Health Product has signed a multi-year sourcing agreement with certified organic farms in Chiang Mai and Chiang Rai.',
       'The partnership guarantees a traceable supply of herbal ingredients and supports local farming communities with fair, long-term contracts.',
@@ -195,7 +237,8 @@ const SEED_POSTS: SeedPost[] = [
     titleTh: 'งานมหกรรมสุขภาพชุมชน กรุงเทพฯ 2026',
     excerpt:
       'Free health checks, pharmacist consultations and product samples. Join us for a weekend of wellness in Bangkok.',
-    excerptTh: 'ตรวจสุขภาพฟรี ปรึกษาเภสัชกร และรับตัวอย่างสินค้า พบกันที่กรุงเทพฯ',
+    excerptTh:
+      'ตรวจสุขภาพฟรี ปรึกษาเภสัชกร และรับตัวอย่างสินค้า พบกันที่กรุงเทพฯ',
     content:
       '<h2>What to expect</h2>' +
       p(
@@ -219,8 +262,10 @@ const SEED_POSTS: SeedPost[] = [
     status: NewsEventStatus.ACTIVE,
     title: 'Free Wellness Check Day in Chiang Mai',
     titleTh: 'วันตรวจสุขภาพฟรี ที่เชียงใหม่',
-    excerpt: 'Our mobile health team visits Chiang Mai with free screenings and nutrition advice.',
-    excerptTh: 'ทีมสุขภาพเคลื่อนที่ของเราเยือนเชียงใหม่ พร้อมตรวจคัดกรองและให้คำแนะนำด้านโภชนาการฟรี',
+    excerpt:
+      'Our mobile health team visits Chiang Mai with free screenings and nutrition advice.',
+    excerptTh:
+      'ทีมสุขภาพเคลื่อนที่ของเราเยือนเชียงใหม่ พร้อมตรวจคัดกรองและให้คำแนะนำด้านโภชนาการฟรี',
     content: p(
       'The THP mobile health team will spend a day at Central Festival Chiang Mai offering free basic screenings and nutrition advice.',
       'No registration is needed — walk in any time during opening hours.',
@@ -238,8 +283,10 @@ const SEED_POSTS: SeedPost[] = [
     status: NewsEventStatus.ACTIVE,
     title: 'THP at Thailand Health Expo 2026',
     titleTh: 'THP ในงาน Thailand Health Expo 2026',
-    excerpt: 'Thank you to everyone who visited our booth. Here are the highlights from three busy days.',
-    excerptTh: 'ขอบคุณทุกท่านที่แวะมาที่บูธของเรา นี่คือไฮไลต์จากสามวันที่ผ่านมา',
+    excerpt:
+      'Thank you to everyone who visited our booth. Here are the highlights from three busy days.',
+    excerptTh:
+      'ขอบคุณทุกท่านที่แวะมาที่บูธของเรา นี่คือไฮไลต์จากสามวันที่ผ่านมา',
     content: p(
       'Over three days, more than 2,000 visitors stopped by the THP booth to learn about our collagen and vitamin ranges.',
       'Our team held six live talks on daily nutrition, and the Collagen Tripeptide 600 Plus CoQ10 sold out on the second day.',
@@ -257,7 +304,8 @@ const SEED_POSTS: SeedPost[] = [
     status: NewsEventStatus.ACTIVE,
     title: 'Year-End Combo Offers Are Here',
     titleTh: 'โปรโมชั่นชุดคอมโบส่งท้ายปี มาแล้ว',
-    excerpt: 'Save on bundles of our best-selling supplements until the end of December.',
+    excerpt:
+      'Save on bundles of our best-selling supplements until the end of December.',
     excerptTh: 'ประหยัดยิ่งขึ้นกับชุดผลิตภัณฑ์ขายดี ถึงสิ้นเดือนธันวาคม',
     content: p(
       'Our year-end combos pair best sellers such as Acerola Cherry Plus and Collagen Tripeptide 600 Plus CoQ10 at a special bundle price.',
@@ -272,8 +320,10 @@ const SEED_POSTS: SeedPost[] = [
     status: NewsEventStatus.ACTIVE,
     title: 'Meet Our Head Pharmacist',
     titleTh: 'พบกับหัวหน้าเภสัชกรของเรา',
-    excerpt: 'A conversation about safe supplement use, common myths and how our product team works.',
-    excerptTh: 'พูดคุยเรื่องการใช้ผลิตภัณฑ์เสริมอาหารอย่างปลอดภัย ความเชื่อผิด ๆ และการทำงานของทีม',
+    excerpt:
+      'A conversation about safe supplement use, common myths and how our product team works.',
+    excerptTh:
+      'พูดคุยเรื่องการใช้ผลิตภัณฑ์เสริมอาหารอย่างปลอดภัย ความเชื่อผิด ๆ และการทำงานของทีม',
     content: p(
       'We sat down with our head pharmacist to talk about how customers can use supplements safely alongside their regular medication.',
       '"The most common mistake is doubling up the same vitamin from different products," she explains. "Always check the label and ask a pharmacist if you are unsure."',
@@ -287,8 +337,10 @@ const SEED_POSTS: SeedPost[] = [
     status: NewsEventStatus.ACTIVE,
     title: 'GMP Certification Renewed for 2026–2029',
     titleTh: 'ต่ออายุการรับรองมาตรฐาน GMP ปี 2026–2029',
-    excerpt: 'Our manufacturing partner has renewed its GMP certification after a full audit.',
-    excerptTh: 'ผู้ผลิตของเราได้รับการต่ออายุการรับรอง GMP หลังผ่านการตรวจประเมินเต็มรูปแบบ',
+    excerpt:
+      'Our manufacturing partner has renewed its GMP certification after a full audit.',
+    excerptTh:
+      'ผู้ผลิตของเราได้รับการต่ออายุการรับรอง GMP หลังผ่านการตรวจประเมินเต็มรูปแบบ',
     content: p(
       'Following a full on-site audit, our manufacturing partner has renewed its Good Manufacturing Practice certification for another three years.',
       'The renewal covers every THP-branded product currently on sale.',
@@ -302,8 +354,10 @@ const SEED_POSTS: SeedPost[] = [
     status: NewsEventStatus.ACTIVE,
     title: 'Healthy Living Workshop in Phuket',
     titleTh: 'เวิร์กช็อปการใช้ชีวิตเพื่อสุขภาพ ที่ภูเก็ต',
-    excerpt: 'A hands-on afternoon on nutrition, sleep and everyday movement with THP experts.',
-    excerptTh: 'เวิร์กช็อปภาคปฏิบัติเรื่องโภชนาการ การนอนหลับ และการเคลื่อนไหวในชีวิตประจำวัน',
+    excerpt:
+      'A hands-on afternoon on nutrition, sleep and everyday movement with THP experts.',
+    excerptTh:
+      'เวิร์กช็อปภาคปฏิบัติเรื่องโภชนาการ การนอนหลับ และการเคลื่อนไหวในชีวิตประจำวัน',
     content: p(
       'Join THP experts for a hands-on afternoon covering balanced nutrition, better sleep habits and simple daily movement.',
       'Seats are limited to 40 participants. Light healthy snacks will be served.',
@@ -325,7 +379,8 @@ const SEED_POSTS: SeedPost[] = [
     status: NewsEventStatus.ACTIVE,
     title: 'New Year Wellness Challenge 2027',
     titleTh: 'ภารกิจสุขภาพดีรับปีใหม่ 2027',
-    excerpt: 'A 30-day challenge to start 2027 with better habits. Prizes for every finisher.',
+    excerpt:
+      'A 30-day challenge to start 2027 with better habits. Prizes for every finisher.',
     content: p(
       'Start the new year with a 30-day wellness challenge: daily steps, water intake and sleep goals tracked together with the THP community.',
     ),
@@ -342,7 +397,8 @@ const SEED_POSTS: SeedPost[] = [
     type: 'news',
     status: NewsEventStatus.DRAFT,
     title: 'A Practical Guide to Vitamin D in a Sunny Country',
-    excerpt: 'Why vitamin D deficiency is common in Thailand despite the sunshine.',
+    excerpt:
+      'Why vitamin D deficiency is common in Thailand despite the sunshine.',
     content: p('Draft — content still being reviewed by the pharmacy team.'),
     publishedAt: null,
     images: ['supplementBlue'],
@@ -354,8 +410,11 @@ const SEED_POSTS: SeedPost[] = [
     status: NewsEventStatus.INACTIVE,
     title: 'Songkran Holiday Delivery Schedule',
     titleTh: 'ตารางการจัดส่งช่วงวันหยุดสงกรานต์',
-    excerpt: 'Orders placed during the Songkran holiday will ship from April 16.',
-    content: p('Orders placed between April 12 and 15 will be shipped from April 16.'),
+    excerpt:
+      'Orders placed during the Songkran holiday will ship from April 16.',
+    content: p(
+      'Orders placed between April 12 and 15 will be shipped from April 16.',
+    ),
     publishedAt: '2026-04-05T09:00:00+07:00',
     images: ['comboProduct'],
   },
@@ -404,18 +463,42 @@ async function main() {
     const typeIds = new Map<string, number>();
     for (const type of SEED_TYPES) {
       const { slug, ...data } = type;
-      const row = await prisma.newsEventType.upsert({
-        where: { slug },
-        create: { slug, ...data, createdBy: superAdmin.id, updatedBy: superAdmin.id },
-        update: { ...data, updatedBy: superAdmin.id },
+      //* slug IS UNIQUE AMONG NON-ARCHIVED TYPES ONLY (PARTIAL INDEX), SO NO
+      //* upsert — MATCH THE LIVE ROW BY HAND. AN ARCHIVED ONE IS LEFT ALONE.
+      const existing = await prisma.newsEventType.findFirst({
+        where: { slug, deletedAt: null },
         select: { id: true },
       });
+      const row = existing
+        ? await prisma.newsEventType.update({
+            where: { id: existing.id },
+            data: { ...data, updatedBy: superAdmin.id },
+            select: { id: true },
+          })
+        : await prisma.newsEventType.create({
+            data: {
+              slug,
+              ...data,
+              createdBy: superAdmin.id,
+              updatedBy: superAdmin.id,
+            },
+            select: { id: true },
+          });
       typeIds.set(slug, row.id);
     }
     console.log(`Upserted ${typeIds.size} news & event types`);
 
     for (const post of SEED_POSTS) {
-      const { slug, type, images, deleted, publishedAt, startsAt, endsAt, ...fields } = post;
+      const {
+        slug,
+        type,
+        images,
+        deleted,
+        publishedAt,
+        startsAt,
+        endsAt,
+        ...fields
+      } = post;
       const data = {
         ...fields,
         typeId: typeIds.get(type)!,
@@ -426,7 +509,10 @@ async function main() {
         deletedAt: deleted ? new Date() : null,
         //* SOFT DELETE = ARCHIVED + deletedAt, SAME AS THE DELETE ENDPOINT
         status: deleted ? NewsEventStatus.ARCHIVED : fields.status,
-        seoMetadata: { metaTitle: fields.title, metaDescription: fields.excerpt },
+        seoMetadata: {
+          metaTitle: fields.title,
+          metaDescription: fields.excerpt,
+        },
         authorId: superAdmin.id,
       };
 
@@ -440,7 +526,9 @@ async function main() {
 
         //* FULL REPLACE KEEPS RE-RUNS IDEMPOTENT (IMAGES HAVE NO NATURAL KEY)
         await tx.newsEventImage.deleteMany({ where: { newsEventId: row.id } });
-        const urls = images.map((key) => imageUrls.get(key)).filter((url): url is string => !!url);
+        const urls = images
+          .map((key) => imageUrls.get(key))
+          .filter((url): url is string => !!url);
         await tx.newsEventImage.createMany({
           data: urls.map((url, index) => ({
             newsEventId: row.id,

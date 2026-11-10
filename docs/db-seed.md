@@ -60,7 +60,7 @@ In other words: as written today, running `export-products.ts` would **not** pro
 
 ## News & Events seeding
 
-`prisma/seed-news-event.ts` seeds 5 types (News, Event, Press Release, Promotion, and an **inactive** Announcement) and 14 posts. Types and posts are upserted by `slug`. Each post's images are fully replaced. Rows with other slugs are never touched, so the script is safe to re-run.
+`prisma/seed-news-event.ts` seeds 5 types (News, Event, Press Release, Promotion, and an **inactive** Announcement) and 14 posts. Types are matched by `slug` among non-archived types (an archived type is never touched), and posts are upserted by `slug`. Re-running resets the seeded types' `isActive` to the seed values. Each post's images are fully replaced. Rows with other slugs are never touched, so the script is safe to re-run.
 
 The posts cover every visibility rule:
 

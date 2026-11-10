@@ -163,7 +163,7 @@ export class NewsEventController {
   @ApiOkResponse({ type: NewsEventResponseDto })
   @ApiBadRequestResponse({ description: 'Invalid input or image operation.' })
   @ApiConflictResponse({
-    description: 'Post is soft-deleted — restore it first.',
+    description: 'Post is archived — archived posts are read-only.',
   })
   @ApiNotFoundResponse({ description: 'Post not found.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
@@ -185,7 +185,7 @@ export class NewsEventController {
   @ApiOperation({
     summary: 'Soft delete a news & event post',
     description:
-      'Archives the post: status becomes ARCHIVED and deletedAt is set. It disappears from the storefront; images are kept so it can be restored. Admin only.',
+      'Archives the post: status becomes ARCHIVED and deletedAt is set. It disappears from the storefront; images are kept. One-way: archived posts cannot be restored or edited. Admin only.',
   })
   @ApiNotFoundResponse({ description: 'Post not found.' })
   @ApiConflictResponse({ description: 'Post is already deleted.' })
@@ -194,25 +194,6 @@ export class NewsEventController {
   @ResponseMessage('News & event deleted successfully')
   async softDeleteNewsEvent(@Param('id', ParseIntPipe) id: number) {
     return this.newsEventService.softDeleteNewsEvent(id);
-  }
-
-  @Patch('restore-news-event/:id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Restore an archived news & event post',
-    description:
-      'Brings an archived post back as INACTIVE — publish it again by setting it ACTIVE. Admin only.',
-  })
-  @ApiOkResponse({ type: NewsEventResponseDto })
-  @ApiNotFoundResponse({ description: 'Post not found.' })
-  @ApiConflictResponse({ description: 'Post is not deleted.' })
-  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
-  @ApiForbiddenResponse({ description: 'Admin role required.' })
-  @ResponseMessage('News & event restored successfully')
-  async restoreNewsEvent(@Param('id', ParseIntPipe) id: number) {
-    return this.newsEventService.restoreNewsEvent(id);
   }
 
   // ═══════════════════════════════════════════════════════════════════════

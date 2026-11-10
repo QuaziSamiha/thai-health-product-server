@@ -10,7 +10,7 @@ enum NewsEventStatus {
   ACTIVE
   INACTIVE
   DRAFT
-  ARCHIVED //* SET ONLY BY THE SOFT-DELETE ENDPOINT (TOGETHER WITH deletedAt) — NEVER CHOSEN IN THE FORM. RESTORE RETURNS THE POST AS INACTIVE.
+  ARCHIVED //* SET ONLY BY THE SOFT-DELETE ENDPOINT (TOGETHER WITH deletedAt) — NEVER CHOSEN IN THE FORM. ONE-WAY: AN ARCHIVED POST CANNOT BE RESTORED OR EDITED.
 }
 
 //* DYNAMIC TYPE LIST — ADD/RENAME TYPES FROM THE ADMIN PANEL, NO MIGRATION NEEDED
@@ -18,9 +18,11 @@ model NewsEventType {
   id  Int    @id @default(autoincrement())
   sid String @unique @default(uuid()) @db.Uuid
 
-  name         String  @unique @db.VarChar(100)
+  //* name / slug ARE UNIQUE AMONG NON-ARCHIVED TYPES ONLY (PARTIAL UNIQUE INDEXES IN
+  //* MIGRATION 20261110140000) SO AN ARCHIVED TYPE'S NAME CAN BE REUSED
+  name         String  @db.VarChar(100)
   nameTh       String? @map("name_th") @db.VarChar(100)
-  slug         String  @unique @db.VarChar(120) //* FILTER KEY, E.G. /news-events?type=event
+  slug         String  @db.VarChar(120) //* FILTER KEY, E.G. /news-events?type=event
   isActive     Boolean @default(true) @map("is_active")
   displayOrder Int     @default(0) @map("display_order")
 
@@ -35,7 +37,12 @@ model NewsEventType {
   updatedBy     Int?  @map("updated_by")
   updatedByUser User? @relation("NewsEventTypeUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
 
+  //* ARCHIVE (SOFT DELETE) — ONE-WAY. ALLOWED ONLY WHILE NO ACTIVE POST USES THE
+  //* TYPE; ALSO FORCES isActive = false. AN ARCHIVED TYPE CANNOT BE EDITED OR RESTORED.
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(3)
+
   @@index([isActive, displayOrder])
+  @@index([slug])
   @@map("news_event_types")
 }
 
@@ -68,7 +75,7 @@ model NewsEvent {
 
   //* RELATIONS
   typeId Int              @map("type_id")
-  type   NewsEventType    @relation(fields: [typeId], references: [id], onDelete: Restrict) //* A TYPE IN USE CANNOT BE DELETED — DEACTIVATE IT INSTEAD
+  type   NewsEventType    @relation(fields: [typeId], references: [id], onDelete: Restrict) //* TYPES ARE NEVER HARD-DELETED — THEY ARE ARCHIVED (deletedAt)
   images NewsEventImage[]
 
   authorId Int?  @map("author_id")
