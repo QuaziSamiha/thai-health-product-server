@@ -185,6 +185,16 @@ export const InventoryExchangeType = {
 export type InventoryExchangeType = (typeof InventoryExchangeType)[keyof typeof InventoryExchangeType]
 
 
+export const NewsEventStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  DRAFT: 'DRAFT',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type NewsEventStatus = (typeof NewsEventStatus)[keyof typeof NewsEventStatus]
+
+
 export const OrderStatus = {
   PENDING: 'PENDING',
   CONFIRMED: 'CONFIRMED',

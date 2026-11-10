@@ -1,0 +1,106 @@
+//* ============= NEWS & EVENTS DOMAIN =============
+//* STOREFRONT "NEWS & EVENTS" PAGES + ADMIN > NEWS & EVENTS.
+//* THREE TABLES:
+//*   NewsEventType  — ADMIN-MANAGED TYPES (E.G. NEWS, EVENT, PRESS RELEASE)
+//*   NewsEvent      — THE POST ITSELF
+//*   NewsEventImage — COVER + GALLERY IMAGES OF A POST
+//* WHO CREATED/EDITED/DELETED IS TRACKED BY THE GENERIC AuditLog, NOT HERE.
+
+enum NewsEventStatus {
+  ACTIVE
+  INACTIVE
+  DRAFT
+  ARCHIVED //* SET ONLY BY THE SOFT-DELETE ENDPOINT (TOGETHER WITH deletedAt) — NEVER CHOSEN IN THE FORM. RESTORE RETURNS THE POST AS INACTIVE.
+}
+
+//* DYNAMIC TYPE LIST — ADD/RENAME TYPES FROM THE ADMIN PANEL, NO MIGRATION NEEDED
+model NewsEventType {
+  id  Int    @id @default(autoincrement())
+  sid String @unique @default(uuid()) @db.Uuid
+
+  name         String  @unique @db.VarChar(100)
+  nameTh       String? @map("name_th") @db.VarChar(100)
+  slug         String  @unique @db.VarChar(120) //* FILTER KEY, E.G. /news-events?type=event
+  isActive     Boolean @default(true) @map("is_active")
+  displayOrder Int     @default(0) @map("display_order")
+
+  newsEvents NewsEvent[]
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  //* AUDIT — WHO CREATED / LAST EDITED THIS TYPE
+  createdBy     Int?  @map("created_by")
+  createdByUser User? @relation("NewsEventTypeCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedBy     Int?  @map("updated_by")
+  updatedByUser User? @relation("NewsEventTypeUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@index([isActive, displayOrder])
+  @@map("news_event_types")
+}
+
+model NewsEvent {
+  id     Int             @id @default(autoincrement())
+  sid    String          @unique @default(uuid()) @db.Uuid
+  status NewsEventStatus @default(DRAFT)
+
+  //* PRIMARY CONTENT (ENGLISH & GLOBAL SLUG)
+  title   String  @db.VarChar(255)
+  slug    String  @unique @db.VarChar(255)
+  excerpt String? @db.VarChar(500) //* SHORT SUMMARY FOR CARDS / META DESCRIPTION
+  content String  @db.Text //* RICH-TEXT HTML FROM THE ADMIN EDITOR
+
+  //* SECONDARY CONTENT (THAI DISPLAY) — NULL FALLS BACK TO ENGLISH
+  titleTh   String? @map("title_th") @db.VarChar(255)
+  excerptTh String? @map("excerpt_th") @db.VarChar(500)
+  contentTh String? @map("content_th") @db.Text
+
+  //* EVENT DETAILS — OPTIONAL, ONLY FILLED FOR EVENT-LIKE POSTS
+  startsAt   DateTime? @map("starts_at") @db.Timestamptz(3)
+  endsAt     DateTime? @map("ends_at") @db.Timestamptz(3)
+  location   String?   @db.VarChar(255)
+  locationTh String?   @map("location_th") @db.VarChar(255)
+
+  isFeatured Boolean @default(false) @map("is_featured")
+
+  //* SEO — SAME SHAPE AS Product.seoMetadata: metaTitle, metaDescription, metaTitleTh, metaDescriptionTh
+  seoMetadata Json? @default("{}") @map("seo_metadata")
+
+  //* RELATIONS
+  typeId Int              @map("type_id")
+  type   NewsEventType    @relation(fields: [typeId], references: [id], onDelete: Restrict) //* A TYPE IN USE CANNOT BE DELETED — DEACTIVATE IT INSTEAD
+  images NewsEventImage[]
+
+  authorId Int?  @map("author_id")
+  author   User? @relation("NewsEventAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  //* TIMESTAMPS
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3) //* DATE SHOWN ON CARDS; FUTURE VALUE = SCHEDULED
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3) //* SOFT DELETE
+
+  @@index([status, publishedAt(sort: Desc)]) //* STOREFRONT LISTING, LATEST FIRST
+  @@index([typeId, status, publishedAt(sort: Desc)]) //* LISTING FILTERED BY TYPE
+  @@index([status, title]) //* "SORT BY A TO Z"
+  @@index([status, isFeatured])
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin, map: "news_events_title_trgm_idx") //* ADMIN SEARCH (ILIKE); pg_trgm ALREADY ENABLED
+  @@map("news_events")
+}
+
+model NewsEventImage {
+  id           Int     @id @default(autoincrement())
+  url          String  @db.VarChar(512)
+  thumbnailUrl String? @map("thumbnail_url") @db.VarChar(512) //* RESIZED FOR CARDS / ADMIN TABLE
+  altText      String? @map("alt_text") @db.VarChar(255)
+  displayOrder Int     @default(0) @map("display_order")
+  isCover      Boolean @default(false) @map("is_cover") //* COVER SHOWN ON LISTING CARDS & DETAIL HERO
+
+  newsEventId Int       @map("news_event_id")
+  newsEvent   NewsEvent @relation(fields: [newsEventId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([newsEventId, isCover])
+  @@map("news_event_images")
+}

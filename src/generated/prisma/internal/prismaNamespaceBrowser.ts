@@ -72,6 +72,9 @@ export const ModelName = {
   Home: 'Home',
   Batch: 'Batch',
   Inventory: 'Inventory',
+  NewsEventType: 'NewsEventType',
+  NewsEvent: 'NewsEvent',
+  NewsEventImage: 'NewsEventImage',
   Order: 'Order',
   OrderAddress: 'OrderAddress',
   OrderItem: 'OrderItem',
@@ -552,6 +555,65 @@ export const InventoryScalarFieldEnum = {
 } as const
 
 export type InventoryScalarFieldEnum = (typeof InventoryScalarFieldEnum)[keyof typeof InventoryScalarFieldEnum]
+
+
+export const NewsEventTypeScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  name: 'name',
+  nameTh: 'nameTh',
+  slug: 'slug',
+  isActive: 'isActive',
+  displayOrder: 'displayOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy'
+} as const
+
+export type NewsEventTypeScalarFieldEnum = (typeof NewsEventTypeScalarFieldEnum)[keyof typeof NewsEventTypeScalarFieldEnum]
+
+
+export const NewsEventScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  status: 'status',
+  title: 'title',
+  slug: 'slug',
+  excerpt: 'excerpt',
+  content: 'content',
+  titleTh: 'titleTh',
+  excerptTh: 'excerptTh',
+  contentTh: 'contentTh',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  location: 'location',
+  locationTh: 'locationTh',
+  isFeatured: 'isFeatured',
+  seoMetadata: 'seoMetadata',
+  typeId: 'typeId',
+  authorId: 'authorId',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type NewsEventScalarFieldEnum = (typeof NewsEventScalarFieldEnum)[keyof typeof NewsEventScalarFieldEnum]
+
+
+export const NewsEventImageScalarFieldEnum = {
+  id: 'id',
+  url: 'url',
+  thumbnailUrl: 'thumbnailUrl',
+  altText: 'altText',
+  displayOrder: 'displayOrder',
+  isCover: 'isCover',
+  newsEventId: 'newsEventId',
+  createdAt: 'createdAt'
+} as const
+
+export type NewsEventImageScalarFieldEnum = (typeof NewsEventImageScalarFieldEnum)[keyof typeof NewsEventImageScalarFieldEnum]
 
 
 export const OrderScalarFieldEnum = {

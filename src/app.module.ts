@@ -23,6 +23,7 @@ import { ProductModule } from './modules/product/product.module';
 import { BlogModule } from './modules/blog/blog.module';
 import { HomeModule } from './modules/home/home.module';
 import { SupportModule } from './modules/support/support.module';
+import { NewsEventModule } from './modules/news-event/news-event.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { ComboProductModule } from './modules/combo-product/combo-product.module';
 import { AddressModule } from './modules/address/address.module';
@@ -104,6 +105,7 @@ import {
     BlogModule,
     HomeModule,
     SupportModule,
+    NewsEventModule,
     ComboProductModule,
     InventoryModule,
     AddressModule,

@@ -405,6 +405,9 @@ export const ModelName = {
   Home: 'Home',
   Batch: 'Batch',
   Inventory: 'Inventory',
+  NewsEventType: 'NewsEventType',
+  NewsEvent: 'NewsEvent',
+  NewsEventImage: 'NewsEventImage',
   Order: 'Order',
   OrderAddress: 'OrderAddress',
   OrderItem: 'OrderItem',
@@ -435,7 +438,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "address" | "auditLog" | "blog" | "cart" | "cartItem" | "category" | "comboProduct" | "comboItem" | "comboImage" | "deliveryChargeZone" | "deliveryChargeArea" | "deliveryChargeRate" | "deliveryFreeDeliveryRule" | "deliveryManProfile" | "deliveryProvider" | "deliveryZone" | "deliveryShipment" | "deliveryStatusHistory" | "home" | "batch" | "inventory" | "order" | "orderAddress" | "orderItem" | "orderStatusHistory" | "payment" | "product" | "productVariant" | "productImage" | "promoCode" | "promoCodeRedemption" | "support" | "user" | "profile" | "userSecurity" | "oTP"
+    modelProps: "address" | "auditLog" | "blog" | "cart" | "cartItem" | "category" | "comboProduct" | "comboItem" | "comboImage" | "deliveryChargeZone" | "deliveryChargeArea" | "deliveryChargeRate" | "deliveryFreeDeliveryRule" | "deliveryManProfile" | "deliveryProvider" | "deliveryZone" | "deliveryShipment" | "deliveryStatusHistory" | "home" | "batch" | "inventory" | "newsEventType" | "newsEvent" | "newsEventImage" | "order" | "orderAddress" | "orderItem" | "orderStatusHistory" | "payment" | "product" | "productVariant" | "productImage" | "promoCode" | "promoCodeRedemption" | "support" | "user" | "profile" | "userSecurity" | "oTP"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1990,6 +1993,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.InventoryCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.InventoryCountAggregateOutputType> | number
+        }
+      }
+    }
+    NewsEventType: {
+      payload: Prisma.$NewsEventTypePayload<ExtArgs>
+      fields: Prisma.NewsEventTypeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.NewsEventTypeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventTypePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.NewsEventTypeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventTypePayload>
+        }
+        findFirst: {
+          args: Prisma.NewsEventTypeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventTypePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.NewsEventTypeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventTypePayload>
+        }
+        findMany: {
+          args: Prisma.NewsEventTypeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventTypePayload>[]
+        }
+        create: {
+          args: Prisma.NewsEventTypeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventTypePayload>
+        }
+        createMany: {
+          args: Prisma.NewsEventTypeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.NewsEventTypeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventTypePayload>[]
+        }
+        delete: {
+          args: Prisma.NewsEventTypeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventTypePayload>
+        }
+        update: {
+          args: Prisma.NewsEventTypeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventTypePayload>
+        }
+        deleteMany: {
+          args: Prisma.NewsEventTypeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.NewsEventTypeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.NewsEventTypeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventTypePayload>[]
+        }
+        upsert: {
+          args: Prisma.NewsEventTypeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventTypePayload>
+        }
+        aggregate: {
+          args: Prisma.NewsEventTypeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNewsEventType>
+        }
+        groupBy: {
+          args: Prisma.NewsEventTypeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NewsEventTypeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.NewsEventTypeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NewsEventTypeCountAggregateOutputType> | number
+        }
+      }
+    }
+    NewsEvent: {
+      payload: Prisma.$NewsEventPayload<ExtArgs>
+      fields: Prisma.NewsEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.NewsEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.NewsEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventPayload>
+        }
+        findFirst: {
+          args: Prisma.NewsEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.NewsEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventPayload>
+        }
+        findMany: {
+          args: Prisma.NewsEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventPayload>[]
+        }
+        create: {
+          args: Prisma.NewsEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventPayload>
+        }
+        createMany: {
+          args: Prisma.NewsEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.NewsEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventPayload>[]
+        }
+        delete: {
+          args: Prisma.NewsEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventPayload>
+        }
+        update: {
+          args: Prisma.NewsEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.NewsEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.NewsEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.NewsEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.NewsEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventPayload>
+        }
+        aggregate: {
+          args: Prisma.NewsEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNewsEvent>
+        }
+        groupBy: {
+          args: Prisma.NewsEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NewsEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.NewsEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NewsEventCountAggregateOutputType> | number
+        }
+      }
+    }
+    NewsEventImage: {
+      payload: Prisma.$NewsEventImagePayload<ExtArgs>
+      fields: Prisma.NewsEventImageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.NewsEventImageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventImagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.NewsEventImageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventImagePayload>
+        }
+        findFirst: {
+          args: Prisma.NewsEventImageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventImagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.NewsEventImageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventImagePayload>
+        }
+        findMany: {
+          args: Prisma.NewsEventImageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventImagePayload>[]
+        }
+        create: {
+          args: Prisma.NewsEventImageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventImagePayload>
+        }
+        createMany: {
+          args: Prisma.NewsEventImageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.NewsEventImageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventImagePayload>[]
+        }
+        delete: {
+          args: Prisma.NewsEventImageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventImagePayload>
+        }
+        update: {
+          args: Prisma.NewsEventImageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventImagePayload>
+        }
+        deleteMany: {
+          args: Prisma.NewsEventImageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.NewsEventImageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.NewsEventImageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventImagePayload>[]
+        }
+        upsert: {
+          args: Prisma.NewsEventImageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NewsEventImagePayload>
+        }
+        aggregate: {
+          args: Prisma.NewsEventImageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNewsEventImage>
+        }
+        groupBy: {
+          args: Prisma.NewsEventImageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NewsEventImageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.NewsEventImageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NewsEventImageCountAggregateOutputType> | number
         }
       }
     }
@@ -3591,6 +3816,65 @@ export const InventoryScalarFieldEnum = {
 export type InventoryScalarFieldEnum = (typeof InventoryScalarFieldEnum)[keyof typeof InventoryScalarFieldEnum]
 
 
+export const NewsEventTypeScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  name: 'name',
+  nameTh: 'nameTh',
+  slug: 'slug',
+  isActive: 'isActive',
+  displayOrder: 'displayOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy'
+} as const
+
+export type NewsEventTypeScalarFieldEnum = (typeof NewsEventTypeScalarFieldEnum)[keyof typeof NewsEventTypeScalarFieldEnum]
+
+
+export const NewsEventScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  status: 'status',
+  title: 'title',
+  slug: 'slug',
+  excerpt: 'excerpt',
+  content: 'content',
+  titleTh: 'titleTh',
+  excerptTh: 'excerptTh',
+  contentTh: 'contentTh',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  location: 'location',
+  locationTh: 'locationTh',
+  isFeatured: 'isFeatured',
+  seoMetadata: 'seoMetadata',
+  typeId: 'typeId',
+  authorId: 'authorId',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type NewsEventScalarFieldEnum = (typeof NewsEventScalarFieldEnum)[keyof typeof NewsEventScalarFieldEnum]
+
+
+export const NewsEventImageScalarFieldEnum = {
+  id: 'id',
+  url: 'url',
+  thumbnailUrl: 'thumbnailUrl',
+  altText: 'altText',
+  displayOrder: 'displayOrder',
+  isCover: 'isCover',
+  newsEventId: 'newsEventId',
+  createdAt: 'createdAt'
+} as const
+
+export type NewsEventImageScalarFieldEnum = (typeof NewsEventImageScalarFieldEnum)[keyof typeof NewsEventImageScalarFieldEnum]
+
+
 export const OrderScalarFieldEnum = {
   id: 'id',
   sid: 'sid',
@@ -4337,6 +4621,20 @@ export type ListEnumInventoryExchangeTypeFieldRefInput<$PrismaModel> = FieldRefI
 
 
 /**
+ * Reference to a field of type 'NewsEventStatus'
+ */
+export type EnumNewsEventStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NewsEventStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'NewsEventStatus[]'
+ */
+export type ListEnumNewsEventStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NewsEventStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'OrderStatus'
  */
 export type EnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus'>
@@ -4633,6 +4931,9 @@ export type GlobalOmitConfig = {
   home?: Prisma.HomeOmit
   batch?: Prisma.BatchOmit
   inventory?: Prisma.InventoryOmit
+  newsEventType?: Prisma.NewsEventTypeOmit
+  newsEvent?: Prisma.NewsEventOmit
+  newsEventImage?: Prisma.NewsEventImageOmit
   order?: Prisma.OrderOmit
   orderAddress?: Prisma.OrderAddressOmit
   orderItem?: Prisma.OrderItemOmit

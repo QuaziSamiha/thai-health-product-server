@@ -58,6 +58,28 @@ yarn db:seed-products      # loads .env.production, replays seed-data/products.j
 
 In other words: as written today, running `export-products.ts` would **not** produce a file `seed-products.ts` can consume as-is. Whoever produced the current `seed-data/products.json` either used an older version of `export-products.ts` or transformed the output by hand. If you need to refresh this fixture from a live DB, fix this mismatch first (either change the export to emit a bare product array, or change the seed script to read `.products` off the wrapper object) rather than assuming the two scripts are still round-trip compatible.
 
+## News & Events seeding
+
+`prisma/seed-news-event.ts` seeds 5 types (News, Event, Press Release, Promotion, and an **inactive** Announcement) and 14 posts. Types and posts are upserted by `slug`. Each post's images are fully replaced. Rows with other slugs are never touched, so the script is safe to re-run.
+
+The posts cover every visibility rule:
+
+| Posts | Storefront | Admin |
+|---|---|---|
+| 10 × ACTIVE, `publishedAt` in the past | Visible (2 pages of 9) | Posts tab |
+| 1 × ACTIVE, `publishedAt` in the future | Hidden (scheduled) | Posts tab, marked "(scheduled)" |
+| 1 × DRAFT, 1 × INACTIVE | Hidden | Posts tab |
+| 1 × soft-deleted (status ARCHIVED) | Hidden | Listed with an "Archived" badge |
+
+Images are copied from existing uploads into `uploads/news-events/images/seed-*` under stable names. Posts are attributed to the `mahfuzislam1695@gmail.com` super admin. If that account doesn't exist, they go to the earliest active admin instead.
+
+```bash
+yarn db:seed-news-event        # .env.development
+yarn db:seed-news-event:local  # .env.development.local
+```
+
+The tables come from migration `20261110120000_add_news_events`. That migration also adds the `news_event_images_one_cover_per_post` partial unique index, which the Prisma schema can't express.
+
 ## Fixture data location
 
 `prisma/seed-data/products.json` holds the large (tens of KB) static fixture the product seed reads. It's deliberately kept out of the `.ts` logic files and is **not** gitignored (`.gitignore` only excludes `*.seed`, which doesn't match this filename) — it's committed as real catalog data, not a local scratch file.

@@ -123,6 +123,21 @@ export type Batch = Prisma.BatchModel
  */
 export type Inventory = Prisma.InventoryModel
 /**
+ * Model NewsEventType
+ * 
+ */
+export type NewsEventType = Prisma.NewsEventTypeModel
+/**
+ * Model NewsEvent
+ * 
+ */
+export type NewsEvent = Prisma.NewsEventModel
+/**
+ * Model NewsEventImage
+ * 
+ */
+export type NewsEventImage = Prisma.NewsEventImageModel
+/**
  * Model Order
  * 
  */

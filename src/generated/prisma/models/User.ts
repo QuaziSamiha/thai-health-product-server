@@ -309,6 +309,9 @@ export type UserWhereInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryListRelationFilter
   verifiedDeliveryMen?: Prisma.DeliveryManProfileListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
+  authoredNewsEvents?: Prisma.NewsEventListRelationFilter
+  createdNewsEventTypes?: Prisma.NewsEventTypeListRelationFilter
+  updatedNewsEventTypes?: Prisma.NewsEventTypeListRelationFilter
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneListRelationFilter
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneListRelationFilter
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleListRelationFilter
@@ -358,6 +361,9 @@ export type UserOrderByWithRelationInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryOrderByRelationAggregateInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileOrderByRelationAggregateInput
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
+  authoredNewsEvents?: Prisma.NewsEventOrderByRelationAggregateInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeOrderByRelationAggregateInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeOrderByRelationAggregateInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneOrderByRelationAggregateInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneOrderByRelationAggregateInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleOrderByRelationAggregateInput
@@ -411,6 +417,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryListRelationFilter
   verifiedDeliveryMen?: Prisma.DeliveryManProfileListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
+  authoredNewsEvents?: Prisma.NewsEventListRelationFilter
+  createdNewsEventTypes?: Prisma.NewsEventTypeListRelationFilter
+  updatedNewsEventTypes?: Prisma.NewsEventTypeListRelationFilter
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneListRelationFilter
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneListRelationFilter
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleListRelationFilter
@@ -499,6 +508,9 @@ export type UserCreateInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -548,6 +560,9 @@ export type UserUncheckedCreateInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -596,6 +611,9 @@ export type UserUpdateInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -645,6 +663,9 @@ export type UserUncheckedUpdateInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -1117,6 +1138,54 @@ export type UserUpdateOneWithoutInventoriesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutInventoriesInput, Prisma.UserUpdateWithoutInventoriesInput>, Prisma.UserUncheckedUpdateWithoutInventoriesInput>
 }
 
+export type UserCreateNestedOneWithoutCreatedNewsEventTypesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedNewsEventTypesInput, Prisma.UserUncheckedCreateWithoutCreatedNewsEventTypesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedNewsEventTypesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutUpdatedNewsEventTypesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedNewsEventTypesInput, Prisma.UserUncheckedCreateWithoutUpdatedNewsEventTypesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedNewsEventTypesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutCreatedNewsEventTypesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedNewsEventTypesInput, Prisma.UserUncheckedCreateWithoutCreatedNewsEventTypesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedNewsEventTypesInput
+  upsert?: Prisma.UserUpsertWithoutCreatedNewsEventTypesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedNewsEventTypesInput, Prisma.UserUpdateWithoutCreatedNewsEventTypesInput>, Prisma.UserUncheckedUpdateWithoutCreatedNewsEventTypesInput>
+}
+
+export type UserUpdateOneWithoutUpdatedNewsEventTypesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedNewsEventTypesInput, Prisma.UserUncheckedCreateWithoutUpdatedNewsEventTypesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedNewsEventTypesInput
+  upsert?: Prisma.UserUpsertWithoutUpdatedNewsEventTypesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUpdatedNewsEventTypesInput, Prisma.UserUpdateWithoutUpdatedNewsEventTypesInput>, Prisma.UserUncheckedUpdateWithoutUpdatedNewsEventTypesInput>
+}
+
+export type UserCreateNestedOneWithoutAuthoredNewsEventsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuthoredNewsEventsInput, Prisma.UserUncheckedCreateWithoutAuthoredNewsEventsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuthoredNewsEventsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutAuthoredNewsEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuthoredNewsEventsInput, Prisma.UserUncheckedCreateWithoutAuthoredNewsEventsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuthoredNewsEventsInput
+  upsert?: Prisma.UserUpsertWithoutAuthoredNewsEventsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAuthoredNewsEventsInput, Prisma.UserUpdateWithoutAuthoredNewsEventsInput>, Prisma.UserUncheckedUpdateWithoutAuthoredNewsEventsInput>
+}
+
 export type UserCreateNestedOneWithoutOrdersInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutOrdersInput, Prisma.UserUncheckedCreateWithoutOrdersInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutOrdersInput
@@ -1342,6 +1411,9 @@ export type UserCreateWithoutAddressesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -1390,6 +1462,9 @@ export type UserUncheckedCreateWithoutAddressesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -1453,6 +1528,9 @@ export type UserUpdateWithoutAddressesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -1501,6 +1579,9 @@ export type UserUncheckedUpdateWithoutAddressesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -1548,6 +1629,9 @@ export type UserCreateWithoutAuditLogsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -1596,6 +1680,9 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -1659,6 +1746,9 @@ export type UserUpdateWithoutAuditLogsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -1707,6 +1797,9 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -1754,6 +1847,9 @@ export type UserCreateWithoutBlogsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -1802,6 +1898,9 @@ export type UserUncheckedCreateWithoutBlogsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -1865,6 +1964,9 @@ export type UserUpdateWithoutBlogsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -1913,6 +2015,9 @@ export type UserUncheckedUpdateWithoutBlogsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -1960,6 +2065,9 @@ export type UserCreateWithoutCartsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -2008,6 +2116,9 @@ export type UserUncheckedCreateWithoutCartsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -2071,6 +2182,9 @@ export type UserUpdateWithoutCartsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -2119,6 +2233,9 @@ export type UserUncheckedUpdateWithoutCartsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -2166,6 +2283,9 @@ export type UserCreateWithoutCreatedCategoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -2214,6 +2334,9 @@ export type UserUncheckedCreateWithoutCreatedCategoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -2266,6 +2389,9 @@ export type UserCreateWithoutUpdatedCategoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -2314,6 +2440,9 @@ export type UserUncheckedCreateWithoutUpdatedCategoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -2377,6 +2506,9 @@ export type UserUpdateWithoutCreatedCategoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -2425,6 +2557,9 @@ export type UserUncheckedUpdateWithoutCreatedCategoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -2483,6 +2618,9 @@ export type UserUpdateWithoutUpdatedCategoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -2531,6 +2669,9 @@ export type UserUncheckedUpdateWithoutUpdatedCategoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -2578,6 +2719,9 @@ export type UserCreateWithoutCreatedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -2626,6 +2770,9 @@ export type UserUncheckedCreateWithoutCreatedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -2678,6 +2825,9 @@ export type UserCreateWithoutUpdatedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -2726,6 +2876,9 @@ export type UserUncheckedCreateWithoutUpdatedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -2778,6 +2931,9 @@ export type UserCreateWithoutDeletedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -2826,6 +2982,9 @@ export type UserUncheckedCreateWithoutDeletedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -2889,6 +3048,9 @@ export type UserUpdateWithoutCreatedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -2937,6 +3099,9 @@ export type UserUncheckedUpdateWithoutCreatedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -2995,6 +3160,9 @@ export type UserUpdateWithoutUpdatedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -3043,6 +3211,9 @@ export type UserUncheckedUpdateWithoutUpdatedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -3101,6 +3272,9 @@ export type UserUpdateWithoutDeletedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -3149,6 +3323,9 @@ export type UserUncheckedUpdateWithoutDeletedCombosInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -3197,6 +3374,9 @@ export type UserCreateWithoutCreatedDeliveryChargeZonesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
   updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
@@ -3245,6 +3425,9 @@ export type UserUncheckedCreateWithoutCreatedDeliveryChargeZonesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -3297,6 +3480,9 @@ export type UserCreateWithoutUpdatedDeliveryChargeZonesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
   updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
@@ -3345,6 +3531,9 @@ export type UserUncheckedCreateWithoutUpdatedDeliveryChargeZonesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -3408,6 +3597,9 @@ export type UserUpdateWithoutCreatedDeliveryChargeZonesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
   updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
@@ -3456,6 +3648,9 @@ export type UserUncheckedUpdateWithoutCreatedDeliveryChargeZonesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -3514,6 +3709,9 @@ export type UserUpdateWithoutUpdatedDeliveryChargeZonesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
   updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
@@ -3562,6 +3760,9 @@ export type UserUncheckedUpdateWithoutUpdatedDeliveryChargeZonesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -3609,6 +3810,9 @@ export type UserCreateWithoutCreatedFreeDeliveryRulesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
@@ -3657,6 +3861,9 @@ export type UserUncheckedCreateWithoutCreatedFreeDeliveryRulesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
@@ -3709,6 +3916,9 @@ export type UserCreateWithoutUpdatedFreeDeliveryRulesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -3757,6 +3967,9 @@ export type UserUncheckedCreateWithoutUpdatedFreeDeliveryRulesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -3820,6 +4033,9 @@ export type UserUpdateWithoutCreatedFreeDeliveryRulesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
@@ -3868,6 +4084,9 @@ export type UserUncheckedUpdateWithoutCreatedFreeDeliveryRulesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -3926,6 +4145,9 @@ export type UserUpdateWithoutUpdatedFreeDeliveryRulesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -3974,6 +4196,9 @@ export type UserUncheckedUpdateWithoutUpdatedFreeDeliveryRulesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -4020,6 +4245,9 @@ export type UserCreateWithoutDeliveryManProfileInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -4068,6 +4296,9 @@ export type UserUncheckedCreateWithoutDeliveryManProfileInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -4120,6 +4351,9 @@ export type UserCreateWithoutVerifiedDeliveryMenInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -4168,6 +4402,9 @@ export type UserUncheckedCreateWithoutVerifiedDeliveryMenInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -4231,6 +4468,9 @@ export type UserUpdateWithoutDeliveryManProfileInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -4279,6 +4519,9 @@ export type UserUncheckedUpdateWithoutDeliveryManProfileInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -4337,6 +4580,9 @@ export type UserUpdateWithoutVerifiedDeliveryMenInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -4385,6 +4631,9 @@ export type UserUncheckedUpdateWithoutVerifiedDeliveryMenInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -4432,6 +4681,9 @@ export type UserCreateWithoutCreatedDeliveryProvidersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -4480,6 +4732,9 @@ export type UserUncheckedCreateWithoutCreatedDeliveryProvidersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -4532,6 +4787,9 @@ export type UserCreateWithoutUpdatedDeliveryProvidersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -4580,6 +4838,9 @@ export type UserUncheckedCreateWithoutUpdatedDeliveryProvidersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -4643,6 +4904,9 @@ export type UserUpdateWithoutCreatedDeliveryProvidersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -4691,6 +4955,9 @@ export type UserUncheckedUpdateWithoutCreatedDeliveryProvidersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -4749,6 +5016,9 @@ export type UserUpdateWithoutUpdatedDeliveryProvidersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -4797,6 +5067,9 @@ export type UserUncheckedUpdateWithoutUpdatedDeliveryProvidersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -4844,6 +5117,9 @@ export type UserCreateWithoutBookedDeliveryShipmentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -4892,6 +5168,9 @@ export type UserUncheckedCreateWithoutBookedDeliveryShipmentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -4955,6 +5234,9 @@ export type UserUpdateWithoutBookedDeliveryShipmentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -5003,6 +5285,9 @@ export type UserUncheckedUpdateWithoutBookedDeliveryShipmentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -5050,6 +5335,9 @@ export type UserCreateWithoutDeliveryStatusChangesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -5098,6 +5386,9 @@ export type UserUncheckedCreateWithoutDeliveryStatusChangesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -5161,6 +5452,9 @@ export type UserUpdateWithoutDeliveryStatusChangesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -5209,6 +5503,9 @@ export type UserUncheckedUpdateWithoutDeliveryStatusChangesInput = {
   bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -5256,6 +5553,9 @@ export type UserCreateWithoutCreatedHomeContentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -5304,6 +5604,9 @@ export type UserUncheckedCreateWithoutCreatedHomeContentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -5356,6 +5659,9 @@ export type UserCreateWithoutUpdatedHomeContentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -5404,6 +5710,9 @@ export type UserUncheckedCreateWithoutUpdatedHomeContentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -5467,6 +5776,9 @@ export type UserUpdateWithoutCreatedHomeContentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -5515,6 +5827,9 @@ export type UserUncheckedUpdateWithoutCreatedHomeContentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -5573,6 +5888,9 @@ export type UserUpdateWithoutUpdatedHomeContentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -5621,6 +5939,9 @@ export type UserUncheckedUpdateWithoutUpdatedHomeContentsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -5668,6 +5989,9 @@ export type UserCreateWithoutInventoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -5716,6 +6040,9 @@ export type UserUncheckedCreateWithoutInventoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -5779,6 +6106,9 @@ export type UserUpdateWithoutInventoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -5827,6 +6157,663 @@ export type UserUncheckedUpdateWithoutInventoriesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserCreateWithoutCreatedNewsEventTypesInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutCreatedNewsEventTypesInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutCreatedNewsEventTypesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedNewsEventTypesInput, Prisma.UserUncheckedCreateWithoutCreatedNewsEventTypesInput>
+}
+
+export type UserCreateWithoutUpdatedNewsEventTypesInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutUpdatedNewsEventTypesInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutUpdatedNewsEventTypesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedNewsEventTypesInput, Prisma.UserUncheckedCreateWithoutUpdatedNewsEventTypesInput>
+}
+
+export type UserUpsertWithoutCreatedNewsEventTypesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedNewsEventTypesInput, Prisma.UserUncheckedUpdateWithoutCreatedNewsEventTypesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedNewsEventTypesInput, Prisma.UserUncheckedCreateWithoutCreatedNewsEventTypesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCreatedNewsEventTypesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedNewsEventTypesInput, Prisma.UserUncheckedUpdateWithoutCreatedNewsEventTypesInput>
+}
+
+export type UserUpdateWithoutCreatedNewsEventTypesInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCreatedNewsEventTypesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUpsertWithoutUpdatedNewsEventTypesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedNewsEventTypesInput, Prisma.UserUncheckedUpdateWithoutUpdatedNewsEventTypesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedNewsEventTypesInput, Prisma.UserUncheckedCreateWithoutUpdatedNewsEventTypesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutUpdatedNewsEventTypesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedNewsEventTypesInput, Prisma.UserUncheckedUpdateWithoutUpdatedNewsEventTypesInput>
+}
+
+export type UserUpdateWithoutUpdatedNewsEventTypesInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutUpdatedNewsEventTypesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserCreateWithoutAuthoredNewsEventsInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutAuthoredNewsEventsInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutAuthoredNewsEventsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuthoredNewsEventsInput, Prisma.UserUncheckedCreateWithoutAuthoredNewsEventsInput>
+}
+
+export type UserUpsertWithoutAuthoredNewsEventsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAuthoredNewsEventsInput, Prisma.UserUncheckedUpdateWithoutAuthoredNewsEventsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuthoredNewsEventsInput, Prisma.UserUncheckedCreateWithoutAuthoredNewsEventsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAuthoredNewsEventsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAuthoredNewsEventsInput, Prisma.UserUncheckedUpdateWithoutAuthoredNewsEventsInput>
+}
+
+export type UserUpdateWithoutAuthoredNewsEventsInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAuthoredNewsEventsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -5874,6 +6861,9 @@ export type UserCreateWithoutOrdersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -5922,6 +6912,9 @@ export type UserUncheckedCreateWithoutOrdersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -5985,6 +6978,9 @@ export type UserUpdateWithoutOrdersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -6033,6 +7029,9 @@ export type UserUncheckedUpdateWithoutOrdersInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -6080,6 +7079,9 @@ export type UserCreateWithoutOrderStatusChangesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -6128,6 +7130,9 @@ export type UserUncheckedCreateWithoutOrderStatusChangesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -6191,6 +7196,9 @@ export type UserUpdateWithoutOrderStatusChangesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -6239,6 +7247,9 @@ export type UserUncheckedUpdateWithoutOrderStatusChangesInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -6286,6 +7297,9 @@ export type UserCreateWithoutCreatedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -6334,6 +7348,9 @@ export type UserUncheckedCreateWithoutCreatedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -6386,6 +7403,9 @@ export type UserCreateWithoutUpdatedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -6434,6 +7454,9 @@ export type UserUncheckedCreateWithoutUpdatedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -6486,6 +7509,9 @@ export type UserCreateWithoutDeletedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -6534,6 +7560,9 @@ export type UserUncheckedCreateWithoutDeletedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -6597,6 +7626,9 @@ export type UserUpdateWithoutCreatedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -6645,6 +7677,9 @@ export type UserUncheckedUpdateWithoutCreatedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -6703,6 +7738,9 @@ export type UserUpdateWithoutUpdatedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -6751,6 +7789,9 @@ export type UserUncheckedUpdateWithoutUpdatedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -6809,6 +7850,9 @@ export type UserUpdateWithoutDeletedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -6857,6 +7901,9 @@ export type UserUncheckedUpdateWithoutDeletedProductsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -6904,6 +7951,9 @@ export type UserCreateWithoutPromoCodeRedemptionsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -6952,6 +8002,9 @@ export type UserUncheckedCreateWithoutPromoCodeRedemptionsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -7015,6 +8068,9 @@ export type UserUpdateWithoutPromoCodeRedemptionsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -7063,6 +8119,9 @@ export type UserUncheckedUpdateWithoutPromoCodeRedemptionsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -7110,6 +8169,9 @@ export type UserCreateWithoutCreatedSupportsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -7158,6 +8220,9 @@ export type UserUncheckedCreateWithoutCreatedSupportsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -7210,6 +8275,9 @@ export type UserCreateWithoutUpdatedSupportsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -7258,6 +8326,9 @@ export type UserUncheckedCreateWithoutUpdatedSupportsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -7321,6 +8392,9 @@ export type UserUpdateWithoutCreatedSupportsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -7369,6 +8443,9 @@ export type UserUncheckedUpdateWithoutCreatedSupportsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -7427,6 +8504,9 @@ export type UserUpdateWithoutUpdatedSupportsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -7475,6 +8555,9 @@ export type UserUncheckedUpdateWithoutUpdatedSupportsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -7522,6 +8605,9 @@ export type UserCreateWithoutProfileInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -7570,6 +8656,9 @@ export type UserUncheckedCreateWithoutProfileInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -7633,6 +8722,9 @@ export type UserUpdateWithoutProfileInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -7681,6 +8773,9 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -7728,6 +8823,9 @@ export type UserCreateWithoutSecurityInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -7776,6 +8874,9 @@ export type UserUncheckedCreateWithoutSecurityInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -7839,6 +8940,9 @@ export type UserUpdateWithoutSecurityInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -7887,6 +8991,9 @@ export type UserUncheckedUpdateWithoutSecurityInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -7934,6 +9041,9 @@ export type UserCreateWithoutOtpsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
@@ -7982,6 +9092,9 @@ export type UserUncheckedCreateWithoutOtpsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -8045,6 +9158,9 @@ export type UserUpdateWithoutOtpsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
@@ -8093,6 +9209,9 @@ export type UserUncheckedUpdateWithoutOtpsInput = {
   deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
   verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -8131,6 +9250,9 @@ export type UserCountOutputType = {
   deliveryStatusChanges: number
   verifiedDeliveryMen: number
   auditLogs: number
+  authoredNewsEvents: number
+  createdNewsEventTypes: number
+  updatedNewsEventTypes: number
   createdDeliveryChargeZones: number
   updatedDeliveryChargeZones: number
   createdFreeDeliveryRules: number
@@ -8164,6 +9286,9 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   deliveryStatusChanges?: boolean | UserCountOutputTypeCountDeliveryStatusChangesArgs
   verifiedDeliveryMen?: boolean | UserCountOutputTypeCountVerifiedDeliveryMenArgs
   auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
+  authoredNewsEvents?: boolean | UserCountOutputTypeCountAuthoredNewsEventsArgs
+  createdNewsEventTypes?: boolean | UserCountOutputTypeCountCreatedNewsEventTypesArgs
+  updatedNewsEventTypes?: boolean | UserCountOutputTypeCountUpdatedNewsEventTypesArgs
   createdDeliveryChargeZones?: boolean | UserCountOutputTypeCountCreatedDeliveryChargeZonesArgs
   updatedDeliveryChargeZones?: boolean | UserCountOutputTypeCountUpdatedDeliveryChargeZonesArgs
   createdFreeDeliveryRules?: boolean | UserCountOutputTypeCountCreatedFreeDeliveryRulesArgs
@@ -8365,6 +9490,27 @@ export type UserCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Types.
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountAuthoredNewsEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NewsEventWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCreatedNewsEventTypesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NewsEventTypeWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountUpdatedNewsEventTypesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NewsEventTypeWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountCreatedDeliveryChargeZonesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.DeliveryChargeZoneWhereInput
 }
@@ -8434,6 +9580,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   deliveryStatusChanges?: boolean | Prisma.User$deliveryStatusChangesArgs<ExtArgs>
   verifiedDeliveryMen?: boolean | Prisma.User$verifiedDeliveryMenArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
+  authoredNewsEvents?: boolean | Prisma.User$authoredNewsEventsArgs<ExtArgs>
+  createdNewsEventTypes?: boolean | Prisma.User$createdNewsEventTypesArgs<ExtArgs>
+  updatedNewsEventTypes?: boolean | Prisma.User$updatedNewsEventTypesArgs<ExtArgs>
   createdDeliveryChargeZones?: boolean | Prisma.User$createdDeliveryChargeZonesArgs<ExtArgs>
   updatedDeliveryChargeZones?: boolean | Prisma.User$updatedDeliveryChargeZonesArgs<ExtArgs>
   createdFreeDeliveryRules?: boolean | Prisma.User$createdFreeDeliveryRulesArgs<ExtArgs>
@@ -8520,6 +9669,9 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   deliveryStatusChanges?: boolean | Prisma.User$deliveryStatusChangesArgs<ExtArgs>
   verifiedDeliveryMen?: boolean | Prisma.User$verifiedDeliveryMenArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
+  authoredNewsEvents?: boolean | Prisma.User$authoredNewsEventsArgs<ExtArgs>
+  createdNewsEventTypes?: boolean | Prisma.User$createdNewsEventTypesArgs<ExtArgs>
+  updatedNewsEventTypes?: boolean | Prisma.User$updatedNewsEventTypesArgs<ExtArgs>
   createdDeliveryChargeZones?: boolean | Prisma.User$createdDeliveryChargeZonesArgs<ExtArgs>
   updatedDeliveryChargeZones?: boolean | Prisma.User$updatedDeliveryChargeZonesArgs<ExtArgs>
   createdFreeDeliveryRules?: boolean | Prisma.User$createdFreeDeliveryRulesArgs<ExtArgs>
@@ -8561,6 +9713,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     deliveryStatusChanges: Prisma.$DeliveryStatusHistoryPayload<ExtArgs>[]
     verifiedDeliveryMen: Prisma.$DeliveryManProfilePayload<ExtArgs>[]
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
+    authoredNewsEvents: Prisma.$NewsEventPayload<ExtArgs>[]
+    createdNewsEventTypes: Prisma.$NewsEventTypePayload<ExtArgs>[]
+    updatedNewsEventTypes: Prisma.$NewsEventTypePayload<ExtArgs>[]
     createdDeliveryChargeZones: Prisma.$DeliveryChargeZonePayload<ExtArgs>[]
     updatedDeliveryChargeZones: Prisma.$DeliveryChargeZonePayload<ExtArgs>[]
     createdFreeDeliveryRules: Prisma.$DeliveryFreeDeliveryRulePayload<ExtArgs>[]
@@ -9003,6 +10158,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   deliveryStatusChanges<T extends Prisma.User$deliveryStatusChangesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$deliveryStatusChangesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryStatusHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   verifiedDeliveryMen<T extends Prisma.User$verifiedDeliveryMenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$verifiedDeliveryMenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryManProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  authoredNewsEvents<T extends Prisma.User$authoredNewsEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$authoredNewsEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NewsEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  createdNewsEventTypes<T extends Prisma.User$createdNewsEventTypesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdNewsEventTypesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NewsEventTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  updatedNewsEventTypes<T extends Prisma.User$updatedNewsEventTypesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$updatedNewsEventTypesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NewsEventTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   createdDeliveryChargeZones<T extends Prisma.User$createdDeliveryChargeZonesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdDeliveryChargeZonesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryChargeZonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   updatedDeliveryChargeZones<T extends Prisma.User$updatedDeliveryChargeZonesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$updatedDeliveryChargeZonesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryChargeZonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   createdFreeDeliveryRules<T extends Prisma.User$createdFreeDeliveryRulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdFreeDeliveryRulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryFreeDeliveryRulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -10120,6 +11278,78 @@ export type User$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
+}
+
+/**
+ * User.authoredNewsEvents
+ */
+export type User$authoredNewsEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the NewsEvent
+   */
+  select?: Prisma.NewsEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the NewsEvent
+   */
+  omit?: Prisma.NewsEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NewsEventInclude<ExtArgs> | null
+  where?: Prisma.NewsEventWhereInput
+  orderBy?: Prisma.NewsEventOrderByWithRelationInput | Prisma.NewsEventOrderByWithRelationInput[]
+  cursor?: Prisma.NewsEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NewsEventScalarFieldEnum | Prisma.NewsEventScalarFieldEnum[]
+}
+
+/**
+ * User.createdNewsEventTypes
+ */
+export type User$createdNewsEventTypesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the NewsEventType
+   */
+  select?: Prisma.NewsEventTypeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the NewsEventType
+   */
+  omit?: Prisma.NewsEventTypeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NewsEventTypeInclude<ExtArgs> | null
+  where?: Prisma.NewsEventTypeWhereInput
+  orderBy?: Prisma.NewsEventTypeOrderByWithRelationInput | Prisma.NewsEventTypeOrderByWithRelationInput[]
+  cursor?: Prisma.NewsEventTypeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NewsEventTypeScalarFieldEnum | Prisma.NewsEventTypeScalarFieldEnum[]
+}
+
+/**
+ * User.updatedNewsEventTypes
+ */
+export type User$updatedNewsEventTypesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the NewsEventType
+   */
+  select?: Prisma.NewsEventTypeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the NewsEventType
+   */
+  omit?: Prisma.NewsEventTypeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NewsEventTypeInclude<ExtArgs> | null
+  where?: Prisma.NewsEventTypeWhereInput
+  orderBy?: Prisma.NewsEventTypeOrderByWithRelationInput | Prisma.NewsEventTypeOrderByWithRelationInput[]
+  cursor?: Prisma.NewsEventTypeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NewsEventTypeScalarFieldEnum | Prisma.NewsEventTypeScalarFieldEnum[]
 }
 
 /**

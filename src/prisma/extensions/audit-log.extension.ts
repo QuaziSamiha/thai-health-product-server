@@ -4,7 +4,7 @@ import type { RequestContextService } from '../../shared/logger/request-context.
 import { redactSensitiveFields } from '../../shared/logger/utils/redact.util';
 import { DEFAULT_REDACTED_KEYS } from '../../shared/logger/constants/logger.constants';
 
-//* THE SAME 8 MODELS THAT ALREADY CARRY MANUAL createdBy/updatedBy/deletedBy
+//* THE ORIGINAL 8 MODELS CARRY MANUAL createdBy/updatedBy/deletedBy (PLUS NewsEvent/NewsEventType)
 //* FIELDS (docs/audit-log.md). ADDING A NEW MODEL HERE IS THE *ONLY* STEP
 //* NEEDED TO START AUDITING IT — NO SCHEMA CHANGE, NO MIGRATION. DELIBERATELY
 //* EXCLUDES DeliveryStatusHistory/OrderStatusHistory — THOSE ARE ALREADY
@@ -22,6 +22,8 @@ export const TRACKED_AUDIT_MODELS = [
   'DeliveryProvider',
   'DeliveryShipment',
   'DeliveryManProfile',
+  'NewsEventType',
+  'NewsEvent',
 ] as const;
 export type TrackedAuditModel = (typeof TRACKED_AUDIT_MODELS)[number];
 

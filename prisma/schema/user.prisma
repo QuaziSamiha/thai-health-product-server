@@ -88,6 +88,9 @@ model User {
   deliveryStatusChanges    DeliveryStatusHistory[] @relation("DeliveryStatusChangedBy")
   verifiedDeliveryMen      DeliveryManProfile[]    @relation("DeliveryManNidVerifiedBy")
   auditLogs                AuditLog[]              @relation("AuditLogActor")
+  authoredNewsEvents       NewsEvent[]             @relation("NewsEventAuthor")
+  createdNewsEventTypes    NewsEventType[]         @relation("NewsEventTypeCreatedBy")
+  updatedNewsEventTypes    NewsEventType[]         @relation("NewsEventTypeUpdatedBy")
 
   //* DELIVERY-CHARGE RATE CARD (delivery-charge.prisma) — WHO SET THE PRICES
   //* AND THE FREE-DELIVERY PROMISES. THESE ARE MERCHANDISING DECISIONS WITH A

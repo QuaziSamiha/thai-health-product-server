@@ -674,6 +674,23 @@ export type EnumInventoryExchangeTypeWithAggregatesFilter<$PrismaModel = never> 
   _max?: Prisma.NestedEnumInventoryExchangeTypeFilter<$PrismaModel>
 }
 
+export type EnumNewsEventStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.NewsEventStatus | Prisma.EnumNewsEventStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.NewsEventStatus[] | Prisma.ListEnumNewsEventStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.NewsEventStatus[] | Prisma.ListEnumNewsEventStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumNewsEventStatusFilter<$PrismaModel> | $Enums.NewsEventStatus
+}
+
+export type EnumNewsEventStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.NewsEventStatus | Prisma.EnumNewsEventStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.NewsEventStatus[] | Prisma.ListEnumNewsEventStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.NewsEventStatus[] | Prisma.ListEnumNewsEventStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumNewsEventStatusWithAggregatesFilter<$PrismaModel> | $Enums.NewsEventStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumNewsEventStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumNewsEventStatusFilter<$PrismaModel>
+}
+
 export type EnumOrderStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.OrderStatus | Prisma.EnumOrderStatusFieldRefInput<$PrismaModel>
   in?: $Enums.OrderStatus[] | Prisma.ListEnumOrderStatusFieldRefInput<$PrismaModel>
@@ -1571,6 +1588,23 @@ export type NestedEnumInventoryExchangeTypeWithAggregatesFilter<$PrismaModel = n
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumInventoryExchangeTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumInventoryExchangeTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumNewsEventStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.NewsEventStatus | Prisma.EnumNewsEventStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.NewsEventStatus[] | Prisma.ListEnumNewsEventStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.NewsEventStatus[] | Prisma.ListEnumNewsEventStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumNewsEventStatusFilter<$PrismaModel> | $Enums.NewsEventStatus
+}
+
+export type NestedEnumNewsEventStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.NewsEventStatus | Prisma.EnumNewsEventStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.NewsEventStatus[] | Prisma.ListEnumNewsEventStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.NewsEventStatus[] | Prisma.ListEnumNewsEventStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumNewsEventStatusWithAggregatesFilter<$PrismaModel> | $Enums.NewsEventStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumNewsEventStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumNewsEventStatusFilter<$PrismaModel>
 }
 
 export type NestedEnumOrderStatusFilter<$PrismaModel = never> = {
