@@ -413,6 +413,9 @@ export const ModelName = {
   OrderItem: 'OrderItem',
   OrderStatusHistory: 'OrderStatusHistory',
   Payment: 'Payment',
+  PartnerType: 'PartnerType',
+  PartnerCountry: 'PartnerCountry',
+  PartnerRequest: 'PartnerRequest',
   Product: 'Product',
   ProductVariant: 'ProductVariant',
   ProductImage: 'ProductImage',
@@ -438,7 +441,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "address" | "auditLog" | "blog" | "cart" | "cartItem" | "category" | "comboProduct" | "comboItem" | "comboImage" | "deliveryChargeZone" | "deliveryChargeArea" | "deliveryChargeRate" | "deliveryFreeDeliveryRule" | "deliveryManProfile" | "deliveryProvider" | "deliveryZone" | "deliveryShipment" | "deliveryStatusHistory" | "home" | "batch" | "inventory" | "newsEventType" | "newsEvent" | "newsEventImage" | "order" | "orderAddress" | "orderItem" | "orderStatusHistory" | "payment" | "product" | "productVariant" | "productImage" | "promoCode" | "promoCodeRedemption" | "support" | "user" | "profile" | "userSecurity" | "oTP"
+    modelProps: "address" | "auditLog" | "blog" | "cart" | "cartItem" | "category" | "comboProduct" | "comboItem" | "comboImage" | "deliveryChargeZone" | "deliveryChargeArea" | "deliveryChargeRate" | "deliveryFreeDeliveryRule" | "deliveryManProfile" | "deliveryProvider" | "deliveryZone" | "deliveryShipment" | "deliveryStatusHistory" | "home" | "batch" | "inventory" | "newsEventType" | "newsEvent" | "newsEventImage" | "order" | "orderAddress" | "orderItem" | "orderStatusHistory" | "payment" | "partnerType" | "partnerCountry" | "partnerRequest" | "product" | "productVariant" | "productImage" | "promoCode" | "promoCodeRedemption" | "support" | "user" | "profile" | "userSecurity" | "oTP"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2588,6 +2591,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PartnerType: {
+      payload: Prisma.$PartnerTypePayload<ExtArgs>
+      fields: Prisma.PartnerTypeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PartnerTypeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerTypePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PartnerTypeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerTypePayload>
+        }
+        findFirst: {
+          args: Prisma.PartnerTypeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerTypePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PartnerTypeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerTypePayload>
+        }
+        findMany: {
+          args: Prisma.PartnerTypeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerTypePayload>[]
+        }
+        create: {
+          args: Prisma.PartnerTypeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerTypePayload>
+        }
+        createMany: {
+          args: Prisma.PartnerTypeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PartnerTypeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerTypePayload>[]
+        }
+        delete: {
+          args: Prisma.PartnerTypeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerTypePayload>
+        }
+        update: {
+          args: Prisma.PartnerTypeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerTypePayload>
+        }
+        deleteMany: {
+          args: Prisma.PartnerTypeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PartnerTypeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PartnerTypeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerTypePayload>[]
+        }
+        upsert: {
+          args: Prisma.PartnerTypeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerTypePayload>
+        }
+        aggregate: {
+          args: Prisma.PartnerTypeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePartnerType>
+        }
+        groupBy: {
+          args: Prisma.PartnerTypeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PartnerTypeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PartnerTypeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PartnerTypeCountAggregateOutputType> | number
+        }
+      }
+    }
+    PartnerCountry: {
+      payload: Prisma.$PartnerCountryPayload<ExtArgs>
+      fields: Prisma.PartnerCountryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PartnerCountryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PartnerCountryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload>
+        }
+        findFirst: {
+          args: Prisma.PartnerCountryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PartnerCountryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload>
+        }
+        findMany: {
+          args: Prisma.PartnerCountryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload>[]
+        }
+        create: {
+          args: Prisma.PartnerCountryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload>
+        }
+        createMany: {
+          args: Prisma.PartnerCountryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PartnerCountryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload>[]
+        }
+        delete: {
+          args: Prisma.PartnerCountryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload>
+        }
+        update: {
+          args: Prisma.PartnerCountryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload>
+        }
+        deleteMany: {
+          args: Prisma.PartnerCountryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PartnerCountryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PartnerCountryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload>[]
+        }
+        upsert: {
+          args: Prisma.PartnerCountryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload>
+        }
+        aggregate: {
+          args: Prisma.PartnerCountryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePartnerCountry>
+        }
+        groupBy: {
+          args: Prisma.PartnerCountryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PartnerCountryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PartnerCountryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PartnerCountryCountAggregateOutputType> | number
+        }
+      }
+    }
+    PartnerRequest: {
+      payload: Prisma.$PartnerRequestPayload<ExtArgs>
+      fields: Prisma.PartnerRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PartnerRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PartnerRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.PartnerRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PartnerRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerRequestPayload>
+        }
+        findMany: {
+          args: Prisma.PartnerRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerRequestPayload>[]
+        }
+        create: {
+          args: Prisma.PartnerRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerRequestPayload>
+        }
+        createMany: {
+          args: Prisma.PartnerRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PartnerRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.PartnerRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerRequestPayload>
+        }
+        update: {
+          args: Prisma.PartnerRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.PartnerRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PartnerRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PartnerRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.PartnerRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.PartnerRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePartnerRequest>
+        }
+        groupBy: {
+          args: Prisma.PartnerRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PartnerRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PartnerRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PartnerRequestCountAggregateOutputType> | number
+        }
+      }
+    }
     Product: {
       payload: Prisma.$ProductPayload<ExtArgs>
       fields: Prisma.ProductFieldRefs
@@ -3988,6 +4213,50 @@ export const PaymentScalarFieldEnum = {
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
 
 
+export const PartnerTypeScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  name: 'name',
+  status: 'status',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PartnerTypeScalarFieldEnum = (typeof PartnerTypeScalarFieldEnum)[keyof typeof PartnerTypeScalarFieldEnum]
+
+
+export const PartnerCountryScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  name: 'name',
+  status: 'status',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PartnerCountryScalarFieldEnum = (typeof PartnerCountryScalarFieldEnum)[keyof typeof PartnerCountryScalarFieldEnum]
+
+
+export const PartnerRequestScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  name: 'name',
+  companyName: 'companyName',
+  message: 'message',
+  partnerTypeId: 'partnerTypeId',
+  partnerCountryId: 'partnerCountryId',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PartnerRequestScalarFieldEnum = (typeof PartnerRequestScalarFieldEnum)[keyof typeof PartnerRequestScalarFieldEnum]
+
+
 export const ProductScalarFieldEnum = {
   id: 'id',
   sid: 'sid',
@@ -4692,6 +4961,34 @@ export type ListEnumPaymentTransactionTypeFieldRefInput<$PrismaModel> = FieldRef
 
 
 /**
+ * Reference to a field of type 'PartnerOptionStatus'
+ */
+export type EnumPartnerOptionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PartnerOptionStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'PartnerOptionStatus[]'
+ */
+export type ListEnumPartnerOptionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PartnerOptionStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PartnerRequestStatus'
+ */
+export type EnumPartnerRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PartnerRequestStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'PartnerRequestStatus[]'
+ */
+export type ListEnumPartnerRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PartnerRequestStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'ProductType'
  */
 export type EnumProductTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProductType'>
@@ -4940,6 +5237,9 @@ export type GlobalOmitConfig = {
   orderItem?: Prisma.OrderItemOmit
   orderStatusHistory?: Prisma.OrderStatusHistoryOmit
   payment?: Prisma.PaymentOmit
+  partnerType?: Prisma.PartnerTypeOmit
+  partnerCountry?: Prisma.PartnerCountryOmit
+  partnerRequest?: Prisma.PartnerRequestOmit
   product?: Prisma.ProductOmit
   productVariant?: Prisma.ProductVariantOmit
   productImage?: Prisma.ProductImageOmit

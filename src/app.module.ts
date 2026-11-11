@@ -19,6 +19,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { OtpModule } from './modules/otp/otp.module';
 import { MailModule } from './modules/mail/mail.module';
 import { CategoryModule } from './modules/category/category.module';
+import { PartnerModule } from './modules/partner/partner.module';
 import { ProductModule } from './modules/product/product.module';
 import { BlogModule } from './modules/blog/blog.module';
 import { HomeModule } from './modules/home/home.module';
@@ -101,6 +102,7 @@ import {
     OtpModule,
     MailModule,
     CategoryModule,
+    PartnerModule,
     ProductModule,
     BlogModule,
     HomeModule,

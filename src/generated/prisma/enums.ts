@@ -242,6 +242,26 @@ export const PaymentTransactionType = {
 export type PaymentTransactionType = (typeof PaymentTransactionType)[keyof typeof PaymentTransactionType]
 
 
+export const PartnerOptionStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type PartnerOptionStatus = (typeof PartnerOptionStatus)[keyof typeof PartnerOptionStatus]
+
+
+export const PartnerRequestStatus = {
+  PENDING: 'PENDING',
+  CONTACTED: 'CONTACTED',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type PartnerRequestStatus = (typeof PartnerRequestStatus)[keyof typeof PartnerRequestStatus]
+
+
 export const ProductType = {
   SIMPLE: 'SIMPLE',
   VARIABLE: 'VARIABLE'

@@ -80,6 +80,9 @@ export const ModelName = {
   OrderItem: 'OrderItem',
   OrderStatusHistory: 'OrderStatusHistory',
   Payment: 'Payment',
+  PartnerType: 'PartnerType',
+  PartnerCountry: 'PartnerCountry',
+  PartnerRequest: 'PartnerRequest',
   Product: 'Product',
   ProductVariant: 'ProductVariant',
   ProductImage: 'ProductImage',
@@ -727,6 +730,50 @@ export const PaymentScalarFieldEnum = {
 } as const
 
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
+
+
+export const PartnerTypeScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  name: 'name',
+  status: 'status',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PartnerTypeScalarFieldEnum = (typeof PartnerTypeScalarFieldEnum)[keyof typeof PartnerTypeScalarFieldEnum]
+
+
+export const PartnerCountryScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  name: 'name',
+  status: 'status',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PartnerCountryScalarFieldEnum = (typeof PartnerCountryScalarFieldEnum)[keyof typeof PartnerCountryScalarFieldEnum]
+
+
+export const PartnerRequestScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  name: 'name',
+  companyName: 'companyName',
+  message: 'message',
+  partnerTypeId: 'partnerTypeId',
+  partnerCountryId: 'partnerCountryId',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PartnerRequestScalarFieldEnum = (typeof PartnerRequestScalarFieldEnum)[keyof typeof PartnerRequestScalarFieldEnum]
 
 
 export const ProductScalarFieldEnum = {

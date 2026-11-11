@@ -185,6 +185,21 @@ export type OrderStatusHistory = Prisma.OrderStatusHistoryModel
  */
 export type Payment = Prisma.PaymentModel
 /**
+ * Model PartnerType
+ * 
+ */
+export type PartnerType = Prisma.PartnerTypeModel
+/**
+ * Model PartnerCountry
+ * 
+ */
+export type PartnerCountry = Prisma.PartnerCountryModel
+/**
+ * Model PartnerRequest
+ * 
+ */
+export type PartnerRequest = Prisma.PartnerRequestModel
+/**
  * Model Product
  * 
  */

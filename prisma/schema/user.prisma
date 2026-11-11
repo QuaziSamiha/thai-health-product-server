@@ -77,6 +77,10 @@ model User {
   updatedHomeContents      Home[]                  @relation("HomeUpdatedBy")
   createdSupports          Support[]               @relation("SupportCreatedBy")
   updatedSupports          Support[]               @relation("SupportUpdatedBy")
+  createdPartnerTypes      PartnerType[]           @relation("PartnerTypeCreatedBy")
+  updatedPartnerTypes      PartnerType[]           @relation("PartnerTypeUpdatedBy")
+  createdPartnerCountries  PartnerCountry[]        @relation("PartnerCountryCreatedBy")
+  updatedPartnerCountries  PartnerCountry[]        @relation("PartnerCountryUpdatedBy")
   addresses                Address[]
   carts                    Cart[]
   orders                   Order[]
