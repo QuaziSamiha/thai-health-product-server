@@ -85,6 +85,16 @@ export type ComboItem = Prisma.ComboItemModel
  */
 export type ComboImage = Prisma.ComboImageModel
 /**
+ * Model ContactInfo
+ * 
+ */
+export type ContactInfo = Prisma.ContactInfoModel
+/**
+ * Model ContactMessage
+ * 
+ */
+export type ContactMessage = Prisma.ContactMessageModel
+/**
  * Model DeliveryChargeZone
  * 
  */
@@ -189,11 +199,6 @@ export type Payment = Prisma.PaymentModel
  * 
  */
 export type PartnerType = Prisma.PartnerTypeModel
-/**
- * Model PartnerCountry
- * 
- */
-export type PartnerCountry = Prisma.PartnerCountryModel
 /**
  * Model PartnerRequest
  * 

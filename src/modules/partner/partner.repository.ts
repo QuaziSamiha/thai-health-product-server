@@ -18,7 +18,6 @@ const USER_MINIFIED_SELECT = {
   profile: { select: { firstName: true, lastName: true } },
 } as const;
 
-//* SAME SHAPE FOR PartnerType AND PartnerCountry
 const OPTION_SELECT = {
   id: true,
   sid: true,
@@ -39,11 +38,11 @@ const REQUEST_SELECT = {
   name: true,
   companyName: true,
   message: true,
+  countryCode: true,
   status: true,
   createdAt: true,
   updatedAt: true,
   partnerType: { select: OPTION_MINIFIED_SELECT },
-  partnerCountry: { select: OPTION_MINIFIED_SELECT },
 } as const;
 
 type OptionWrite = { name?: string; status?: PartnerOptionStatus };
@@ -133,75 +132,6 @@ export class PartnerRepository extends BaseRepository {
     });
   }
 
-  // ─── Partner Country ───────────────────────────────────────────────────────
-
-  async findCountryById(id: number, tx?: Prisma.TransactionClient) {
-    const client = tx || this.prisma;
-    return await client.partnerCountry.findUnique({
-      where: { id },
-      select: OPTION_SELECT,
-    });
-  }
-
-  async findCountryByName(name: string, tx?: Prisma.TransactionClient) {
-    const client = tx || this.prisma;
-    return await client.partnerCountry.findFirst({
-      where: { name: { equals: name, mode: 'insensitive' } },
-      select: { id: true, status: true },
-    });
-  }
-
-  async findAllCountries(
-    params: PartnerOptionQueryDto,
-    tx?: Prisma.TransactionClient,
-  ) {
-    const client = tx || this.prisma;
-    return await this.paginationService.paginate<
-      Prisma.PartnerCountryGetPayload<{ select: typeof OPTION_SELECT }>,
-      typeof client.partnerCountry
-    >(client.partnerCountry, params, {
-      select: OPTION_SELECT,
-      where: this.optionWhere(params),
-      searchableFields: ['name'],
-      defaultSortField: 'createdAt',
-    });
-  }
-
-  async findActiveCountries(tx?: Prisma.TransactionClient) {
-    const client = tx || this.prisma;
-    return await client.partnerCountry.findMany({
-      where: { status: PartnerOptionStatus.ACTIVE },
-      select: OPTION_MINIFIED_SELECT,
-      orderBy: { id: 'asc' },
-    });
-  }
-
-  async createCountry(
-    data: OptionWrite & { name: string; userId: number },
-    tx?: Prisma.TransactionClient,
-  ) {
-    const client = tx || this.prisma;
-    const { userId, ...rest } = data;
-    return await client.partnerCountry.create({
-      data: { ...rest, createdBy: userId, updatedBy: userId },
-      select: OPTION_SELECT,
-    });
-  }
-
-  async updateCountry(
-    id: number,
-    data: OptionWrite & { userId: number },
-    tx?: Prisma.TransactionClient,
-  ) {
-    const client = tx || this.prisma;
-    const { userId, ...rest } = data;
-    return await client.partnerCountry.update({
-      where: { id },
-      data: { ...rest, updatedBy: userId },
-      select: OPTION_SELECT,
-    });
-  }
-
   // ─── Partner Request ───────────────────────────────────────────────────────
 
   async findRequestById(id: number, tx?: Prisma.TransactionClient) {
@@ -217,7 +147,7 @@ export class PartnerRepository extends BaseRepository {
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx || this.prisma;
-    const { status, partnerTypeId, partnerCountryId } = params;
+    const { status, partnerTypeId, countryCode } = params;
     return await this.paginationService.paginate<
       Prisma.PartnerRequestGetPayload<{ select: typeof REQUEST_SELECT }>,
       typeof client.partnerRequest
@@ -226,7 +156,7 @@ export class PartnerRepository extends BaseRepository {
       where: {
         ...(status && { status }),
         ...(partnerTypeId && { partnerTypeId }),
-        ...(partnerCountryId && { partnerCountryId }),
+        ...(countryCode && { countryCode }),
       },
       searchableFields: ['name', 'companyName'],
       defaultSortField: 'createdAt',
@@ -239,13 +169,22 @@ export class PartnerRepository extends BaseRepository {
       companyName: string;
       message?: string;
       partnerTypeId: number;
-      partnerCountryId: number;
+      countryCode: string;
     },
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx || this.prisma;
     return await client.partnerRequest.create({
       data,
+      select: REQUEST_SELECT,
+    });
+  }
+
+  //* HARD DELETE — NOTHING REFERENCES partner_requests, SO THE ROW CAN GO
+  async deleteRequest(id: number, tx?: Prisma.TransactionClient) {
+    const client = tx || this.prisma;
+    return await client.partnerRequest.delete({
+      where: { id },
       select: REQUEST_SELECT,
     });
   }

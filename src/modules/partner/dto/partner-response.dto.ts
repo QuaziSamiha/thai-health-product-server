@@ -8,6 +8,7 @@ import {
   MinifiedUser,
   UserMinifiedResponseDto,
 } from '../../user/dto/user-response.dto';
+import { getCountryName } from '../../../common/geography/countries';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PUBLIC DROPDOWN OPTION — id + name only
@@ -29,7 +30,7 @@ export class PartnerOptionMinifiedResponseDto {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ADMIN OPTION — PartnerType / PartnerCountry full detail
+// ADMIN OPTION — PartnerType full detail
 // ─────────────────────────────────────────────────────────────────────────────
 
 export class PartnerOptionResponseDto {
@@ -108,6 +109,25 @@ export class PartnerOptionResponseDto {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// COUNTRY — STATIC ISO 3166-1 DATA, NAME RESOLVED FROM THE CODE
+// ─────────────────────────────────────────────────────────────────────────────
+
+export class PartnerCountryResponseDto {
+  @Expose()
+  @ApiProperty({ description: 'ISO 3166-1 alpha-2 code', example: 'TH' })
+  code!: string;
+
+  @Expose()
+  @ApiProperty({ description: 'English country name', example: 'Thailand' })
+  name!: string;
+
+  constructor(code: string) {
+    this.code = code;
+    this.name = getCountryName(code);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // PARTNER REQUEST
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -147,9 +167,9 @@ export class PartnerRequestResponseDto {
   partnerType!: PartnerOptionMinifiedResponseDto;
 
   @Expose()
-  @ApiProperty({ type: () => PartnerOptionMinifiedResponseDto })
-  @Type(() => PartnerOptionMinifiedResponseDto)
-  partnerCountry!: PartnerOptionMinifiedResponseDto;
+  @ApiProperty({ type: () => PartnerCountryResponseDto })
+  @Type(() => PartnerCountryResponseDto)
+  country!: PartnerCountryResponseDto;
 
   @Expose()
   @ApiProperty()
@@ -168,8 +188,8 @@ export class PartnerRequestResponseDto {
     status: PartnerRequestStatus;
     createdAt: Date;
     updatedAt: Date;
+    countryCode: string;
     partnerType: { id: number; name: string };
-    partnerCountry: { id: number; name: string };
   }) {
     this.id = request.id;
     this.sid = request.sid;
@@ -180,9 +200,7 @@ export class PartnerRequestResponseDto {
     this.partnerType = new PartnerOptionMinifiedResponseDto(
       request.partnerType,
     );
-    this.partnerCountry = new PartnerOptionMinifiedResponseDto(
-      request.partnerCountry,
-    );
+    this.country = new PartnerCountryResponseDto(request.countryCode);
     this.createdAt = request.createdAt;
     this.updatedAt = request.updatedAt;
   }

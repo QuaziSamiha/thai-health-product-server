@@ -1,6 +1,7 @@
 /**
- * Seeds the "Become a Partner" form's dropdown options — partner types and
- * countries — as ACTIVE, in the order the design shows them.
+ * Seeds the "Become a Partner" form's partner type dropdown options as ACTIVE,
+ * in the order the design shows them. (Countries are static ISO data in
+ * src/common/geography/countries.ts — nothing to seed.)
  *
  * Idempotent: rows are matched by name (case-insensitive). A name that already
  * exists is left untouched, so an admin's later edits (rename, deactivate,
@@ -19,14 +20,13 @@ const { Pool } = pkg;
 
 const SUPER_ADMIN_EMAIL = 'mahfuzislam1695@gmail.com';
 
-//* ORDER MATTERS — THE PUBLIC DROPDOWNS LIST OPTIONS BY id, I.E. INSERT ORDER
+//* ORDER MATTERS — THE PUBLIC DROPDOWN LISTS OPTIONS BY id, I.E. INSERT ORDER
 const PARTNER_TYPES = [
   'Pharmacy',
   'Dealer',
   'Distributor',
   'International Partner',
 ];
-const PARTNER_COUNTRIES = ['Thailand', 'Russia', 'United States', 'China'];
 
 async function main() {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -74,31 +74,6 @@ async function main() {
     }
     console.log(
       `Partner types: ${created} created, ${skipped} already existed`,
-    );
-
-    created = 0;
-    skipped = 0;
-    for (const name of PARTNER_COUNTRIES) {
-      const existing = await prisma.partnerCountry.findFirst({
-        where: { name: { equals: name, mode: 'insensitive' } },
-        select: { id: true },
-      });
-      if (existing) {
-        skipped++;
-        continue;
-      }
-      await prisma.partnerCountry.create({
-        data: {
-          name,
-          status: PartnerOptionStatus.ACTIVE,
-          createdBy: userId,
-          updatedBy: userId,
-        },
-      });
-      created++;
-    }
-    console.log(
-      `Partner countries: ${created} created, ${skipped} already existed`,
     );
   } finally {
     await prisma.$disconnect();

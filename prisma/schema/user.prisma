@@ -79,8 +79,8 @@ model User {
   updatedSupports          Support[]               @relation("SupportUpdatedBy")
   createdPartnerTypes      PartnerType[]           @relation("PartnerTypeCreatedBy")
   updatedPartnerTypes      PartnerType[]           @relation("PartnerTypeUpdatedBy")
-  createdPartnerCountries  PartnerCountry[]        @relation("PartnerCountryCreatedBy")
-  updatedPartnerCountries  PartnerCountry[]        @relation("PartnerCountryUpdatedBy")
+  createdContactInfos      ContactInfo[]           @relation("ContactInfoCreatedBy")
+  updatedContactInfos      ContactInfo[]           @relation("ContactInfoUpdatedBy")
   addresses                Address[]
   carts                    Cart[]
   orders                   Order[]

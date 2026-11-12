@@ -393,6 +393,8 @@ export const ModelName = {
   ComboProduct: 'ComboProduct',
   ComboItem: 'ComboItem',
   ComboImage: 'ComboImage',
+  ContactInfo: 'ContactInfo',
+  ContactMessage: 'ContactMessage',
   DeliveryChargeZone: 'DeliveryChargeZone',
   DeliveryChargeArea: 'DeliveryChargeArea',
   DeliveryChargeRate: 'DeliveryChargeRate',
@@ -414,7 +416,6 @@ export const ModelName = {
   OrderStatusHistory: 'OrderStatusHistory',
   Payment: 'Payment',
   PartnerType: 'PartnerType',
-  PartnerCountry: 'PartnerCountry',
   PartnerRequest: 'PartnerRequest',
   Product: 'Product',
   ProductVariant: 'ProductVariant',
@@ -441,7 +442,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "address" | "auditLog" | "blog" | "cart" | "cartItem" | "category" | "comboProduct" | "comboItem" | "comboImage" | "deliveryChargeZone" | "deliveryChargeArea" | "deliveryChargeRate" | "deliveryFreeDeliveryRule" | "deliveryManProfile" | "deliveryProvider" | "deliveryZone" | "deliveryShipment" | "deliveryStatusHistory" | "home" | "batch" | "inventory" | "newsEventType" | "newsEvent" | "newsEventImage" | "order" | "orderAddress" | "orderItem" | "orderStatusHistory" | "payment" | "partnerType" | "partnerCountry" | "partnerRequest" | "product" | "productVariant" | "productImage" | "promoCode" | "promoCodeRedemption" | "support" | "user" | "profile" | "userSecurity" | "oTP"
+    modelProps: "address" | "auditLog" | "blog" | "cart" | "cartItem" | "category" | "comboProduct" | "comboItem" | "comboImage" | "contactInfo" | "contactMessage" | "deliveryChargeZone" | "deliveryChargeArea" | "deliveryChargeRate" | "deliveryFreeDeliveryRule" | "deliveryManProfile" | "deliveryProvider" | "deliveryZone" | "deliveryShipment" | "deliveryStatusHistory" | "home" | "batch" | "inventory" | "newsEventType" | "newsEvent" | "newsEventImage" | "order" | "orderAddress" | "orderItem" | "orderStatusHistory" | "payment" | "partnerType" | "partnerRequest" | "product" | "productVariant" | "productImage" | "promoCode" | "promoCodeRedemption" | "support" | "user" | "profile" | "userSecurity" | "oTP"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1108,6 +1109,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ComboImageCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ComboImageCountAggregateOutputType> | number
+        }
+      }
+    }
+    ContactInfo: {
+      payload: Prisma.$ContactInfoPayload<ExtArgs>
+      fields: Prisma.ContactInfoFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ContactInfoFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactInfoPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ContactInfoFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactInfoPayload>
+        }
+        findFirst: {
+          args: Prisma.ContactInfoFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactInfoPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ContactInfoFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactInfoPayload>
+        }
+        findMany: {
+          args: Prisma.ContactInfoFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactInfoPayload>[]
+        }
+        create: {
+          args: Prisma.ContactInfoCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactInfoPayload>
+        }
+        createMany: {
+          args: Prisma.ContactInfoCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ContactInfoCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactInfoPayload>[]
+        }
+        delete: {
+          args: Prisma.ContactInfoDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactInfoPayload>
+        }
+        update: {
+          args: Prisma.ContactInfoUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactInfoPayload>
+        }
+        deleteMany: {
+          args: Prisma.ContactInfoDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ContactInfoUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ContactInfoUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactInfoPayload>[]
+        }
+        upsert: {
+          args: Prisma.ContactInfoUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactInfoPayload>
+        }
+        aggregate: {
+          args: Prisma.ContactInfoAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateContactInfo>
+        }
+        groupBy: {
+          args: Prisma.ContactInfoGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContactInfoGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ContactInfoCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContactInfoCountAggregateOutputType> | number
+        }
+      }
+    }
+    ContactMessage: {
+      payload: Prisma.$ContactMessagePayload<ExtArgs>
+      fields: Prisma.ContactMessageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ContactMessageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactMessagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ContactMessageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactMessagePayload>
+        }
+        findFirst: {
+          args: Prisma.ContactMessageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactMessagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ContactMessageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactMessagePayload>
+        }
+        findMany: {
+          args: Prisma.ContactMessageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactMessagePayload>[]
+        }
+        create: {
+          args: Prisma.ContactMessageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactMessagePayload>
+        }
+        createMany: {
+          args: Prisma.ContactMessageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ContactMessageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactMessagePayload>[]
+        }
+        delete: {
+          args: Prisma.ContactMessageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactMessagePayload>
+        }
+        update: {
+          args: Prisma.ContactMessageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactMessagePayload>
+        }
+        deleteMany: {
+          args: Prisma.ContactMessageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ContactMessageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ContactMessageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactMessagePayload>[]
+        }
+        upsert: {
+          args: Prisma.ContactMessageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactMessagePayload>
+        }
+        aggregate: {
+          args: Prisma.ContactMessageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateContactMessage>
+        }
+        groupBy: {
+          args: Prisma.ContactMessageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContactMessageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ContactMessageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContactMessageCountAggregateOutputType> | number
         }
       }
     }
@@ -2665,80 +2814,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    PartnerCountry: {
-      payload: Prisma.$PartnerCountryPayload<ExtArgs>
-      fields: Prisma.PartnerCountryFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.PartnerCountryFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.PartnerCountryFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload>
-        }
-        findFirst: {
-          args: Prisma.PartnerCountryFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.PartnerCountryFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload>
-        }
-        findMany: {
-          args: Prisma.PartnerCountryFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload>[]
-        }
-        create: {
-          args: Prisma.PartnerCountryCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload>
-        }
-        createMany: {
-          args: Prisma.PartnerCountryCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.PartnerCountryCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload>[]
-        }
-        delete: {
-          args: Prisma.PartnerCountryDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload>
-        }
-        update: {
-          args: Prisma.PartnerCountryUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload>
-        }
-        deleteMany: {
-          args: Prisma.PartnerCountryDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.PartnerCountryUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.PartnerCountryUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload>[]
-        }
-        upsert: {
-          args: Prisma.PartnerCountryUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerCountryPayload>
-        }
-        aggregate: {
-          args: Prisma.PartnerCountryAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregatePartnerCountry>
-        }
-        groupBy: {
-          args: Prisma.PartnerCountryGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.PartnerCountryGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.PartnerCountryCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.PartnerCountryCountAggregateOutputType> | number
-        }
-      }
-    }
     PartnerRequest: {
       payload: Prisma.$PartnerRequestPayload<ExtArgs>
       fields: Prisma.PartnerRequestFieldRefs
@@ -3772,6 +3847,37 @@ export const ComboImageScalarFieldEnum = {
 export type ComboImageScalarFieldEnum = (typeof ComboImageScalarFieldEnum)[keyof typeof ComboImageScalarFieldEnum]
 
 
+export const ContactInfoScalarFieldEnum = {
+  id: 'id',
+  hotline: 'hotline',
+  lineId: 'lineId',
+  email: 'email',
+  heading: 'heading',
+  description: 'description',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ContactInfoScalarFieldEnum = (typeof ContactInfoScalarFieldEnum)[keyof typeof ContactInfoScalarFieldEnum]
+
+
+export const ContactMessageScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  name: 'name',
+  email: 'email',
+  phone: 'phone',
+  message: 'message',
+  isRead: 'isRead',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ContactMessageScalarFieldEnum = (typeof ContactMessageScalarFieldEnum)[keyof typeof ContactMessageScalarFieldEnum]
+
+
 export const DeliveryChargeZoneScalarFieldEnum = {
   id: 'id',
   sid: 'sid',
@@ -4227,28 +4333,14 @@ export const PartnerTypeScalarFieldEnum = {
 export type PartnerTypeScalarFieldEnum = (typeof PartnerTypeScalarFieldEnum)[keyof typeof PartnerTypeScalarFieldEnum]
 
 
-export const PartnerCountryScalarFieldEnum = {
-  id: 'id',
-  sid: 'sid',
-  name: 'name',
-  status: 'status',
-  createdBy: 'createdBy',
-  updatedBy: 'updatedBy',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type PartnerCountryScalarFieldEnum = (typeof PartnerCountryScalarFieldEnum)[keyof typeof PartnerCountryScalarFieldEnum]
-
-
 export const PartnerRequestScalarFieldEnum = {
   id: 'id',
   sid: 'sid',
   name: 'name',
   companyName: 'companyName',
   message: 'message',
+  countryCode: 'countryCode',
   partnerTypeId: 'partnerTypeId',
-  partnerCountryId: 'partnerCountryId',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -5217,6 +5309,8 @@ export type GlobalOmitConfig = {
   comboProduct?: Prisma.ComboProductOmit
   comboItem?: Prisma.ComboItemOmit
   comboImage?: Prisma.ComboImageOmit
+  contactInfo?: Prisma.ContactInfoOmit
+  contactMessage?: Prisma.ContactMessageOmit
   deliveryChargeZone?: Prisma.DeliveryChargeZoneOmit
   deliveryChargeArea?: Prisma.DeliveryChargeAreaOmit
   deliveryChargeRate?: Prisma.DeliveryChargeRateOmit
@@ -5238,7 +5332,6 @@ export type GlobalOmitConfig = {
   orderStatusHistory?: Prisma.OrderStatusHistoryOmit
   payment?: Prisma.PaymentOmit
   partnerType?: Prisma.PartnerTypeOmit
-  partnerCountry?: Prisma.PartnerCountryOmit
   partnerRequest?: Prisma.PartnerRequestOmit
   product?: Prisma.ProductOmit
   productVariant?: Prisma.ProductVariantOmit

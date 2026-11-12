@@ -60,6 +60,8 @@ export const ModelName = {
   ComboProduct: 'ComboProduct',
   ComboItem: 'ComboItem',
   ComboImage: 'ComboImage',
+  ContactInfo: 'ContactInfo',
+  ContactMessage: 'ContactMessage',
   DeliveryChargeZone: 'DeliveryChargeZone',
   DeliveryChargeArea: 'DeliveryChargeArea',
   DeliveryChargeRate: 'DeliveryChargeRate',
@@ -81,7 +83,6 @@ export const ModelName = {
   OrderStatusHistory: 'OrderStatusHistory',
   Payment: 'Payment',
   PartnerType: 'PartnerType',
-  PartnerCountry: 'PartnerCountry',
   PartnerRequest: 'PartnerRequest',
   Product: 'Product',
   ProductVariant: 'ProductVariant',
@@ -289,6 +290,37 @@ export const ComboImageScalarFieldEnum = {
 } as const
 
 export type ComboImageScalarFieldEnum = (typeof ComboImageScalarFieldEnum)[keyof typeof ComboImageScalarFieldEnum]
+
+
+export const ContactInfoScalarFieldEnum = {
+  id: 'id',
+  hotline: 'hotline',
+  lineId: 'lineId',
+  email: 'email',
+  heading: 'heading',
+  description: 'description',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ContactInfoScalarFieldEnum = (typeof ContactInfoScalarFieldEnum)[keyof typeof ContactInfoScalarFieldEnum]
+
+
+export const ContactMessageScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  name: 'name',
+  email: 'email',
+  phone: 'phone',
+  message: 'message',
+  isRead: 'isRead',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ContactMessageScalarFieldEnum = (typeof ContactMessageScalarFieldEnum)[keyof typeof ContactMessageScalarFieldEnum]
 
 
 export const DeliveryChargeZoneScalarFieldEnum = {
@@ -746,28 +778,14 @@ export const PartnerTypeScalarFieldEnum = {
 export type PartnerTypeScalarFieldEnum = (typeof PartnerTypeScalarFieldEnum)[keyof typeof PartnerTypeScalarFieldEnum]
 
 
-export const PartnerCountryScalarFieldEnum = {
-  id: 'id',
-  sid: 'sid',
-  name: 'name',
-  status: 'status',
-  createdBy: 'createdBy',
-  updatedBy: 'updatedBy',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type PartnerCountryScalarFieldEnum = (typeof PartnerCountryScalarFieldEnum)[keyof typeof PartnerCountryScalarFieldEnum]
-
-
 export const PartnerRequestScalarFieldEnum = {
   id: 'id',
   sid: 'sid',
   name: 'name',
   companyName: 'companyName',
   message: 'message',
+  countryCode: 'countryCode',
   partnerTypeId: 'partnerTypeId',
-  partnerCountryId: 'partnerCountryId',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

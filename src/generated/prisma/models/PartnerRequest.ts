@@ -29,13 +29,11 @@ export type AggregatePartnerRequest = {
 export type PartnerRequestAvgAggregateOutputType = {
   id: number | null
   partnerTypeId: number | null
-  partnerCountryId: number | null
 }
 
 export type PartnerRequestSumAggregateOutputType = {
   id: number | null
   partnerTypeId: number | null
-  partnerCountryId: number | null
 }
 
 export type PartnerRequestMinAggregateOutputType = {
@@ -44,8 +42,8 @@ export type PartnerRequestMinAggregateOutputType = {
   name: string | null
   companyName: string | null
   message: string | null
+  countryCode: string | null
   partnerTypeId: number | null
-  partnerCountryId: number | null
   status: $Enums.PartnerRequestStatus | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -57,8 +55,8 @@ export type PartnerRequestMaxAggregateOutputType = {
   name: string | null
   companyName: string | null
   message: string | null
+  countryCode: string | null
   partnerTypeId: number | null
-  partnerCountryId: number | null
   status: $Enums.PartnerRequestStatus | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -70,8 +68,8 @@ export type PartnerRequestCountAggregateOutputType = {
   name: number
   companyName: number
   message: number
+  countryCode: number
   partnerTypeId: number
-  partnerCountryId: number
   status: number
   createdAt: number
   updatedAt: number
@@ -82,13 +80,11 @@ export type PartnerRequestCountAggregateOutputType = {
 export type PartnerRequestAvgAggregateInputType = {
   id?: true
   partnerTypeId?: true
-  partnerCountryId?: true
 }
 
 export type PartnerRequestSumAggregateInputType = {
   id?: true
   partnerTypeId?: true
-  partnerCountryId?: true
 }
 
 export type PartnerRequestMinAggregateInputType = {
@@ -97,8 +93,8 @@ export type PartnerRequestMinAggregateInputType = {
   name?: true
   companyName?: true
   message?: true
+  countryCode?: true
   partnerTypeId?: true
-  partnerCountryId?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -110,8 +106,8 @@ export type PartnerRequestMaxAggregateInputType = {
   name?: true
   companyName?: true
   message?: true
+  countryCode?: true
   partnerTypeId?: true
-  partnerCountryId?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -123,8 +119,8 @@ export type PartnerRequestCountAggregateInputType = {
   name?: true
   companyName?: true
   message?: true
+  countryCode?: true
   partnerTypeId?: true
-  partnerCountryId?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -223,8 +219,8 @@ export type PartnerRequestGroupByOutputType = {
   name: string
   companyName: string
   message: string | null
+  countryCode: string
   partnerTypeId: number
-  partnerCountryId: number
   status: $Enums.PartnerRequestStatus
   createdAt: Date
   updatedAt: Date
@@ -259,13 +255,12 @@ export type PartnerRequestWhereInput = {
   name?: Prisma.StringFilter<"PartnerRequest"> | string
   companyName?: Prisma.StringFilter<"PartnerRequest"> | string
   message?: Prisma.StringNullableFilter<"PartnerRequest"> | string | null
+  countryCode?: Prisma.StringFilter<"PartnerRequest"> | string
   partnerTypeId?: Prisma.IntFilter<"PartnerRequest"> | number
-  partnerCountryId?: Prisma.IntFilter<"PartnerRequest"> | number
   status?: Prisma.EnumPartnerRequestStatusFilter<"PartnerRequest"> | $Enums.PartnerRequestStatus
   createdAt?: Prisma.DateTimeFilter<"PartnerRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PartnerRequest"> | Date | string
   partnerType?: Prisma.XOR<Prisma.PartnerTypeScalarRelationFilter, Prisma.PartnerTypeWhereInput>
-  partnerCountry?: Prisma.XOR<Prisma.PartnerCountryScalarRelationFilter, Prisma.PartnerCountryWhereInput>
 }
 
 export type PartnerRequestOrderByWithRelationInput = {
@@ -274,13 +269,12 @@ export type PartnerRequestOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
   message?: Prisma.SortOrderInput | Prisma.SortOrder
+  countryCode?: Prisma.SortOrder
   partnerTypeId?: Prisma.SortOrder
-  partnerCountryId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   partnerType?: Prisma.PartnerTypeOrderByWithRelationInput
-  partnerCountry?: Prisma.PartnerCountryOrderByWithRelationInput
 }
 
 export type PartnerRequestWhereUniqueInput = Prisma.AtLeast<{
@@ -292,13 +286,12 @@ export type PartnerRequestWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"PartnerRequest"> | string
   companyName?: Prisma.StringFilter<"PartnerRequest"> | string
   message?: Prisma.StringNullableFilter<"PartnerRequest"> | string | null
+  countryCode?: Prisma.StringFilter<"PartnerRequest"> | string
   partnerTypeId?: Prisma.IntFilter<"PartnerRequest"> | number
-  partnerCountryId?: Prisma.IntFilter<"PartnerRequest"> | number
   status?: Prisma.EnumPartnerRequestStatusFilter<"PartnerRequest"> | $Enums.PartnerRequestStatus
   createdAt?: Prisma.DateTimeFilter<"PartnerRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PartnerRequest"> | Date | string
   partnerType?: Prisma.XOR<Prisma.PartnerTypeScalarRelationFilter, Prisma.PartnerTypeWhereInput>
-  partnerCountry?: Prisma.XOR<Prisma.PartnerCountryScalarRelationFilter, Prisma.PartnerCountryWhereInput>
 }, "id" | "sid">
 
 export type PartnerRequestOrderByWithAggregationInput = {
@@ -307,8 +300,8 @@ export type PartnerRequestOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
   message?: Prisma.SortOrderInput | Prisma.SortOrder
+  countryCode?: Prisma.SortOrder
   partnerTypeId?: Prisma.SortOrder
-  partnerCountryId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -328,8 +321,8 @@ export type PartnerRequestScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"PartnerRequest"> | string
   companyName?: Prisma.StringWithAggregatesFilter<"PartnerRequest"> | string
   message?: Prisma.StringNullableWithAggregatesFilter<"PartnerRequest"> | string | null
+  countryCode?: Prisma.StringWithAggregatesFilter<"PartnerRequest"> | string
   partnerTypeId?: Prisma.IntWithAggregatesFilter<"PartnerRequest"> | number
-  partnerCountryId?: Prisma.IntWithAggregatesFilter<"PartnerRequest"> | number
   status?: Prisma.EnumPartnerRequestStatusWithAggregatesFilter<"PartnerRequest"> | $Enums.PartnerRequestStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PartnerRequest"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PartnerRequest"> | Date | string
@@ -340,11 +333,11 @@ export type PartnerRequestCreateInput = {
   name: string
   companyName: string
   message?: string | null
+  countryCode: string
   status?: $Enums.PartnerRequestStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   partnerType: Prisma.PartnerTypeCreateNestedOneWithoutPartnerRequestsInput
-  partnerCountry: Prisma.PartnerCountryCreateNestedOneWithoutPartnerRequestsInput
 }
 
 export type PartnerRequestUncheckedCreateInput = {
@@ -353,8 +346,8 @@ export type PartnerRequestUncheckedCreateInput = {
   name: string
   companyName: string
   message?: string | null
+  countryCode: string
   partnerTypeId: number
-  partnerCountryId: number
   status?: $Enums.PartnerRequestStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -365,11 +358,11 @@ export type PartnerRequestUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerRequestStatusFieldUpdateOperationsInput | $Enums.PartnerRequestStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   partnerType?: Prisma.PartnerTypeUpdateOneRequiredWithoutPartnerRequestsNestedInput
-  partnerCountry?: Prisma.PartnerCountryUpdateOneRequiredWithoutPartnerRequestsNestedInput
 }
 
 export type PartnerRequestUncheckedUpdateInput = {
@@ -378,8 +371,8 @@ export type PartnerRequestUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   partnerTypeId?: Prisma.IntFieldUpdateOperationsInput | number
-  partnerCountryId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumPartnerRequestStatusFieldUpdateOperationsInput | $Enums.PartnerRequestStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -391,8 +384,8 @@ export type PartnerRequestCreateManyInput = {
   name: string
   companyName: string
   message?: string | null
+  countryCode: string
   partnerTypeId: number
-  partnerCountryId: number
   status?: $Enums.PartnerRequestStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -403,6 +396,7 @@ export type PartnerRequestUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerRequestStatusFieldUpdateOperationsInput | $Enums.PartnerRequestStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -414,8 +408,8 @@ export type PartnerRequestUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   partnerTypeId?: Prisma.IntFieldUpdateOperationsInput | number
-  partnerCountryId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumPartnerRequestStatusFieldUpdateOperationsInput | $Enums.PartnerRequestStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -437,8 +431,8 @@ export type PartnerRequestCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
   message?: Prisma.SortOrder
+  countryCode?: Prisma.SortOrder
   partnerTypeId?: Prisma.SortOrder
-  partnerCountryId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -447,7 +441,6 @@ export type PartnerRequestCountOrderByAggregateInput = {
 export type PartnerRequestAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   partnerTypeId?: Prisma.SortOrder
-  partnerCountryId?: Prisma.SortOrder
 }
 
 export type PartnerRequestMaxOrderByAggregateInput = {
@@ -456,8 +449,8 @@ export type PartnerRequestMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
   message?: Prisma.SortOrder
+  countryCode?: Prisma.SortOrder
   partnerTypeId?: Prisma.SortOrder
-  partnerCountryId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -469,8 +462,8 @@ export type PartnerRequestMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
   message?: Prisma.SortOrder
+  countryCode?: Prisma.SortOrder
   partnerTypeId?: Prisma.SortOrder
-  partnerCountryId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -479,7 +472,6 @@ export type PartnerRequestMinOrderByAggregateInput = {
 export type PartnerRequestSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   partnerTypeId?: Prisma.SortOrder
-  partnerCountryId?: Prisma.SortOrder
 }
 
 export type PartnerRequestCreateNestedManyWithoutPartnerTypeInput = {
@@ -524,48 +516,6 @@ export type PartnerRequestUncheckedUpdateManyWithoutPartnerTypeNestedInput = {
   deleteMany?: Prisma.PartnerRequestScalarWhereInput | Prisma.PartnerRequestScalarWhereInput[]
 }
 
-export type PartnerRequestCreateNestedManyWithoutPartnerCountryInput = {
-  create?: Prisma.XOR<Prisma.PartnerRequestCreateWithoutPartnerCountryInput, Prisma.PartnerRequestUncheckedCreateWithoutPartnerCountryInput> | Prisma.PartnerRequestCreateWithoutPartnerCountryInput[] | Prisma.PartnerRequestUncheckedCreateWithoutPartnerCountryInput[]
-  connectOrCreate?: Prisma.PartnerRequestCreateOrConnectWithoutPartnerCountryInput | Prisma.PartnerRequestCreateOrConnectWithoutPartnerCountryInput[]
-  createMany?: Prisma.PartnerRequestCreateManyPartnerCountryInputEnvelope
-  connect?: Prisma.PartnerRequestWhereUniqueInput | Prisma.PartnerRequestWhereUniqueInput[]
-}
-
-export type PartnerRequestUncheckedCreateNestedManyWithoutPartnerCountryInput = {
-  create?: Prisma.XOR<Prisma.PartnerRequestCreateWithoutPartnerCountryInput, Prisma.PartnerRequestUncheckedCreateWithoutPartnerCountryInput> | Prisma.PartnerRequestCreateWithoutPartnerCountryInput[] | Prisma.PartnerRequestUncheckedCreateWithoutPartnerCountryInput[]
-  connectOrCreate?: Prisma.PartnerRequestCreateOrConnectWithoutPartnerCountryInput | Prisma.PartnerRequestCreateOrConnectWithoutPartnerCountryInput[]
-  createMany?: Prisma.PartnerRequestCreateManyPartnerCountryInputEnvelope
-  connect?: Prisma.PartnerRequestWhereUniqueInput | Prisma.PartnerRequestWhereUniqueInput[]
-}
-
-export type PartnerRequestUpdateManyWithoutPartnerCountryNestedInput = {
-  create?: Prisma.XOR<Prisma.PartnerRequestCreateWithoutPartnerCountryInput, Prisma.PartnerRequestUncheckedCreateWithoutPartnerCountryInput> | Prisma.PartnerRequestCreateWithoutPartnerCountryInput[] | Prisma.PartnerRequestUncheckedCreateWithoutPartnerCountryInput[]
-  connectOrCreate?: Prisma.PartnerRequestCreateOrConnectWithoutPartnerCountryInput | Prisma.PartnerRequestCreateOrConnectWithoutPartnerCountryInput[]
-  upsert?: Prisma.PartnerRequestUpsertWithWhereUniqueWithoutPartnerCountryInput | Prisma.PartnerRequestUpsertWithWhereUniqueWithoutPartnerCountryInput[]
-  createMany?: Prisma.PartnerRequestCreateManyPartnerCountryInputEnvelope
-  set?: Prisma.PartnerRequestWhereUniqueInput | Prisma.PartnerRequestWhereUniqueInput[]
-  disconnect?: Prisma.PartnerRequestWhereUniqueInput | Prisma.PartnerRequestWhereUniqueInput[]
-  delete?: Prisma.PartnerRequestWhereUniqueInput | Prisma.PartnerRequestWhereUniqueInput[]
-  connect?: Prisma.PartnerRequestWhereUniqueInput | Prisma.PartnerRequestWhereUniqueInput[]
-  update?: Prisma.PartnerRequestUpdateWithWhereUniqueWithoutPartnerCountryInput | Prisma.PartnerRequestUpdateWithWhereUniqueWithoutPartnerCountryInput[]
-  updateMany?: Prisma.PartnerRequestUpdateManyWithWhereWithoutPartnerCountryInput | Prisma.PartnerRequestUpdateManyWithWhereWithoutPartnerCountryInput[]
-  deleteMany?: Prisma.PartnerRequestScalarWhereInput | Prisma.PartnerRequestScalarWhereInput[]
-}
-
-export type PartnerRequestUncheckedUpdateManyWithoutPartnerCountryNestedInput = {
-  create?: Prisma.XOR<Prisma.PartnerRequestCreateWithoutPartnerCountryInput, Prisma.PartnerRequestUncheckedCreateWithoutPartnerCountryInput> | Prisma.PartnerRequestCreateWithoutPartnerCountryInput[] | Prisma.PartnerRequestUncheckedCreateWithoutPartnerCountryInput[]
-  connectOrCreate?: Prisma.PartnerRequestCreateOrConnectWithoutPartnerCountryInput | Prisma.PartnerRequestCreateOrConnectWithoutPartnerCountryInput[]
-  upsert?: Prisma.PartnerRequestUpsertWithWhereUniqueWithoutPartnerCountryInput | Prisma.PartnerRequestUpsertWithWhereUniqueWithoutPartnerCountryInput[]
-  createMany?: Prisma.PartnerRequestCreateManyPartnerCountryInputEnvelope
-  set?: Prisma.PartnerRequestWhereUniqueInput | Prisma.PartnerRequestWhereUniqueInput[]
-  disconnect?: Prisma.PartnerRequestWhereUniqueInput | Prisma.PartnerRequestWhereUniqueInput[]
-  delete?: Prisma.PartnerRequestWhereUniqueInput | Prisma.PartnerRequestWhereUniqueInput[]
-  connect?: Prisma.PartnerRequestWhereUniqueInput | Prisma.PartnerRequestWhereUniqueInput[]
-  update?: Prisma.PartnerRequestUpdateWithWhereUniqueWithoutPartnerCountryInput | Prisma.PartnerRequestUpdateWithWhereUniqueWithoutPartnerCountryInput[]
-  updateMany?: Prisma.PartnerRequestUpdateManyWithWhereWithoutPartnerCountryInput | Prisma.PartnerRequestUpdateManyWithWhereWithoutPartnerCountryInput[]
-  deleteMany?: Prisma.PartnerRequestScalarWhereInput | Prisma.PartnerRequestScalarWhereInput[]
-}
-
 export type EnumPartnerRequestStatusFieldUpdateOperationsInput = {
   set?: $Enums.PartnerRequestStatus
 }
@@ -575,10 +525,10 @@ export type PartnerRequestCreateWithoutPartnerTypeInput = {
   name: string
   companyName: string
   message?: string | null
+  countryCode: string
   status?: $Enums.PartnerRequestStatus
   createdAt?: Date | string
   updatedAt?: Date | string
-  partnerCountry: Prisma.PartnerCountryCreateNestedOneWithoutPartnerRequestsInput
 }
 
 export type PartnerRequestUncheckedCreateWithoutPartnerTypeInput = {
@@ -587,7 +537,7 @@ export type PartnerRequestUncheckedCreateWithoutPartnerTypeInput = {
   name: string
   companyName: string
   message?: string | null
-  partnerCountryId: number
+  countryCode: string
   status?: $Enums.PartnerRequestStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -628,60 +578,11 @@ export type PartnerRequestScalarWhereInput = {
   name?: Prisma.StringFilter<"PartnerRequest"> | string
   companyName?: Prisma.StringFilter<"PartnerRequest"> | string
   message?: Prisma.StringNullableFilter<"PartnerRequest"> | string | null
+  countryCode?: Prisma.StringFilter<"PartnerRequest"> | string
   partnerTypeId?: Prisma.IntFilter<"PartnerRequest"> | number
-  partnerCountryId?: Prisma.IntFilter<"PartnerRequest"> | number
   status?: Prisma.EnumPartnerRequestStatusFilter<"PartnerRequest"> | $Enums.PartnerRequestStatus
   createdAt?: Prisma.DateTimeFilter<"PartnerRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PartnerRequest"> | Date | string
-}
-
-export type PartnerRequestCreateWithoutPartnerCountryInput = {
-  sid?: string
-  name: string
-  companyName: string
-  message?: string | null
-  status?: $Enums.PartnerRequestStatus
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  partnerType: Prisma.PartnerTypeCreateNestedOneWithoutPartnerRequestsInput
-}
-
-export type PartnerRequestUncheckedCreateWithoutPartnerCountryInput = {
-  id?: number
-  sid?: string
-  name: string
-  companyName: string
-  message?: string | null
-  partnerTypeId: number
-  status?: $Enums.PartnerRequestStatus
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type PartnerRequestCreateOrConnectWithoutPartnerCountryInput = {
-  where: Prisma.PartnerRequestWhereUniqueInput
-  create: Prisma.XOR<Prisma.PartnerRequestCreateWithoutPartnerCountryInput, Prisma.PartnerRequestUncheckedCreateWithoutPartnerCountryInput>
-}
-
-export type PartnerRequestCreateManyPartnerCountryInputEnvelope = {
-  data: Prisma.PartnerRequestCreateManyPartnerCountryInput | Prisma.PartnerRequestCreateManyPartnerCountryInput[]
-  skipDuplicates?: boolean
-}
-
-export type PartnerRequestUpsertWithWhereUniqueWithoutPartnerCountryInput = {
-  where: Prisma.PartnerRequestWhereUniqueInput
-  update: Prisma.XOR<Prisma.PartnerRequestUpdateWithoutPartnerCountryInput, Prisma.PartnerRequestUncheckedUpdateWithoutPartnerCountryInput>
-  create: Prisma.XOR<Prisma.PartnerRequestCreateWithoutPartnerCountryInput, Prisma.PartnerRequestUncheckedCreateWithoutPartnerCountryInput>
-}
-
-export type PartnerRequestUpdateWithWhereUniqueWithoutPartnerCountryInput = {
-  where: Prisma.PartnerRequestWhereUniqueInput
-  data: Prisma.XOR<Prisma.PartnerRequestUpdateWithoutPartnerCountryInput, Prisma.PartnerRequestUncheckedUpdateWithoutPartnerCountryInput>
-}
-
-export type PartnerRequestUpdateManyWithWhereWithoutPartnerCountryInput = {
-  where: Prisma.PartnerRequestScalarWhereInput
-  data: Prisma.XOR<Prisma.PartnerRequestUpdateManyMutationInput, Prisma.PartnerRequestUncheckedUpdateManyWithoutPartnerCountryInput>
 }
 
 export type PartnerRequestCreateManyPartnerTypeInput = {
@@ -690,7 +591,7 @@ export type PartnerRequestCreateManyPartnerTypeInput = {
   name: string
   companyName: string
   message?: string | null
-  partnerCountryId: number
+  countryCode: string
   status?: $Enums.PartnerRequestStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -701,10 +602,10 @@ export type PartnerRequestUpdateWithoutPartnerTypeInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerRequestStatusFieldUpdateOperationsInput | $Enums.PartnerRequestStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  partnerCountry?: Prisma.PartnerCountryUpdateOneRequiredWithoutPartnerRequestsNestedInput
 }
 
 export type PartnerRequestUncheckedUpdateWithoutPartnerTypeInput = {
@@ -713,7 +614,7 @@ export type PartnerRequestUncheckedUpdateWithoutPartnerTypeInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  partnerCountryId?: Prisma.IntFieldUpdateOperationsInput | number
+  countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerRequestStatusFieldUpdateOperationsInput | $Enums.PartnerRequestStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -725,54 +626,7 @@ export type PartnerRequestUncheckedUpdateManyWithoutPartnerTypeInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  partnerCountryId?: Prisma.IntFieldUpdateOperationsInput | number
-  status?: Prisma.EnumPartnerRequestStatusFieldUpdateOperationsInput | $Enums.PartnerRequestStatus
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type PartnerRequestCreateManyPartnerCountryInput = {
-  id?: number
-  sid?: string
-  name: string
-  companyName: string
-  message?: string | null
-  partnerTypeId: number
-  status?: $Enums.PartnerRequestStatus
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type PartnerRequestUpdateWithoutPartnerCountryInput = {
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  companyName?: Prisma.StringFieldUpdateOperationsInput | string
-  message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPartnerRequestStatusFieldUpdateOperationsInput | $Enums.PartnerRequestStatus
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  partnerType?: Prisma.PartnerTypeUpdateOneRequiredWithoutPartnerRequestsNestedInput
-}
-
-export type PartnerRequestUncheckedUpdateWithoutPartnerCountryInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  companyName?: Prisma.StringFieldUpdateOperationsInput | string
-  message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  partnerTypeId?: Prisma.IntFieldUpdateOperationsInput | number
-  status?: Prisma.EnumPartnerRequestStatusFieldUpdateOperationsInput | $Enums.PartnerRequestStatus
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type PartnerRequestUncheckedUpdateManyWithoutPartnerCountryInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  companyName?: Prisma.StringFieldUpdateOperationsInput | string
-  message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  partnerTypeId?: Prisma.IntFieldUpdateOperationsInput | number
+  countryCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerRequestStatusFieldUpdateOperationsInput | $Enums.PartnerRequestStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -786,13 +640,12 @@ export type PartnerRequestSelect<ExtArgs extends runtime.Types.Extensions.Intern
   name?: boolean
   companyName?: boolean
   message?: boolean
+  countryCode?: boolean
   partnerTypeId?: boolean
-  partnerCountryId?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   partnerType?: boolean | Prisma.PartnerTypeDefaultArgs<ExtArgs>
-  partnerCountry?: boolean | Prisma.PartnerCountryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["partnerRequest"]>
 
 export type PartnerRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -801,13 +654,12 @@ export type PartnerRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   name?: boolean
   companyName?: boolean
   message?: boolean
+  countryCode?: boolean
   partnerTypeId?: boolean
-  partnerCountryId?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   partnerType?: boolean | Prisma.PartnerTypeDefaultArgs<ExtArgs>
-  partnerCountry?: boolean | Prisma.PartnerCountryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["partnerRequest"]>
 
 export type PartnerRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -816,13 +668,12 @@ export type PartnerRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   name?: boolean
   companyName?: boolean
   message?: boolean
+  countryCode?: boolean
   partnerTypeId?: boolean
-  partnerCountryId?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   partnerType?: boolean | Prisma.PartnerTypeDefaultArgs<ExtArgs>
-  partnerCountry?: boolean | Prisma.PartnerCountryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["partnerRequest"]>
 
 export type PartnerRequestSelectScalar = {
@@ -831,32 +682,28 @@ export type PartnerRequestSelectScalar = {
   name?: boolean
   companyName?: boolean
   message?: boolean
+  countryCode?: boolean
   partnerTypeId?: boolean
-  partnerCountryId?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PartnerRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "name" | "companyName" | "message" | "partnerTypeId" | "partnerCountryId" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["partnerRequest"]>
+export type PartnerRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sid" | "name" | "companyName" | "message" | "countryCode" | "partnerTypeId" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["partnerRequest"]>
 export type PartnerRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   partnerType?: boolean | Prisma.PartnerTypeDefaultArgs<ExtArgs>
-  partnerCountry?: boolean | Prisma.PartnerCountryDefaultArgs<ExtArgs>
 }
 export type PartnerRequestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   partnerType?: boolean | Prisma.PartnerTypeDefaultArgs<ExtArgs>
-  partnerCountry?: boolean | Prisma.PartnerCountryDefaultArgs<ExtArgs>
 }
 export type PartnerRequestIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   partnerType?: boolean | Prisma.PartnerTypeDefaultArgs<ExtArgs>
-  partnerCountry?: boolean | Prisma.PartnerCountryDefaultArgs<ExtArgs>
 }
 
 export type $PartnerRequestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PartnerRequest"
   objects: {
     partnerType: Prisma.$PartnerTypePayload<ExtArgs>
-    partnerCountry: Prisma.$PartnerCountryPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -864,8 +711,8 @@ export type $PartnerRequestPayload<ExtArgs extends runtime.Types.Extensions.Inte
     name: string
     companyName: string
     message: string | null
+    countryCode: string
     partnerTypeId: number
-    partnerCountryId: number
     status: $Enums.PartnerRequestStatus
     createdAt: Date
     updatedAt: Date
@@ -1264,7 +1111,6 @@ readonly fields: PartnerRequestFieldRefs;
 export interface Prisma__PartnerRequestClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   partnerType<T extends Prisma.PartnerTypeDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerTypeDefaultArgs<ExtArgs>>): Prisma.Prisma__PartnerTypeClient<runtime.Types.Result.GetResult<Prisma.$PartnerTypePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  partnerCountry<T extends Prisma.PartnerCountryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerCountryDefaultArgs<ExtArgs>>): Prisma.Prisma__PartnerCountryClient<runtime.Types.Result.GetResult<Prisma.$PartnerCountryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1299,8 +1145,8 @@ export interface PartnerRequestFieldRefs {
   readonly name: Prisma.FieldRef<"PartnerRequest", 'String'>
   readonly companyName: Prisma.FieldRef<"PartnerRequest", 'String'>
   readonly message: Prisma.FieldRef<"PartnerRequest", 'String'>
+  readonly countryCode: Prisma.FieldRef<"PartnerRequest", 'String'>
   readonly partnerTypeId: Prisma.FieldRef<"PartnerRequest", 'Int'>
-  readonly partnerCountryId: Prisma.FieldRef<"PartnerRequest", 'Int'>
   readonly status: Prisma.FieldRef<"PartnerRequest", 'PartnerRequestStatus'>
   readonly createdAt: Prisma.FieldRef<"PartnerRequest", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PartnerRequest", 'DateTime'>

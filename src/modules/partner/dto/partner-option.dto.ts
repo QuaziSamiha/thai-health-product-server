@@ -10,8 +10,7 @@ import {
 import { PartnerOptionStatus } from '../../../generated/prisma/enums';
 import { PaginationQueryDto } from '../../../shared/pagination';
 
-//* PartnerType AND PartnerCountry ARE THE SAME SHAPE (name + status), SO ONE
-//* SET OF REQUEST DTOs SERVES BOTH ADMIN-MANAGED DROPDOWN TABLES.
+//* REQUEST DTOs FOR THE ADMIN-MANAGED DROPDOWN TABLE (PartnerType — name + status).
 
 const trim = ({ value }: { value: unknown }) =>
   typeof value === 'string' ? value.trim() : value;

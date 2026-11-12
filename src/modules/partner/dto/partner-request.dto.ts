@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   IsEnum,
+  IsIn,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -11,9 +12,14 @@ import {
 } from 'class-validator';
 import { PartnerRequestStatus } from '../../../generated/prisma/enums';
 import { PaginationQueryDto } from '../../../shared/pagination';
+import { COUNTRY_CODES } from '../../../common/geography/countries';
 
 const trim = ({ value }: { value: unknown }) =>
   typeof value === 'string' ? value.trim() : value;
+
+//* ACCEPT 'th' AS WELL AS 'TH' — CODES ARE STORED UPPER-CASE
+const toCountryCode = ({ value }: { value: unknown }) =>
+  typeof value === 'string' ? value.trim().toUpperCase() : value;
 
 //* PUBLIC "BECOME A PARTNER" FORM SUBMISSION
 export class CreatePartnerRequestDto {
@@ -50,14 +56,15 @@ export class CreatePartnerRequestDto {
   partnerTypeId!: number;
 
   @ApiProperty({
-    description: 'ID of an ACTIVE partner country',
-    example: 1,
-    minimum: 1,
+    description: 'ISO 3166-1 alpha-2 country code',
+    example: 'TH',
+    minLength: 2,
+    maxLength: 2,
   })
-  @Type(() => Number)
-  @IsInt({ message: 'Please select a valid country' })
-  @Min(1, { message: 'Please select a valid country' })
-  partnerCountryId!: number;
+  @Transform(toCountryCode)
+  @IsNotEmpty({ message: 'Please select a country' })
+  @IsIn(COUNTRY_CODES, { message: 'Please select a valid country' })
+  countryCode!: string;
 
   @ApiPropertyOptional({
     description: 'Optional message from the applicant',
@@ -98,12 +105,11 @@ export class PartnerRequestQueryDto extends PaginationQueryDto {
   partnerTypeId?: number;
 
   @ApiPropertyOptional({
-    description: 'Filter by partner country ID',
-    example: 1,
+    description: 'Filter by ISO 3166-1 alpha-2 country code',
+    example: 'TH',
   })
   @IsOptional()
-  @Type(() => Number)
-  @IsInt({ message: 'Partner country ID must be a whole number' })
-  @Min(1)
-  partnerCountryId?: number;
+  @Transform(toCountryCode)
+  @IsIn(COUNTRY_CODES, { message: 'Please select a valid country' })
+  countryCode?: string;
 }

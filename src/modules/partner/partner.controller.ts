@@ -188,130 +188,6 @@ export class PartnerController {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // PARTNER COUNTRY
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  @Post('create-country')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Create a partner country',
-    description:
-      'Adds an option to the "Country" dropdown. Re-adding the name of an archived country restores it. Admin only.',
-  })
-  @ApiBody({ type: CreatePartnerOptionDto })
-  @ApiCreatedResponse({ type: PartnerOptionResponseDto })
-  @ApiBadRequestResponse({ description: 'Invalid input data.' })
-  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
-  @ApiForbiddenResponse({ description: 'Admin role required.' })
-  @ApiConflictResponse({
-    description: 'A country with this name already exists.',
-  })
-  @ResponseMessage('Country created successfully')
-  async createCountry(
-    @Body() dto: CreatePartnerOptionDto,
-    @Req() req: AuthedRequest,
-  ) {
-    return this.partnerService.createCountry(requireUserId(req), dto);
-  }
-
-  @Get('all-countries')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Get all partner countries (paginated)',
-    description:
-      'Includes archived countries (read-only). Filter with `?status=`. Admin only.',
-  })
-  @ApiPaginatedResponse(
-    PartnerOptionResponseDto,
-    'Countries retrieved successfully.',
-  )
-  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
-  @ApiForbiddenResponse({ description: 'Admin role required.' })
-  @ResponseMessage('Countries retrieved successfully')
-  async getAllCountries(@Query() query: PartnerOptionQueryDto) {
-    return this.partnerService.getAllCountries(query);
-  }
-
-  @Get('active-countries')
-  @ApiOperation({
-    summary: 'Get active partner countries (Public)',
-    description:
-      'Options for the "Country" dropdown on the Become a Partner form.',
-  })
-  @ApiOkResponse({ type: [PartnerOptionMinifiedResponseDto] })
-  @ResponseMessage('Active countries retrieved successfully')
-  async getActiveCountries() {
-    return this.partnerService.getActiveCountries();
-  }
-
-  @Get('country/:id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get a partner country by ID. Admin only.' })
-  @ApiOkResponse({ type: PartnerOptionResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
-  @ApiForbiddenResponse({ description: 'Admin role required.' })
-  @ApiNotFoundResponse({ description: 'Country not found.' })
-  @ResponseMessage('Country retrieved successfully')
-  async getCountryById(@Param('id', ParseIntPipe) id: number) {
-    return this.partnerService.getCountryById(id);
-  }
-
-  @Patch('update-country/:id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Update a partner country',
-    description:
-      'Change its name or ACTIVE/INACTIVE status. Archived rows cannot be edited. Admin only.',
-  })
-  @ApiBody({ type: UpdatePartnerOptionDto })
-  @ApiOkResponse({ type: PartnerOptionResponseDto })
-  @ApiBadRequestResponse({ description: 'Invalid input data.' })
-  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
-  @ApiForbiddenResponse({ description: 'Admin role required.' })
-  @ApiNotFoundResponse({ description: 'Country not found.' })
-  @ApiConflictResponse({
-    description: 'A country with this name already exists.',
-  })
-  @ResponseMessage('Country updated successfully')
-  async updateCountry(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdatePartnerOptionDto,
-    @Req() req: AuthedRequest,
-  ) {
-    return this.partnerService.updateCountry(id, requireUserId(req), dto);
-  }
-
-  @Delete('delete-country/:id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Archive (soft delete) a partner country',
-    description:
-      'Sets status to ARCHIVED. The row is kept so existing partner requests still show their country. Archived rows are read-only. Admin only.',
-  })
-  @ApiOkResponse({ type: PartnerOptionResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
-  @ApiForbiddenResponse({ description: 'Admin role required.' })
-  @ApiNotFoundResponse({ description: 'Country not found.' })
-  @ApiConflictResponse({ description: 'Country is already archived.' })
-  @ResponseMessage('Country deleted successfully')
-  async deleteCountry(
-    @Param('id', ParseIntPipe) id: number,
-    @Req() req: AuthedRequest,
-  ) {
-    return this.partnerService.archiveCountry(id, requireUserId(req));
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════════
   // PARTNER REQUEST
   // ═══════════════════════════════════════════════════════════════════════════
 
@@ -320,12 +196,12 @@ export class PartnerController {
   @ApiOperation({
     summary: 'Submit a Become a Partner request (Public)',
     description:
-      'Public form submission. `partnerTypeId` and `partnerCountryId` must reference ACTIVE options. Rate-limited per IP.',
+      'Public form submission. `partnerTypeId` must reference an ACTIVE type; `countryCode` is an ISO 3166-1 alpha-2 code. Rate-limited per IP.',
   })
   @ApiBody({ type: CreatePartnerRequestDto })
   @ApiCreatedResponse({ type: PartnerRequestResponseDto })
   @ApiBadRequestResponse({
-    description: 'Invalid input, or the selected type/country is not active.',
+    description: 'Invalid input, an inactive type, or an unknown country code.',
   })
   @ApiTooManyRequestsResponse({ description: 'Too many submissions.' })
   @ResponseMessage('Your partner request has been submitted successfully')
@@ -407,5 +283,23 @@ export class PartnerController {
   @ResponseMessage('Partner request deleted successfully')
   async deleteRequest(@Param('id', ParseIntPipe) id: number) {
     return this.partnerService.archiveRequest(id);
+  }
+
+  @Delete('hard-delete-request/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Permanently delete a partner request',
+    description:
+      'Removes the row from the database — cannot be undone. Works on archived requests too. Admin only.',
+  })
+  @ApiOkResponse({ type: PartnerRequestResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token.' })
+  @ApiForbiddenResponse({ description: 'Admin role required.' })
+  @ApiNotFoundResponse({ description: 'Partner request not found.' })
+  @ResponseMessage('Partner request permanently deleted')
+  async hardDeleteRequest(@Param('id', ParseIntPipe) id: number) {
+    return this.partnerService.deleteRequest(id);
   }
 }

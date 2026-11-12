@@ -300,8 +300,8 @@ export type UserWhereInput = {
   updatedSupports?: Prisma.SupportListRelationFilter
   createdPartnerTypes?: Prisma.PartnerTypeListRelationFilter
   updatedPartnerTypes?: Prisma.PartnerTypeListRelationFilter
-  createdPartnerCountries?: Prisma.PartnerCountryListRelationFilter
-  updatedPartnerCountries?: Prisma.PartnerCountryListRelationFilter
+  createdContactInfos?: Prisma.ContactInfoListRelationFilter
+  updatedContactInfos?: Prisma.ContactInfoListRelationFilter
   addresses?: Prisma.AddressListRelationFilter
   carts?: Prisma.CartListRelationFilter
   orders?: Prisma.OrderListRelationFilter
@@ -356,8 +356,8 @@ export type UserOrderByWithRelationInput = {
   updatedSupports?: Prisma.SupportOrderByRelationAggregateInput
   createdPartnerTypes?: Prisma.PartnerTypeOrderByRelationAggregateInput
   updatedPartnerTypes?: Prisma.PartnerTypeOrderByRelationAggregateInput
-  createdPartnerCountries?: Prisma.PartnerCountryOrderByRelationAggregateInput
-  updatedPartnerCountries?: Prisma.PartnerCountryOrderByRelationAggregateInput
+  createdContactInfos?: Prisma.ContactInfoOrderByRelationAggregateInput
+  updatedContactInfos?: Prisma.ContactInfoOrderByRelationAggregateInput
   addresses?: Prisma.AddressOrderByRelationAggregateInput
   carts?: Prisma.CartOrderByRelationAggregateInput
   orders?: Prisma.OrderOrderByRelationAggregateInput
@@ -416,8 +416,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   updatedSupports?: Prisma.SupportListRelationFilter
   createdPartnerTypes?: Prisma.PartnerTypeListRelationFilter
   updatedPartnerTypes?: Prisma.PartnerTypeListRelationFilter
-  createdPartnerCountries?: Prisma.PartnerCountryListRelationFilter
-  updatedPartnerCountries?: Prisma.PartnerCountryListRelationFilter
+  createdContactInfos?: Prisma.ContactInfoListRelationFilter
+  updatedContactInfos?: Prisma.ContactInfoListRelationFilter
   addresses?: Prisma.AddressListRelationFilter
   carts?: Prisma.CartListRelationFilter
   orders?: Prisma.OrderListRelationFilter
@@ -511,8 +511,8 @@ export type UserCreateInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -567,8 +567,8 @@ export type UserUncheckedCreateInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -622,8 +622,8 @@ export type UserUpdateInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -678,8 +678,8 @@ export type UserUncheckedUpdateInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -958,6 +958,38 @@ export type UserUpdateOneWithoutDeletedCombosNestedInput = {
   delete?: Prisma.UserWhereInput | boolean
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDeletedCombosInput, Prisma.UserUpdateWithoutDeletedCombosInput>, Prisma.UserUncheckedUpdateWithoutDeletedCombosInput>
+}
+
+export type UserCreateNestedOneWithoutCreatedContactInfosInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedContactInfosInput, Prisma.UserUncheckedCreateWithoutCreatedContactInfosInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedContactInfosInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutUpdatedContactInfosInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedContactInfosInput, Prisma.UserUncheckedCreateWithoutUpdatedContactInfosInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedContactInfosInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutCreatedContactInfosNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedContactInfosInput, Prisma.UserUncheckedCreateWithoutCreatedContactInfosInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedContactInfosInput
+  upsert?: Prisma.UserUpsertWithoutCreatedContactInfosInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedContactInfosInput, Prisma.UserUpdateWithoutCreatedContactInfosInput>, Prisma.UserUncheckedUpdateWithoutCreatedContactInfosInput>
+}
+
+export type UserUpdateOneWithoutUpdatedContactInfosNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedContactInfosInput, Prisma.UserUncheckedCreateWithoutUpdatedContactInfosInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedContactInfosInput
+  upsert?: Prisma.UserUpsertWithoutUpdatedContactInfosInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUpdatedContactInfosInput, Prisma.UserUpdateWithoutUpdatedContactInfosInput>, Prisma.UserUncheckedUpdateWithoutUpdatedContactInfosInput>
 }
 
 export type UserCreateNestedOneWithoutCreatedDeliveryChargeZonesInput = {
@@ -1278,38 +1310,6 @@ export type UserUpdateOneWithoutUpdatedPartnerTypesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUpdatedPartnerTypesInput, Prisma.UserUpdateWithoutUpdatedPartnerTypesInput>, Prisma.UserUncheckedUpdateWithoutUpdatedPartnerTypesInput>
 }
 
-export type UserCreateNestedOneWithoutCreatedPartnerCountriesInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedPartnerCountriesInput, Prisma.UserUncheckedCreateWithoutCreatedPartnerCountriesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedPartnerCountriesInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserCreateNestedOneWithoutUpdatedPartnerCountriesInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedPartnerCountriesInput, Prisma.UserUncheckedCreateWithoutUpdatedPartnerCountriesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedPartnerCountriesInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserUpdateOneWithoutCreatedPartnerCountriesNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedPartnerCountriesInput, Prisma.UserUncheckedCreateWithoutCreatedPartnerCountriesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedPartnerCountriesInput
-  upsert?: Prisma.UserUpsertWithoutCreatedPartnerCountriesInput
-  disconnect?: Prisma.UserWhereInput | boolean
-  delete?: Prisma.UserWhereInput | boolean
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedPartnerCountriesInput, Prisma.UserUpdateWithoutCreatedPartnerCountriesInput>, Prisma.UserUncheckedUpdateWithoutCreatedPartnerCountriesInput>
-}
-
-export type UserUpdateOneWithoutUpdatedPartnerCountriesNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutUpdatedPartnerCountriesInput, Prisma.UserUncheckedCreateWithoutUpdatedPartnerCountriesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUpdatedPartnerCountriesInput
-  upsert?: Prisma.UserUpsertWithoutUpdatedPartnerCountriesInput
-  disconnect?: Prisma.UserWhereInput | boolean
-  delete?: Prisma.UserWhereInput | boolean
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUpdatedPartnerCountriesInput, Prisma.UserUpdateWithoutUpdatedPartnerCountriesInput>, Prisma.UserUncheckedUpdateWithoutUpdatedPartnerCountriesInput>
-}
-
 export type UserCreateNestedOneWithoutCreatedProductsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedProductsInput, Prisma.UserUncheckedCreateWithoutCreatedProductsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedProductsInput
@@ -1495,8 +1495,8 @@ export type UserCreateWithoutAddressesInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
@@ -1550,8 +1550,8 @@ export type UserUncheckedCreateWithoutAddressesInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
@@ -1620,8 +1620,8 @@ export type UserUpdateWithoutAddressesInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
@@ -1675,8 +1675,8 @@ export type UserUncheckedUpdateWithoutAddressesInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
@@ -1729,8 +1729,8 @@ export type UserCreateWithoutAuditLogsInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -1784,8 +1784,8 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -1854,8 +1854,8 @@ export type UserUpdateWithoutAuditLogsInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -1909,8 +1909,8 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -1962,8 +1962,8 @@ export type UserCreateWithoutBlogsInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -2017,8 +2017,8 @@ export type UserUncheckedCreateWithoutBlogsInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -2087,8 +2087,8 @@ export type UserUpdateWithoutBlogsInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -2142,8 +2142,8 @@ export type UserUncheckedUpdateWithoutBlogsInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -2197,8 +2197,8 @@ export type UserCreateWithoutCartsInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
@@ -2252,8 +2252,8 @@ export type UserUncheckedCreateWithoutCartsInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
@@ -2322,8 +2322,8 @@ export type UserUpdateWithoutCartsInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
@@ -2377,8 +2377,8 @@ export type UserUncheckedUpdateWithoutCartsInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
@@ -2430,8 +2430,8 @@ export type UserCreateWithoutCreatedCategoriesInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -2485,8 +2485,8 @@ export type UserUncheckedCreateWithoutCreatedCategoriesInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -2544,8 +2544,8 @@ export type UserCreateWithoutUpdatedCategoriesInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -2599,8 +2599,8 @@ export type UserUncheckedCreateWithoutUpdatedCategoriesInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -2669,8 +2669,8 @@ export type UserUpdateWithoutCreatedCategoriesInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -2724,8 +2724,8 @@ export type UserUncheckedUpdateWithoutCreatedCategoriesInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -2789,8 +2789,8 @@ export type UserUpdateWithoutUpdatedCategoriesInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -2844,8 +2844,8 @@ export type UserUncheckedUpdateWithoutUpdatedCategoriesInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -2898,8 +2898,8 @@ export type UserCreateWithoutCreatedCombosInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -2953,8 +2953,8 @@ export type UserUncheckedCreateWithoutCreatedCombosInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -3012,8 +3012,8 @@ export type UserCreateWithoutUpdatedCombosInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -3067,8 +3067,8 @@ export type UserUncheckedCreateWithoutUpdatedCombosInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -3126,8 +3126,8 @@ export type UserCreateWithoutDeletedCombosInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -3181,8 +3181,8 @@ export type UserUncheckedCreateWithoutDeletedCombosInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -3251,8 +3251,8 @@ export type UserUpdateWithoutCreatedCombosInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -3306,8 +3306,8 @@ export type UserUncheckedUpdateWithoutCreatedCombosInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -3371,8 +3371,8 @@ export type UserUpdateWithoutUpdatedCombosInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -3426,8 +3426,8 @@ export type UserUncheckedUpdateWithoutUpdatedCombosInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -3491,8 +3491,8 @@ export type UserUpdateWithoutDeletedCombosInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -3546,8 +3546,476 @@ export type UserUncheckedUpdateWithoutDeletedCombosInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserCreateWithoutCreatedContactInfosInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
+  createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutCreatedContactInfosInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutCreatedContactInfosInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedContactInfosInput, Prisma.UserUncheckedCreateWithoutCreatedContactInfosInput>
+}
+
+export type UserCreateWithoutUpdatedContactInfosInput = {
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
+  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
+  createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutUpdatedContactInfosInput = {
+  id?: number
+  sid?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  authProvider?: $Enums.AuthProvider
+  providerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
+  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
+  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
+  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
+  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
+  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
+  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutUpdatedContactInfosInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedContactInfosInput, Prisma.UserUncheckedCreateWithoutUpdatedContactInfosInput>
+}
+
+export type UserUpsertWithoutCreatedContactInfosInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedContactInfosInput, Prisma.UserUncheckedUpdateWithoutCreatedContactInfosInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedContactInfosInput, Prisma.UserUncheckedCreateWithoutCreatedContactInfosInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCreatedContactInfosInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedContactInfosInput, Prisma.UserUncheckedUpdateWithoutCreatedContactInfosInput>
+}
+
+export type UserUpdateWithoutCreatedContactInfosInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
+  createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCreatedContactInfosInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUpsertWithoutUpdatedContactInfosInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedContactInfosInput, Prisma.UserUncheckedUpdateWithoutUpdatedContactInfosInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedContactInfosInput, Prisma.UserUncheckedCreateWithoutUpdatedContactInfosInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutUpdatedContactInfosInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedContactInfosInput, Prisma.UserUncheckedUpdateWithoutUpdatedContactInfosInput>
+}
+
+export type UserUpdateWithoutUpdatedContactInfosInput = {
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
+  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
+  createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
+  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
+  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
+  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
+  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
+  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
+  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
+  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
+  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
+  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
+  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutUpdatedContactInfosInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
+  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
+  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
+  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
+  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
+  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -3601,8 +4069,8 @@ export type UserCreateWithoutCreatedDeliveryChargeZonesInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -3656,8 +4124,8 @@ export type UserUncheckedCreateWithoutCreatedDeliveryChargeZonesInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -3715,8 +4183,8 @@ export type UserCreateWithoutUpdatedDeliveryChargeZonesInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -3770,8 +4238,8 @@ export type UserUncheckedCreateWithoutUpdatedDeliveryChargeZonesInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -3840,8 +4308,8 @@ export type UserUpdateWithoutCreatedDeliveryChargeZonesInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -3895,8 +4363,8 @@ export type UserUncheckedUpdateWithoutCreatedDeliveryChargeZonesInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -3960,8 +4428,8 @@ export type UserUpdateWithoutUpdatedDeliveryChargeZonesInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -4015,8 +4483,8 @@ export type UserUncheckedUpdateWithoutUpdatedDeliveryChargeZonesInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -4069,8 +4537,8 @@ export type UserCreateWithoutCreatedFreeDeliveryRulesInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -4124,8 +4592,8 @@ export type UserUncheckedCreateWithoutCreatedFreeDeliveryRulesInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -4183,8 +4651,8 @@ export type UserCreateWithoutUpdatedFreeDeliveryRulesInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -4238,8 +4706,8 @@ export type UserUncheckedCreateWithoutUpdatedFreeDeliveryRulesInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -4308,8 +4776,8 @@ export type UserUpdateWithoutCreatedFreeDeliveryRulesInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -4363,8 +4831,8 @@ export type UserUncheckedUpdateWithoutCreatedFreeDeliveryRulesInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -4428,8 +4896,8 @@ export type UserUpdateWithoutUpdatedFreeDeliveryRulesInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -4483,8 +4951,8 @@ export type UserUncheckedUpdateWithoutUpdatedFreeDeliveryRulesInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -4536,8 +5004,8 @@ export type UserCreateWithoutDeliveryManProfileInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -4591,8 +5059,8 @@ export type UserUncheckedCreateWithoutDeliveryManProfileInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -4651,8 +5119,8 @@ export type UserCreateWithoutVerifiedDeliveryMenInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -4706,8 +5174,8 @@ export type UserUncheckedCreateWithoutVerifiedDeliveryMenInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -4775,8 +5243,8 @@ export type UserUpdateWithoutDeliveryManProfileInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -4830,8 +5298,8 @@ export type UserUncheckedUpdateWithoutDeliveryManProfileInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -4896,8 +5364,8 @@ export type UserUpdateWithoutVerifiedDeliveryMenInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -4951,8 +5419,8 @@ export type UserUncheckedUpdateWithoutVerifiedDeliveryMenInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -5005,8 +5473,8 @@ export type UserCreateWithoutCreatedDeliveryProvidersInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -5060,8 +5528,8 @@ export type UserUncheckedCreateWithoutCreatedDeliveryProvidersInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -5119,8 +5587,8 @@ export type UserCreateWithoutUpdatedDeliveryProvidersInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -5174,8 +5642,8 @@ export type UserUncheckedCreateWithoutUpdatedDeliveryProvidersInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -5244,8 +5712,8 @@ export type UserUpdateWithoutCreatedDeliveryProvidersInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -5299,8 +5767,8 @@ export type UserUncheckedUpdateWithoutCreatedDeliveryProvidersInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -5364,8 +5832,8 @@ export type UserUpdateWithoutUpdatedDeliveryProvidersInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -5419,8 +5887,8 @@ export type UserUncheckedUpdateWithoutUpdatedDeliveryProvidersInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -5473,8 +5941,8 @@ export type UserCreateWithoutBookedDeliveryShipmentsInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -5528,8 +5996,8 @@ export type UserUncheckedCreateWithoutBookedDeliveryShipmentsInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -5598,8 +6066,8 @@ export type UserUpdateWithoutBookedDeliveryShipmentsInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -5653,8 +6121,8 @@ export type UserUncheckedUpdateWithoutBookedDeliveryShipmentsInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -5707,8 +6175,8 @@ export type UserCreateWithoutDeliveryStatusChangesInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -5762,8 +6230,8 @@ export type UserUncheckedCreateWithoutDeliveryStatusChangesInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -5832,8 +6300,8 @@ export type UserUpdateWithoutDeliveryStatusChangesInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -5887,8 +6355,8 @@ export type UserUncheckedUpdateWithoutDeliveryStatusChangesInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -5940,8 +6408,8 @@ export type UserCreateWithoutCreatedHomeContentsInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -5995,8 +6463,8 @@ export type UserUncheckedCreateWithoutCreatedHomeContentsInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -6054,8 +6522,8 @@ export type UserCreateWithoutUpdatedHomeContentsInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -6109,8 +6577,8 @@ export type UserUncheckedCreateWithoutUpdatedHomeContentsInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -6179,8 +6647,8 @@ export type UserUpdateWithoutCreatedHomeContentsInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -6234,8 +6702,8 @@ export type UserUncheckedUpdateWithoutCreatedHomeContentsInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -6299,8 +6767,8 @@ export type UserUpdateWithoutUpdatedHomeContentsInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -6354,8 +6822,8 @@ export type UserUncheckedUpdateWithoutUpdatedHomeContentsInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -6408,8 +6876,8 @@ export type UserCreateWithoutInventoriesInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -6463,8 +6931,8 @@ export type UserUncheckedCreateWithoutInventoriesInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -6533,8 +7001,8 @@ export type UserUpdateWithoutInventoriesInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -6588,8 +7056,8 @@ export type UserUncheckedUpdateWithoutInventoriesInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -6643,8 +7111,8 @@ export type UserCreateWithoutCreatedNewsEventTypesInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -6698,8 +7166,8 @@ export type UserUncheckedCreateWithoutCreatedNewsEventTypesInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -6757,8 +7225,8 @@ export type UserCreateWithoutUpdatedNewsEventTypesInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -6812,8 +7280,8 @@ export type UserUncheckedCreateWithoutUpdatedNewsEventTypesInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -6882,8 +7350,8 @@ export type UserUpdateWithoutCreatedNewsEventTypesInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -6937,8 +7405,8 @@ export type UserUncheckedUpdateWithoutCreatedNewsEventTypesInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -7002,8 +7470,8 @@ export type UserUpdateWithoutUpdatedNewsEventTypesInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -7057,8 +7525,8 @@ export type UserUncheckedUpdateWithoutUpdatedNewsEventTypesInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -7111,8 +7579,8 @@ export type UserCreateWithoutAuthoredNewsEventsInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -7166,8 +7634,8 @@ export type UserUncheckedCreateWithoutAuthoredNewsEventsInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -7236,8 +7704,8 @@ export type UserUpdateWithoutAuthoredNewsEventsInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -7291,8 +7759,8 @@ export type UserUncheckedUpdateWithoutAuthoredNewsEventsInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -7345,8 +7813,8 @@ export type UserCreateWithoutOrdersInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
@@ -7400,8 +7868,8 @@ export type UserUncheckedCreateWithoutOrdersInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
@@ -7470,8 +7938,8 @@ export type UserUpdateWithoutOrdersInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
@@ -7525,8 +7993,8 @@ export type UserUncheckedUpdateWithoutOrdersInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
@@ -7579,8 +8047,8 @@ export type UserCreateWithoutOrderStatusChangesInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -7634,8 +8102,8 @@ export type UserUncheckedCreateWithoutOrderStatusChangesInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -7704,8 +8172,8 @@ export type UserUpdateWithoutOrderStatusChangesInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -7759,8 +8227,8 @@ export type UserUncheckedUpdateWithoutOrderStatusChangesInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -7812,8 +8280,8 @@ export type UserCreateWithoutCreatedPartnerTypesInput = {
   createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -7867,8 +8335,8 @@ export type UserUncheckedCreateWithoutCreatedPartnerTypesInput = {
   createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -7926,8 +8394,8 @@ export type UserCreateWithoutUpdatedPartnerTypesInput = {
   createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -7981,8 +8449,8 @@ export type UserUncheckedCreateWithoutUpdatedPartnerTypesInput = {
   createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -8051,8 +8519,8 @@ export type UserUpdateWithoutCreatedPartnerTypesInput = {
   createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -8106,8 +8574,8 @@ export type UserUncheckedUpdateWithoutCreatedPartnerTypesInput = {
   createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -8171,8 +8639,8 @@ export type UserUpdateWithoutUpdatedPartnerTypesInput = {
   createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -8226,476 +8694,8 @@ export type UserUncheckedUpdateWithoutUpdatedPartnerTypesInput = {
   createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
-  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
-  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
-  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
-  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
-  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
-  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
-  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
-  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
-  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-}
-
-export type UserCreateWithoutCreatedPartnerCountriesInput = {
-  sid?: string
-  email: string
-  password?: string | null
-  phone?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  authProvider?: $Enums.AuthProvider
-  providerId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  lastLoginAt?: Date | string | null
-  deletedAt?: Date | string | null
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
-  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
-  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
-  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
-  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
-  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
-  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
-  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
-  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
-  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
-  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
-  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
-  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
-  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
-  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
-  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
-  carts?: Prisma.CartCreateNestedManyWithoutUserInput
-  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
-  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
-  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
-  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
-  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
-  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
-  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
-  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
-  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
-  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
-  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
-  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
-  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
-  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
-  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
-}
-
-export type UserUncheckedCreateWithoutCreatedPartnerCountriesInput = {
-  id?: number
-  sid?: string
-  email: string
-  password?: string | null
-  phone?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  authProvider?: $Enums.AuthProvider
-  providerId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  lastLoginAt?: Date | string | null
-  deletedAt?: Date | string | null
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
-  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
-  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
-  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
-  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
-  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
-  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
-  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
-  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
-  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
-  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
-  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
-  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
-  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
-  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
-}
-
-export type UserCreateOrConnectWithoutCreatedPartnerCountriesInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedPartnerCountriesInput, Prisma.UserUncheckedCreateWithoutCreatedPartnerCountriesInput>
-}
-
-export type UserCreateWithoutUpdatedPartnerCountriesInput = {
-  sid?: string
-  email: string
-  password?: string | null
-  phone?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  authProvider?: $Enums.AuthProvider
-  providerId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  lastLoginAt?: Date | string | null
-  deletedAt?: Date | string | null
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  security?: Prisma.UserSecurityCreateNestedOneWithoutUserInput
-  deliveryManProfile?: Prisma.DeliveryManProfileCreateNestedOneWithoutUserInput
-  otps?: Prisma.OTPCreateNestedManyWithoutUserInput
-  createdCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedByUserInput
-  updatedCategories?: Prisma.CategoryCreateNestedManyWithoutUpdatedByUserInput
-  createdProducts?: Prisma.ProductCreateNestedManyWithoutCreatedByUserInput
-  updatedProducts?: Prisma.ProductCreateNestedManyWithoutUpdatedByUserInput
-  deletedProducts?: Prisma.ProductCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutInventoryRecordedByInput
-  createdCombos?: Prisma.ComboProductCreateNestedManyWithoutCreatedByUserInput
-  updatedCombos?: Prisma.ComboProductCreateNestedManyWithoutUpdatedByUserInput
-  deletedCombos?: Prisma.ComboProductCreateNestedManyWithoutDeletedByUserInput
-  blogs?: Prisma.BlogCreateNestedManyWithoutAuthorInput
-  createdHomeContents?: Prisma.HomeCreateNestedManyWithoutCreatedByUserInput
-  updatedHomeContents?: Prisma.HomeCreateNestedManyWithoutUpdatedByUserInput
-  createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
-  updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
-  carts?: Prisma.CartCreateNestedManyWithoutUserInput
-  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
-  orderStatusChanges?: Prisma.OrderStatusHistoryCreateNestedManyWithoutChangedByUserInput
-  promoCodeRedemptions?: Prisma.PromoCodeRedemptionCreateNestedManyWithoutUserInput
-  createdDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutCreatedByUserInput
-  updatedDeliveryProviders?: Prisma.DeliveryProviderCreateNestedManyWithoutUpdatedByUserInput
-  bookedDeliveryShipments?: Prisma.DeliveryShipmentCreateNestedManyWithoutCreatedByUserInput
-  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryCreateNestedManyWithoutChangedByUserInput
-  verifiedDeliveryMen?: Prisma.DeliveryManProfileCreateNestedManyWithoutNidVerifiedByUserInput
-  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
-  authoredNewsEvents?: Prisma.NewsEventCreateNestedManyWithoutAuthorInput
-  createdNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutCreatedByUserInput
-  updatedNewsEventTypes?: Prisma.NewsEventTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutCreatedByUserInput
-  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneCreateNestedManyWithoutUpdatedByUserInput
-  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutCreatedByUserInput
-  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleCreateNestedManyWithoutUpdatedByUserInput
-}
-
-export type UserUncheckedCreateWithoutUpdatedPartnerCountriesInput = {
-  id?: number
-  sid?: string
-  email: string
-  password?: string | null
-  phone?: string | null
-  role?: $Enums.UserRole
-  status?: $Enums.UserStatus
-  authProvider?: $Enums.AuthProvider
-  providerId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  lastLoginAt?: Date | string | null
-  deletedAt?: Date | string | null
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  security?: Prisma.UserSecurityUncheckedCreateNestedOneWithoutUserInput
-  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedCreateNestedOneWithoutUserInput
-  otps?: Prisma.OTPUncheckedCreateNestedManyWithoutUserInput
-  createdCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  deletedProducts?: Prisma.ProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutInventoryRecordedByInput
-  createdCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  deletedCombos?: Prisma.ComboProductUncheckedCreateNestedManyWithoutDeletedByUserInput
-  blogs?: Prisma.BlogUncheckedCreateNestedManyWithoutAuthorInput
-  createdHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedHomeContents?: Prisma.HomeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
-  carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
-  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
-  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
-  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
-  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedCreateNestedManyWithoutCreatedByUserInput
-  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedCreateNestedManyWithoutChangedByUserInput
-  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedCreateNestedManyWithoutNidVerifiedByUserInput
-  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
-  authoredNewsEvents?: Prisma.NewsEventUncheckedCreateNestedManyWithoutAuthorInput
-  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedCreateNestedManyWithoutUpdatedByUserInput
-}
-
-export type UserCreateOrConnectWithoutUpdatedPartnerCountriesInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedPartnerCountriesInput, Prisma.UserUncheckedCreateWithoutUpdatedPartnerCountriesInput>
-}
-
-export type UserUpsertWithoutCreatedPartnerCountriesInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedPartnerCountriesInput, Prisma.UserUncheckedUpdateWithoutCreatedPartnerCountriesInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedPartnerCountriesInput, Prisma.UserUncheckedCreateWithoutCreatedPartnerCountriesInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutCreatedPartnerCountriesInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedPartnerCountriesInput, Prisma.UserUncheckedUpdateWithoutCreatedPartnerCountriesInput>
-}
-
-export type UserUpdateWithoutCreatedPartnerCountriesInput = {
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
-  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
-  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
-  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
-  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
-  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
-  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
-  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
-  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
-  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
-  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
-  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
-  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
-  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
-  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
-  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
-  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
-  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
-  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
-  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
-  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
-  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
-  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
-  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
-  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
-  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
-  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
-  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
-  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
-  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
-  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
-  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
-  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
-}
-
-export type UserUncheckedUpdateWithoutCreatedPartnerCountriesInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
-  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
-  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
-  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
-  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
-  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
-  carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
-  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
-  orderStatusChanges?: Prisma.OrderStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
-  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
-  createdDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedDeliveryProviders?: Prisma.DeliveryProviderUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  bookedDeliveryShipments?: Prisma.DeliveryShipmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUncheckedUpdateManyWithoutChangedByUserNestedInput
-  verifiedDeliveryMen?: Prisma.DeliveryManProfileUncheckedUpdateManyWithoutNidVerifiedByUserNestedInput
-  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
-  authoredNewsEvents?: Prisma.NewsEventUncheckedUpdateManyWithoutAuthorNestedInput
-  createdNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedNewsEventTypes?: Prisma.NewsEventTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-}
-
-export type UserUpsertWithoutUpdatedPartnerCountriesInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedPartnerCountriesInput, Prisma.UserUncheckedUpdateWithoutUpdatedPartnerCountriesInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutUpdatedPartnerCountriesInput, Prisma.UserUncheckedCreateWithoutUpdatedPartnerCountriesInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutUpdatedPartnerCountriesInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutUpdatedPartnerCountriesInput, Prisma.UserUncheckedUpdateWithoutUpdatedPartnerCountriesInput>
-}
-
-export type UserUpdateWithoutUpdatedPartnerCountriesInput = {
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
-  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  security?: Prisma.UserSecurityUpdateOneWithoutUserNestedInput
-  deliveryManProfile?: Prisma.DeliveryManProfileUpdateOneWithoutUserNestedInput
-  otps?: Prisma.OTPUpdateManyWithoutUserNestedInput
-  createdCategories?: Prisma.CategoryUpdateManyWithoutCreatedByUserNestedInput
-  updatedCategories?: Prisma.CategoryUpdateManyWithoutUpdatedByUserNestedInput
-  createdProducts?: Prisma.ProductUpdateManyWithoutCreatedByUserNestedInput
-  updatedProducts?: Prisma.ProductUpdateManyWithoutUpdatedByUserNestedInput
-  deletedProducts?: Prisma.ProductUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUpdateManyWithoutInventoryRecordedByNestedInput
-  createdCombos?: Prisma.ComboProductUpdateManyWithoutCreatedByUserNestedInput
-  updatedCombos?: Prisma.ComboProductUpdateManyWithoutUpdatedByUserNestedInput
-  deletedCombos?: Prisma.ComboProductUpdateManyWithoutDeletedByUserNestedInput
-  blogs?: Prisma.BlogUpdateManyWithoutAuthorNestedInput
-  createdHomeContents?: Prisma.HomeUpdateManyWithoutCreatedByUserNestedInput
-  updatedHomeContents?: Prisma.HomeUpdateManyWithoutUpdatedByUserNestedInput
-  createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
-  updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
-  carts?: Prisma.CartUpdateManyWithoutUserNestedInput
-  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
-  orderStatusChanges?: Prisma.OrderStatusHistoryUpdateManyWithoutChangedByUserNestedInput
-  promoCodeRedemptions?: Prisma.PromoCodeRedemptionUpdateManyWithoutUserNestedInput
-  createdDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutCreatedByUserNestedInput
-  updatedDeliveryProviders?: Prisma.DeliveryProviderUpdateManyWithoutUpdatedByUserNestedInput
-  bookedDeliveryShipments?: Prisma.DeliveryShipmentUpdateManyWithoutCreatedByUserNestedInput
-  deliveryStatusChanges?: Prisma.DeliveryStatusHistoryUpdateManyWithoutChangedByUserNestedInput
-  verifiedDeliveryMen?: Prisma.DeliveryManProfileUpdateManyWithoutNidVerifiedByUserNestedInput
-  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
-  authoredNewsEvents?: Prisma.NewsEventUpdateManyWithoutAuthorNestedInput
-  createdNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutCreatedByUserNestedInput
-  updatedNewsEventTypes?: Prisma.NewsEventTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutCreatedByUserNestedInput
-  updatedDeliveryChargeZones?: Prisma.DeliveryChargeZoneUpdateManyWithoutUpdatedByUserNestedInput
-  createdFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutCreatedByUserNestedInput
-  updatedFreeDeliveryRules?: Prisma.DeliveryFreeDeliveryRuleUpdateManyWithoutUpdatedByUserNestedInput
-}
-
-export type UserUncheckedUpdateWithoutUpdatedPartnerCountriesInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  sid?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  authProvider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
-  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  security?: Prisma.UserSecurityUncheckedUpdateOneWithoutUserNestedInput
-  deliveryManProfile?: Prisma.DeliveryManProfileUncheckedUpdateOneWithoutUserNestedInput
-  otps?: Prisma.OTPUncheckedUpdateManyWithoutUserNestedInput
-  createdCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdProducts?: Prisma.ProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedProducts?: Prisma.ProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  deletedProducts?: Prisma.ProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutInventoryRecordedByNestedInput
-  createdCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  deletedCombos?: Prisma.ComboProductUncheckedUpdateManyWithoutDeletedByUserNestedInput
-  blogs?: Prisma.BlogUncheckedUpdateManyWithoutAuthorNestedInput
-  createdHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedHomeContents?: Prisma.HomeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -8748,8 +8748,8 @@ export type UserCreateWithoutCreatedProductsInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -8803,8 +8803,8 @@ export type UserUncheckedCreateWithoutCreatedProductsInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -8862,8 +8862,8 @@ export type UserCreateWithoutUpdatedProductsInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -8917,8 +8917,8 @@ export type UserUncheckedCreateWithoutUpdatedProductsInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -8976,8 +8976,8 @@ export type UserCreateWithoutDeletedProductsInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -9031,8 +9031,8 @@ export type UserUncheckedCreateWithoutDeletedProductsInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -9101,8 +9101,8 @@ export type UserUpdateWithoutCreatedProductsInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -9156,8 +9156,8 @@ export type UserUncheckedUpdateWithoutCreatedProductsInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -9221,8 +9221,8 @@ export type UserUpdateWithoutUpdatedProductsInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -9276,8 +9276,8 @@ export type UserUncheckedUpdateWithoutUpdatedProductsInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -9341,8 +9341,8 @@ export type UserUpdateWithoutDeletedProductsInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -9396,8 +9396,8 @@ export type UserUncheckedUpdateWithoutDeletedProductsInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -9451,8 +9451,8 @@ export type UserCreateWithoutPromoCodeRedemptionsInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -9506,8 +9506,8 @@ export type UserUncheckedCreateWithoutPromoCodeRedemptionsInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -9576,8 +9576,8 @@ export type UserUpdateWithoutPromoCodeRedemptionsInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -9631,8 +9631,8 @@ export type UserUncheckedUpdateWithoutPromoCodeRedemptionsInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -9684,8 +9684,8 @@ export type UserCreateWithoutCreatedSupportsInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -9739,8 +9739,8 @@ export type UserUncheckedCreateWithoutCreatedSupportsInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -9798,8 +9798,8 @@ export type UserCreateWithoutUpdatedSupportsInput = {
   createdSupports?: Prisma.SupportCreateNestedManyWithoutCreatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -9853,8 +9853,8 @@ export type UserUncheckedCreateWithoutUpdatedSupportsInput = {
   createdSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutCreatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -9923,8 +9923,8 @@ export type UserUpdateWithoutCreatedSupportsInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -9978,8 +9978,8 @@ export type UserUncheckedUpdateWithoutCreatedSupportsInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -10043,8 +10043,8 @@ export type UserUpdateWithoutUpdatedSupportsInput = {
   createdSupports?: Prisma.SupportUpdateManyWithoutCreatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -10098,8 +10098,8 @@ export type UserUncheckedUpdateWithoutUpdatedSupportsInput = {
   createdSupports?: Prisma.SupportUncheckedUpdateManyWithoutCreatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -10152,8 +10152,8 @@ export type UserCreateWithoutProfileInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -10207,8 +10207,8 @@ export type UserUncheckedCreateWithoutProfileInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -10277,8 +10277,8 @@ export type UserUpdateWithoutProfileInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -10332,8 +10332,8 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -10386,8 +10386,8 @@ export type UserCreateWithoutSecurityInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -10441,8 +10441,8 @@ export type UserUncheckedCreateWithoutSecurityInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -10511,8 +10511,8 @@ export type UserUpdateWithoutSecurityInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -10566,8 +10566,8 @@ export type UserUncheckedUpdateWithoutSecurityInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -10620,8 +10620,8 @@ export type UserCreateWithoutOtpsInput = {
   updatedSupports?: Prisma.SupportCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   carts?: Prisma.CartCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
@@ -10675,8 +10675,8 @@ export type UserUncheckedCreateWithoutOtpsInput = {
   updatedSupports?: Prisma.SupportUncheckedCreateNestedManyWithoutUpdatedByUserInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutCreatedByUserInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedCreateNestedManyWithoutUpdatedByUserInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutCreatedByUserInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutCreatedByUserInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedCreateNestedManyWithoutUpdatedByUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   carts?: Prisma.CartUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
@@ -10745,8 +10745,8 @@ export type UserUpdateWithoutOtpsInput = {
   updatedSupports?: Prisma.SupportUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
@@ -10800,8 +10800,8 @@ export type UserUncheckedUpdateWithoutOtpsInput = {
   updatedSupports?: Prisma.SupportUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   createdPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutCreatedByUserNestedInput
   updatedPartnerTypes?: Prisma.PartnerTypeUncheckedUpdateManyWithoutUpdatedByUserNestedInput
-  createdPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutCreatedByUserNestedInput
-  updatedPartnerCountries?: Prisma.PartnerCountryUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  createdContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  updatedContactInfos?: Prisma.ContactInfoUncheckedUpdateManyWithoutUpdatedByUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   carts?: Prisma.CartUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -10845,8 +10845,8 @@ export type UserCountOutputType = {
   updatedSupports: number
   createdPartnerTypes: number
   updatedPartnerTypes: number
-  createdPartnerCountries: number
-  updatedPartnerCountries: number
+  createdContactInfos: number
+  updatedContactInfos: number
   addresses: number
   carts: number
   orders: number
@@ -10885,8 +10885,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   updatedSupports?: boolean | UserCountOutputTypeCountUpdatedSupportsArgs
   createdPartnerTypes?: boolean | UserCountOutputTypeCountCreatedPartnerTypesArgs
   updatedPartnerTypes?: boolean | UserCountOutputTypeCountUpdatedPartnerTypesArgs
-  createdPartnerCountries?: boolean | UserCountOutputTypeCountCreatedPartnerCountriesArgs
-  updatedPartnerCountries?: boolean | UserCountOutputTypeCountUpdatedPartnerCountriesArgs
+  createdContactInfos?: boolean | UserCountOutputTypeCountCreatedContactInfosArgs
+  updatedContactInfos?: boolean | UserCountOutputTypeCountUpdatedContactInfosArgs
   addresses?: boolean | UserCountOutputTypeCountAddressesArgs
   carts?: boolean | UserCountOutputTypeCountCartsArgs
   orders?: boolean | UserCountOutputTypeCountOrdersArgs
@@ -11039,15 +11039,15 @@ export type UserCountOutputTypeCountUpdatedPartnerTypesArgs<ExtArgs extends runt
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountCreatedPartnerCountriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.PartnerCountryWhereInput
+export type UserCountOutputTypeCountCreatedContactInfosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ContactInfoWhereInput
 }
 
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountUpdatedPartnerCountriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.PartnerCountryWhereInput
+export type UserCountOutputTypeCountUpdatedContactInfosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ContactInfoWhereInput
 }
 
 /**
@@ -11211,8 +11211,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedSupports?: boolean | Prisma.User$updatedSupportsArgs<ExtArgs>
   createdPartnerTypes?: boolean | Prisma.User$createdPartnerTypesArgs<ExtArgs>
   updatedPartnerTypes?: boolean | Prisma.User$updatedPartnerTypesArgs<ExtArgs>
-  createdPartnerCountries?: boolean | Prisma.User$createdPartnerCountriesArgs<ExtArgs>
-  updatedPartnerCountries?: boolean | Prisma.User$updatedPartnerCountriesArgs<ExtArgs>
+  createdContactInfos?: boolean | Prisma.User$createdContactInfosArgs<ExtArgs>
+  updatedContactInfos?: boolean | Prisma.User$updatedContactInfosArgs<ExtArgs>
   addresses?: boolean | Prisma.User$addressesArgs<ExtArgs>
   carts?: boolean | Prisma.User$cartsArgs<ExtArgs>
   orders?: boolean | Prisma.User$ordersArgs<ExtArgs>
@@ -11304,8 +11304,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   updatedSupports?: boolean | Prisma.User$updatedSupportsArgs<ExtArgs>
   createdPartnerTypes?: boolean | Prisma.User$createdPartnerTypesArgs<ExtArgs>
   updatedPartnerTypes?: boolean | Prisma.User$updatedPartnerTypesArgs<ExtArgs>
-  createdPartnerCountries?: boolean | Prisma.User$createdPartnerCountriesArgs<ExtArgs>
-  updatedPartnerCountries?: boolean | Prisma.User$updatedPartnerCountriesArgs<ExtArgs>
+  createdContactInfos?: boolean | Prisma.User$createdContactInfosArgs<ExtArgs>
+  updatedContactInfos?: boolean | Prisma.User$updatedContactInfosArgs<ExtArgs>
   addresses?: boolean | Prisma.User$addressesArgs<ExtArgs>
   carts?: boolean | Prisma.User$cartsArgs<ExtArgs>
   orders?: boolean | Prisma.User$ordersArgs<ExtArgs>
@@ -11352,8 +11352,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     updatedSupports: Prisma.$SupportPayload<ExtArgs>[]
     createdPartnerTypes: Prisma.$PartnerTypePayload<ExtArgs>[]
     updatedPartnerTypes: Prisma.$PartnerTypePayload<ExtArgs>[]
-    createdPartnerCountries: Prisma.$PartnerCountryPayload<ExtArgs>[]
-    updatedPartnerCountries: Prisma.$PartnerCountryPayload<ExtArgs>[]
+    createdContactInfos: Prisma.$ContactInfoPayload<ExtArgs>[]
+    updatedContactInfos: Prisma.$ContactInfoPayload<ExtArgs>[]
     addresses: Prisma.$AddressPayload<ExtArgs>[]
     carts: Prisma.$CartPayload<ExtArgs>[]
     orders: Prisma.$OrderPayload<ExtArgs>[]
@@ -11801,8 +11801,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   updatedSupports<T extends Prisma.User$updatedSupportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$updatedSupportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   createdPartnerTypes<T extends Prisma.User$createdPartnerTypesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdPartnerTypesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartnerTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   updatedPartnerTypes<T extends Prisma.User$updatedPartnerTypesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$updatedPartnerTypesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartnerTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  createdPartnerCountries<T extends Prisma.User$createdPartnerCountriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdPartnerCountriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartnerCountryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  updatedPartnerCountries<T extends Prisma.User$updatedPartnerCountriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$updatedPartnerCountriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartnerCountryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  createdContactInfos<T extends Prisma.User$createdContactInfosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdContactInfosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContactInfoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  updatedContactInfos<T extends Prisma.User$updatedContactInfosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$updatedContactInfosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContactInfoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   addresses<T extends Prisma.User$addressesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$addressesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AddressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   carts<T extends Prisma.User$cartsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$cartsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CartPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   orders<T extends Prisma.User$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -12721,51 +12721,51 @@ export type User$updatedPartnerTypesArgs<ExtArgs extends runtime.Types.Extension
 }
 
 /**
- * User.createdPartnerCountries
+ * User.createdContactInfos
  */
-export type User$createdPartnerCountriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$createdContactInfosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the PartnerCountry
+   * Select specific fields to fetch from the ContactInfo
    */
-  select?: Prisma.PartnerCountrySelect<ExtArgs> | null
+  select?: Prisma.ContactInfoSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the PartnerCountry
+   * Omit specific fields from the ContactInfo
    */
-  omit?: Prisma.PartnerCountryOmit<ExtArgs> | null
+  omit?: Prisma.ContactInfoOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.PartnerCountryInclude<ExtArgs> | null
-  where?: Prisma.PartnerCountryWhereInput
-  orderBy?: Prisma.PartnerCountryOrderByWithRelationInput | Prisma.PartnerCountryOrderByWithRelationInput[]
-  cursor?: Prisma.PartnerCountryWhereUniqueInput
+  include?: Prisma.ContactInfoInclude<ExtArgs> | null
+  where?: Prisma.ContactInfoWhereInput
+  orderBy?: Prisma.ContactInfoOrderByWithRelationInput | Prisma.ContactInfoOrderByWithRelationInput[]
+  cursor?: Prisma.ContactInfoWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.PartnerCountryScalarFieldEnum | Prisma.PartnerCountryScalarFieldEnum[]
+  distinct?: Prisma.ContactInfoScalarFieldEnum | Prisma.ContactInfoScalarFieldEnum[]
 }
 
 /**
- * User.updatedPartnerCountries
+ * User.updatedContactInfos
  */
-export type User$updatedPartnerCountriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$updatedContactInfosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the PartnerCountry
+   * Select specific fields to fetch from the ContactInfo
    */
-  select?: Prisma.PartnerCountrySelect<ExtArgs> | null
+  select?: Prisma.ContactInfoSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the PartnerCountry
+   * Omit specific fields from the ContactInfo
    */
-  omit?: Prisma.PartnerCountryOmit<ExtArgs> | null
+  omit?: Prisma.ContactInfoOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.PartnerCountryInclude<ExtArgs> | null
-  where?: Prisma.PartnerCountryWhereInput
-  orderBy?: Prisma.PartnerCountryOrderByWithRelationInput | Prisma.PartnerCountryOrderByWithRelationInput[]
-  cursor?: Prisma.PartnerCountryWhereUniqueInput
+  include?: Prisma.ContactInfoInclude<ExtArgs> | null
+  where?: Prisma.ContactInfoWhereInput
+  orderBy?: Prisma.ContactInfoOrderByWithRelationInput | Prisma.ContactInfoOrderByWithRelationInput[]
+  cursor?: Prisma.ContactInfoWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.PartnerCountryScalarFieldEnum | Prisma.PartnerCountryScalarFieldEnum[]
+  distinct?: Prisma.ContactInfoScalarFieldEnum | Prisma.ContactInfoScalarFieldEnum[]
 }
 
 /**

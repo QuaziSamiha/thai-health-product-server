@@ -25,12 +25,12 @@ import {
   PartnerRequestResponseDto,
 } from './dto/partner-response.dto';
 
-//* PartnerType AND PartnerCountry FOLLOW IDENTICAL RULES, SO THE BUSINESS LOGIC
-//* IS WRITTEN ONCE AGAINST THIS SMALL ADAPTER AND EACH TABLE PLUGS IN ITS OWN
-//* REPOSITORY METHODS.
+//* THE ADMIN-MANAGED DROPDOWN OPTION RULES (UNIQUE NAME, RESTORE-ON-READD,
+//* ARCHIVED IS READ-ONLY) ARE WRITTEN AGAINST THIS SMALL ADAPTER, SO THE TABLE
+//* (CURRENTLY ONLY PartnerType) PLUGS IN ITS OWN REPOSITORY METHODS.
 type OptionRow = ConstructorParameters<typeof PartnerOptionResponseDto>[0];
 interface OptionOps {
-  label: string; //* USED IN ERROR MESSAGES — "Partner type" / "Country"
+  label: string; //* USED IN ERROR MESSAGES — "Partner type"
   findById(id: number): Promise<OptionRow | null>;
   findByName(
     name: string,
@@ -51,7 +51,6 @@ interface OptionOps {
 @Injectable()
 export class PartnerService {
   private readonly typeOps: OptionOps;
-  private readonly countryOps: OptionOps;
 
   constructor(private readonly partnerRepository: PartnerRepository) {
     const repo = this.partnerRepository;
@@ -63,15 +62,6 @@ export class PartnerService {
       findActive: () => repo.findActiveTypes(),
       create: (data) => repo.createType(data),
       update: (id, data) => repo.updateType(id, data),
-    };
-    this.countryOps = {
-      label: 'Country',
-      findById: (id) => repo.findCountryById(id),
-      findByName: (name) => repo.findCountryByName(name),
-      findAll: (params) => repo.findAllCountries(params),
-      findActive: () => repo.findActiveCountries(),
-      create: (data) => repo.createCountry(data),
-      update: (id, data) => repo.updateCountry(id, data),
     };
   }
 
@@ -96,43 +86,17 @@ export class PartnerService {
     return this.archiveOption(this.typeOps, id, userId);
   }
 
-  // ─── Partner Country ───────────────────────────────────────────────────────
-
-  createCountry(userId: number, dto: CreatePartnerOptionDto) {
-    return this.createOption(this.countryOps, userId, dto);
-  }
-  getAllCountries(params: PartnerOptionQueryDto) {
-    return this.getAllOptions(this.countryOps, params);
-  }
-  getActiveCountries() {
-    return this.getActiveOptions(this.countryOps);
-  }
-  getCountryById(id: number) {
-    return this.getOptionById(this.countryOps, id);
-  }
-  updateCountry(id: number, userId: number, dto: UpdatePartnerOptionDto) {
-    return this.updateOption(this.countryOps, id, userId, dto);
-  }
-  archiveCountry(id: number, userId: number) {
-    return this.archiveOption(this.countryOps, id, userId);
-  }
-
   // ─── Partner Request ───────────────────────────────────────────────────────
 
   async createRequest(
     dto: CreatePartnerRequestDto,
   ): Promise<PartnerRequestResponseDto> {
-    //* ONLY ACTIVE OPTIONS ARE SELECTABLE — AN INACTIVE/ARCHIVED ID FROM A
-    //* STALE FORM IS REJECTED RATHER THAN SILENTLY ACCEPTED.
-    const [type, country] = await Promise.all([
-      this.partnerRepository.findTypeById(dto.partnerTypeId),
-      this.partnerRepository.findCountryById(dto.partnerCountryId),
-    ]);
+    //* ONLY ACTIVE TYPES ARE SELECTABLE — AN INACTIVE/ARCHIVED ID FROM A
+    //* STALE FORM IS REJECTED RATHER THAN SILENTLY ACCEPTED. countryCode IS
+    //* ALREADY CHECKED AGAINST THE STATIC LIST BY THE DTO.
+    const type = await this.partnerRepository.findTypeById(dto.partnerTypeId);
     if (type?.status !== PartnerOptionStatus.ACTIVE) {
       throw new BadRequestException('Please select a valid partner type');
-    }
-    if (country?.status !== PartnerOptionStatus.ACTIVE) {
-      throw new BadRequestException('Please select a valid country');
     }
 
     const created = await this.partnerRepository.createRequest({
@@ -185,6 +149,14 @@ export class PartnerService {
       PartnerRequestStatus.ARCHIVED,
     );
     return new PartnerRequestResponseDto(updated);
+  }
+
+  //* HARD DELETE — PERMANENTLY REMOVES THE ROW, ARCHIVED OR NOT. RETURNS THE
+  //* DELETED REQUEST SO THE CALLER CAN SHOW WHAT WAS REMOVED.
+  async deleteRequest(id: number): Promise<PartnerRequestResponseDto> {
+    await this.getRequestById(id); //* 404 IF IT DOESN'T EXIST
+    const deleted = await this.partnerRepository.deleteRequest(id);
+    return new PartnerRequestResponseDto(deleted);
   }
 
   private async assertRequestNotArchived(id: number) {
@@ -288,7 +260,7 @@ export class PartnerService {
   }
 
   //* SOFT DELETE — ROWS ARE NEVER HARD-DELETED BECAUSE PartnerRequest HOLDS A
-  //* RESTRICT FK TO THEM AND OLD REQUESTS MUST KEEP SHOWING THEIR TYPE/COUNTRY.
+  //* RESTRICT FK TO THEM AND OLD REQUESTS MUST KEEP SHOWING THEIR TYPE.
   private async archiveOption(
     ops: OptionOps,
     id: number,

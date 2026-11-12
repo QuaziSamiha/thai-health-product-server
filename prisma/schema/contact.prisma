@@ -1,0 +1,48 @@
+//* ============= CONTACT DOMAIN =============
+//* "CONTACT US" PAGE: ONE ADMIN-EDITED INFO BLOCK (HOTLINE, LINE ID, EMAIL,
+//* HEADING, DESCRIPTION) PLUS MESSAGES SUBMITTED FROM THE PUBLIC FORM.
+//* ANONYMOUS VISITORS CAN SUBMIT, SO MESSAGES HAVE NO User RELATION.
+
+//* SINGLETON — THE SERVICE ALWAYS READS / UPSERTS THE ROW WITH id = 1
+model ContactInfo {
+  id Int @id @default(1)
+
+  hotline     String  @db.VarChar(50)
+  lineId      String? @map("line_id") @db.VarChar(100)
+  email       String  @db.VarChar(255)
+  heading     String  @db.VarChar(255)
+  description String  @db.Text
+
+  //* AUDIT TRAIL — ADMIN WHO CREATED / LAST UPDATED THE CONTACT INFO
+  createdBy     Int?  @map("created_by")
+  createdByUser User? @relation("ContactInfoCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedBy     Int?  @map("updated_by")
+  updatedByUser User? @relation("ContactInfoUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  //* TIMESTAMPS
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("contact_info")
+}
+
+model ContactMessage {
+  id  Int    @id @default(autoincrement())
+  sid String @unique @default(uuid()) @db.Uuid
+
+  //* FORM FIELDS
+  name    String  @db.VarChar(150)
+  email   String  @db.VarChar(255)
+  phone   String? @db.VarChar(20)
+  message String  @db.Text
+
+  //* ADMIN WORKFLOW — FLIPPED TO true WHEN AN ADMIN OPENS THE MESSAGE
+  isRead Boolean @default(false) @map("is_read")
+
+  //* TIMESTAMPS
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([isRead, createdAt])
+  @@map("contact_messages")
+}

@@ -3,7 +3,7 @@
 //* BUTTON → MODAL FORM). ANONYMOUS VISITORS CAN SUBMIT, SO THERE IS NO User
 //* RELATION. ADMINS REVIEW THE LIST AND MOVE EACH ROW THROUGH `status`.
 
-//* SHARED STATUS FOR THE ADMIN-MANAGED DROPDOWN TABLES (PartnerType, PartnerCountry)
+//* STATUS FOR THE ADMIN-MANAGED DROPDOWN TABLE (PartnerType)
 enum PartnerOptionStatus {
   ACTIVE //* SHOWN ON THE PUBLIC FORM
   INACTIVE //* HIDDEN FROM THE FORM, STILL LISTED IN ADMIN
@@ -35,31 +35,6 @@ model PartnerType {
   @@map("partner_types")
 }
 
-//* COUNTRY OPTIONS SHOWN IN THE FORM'S "COUNTRY" DROPDOWN — MANAGED BY
-//* ADMIN. ONLY ACTIVE ROWS ARE SHOWN ON THE PUBLIC FORM.
-model PartnerCountry {
-  id  Int    @id @default(autoincrement())
-  sid String @unique @default(uuid()) @db.Uuid
-
-  name   String              @unique @db.VarChar(100) //* E.G. "Thailand"
-  status PartnerOptionStatus @default(ACTIVE)
-
-  partnerRequests PartnerRequest[]
-
-  //* AUDIT TRAIL — ADMIN WHO CREATED / LAST UPDATED THIS COUNTRY
-  createdBy     Int?  @map("created_by")
-  createdByUser User? @relation("PartnerCountryCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
-  updatedBy     Int?  @map("updated_by")
-  updatedByUser User? @relation("PartnerCountryUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
-
-  //* TIMESTAMPS
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
-
-  @@index([status])
-  @@map("partner_countries")
-}
-
 enum PartnerRequestStatus {
   PENDING //* JUST SUBMITTED, NOT YET LOOKED AT
   CONTACTED //* ADMIN HAS REACHED OUT
@@ -77,12 +52,13 @@ model PartnerRequest {
   companyName String  @map("company_name") @db.VarChar(200)
   message     String? @db.Text
 
+  //* ISO 3166-1 ALPHA-2 CODE, E.G. "TH". COUNTRIES ARE STATIC DATA
+  //* (src/common/geography/countries.ts), NOT A TABLE — VALIDATED IN THE DTO.
+  countryCode String @map("country_code") @db.VarChar(2)
+
   //* RELATIONS
   partnerTypeId Int         @map("partner_type_id")
   partnerType   PartnerType @relation(fields: [partnerTypeId], references: [id], onDelete: Restrict) //* CAN'T DELETE A TYPE THAT HAS REQUESTS — DEACTIVATE IT INSTEAD
-
-  partnerCountryId Int            @map("partner_country_id")
-  partnerCountry   PartnerCountry @relation(fields: [partnerCountryId], references: [id], onDelete: Restrict) //* SAME RULE — SET INACTIVE INSTEAD OF DELETING
 
   //* ADMIN WORKFLOW
   status PartnerRequestStatus @default(PENDING)
@@ -93,6 +69,6 @@ model PartnerRequest {
 
   @@index([status, createdAt])
   @@index([partnerTypeId])
-  @@index([partnerCountryId])
+  @@index([countryCode])
   @@map("partner_requests")
 }

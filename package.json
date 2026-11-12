@@ -78,6 +78,7 @@
     "google-auth-library": "^10.9.1",
     "handlebars": "^4.7.9",
     "jsonwebtoken": "^9.0.3",
+    "libphonenumber-js": "1.12.41",
     "nest-winston": "^1.10.2",
     "nodemailer": "^8.0.5",
     "passport": "^0.7.0",
